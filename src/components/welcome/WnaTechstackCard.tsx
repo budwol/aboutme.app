@@ -5,14 +5,38 @@ import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { appLayoutConstants } from "@constants/layoutConstants";
 
+type WnaTechStackGroup = {
+  key: string;
+  title: string;
+  stack: string[];
+};
+
+type WnaTechStackCardProps = Pick<
+  WnaWelcomeProps,
+  "appColors" | "appData" | "appStyle" | "t"
+> & {
+  groups?: WnaTechStackGroup[];
+};
+
 export default function WnaTechStackCard({
   appColors,
   appData,
   appStyle,
   t,
-}: WnaWelcomeProps) {
-  const primaryStack = appData?.techStack?.primary ?? [];
-  const secondaryStack = appData?.techStack?.secondary ?? [];
+  groups,
+}: WnaTechStackCardProps) {
+  const resolvedGroups = groups ?? [
+    {
+      key: "primary",
+      title: t(i18nKeys.titleTechstackPrimary),
+      stack: appData?.techStack?.primary ?? [],
+    },
+    {
+      key: "secondary",
+      title: t(i18nKeys.titleTechStackSecondary),
+      stack: appData?.techStack?.secondary ?? [],
+    },
+  ];
 
   const renderTechGroup = (stack: string[], groupKey: string) => (
     <View
@@ -71,13 +95,9 @@ export default function WnaTechStackCard({
         flexWrap: "wrap",
       }}
     >
-      {renderCard(t(i18nKeys.titleTechstackPrimary), primaryStack, "primary")}
-
-      {renderCard(
-        t(i18nKeys.titleTechStackSecondary),
-        secondaryStack,
-        "secondary",
-      )}
+      {resolvedGroups
+        .filter((group) => group.stack.length > 0)
+        .map((group) => renderCard(group.title, group.stack, group.key))}
     </View>
   );
 }

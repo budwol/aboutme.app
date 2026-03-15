@@ -3,11 +3,11 @@ import WnaListCardWhiteDecent from "@/components/cards/WnaListCardWhiteDecent";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
-import { seoCatalog } from "@constants/seoCatalog";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import WnaScrollViewScreen from "./WnaScrollViewScreen";
+import { i18nKeys } from "@services/i18n/i18nKeys";
 
 export default function WnaExperienceRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
@@ -20,7 +20,7 @@ export default function WnaExperienceRoute(): ReactNode {
     <WnaScrollViewScreen
       isRootPage
       showFooter={false}
-      seoEntry={seoCatalog.experience}
+      headerTitle={t(i18nKeys.screenTitleExperience)}
       headerButton0={
         <WnaNavigationHeaderButtonRight
           appStyle={appStyle}

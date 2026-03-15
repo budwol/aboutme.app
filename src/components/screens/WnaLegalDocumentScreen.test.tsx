@@ -69,7 +69,7 @@ describe("WnaLegalDocumentScreen", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaLegalDocumentScreen
-          seoEntry={{ title: "Legal" } as never}
+          headerTitle="Legal"
           htmlContent="<p>Legal</p>"
         />,
       );
@@ -78,5 +78,31 @@ describe("WnaLegalDocumentScreen", () => {
     expect(tree!.root.findByType("Redirect").props.href).toBe(
       "/(drawer)/(tabs-de)/menu",
     );
+  });
+
+  it("disables the shared contact footer for legal content pages", () => {
+    (useWnaAppLifecycle as jest.Mock).mockReturnValue({
+      isAppInitialized: true,
+    });
+    (useWnaLayout as jest.Mock).mockReturnValue({ currentWindowWidth: 800 });
+    (useWnaTheme as jest.Mock).mockReturnValue({
+      appColors: { white: "#fff", coolgray2: "#999" },
+      appStyle: {},
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaLegalDocumentScreen
+          headerTitle="Legal"
+          htmlContent="<p>Legal</p>"
+        />,
+      );
+    });
+
+    expect(
+      tree!.root.findByType("WnaScrollViewScreen").props.showContactFooter,
+    ).toBe(false);
   });
 });

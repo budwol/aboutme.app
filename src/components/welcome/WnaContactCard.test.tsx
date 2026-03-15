@@ -1,11 +1,15 @@
-import { DEFAULT_APP_DATA } from "@/app-data";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { defaultAppData } from "@/app-data";
 import WnaContactCard from "@components/welcome/WnaContactCard";
 import { Linking } from "react-native";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 jest.mock("react-i18next", () => ({
+  initReactI18next: {
+    type: "3rdParty",
+    init: () => {},
+  },
   useTranslation: () => ({
     t: (value: string) => value,
   }),
@@ -14,9 +18,9 @@ jest.mock("react-i18next", () => ({
 jest.mock("wna-logger", () => ({
   __esModule: true,
   default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
+    error: () => {},
+    info: () => {},
+    warn: () => {},
   },
 }));
 
@@ -41,9 +45,9 @@ describe("WnaContactCard", () => {
 
   it("opens the social, phone and email URLs via Linking", async () => {
     const appData = {
-      ...DEFAULT_APP_DATA,
+      ...defaultAppData,
       contact: {
-        ...DEFAULT_APP_DATA.contact,
+        ...defaultAppData.contact,
         github: "https://github.com/example",
         linkedin: "https://linkedin.com/in/example",
         xing: "https://xing.com/profile/example",

@@ -1,9 +1,7 @@
 import { cleanAndTruncate } from "@/utils/stringHelper";
 import { AppLayout } from "@constants/layoutConstants";
-import { SeoEntry } from "@constants/seoCatalog";
 import AppStyle from "@services/wnaStyleService";
 import Colors from "@constants/theme/colors";
-import { isLangGerman } from "@services/i18n/i18n";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { StyleSheet, Text, View } from "react-native";
 import WnaPressable from "../buttons/WnaPressable";
@@ -15,14 +13,12 @@ export default function WnaMultilineHeader(
   appLayout: AppLayout,
   isTabRoot: boolean,
   isLandscape: boolean,
-  seoEntry?: SeoEntry,
+  headerTitle?: string,
   onPress: () => void = () => {},
 ) {
-  if (!seoEntry) return null;
+  if (!headerTitle) return null;
 
-  const title = isLangGerman()
-    ? seoEntry.headerTitle.de
-    : seoEntry.headerTitle.en;
+  const title = headerTitle;
   const maxLength = 4096;
   let mainTitle = "";
   let subTitle = "";
@@ -102,7 +98,7 @@ export default function WnaMultilineHeader(
                   justifyContent: "center",
                   alignItems: "center",
                   padding: 8,
-                  paddingLeft: 16,
+                  paddingLeft: showLogo ? 16 : 8,
                 }}
               >
                 <Text
