@@ -9,7 +9,7 @@ import { WnaFooter } from "@components/screens/WnaFooter";
 import { WnaHeader } from "@components/screens/WnaHeader";
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
 import { animationSpeed } from "@constants/animationSpeed";
-import { SeoEntry } from "@constants/seoCatalog";
+import { Href } from "expo-router";
 import { FC, ReactNode, memo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
@@ -30,7 +30,9 @@ export type WnaBaseScreenProps = {
   onCancel?: () => void;
   preventBack?: boolean;
   askBeforeBack?: boolean;
-  seoEntry: SeoEntry;
+  backHref?: Href;
+  titleHref?: Href;
+  headerTitle?: string;
   icon?: string;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
@@ -39,11 +41,14 @@ export type WnaBaseScreenProps = {
   scrollY?: SharedValue<number>;
   showHeaderShadow?: boolean;
   showAppStoreButtons?: boolean;
+  onTitlePress?: () => void;
 };
 
 type WnaBaseScreenChromeProps = Pick<
   WnaBaseScreenProps,
   | "askBeforeBack"
+  | "backHref"
+  | "titleHref"
   | "headerButton0"
   | "headerButton1"
   | "headerButton2"
@@ -51,11 +56,13 @@ type WnaBaseScreenChromeProps = Pick<
   | "isRootPage"
   | "preventBack"
   | "scrollY"
-  | "seoEntry"
+  | "headerTitle"
   | "showAppStoreButtons"
   | "showHeaderShadow"
+  | "onTitlePress"
 > & {
   appColors: ReturnType<typeof useWnaTheme>["appColors"];
+  appStyle: ReturnType<typeof useWnaTheme>["appStyle"];
   isLandscape: boolean;
   t: ReturnType<typeof useTranslation>["t"];
 };
@@ -70,7 +77,11 @@ type WnaBusyOverlayProps = {
 const WnaBaseScreenChrome = memo(
   ({
     appColors,
+    appStyle,
     askBeforeBack,
+    backHref,
+    titleHref,
+    headerTitle,
     headerButton0,
     headerButton1,
     headerButton2,
@@ -79,29 +90,33 @@ const WnaBaseScreenChrome = memo(
     isRootPage,
     preventBack,
     scrollY,
-    seoEntry,
     showAppStoreButtons,
     showHeaderShadow,
+    onTitlePress,
     t,
   }: WnaBaseScreenChromeProps) => {
     return (
       <>
         <WnaHeader
-          seoEntry={seoEntry}
+          headerTitle={headerTitle}
           icon={icon}
           preventBack={preventBack}
           askBeforeBack={askBeforeBack}
+          backHref={backHref}
+          titleHref={titleHref}
           isRootPage={isRootPage}
           scrollY={scrollY}
           headerButton0={headerButton0}
           headerButton1={headerButton1}
           headerButton2={headerButton2}
           showShadow={showHeaderShadow}
+          onTitlePress={onTitlePress}
         />
 
         <WnaFooter
           t={t}
           appColors={appColors}
+          appStyle={appStyle}
           isLandscape={isLandscape}
           isInternetReachable
           showAppStoreButtons={showAppStoreButtons}
@@ -171,7 +186,9 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   backgroundImageUrl,
   preventBack,
   askBeforeBack,
-  seoEntry,
+  backHref,
+  titleHref,
+  headerTitle,
   icon,
   headerButton0,
   headerButton1,
@@ -180,6 +197,7 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   scrollY,
   showHeaderShadow,
   showAppStoreButtons,
+  onTitlePress,
 }) => {
   const { t } = useTranslation(["common"]);
   const { isAppInitialized } = useWnaAppLifecycle();
@@ -189,17 +207,22 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   if (!isAppInitialized) return null;
 
   return (
-    <WnaWebBaseScreen seoEntry={seoEntry}>
+    <WnaWebBaseScreen title={headerTitle}>
       <WnaImageBackground
         imageUri={backgroundImageUrl ?? appLayout.backgroundImageUrl}
         appColors={appColors}
+        isDarkMode={appColors.isDark}
       >
         <View style={styles.container}>
           <View style={styles.content}>{children}</View>
 
           <WnaBaseScreenChrome
             appColors={appColors}
+            appStyle={appStyle}
             askBeforeBack={askBeforeBack}
+            backHref={backHref}
+            titleHref={titleHref}
+            headerTitle={headerTitle}
             headerButton0={headerButton0}
             headerButton1={headerButton1}
             headerButton2={headerButton2}
@@ -208,9 +231,9 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
             isRootPage={isRootPage}
             preventBack={preventBack}
             scrollY={scrollY}
-            seoEntry={seoEntry}
             showAppStoreButtons={showAppStoreButtons}
             showHeaderShadow={showHeaderShadow}
+            onTitlePress={onTitlePress}
             t={t}
           />
 

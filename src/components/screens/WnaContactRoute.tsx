@@ -11,7 +11,6 @@ import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigation
 import WnaSeparatorHorizontal from "@components/misc/WnaSeparatorHorizontal";
 import WnaWelcomeTitle from "@components/text/WnaWelcomeTitle";
 import WnaContactCard from "@components/welcome/WnaContactCard";
-import { seoCatalog } from "@constants/seoCatalog";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode, useMemo } from "react";
@@ -44,9 +43,10 @@ export default function WnaContactRoute(): ReactNode {
   return (
     <WnaScrollViewScreen
       isRootPage
-      seoEntry={seoCatalog.contact}
+      headerTitle={t(i18nKeys.screenTitleContact)}
       iconName={"email"}
       showFooter={false}
+      showContactFooter={false}
       headerButton0={
         <WnaNavigationHeaderButtonRight
           appStyle={appStyle}
@@ -70,14 +70,14 @@ export default function WnaContactRoute(): ReactNode {
           <WnaHeroImage
             appColors={appColors}
             imageUrl={heroImageUrl}
-            imageTitle={t(i18nKeys.screenTitleStartPage)}
+            imageTitle={t(i18nKeys.screenTitleContact)}
           />
 
           <WnaWelcomeTitle
             appColors={appColors}
             appStyle={appStyle}
             title={t(i18nKeys.screenTitleContact)}
-            subtitle={"Fragen und Anregungen".toUpperCase()}
+            subtitle={t(i18nKeys.contactSubtitle).toUpperCase()}
           />
 
           <WnaSeparatorHorizontal transparent={true} space={8} />

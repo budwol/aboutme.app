@@ -2,22 +2,26 @@ import {
   WnaBaseCardProps,
   WnaVerticalTextCardContent,
 } from "@components/cards/wnaCardTypes";
+import WnaBadge from "@components/misc/WnaBadge";
 import WnaVerticalCardTextContent from "@components/cards/WnaVerticalCardTextContent";
 import { createVerticalCardContainerStyle } from "@components/cards/wnaVerticalCardStyles";
 import { FC, memo } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 export interface IWnaCardSmallVerticalProps
   extends WnaBaseCardProps, WnaVerticalTextCardContent {
   description: string;
+  badgeText?: string;
   width?: number;
   opacity?: number;
 }
 
 const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
   appColors,
+  appStyle,
   title,
   subtitle,
   description,
+  badgeText,
   opacity,
 }) => (
   <View
@@ -27,12 +31,42 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
       gap: 6,
     }}
   >
-    <WnaVerticalCardTextContent
-      appColors={appColors}
-      title={title}
-      subtitle={subtitle}
-      description={description}
-    />
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 8,
+      }}
+    >
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <WnaVerticalCardTextContent
+          appColors={appColors}
+          appStyle={appStyle}
+          title={title}
+          subtitle={subtitle}
+        />
+      </View>
+
+      {badgeText ? (
+        <WnaBadge
+          appColors={appColors}
+          appStyle={appStyle}
+          text={badgeText}
+          style={{
+            paddingHorizontal: 4,
+            paddingVertical: 2,
+            borderRadius: 3,
+            minHeight: 18,
+          }}
+          textStyle={{ lineHeight: appStyle.textMicro.lineHeight }}
+        />
+      ) : null}
+    </View>
+
+    {!!description ? (
+      <Text style={appStyle.textNeutralMicro}>{description}</Text>
+    ) : null}
   </View>
 );
 
@@ -43,6 +77,7 @@ const WnaCardSmallVertical = memo(
     prevProps.title === nextProps.title &&
     prevProps.subtitle === nextProps.subtitle &&
     prevProps.description === nextProps.description &&
+    prevProps.badgeText === nextProps.badgeText &&
     prevProps.width === nextProps.width,
 );
 

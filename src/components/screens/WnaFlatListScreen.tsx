@@ -6,7 +6,6 @@ import { getNavigationBaseUrl } from "@components/navigation/wnaNavigationRouteP
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import WnaShareCard from "@components/welcome/WnaShareCard";
-import { SeoEntry } from "@constants/seoCatalog";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { cleanAndTruncate } from "@utils/stringHelper";
 import Animated from "react-native-reanimated";
@@ -37,7 +36,7 @@ export type WnaFlatListScreenProps<
   T extends KeyExtractorItem = KeyExtractorItem,
 > = {
   isBusy?: boolean;
-  seoEntry: SeoEntry;
+  headerTitle?: string;
   icon?: keyof typeof iconMap;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
@@ -137,7 +136,7 @@ const WnaFlatListScreen = <T extends KeyExtractorItem>(
   return (
     <WnaBaseScreen
       isRootPage={props.isRootPage}
-      seoEntry={props.seoEntry}
+      headerTitle={props.headerTitle}
       scrollY={scrollY}
       headerButton0={props.headerButton0}
       headerButton1={props.headerButton1}

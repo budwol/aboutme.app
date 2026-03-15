@@ -21,14 +21,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   text: {
-    fontSize: 15,
     fontWeight: "500",
     marginHorizontal: 8,
     alignSelf: "center",
     letterSpacing: 0.5,
   },
   fallbackText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "500",
   },
 });
