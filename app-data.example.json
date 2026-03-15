@@ -1,0 +1,76 @@
+{
+  "siteUrl": "https://my.portfolio.org",
+  "profile": {
+    "name": "John Doe",
+    "title": "Software Engineer",
+    "avatar": "default_avatar.webp",
+    "description": [
+      "Hi, I'm John Doe.",
+      "I can write code.",
+      "I'm a coolest monkey in town."
+    ]
+  },
+  "techStack": {
+    "primary": ["PHP", "Basic"],
+    "secondary": ["Perl", "Java"]
+  },
+  "projectsSubtitle": "Some private side projects",
+  "projects": [
+    {
+      "title": "Pizza App",
+      "subtitle": "Android / iOS / Web-App",
+      "tech": "Flutter",
+      "imageL": "app1_1024.webp",
+      "imageM": "app1_300.webp",
+      "imageS": "app1_300.webp"
+    },
+    {
+      "title": "API",
+      "subtitle": "ContainerApp",
+      "tech": "C# / ASP / .NET 9",
+      "imageL": "api_1024.webp",
+      "imageM": "api_300.webp",
+      "imageS": "api_300.webp"
+    },
+    {
+      "title": "E-Commerce Platform",
+      "subtitle": "Code Snippet Store",
+      "tech": "Python / React",
+      "imageL": "concept_1024.webp",
+      "imageM": "concept_300.webp",
+      "imageS": "concept_300.webp"
+    }
+  ],
+  "experienceSubtitle": "My career path",
+  "experience": [
+    {
+      "period": "since 2020",
+      "role": "Software Developer",
+      "company": "Cool Company Ltd.",
+      "description": "Code monkey suff"
+    },
+    {
+      "period": "2015 - 2020",
+      "role": "Software Developer",
+      "company": "Rocket Science Ltd.",
+      "description": "Code monkey suff"
+    },
+    {
+      "period": "2010 - 2015",
+      "role": "Software Developer",
+      "company": "Code Fabric Ltd.",
+      "description": "Code monkey suff"
+    }
+  ],
+  "contact": {
+    "phone": "+491631737743",
+    "email": "tough.camel.mcew@hidingmail.com",
+    "addressCountry": "Deutschland",
+    "addressStreet": "Straße 1",
+    "addressZipCode": "01234",
+    "addressCity": "Berlin",
+    "github": "https://github.com/JohnDoe",
+    "xing": "https://xing.com/JohnDoe",
+    "linkedin": "https://linkedin.com/JohnDoe"
+  }
+}
