@@ -25,6 +25,7 @@ i18n.use(initReactI18next).init({
   compatibilityJSON: "v4",
   lng: getLangCode(),
   defaultNS: "translation",
+  showSupportNotice: false,
   interpolation: {
     escapeValue: false,
   },

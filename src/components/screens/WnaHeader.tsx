@@ -2,8 +2,7 @@ import { WnaShadowStyle } from "@components/misc/WnaShadowStyle";
 import { getNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
 import { animationSpeed } from "@constants/animationSpeed";
-import { SeoEntry } from "@constants/seoCatalog";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback, useEffect } from "react";
 import { useColorScheme, View, ViewStyle } from "react-native";
 import Animated, {
@@ -25,29 +24,35 @@ import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 
 export type WnaHeaderProps = {
-  seoEntry: SeoEntry;
+  headerTitle?: string;
   icon?: string;
   isRootPage?: boolean;
   isBusy?: boolean;
   askBeforeBack?: boolean;
+  backHref?: Href;
+  titleHref?: Href;
   preventBack?: boolean;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
   headerButton2?: ReactNode;
   scrollY?: SharedValue<number>;
   showShadow?: boolean;
+  onTitlePress?: () => void;
 };
 
 export const WnaHeader: FC<WnaHeaderProps> = memo(
   ({
-    seoEntry,
+    headerTitle,
     isRootPage = false,
     isBusy = false,
+    backHref,
+    titleHref,
     headerButton0,
     headerButton1,
     headerButton2,
     scrollY,
     showShadow,
+    onTitlePress,
   }) => {
     const router = useRouter();
     const { appColors, appStyle, setAppColors, theme, setTheme } =
@@ -114,12 +119,33 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const handleBack = useCallback(() => {
       if (isBusy) return;
 
+      if (backHref) {
+        router.replace(backHref);
+        return;
+      }
+
       if (router.canGoBack()) {
         router.back();
       } else {
         router.navigate(getNavigationPath("root"));
       }
-    }, [router, isBusy]);
+    }, [backHref, router, isBusy]);
+
+    const handleTitlePress = useCallback(() => {
+      if (isBusy) return;
+
+      if (onTitlePress) {
+        onTitlePress();
+        return;
+      }
+
+      if (titleHref) {
+        router.replace(titleHref);
+        return;
+      }
+
+      handleBack();
+    }, [handleBack, isBusy, onTitlePress, router, titleHref]);
 
     const toggleTheme = async () => {
       const currentVal = (await getThemeFromStorageAsync()) ?? theme;
@@ -134,7 +160,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       await setThemeToStorageAsync(nextVal);
     };
 
-    const backButtonVisible = !isRootPage && router.canGoBack();
+    const backButtonVisible =
+      !isRootPage && (Boolean(backHref) || router.canGoBack());
 
     const headerStyle: ViewStyle = {
       position: "absolute",
@@ -220,8 +247,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
                 appLayout,
                 isRootPage,
                 isLandscape,
-                seoEntry,
-                handleBack,
+                headerTitle,
+                handleTitlePress,
               )}
             </View>
 

@@ -19,13 +19,18 @@ export default interface AppStyle {
   tabBarStyle: ViewStyle;
   buttonWithText: ViewStyle;
   separator: ViewStyle;
+  textExtraLarge: TextStyle;
+  textLarge: TextStyle;
+  textMedium: TextStyle;
+  textSmall: TextStyle;
+  textMicro: TextStyle;
+  textNeutralExtraLarge: TextStyle;
+  textNeutralLarge: TextStyle;
+  textNeutralMedium: TextStyle;
+  textNeutralSmall: TextStyle;
+  textNeutralMicro: TextStyle;
   textTitleLarge: TextStyle;
   textNeutralTitleLarge: TextStyle;
-  textSmall: TextStyle;
-  textMedium: TextStyle;
-  textNeutralSmall: TextStyle;
-  textNeutralMedium: TextStyle;
-  textNeutralLarge: TextStyle;
   textNeutralSubtitle: TextStyle;
   textInput: TextStyle;
   separatorHorizontal: object;
@@ -132,6 +137,86 @@ const setAppStyle = (colors: Colors) => {
 
     // TEXT
 
+    textExtraLarge: {
+      fontSize: 24,
+      lineHeight: 30,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "600",
+      color: colors.black,
+    },
+
+    textLarge: {
+      fontSize: 18,
+      lineHeight: 24,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "600",
+      color: colors.black,
+    },
+
+    textMedium: {
+      fontSize: 16,
+      lineHeight: 22,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "600",
+      color: colors.black,
+    },
+
+    textSmall: {
+      fontSize: 14,
+      lineHeight: 18,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "600",
+      color: colors.black,
+    },
+
+    textMicro: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "500",
+      color: colors.black,
+    },
+
+    textNeutralExtraLarge: {
+      fontSize: 24,
+      lineHeight: 30,
+      fontFamily: FontFamilies.UI,
+      fontWeight: "500",
+      color: colors.black,
+    },
+
+    textNeutralLarge: {
+      fontSize: 18,
+      fontWeight: "500",
+      lineHeight: 24,
+      fontFamily: FontFamilies.UI,
+      color: colors.black,
+    },
+
+    textNeutralMedium: {
+      fontSize: 15,
+      fontWeight: "400",
+      lineHeight: 22,
+      fontFamily: FontFamilies.UI,
+      color: colors.coolgray8,
+    },
+
+    textNeutralSmall: {
+      fontSize: 14,
+      fontWeight: "500",
+      lineHeight: 18,
+      fontFamily: FontFamilies.UI,
+      color: colors.coolgray6,
+    },
+
+    textNeutralMicro: {
+      fontSize: 12,
+      fontWeight: "400",
+      lineHeight: 18,
+      fontFamily: FontFamilies.UI,
+      color: colors.coolgray6,
+    },
+
     textTitleLarge: {
       fontSize: 18,
       fontFamily: FontFamilies.UI,
@@ -146,44 +231,6 @@ const setAppStyle = (colors: Colors) => {
       fontFamily: FontFamilies.UI,
       color: colors.black,
       letterSpacing: 1.4,
-    },
-
-    textSmall: {
-      fontSize: 16,
-      fontFamily: FontFamilies.UI,
-      fontWeight: "bold",
-      color: colors.black,
-    },
-
-    textMedium: {
-      fontSize: 17,
-      fontFamily: FontFamilies.UI,
-      fontWeight: "bold",
-      color: colors.black,
-    },
-
-    textNeutralSmall: {
-      fontSize: 14,
-      fontWeight: "500",
-      lineHeight: 18,
-      fontFamily: FontFamilies.UI,
-      color: colors.coolgray6,
-    },
-
-    textNeutralMedium: {
-      fontSize: 15,
-      fontWeight: "400",
-      lineHeight: 22,
-      fontFamily: FontFamilies.UI,
-      color: colors.coolgray8,
-    },
-
-    textNeutralLarge: {
-      fontSize: 18,
-      fontWeight: "500",
-      lineHeight: 24,
-      fontFamily: FontFamilies.UI,
-      color: colors.black,
     },
 
     textNeutralSubtitle: {

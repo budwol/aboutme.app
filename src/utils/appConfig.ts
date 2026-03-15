@@ -1,7 +1,7 @@
-import { DEFAULT_APP_DATA } from "@/app-data";
+import { defaultAppData } from "@/app-data";
 
-type AppDataJson = Partial<typeof DEFAULT_APP_DATA> & {
-  profile?: Partial<typeof DEFAULT_APP_DATA.profile>;
+type AppDataJson = Partial<typeof defaultAppData> & {
+  profile?: Partial<typeof defaultAppData.profile>;
 };
 
 function readAppDataJson(): AppDataJson {
@@ -27,7 +27,7 @@ export function normalizeSiteUrl(value?: unknown): string {
   const normalized = typeof value === "string" ? value.trim() : "";
 
   if (!normalized) {
-    return DEFAULT_APP_DATA.siteUrl;
+    return defaultAppData.siteUrl;
   }
 
   return normalized.replace(/\/+$/, "");
@@ -35,12 +35,23 @@ export function normalizeSiteUrl(value?: unknown): string {
 
 export function getConfiguredSiteUrl(): string {
   const appData = readAppDataJson();
+  const appDataSiteUrl =
+    typeof appData.siteUrl === "string" ? appData.siteUrl.trim() : "";
+  const publicSiteUrl =
+    typeof process.env.EXPO_PUBLIC_SITE_URL === "string"
+      ? process.env.EXPO_PUBLIC_SITE_URL.trim()
+      : "";
+  const baseUrl =
+    typeof process.env.BASE_URL === "string" ? process.env.BASE_URL.trim() : "";
+
+  if (!appDataSiteUrl && !publicSiteUrl && !baseUrl) {
+    throw new Error(
+      "Missing site URL configuration. Set app-data.json siteUrl, EXPO_PUBLIC_SITE_URL, or BASE_URL.",
+    );
+  }
 
   return normalizeSiteUrl(
-    appData.siteUrl ??
-      process.env.EXPO_PUBLIC_SITE_URL ??
-      process.env.BASE_URL ??
-      DEFAULT_APP_DATA.siteUrl,
+    appDataSiteUrl || publicSiteUrl || baseUrl || defaultAppData.siteUrl,
   );
 }
 
@@ -53,5 +64,5 @@ export function getConfiguredProfileName(): string {
   const envAppName =
     typeof process.env.APP_NAME === "string" ? process.env.APP_NAME.trim() : "";
 
-  return appDataProfileName || envAppName || DEFAULT_APP_DATA.profile.name;
+  return appDataProfileName || envAppName || defaultAppData.profile.name;
 }

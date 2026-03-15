@@ -1,4 +1,4 @@
-import { AppData, DEFAULT_APP_DATA } from "@/app-data";
+import { AppData, defaultAppData } from "@/app-data";
 import { AppLayout, getAppLayout } from "@constants/layoutConstants";
 import { CurrentColors } from "@constants/currentColors";
 import Colors from "@constants/theme/colors";
@@ -97,7 +97,7 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
 
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isStatusBarVisible, setIsStatusBarVisible] = useState(true);
-  const [appData, setAppData] = useState<AppData>(DEFAULT_APP_DATA);
+  const [appData, setAppData] = useState<AppData>(defaultAppData);
   const [theme, setTheme] = useState<Theme>("system");
   const [appColors, setAppColors] = useState<Colors>(initialColors);
 

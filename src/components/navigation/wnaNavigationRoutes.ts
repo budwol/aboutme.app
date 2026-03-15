@@ -1,4 +1,5 @@
 import { getConfiguredSiteUrl, normalizeSiteUrl } from "@utils/appConfig";
+import { getProjectPathSegment } from "@utils/projectRoutes";
 import { Href, Router } from "expo-router";
 import { getLangCode } from "@services/i18n/i18n";
 
@@ -80,6 +81,27 @@ export function getAbsoluteNavigationPath(
   lang = getNavigationLang(),
 ): Href {
   return `${currentBaseUrl}${getNavigationPath(key, lang)}` as Href;
+}
+
+export function getProjectNavigationPath(
+  slug: string,
+  lang = getNavigationLang(),
+): Href {
+  return `/${getProjectPathSegment(lang)}/${slug}` as Href;
+}
+
+export function getDrawerProjectNavigationPath(
+  slug: string,
+  lang = getNavigationLang(),
+): string {
+  return `/(drawer)/(tabs-${lang})/${getProjectPathSegment(lang)}/${slug}`;
+}
+
+export function getAbsoluteProjectNavigationPath(
+  slug: string,
+  lang = getNavigationLang(),
+): Href {
+  return `${currentBaseUrl}${getProjectNavigationPath(slug, lang)}` as Href;
 }
 
 export function navigateToRoot(router: Router) {

@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { View, StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import WnaText from "@components/text/WnaText";
 import WnaIcon from "../icon/WnaIcon/WnaIcon";
@@ -10,6 +10,7 @@ export type WnaBadgeProps = {
   appColors: Colors;
   appStyle: AppStyle;
   style?: ViewStyle;
+  textStyle?: TextStyle | TextStyle[];
   icon?: keyof typeof iconMap;
   text?: string;
 };
@@ -18,6 +19,7 @@ const WnaBadge = ({
   appColors,
   appStyle,
   style,
+  textStyle,
   icon,
   text,
 }: WnaBadgeProps) => {
@@ -40,7 +42,11 @@ const WnaBadge = ({
           appColors={appColors}
           appStyle={appStyle}
           fontColor={appColors.white}
-          style={styles.text}
+          style={
+            Array.isArray(textStyle)
+              ? [appStyle.textMicro, styles.text, ...textStyle]
+              : [appStyle.textMicro, styles.text, textStyle ?? {}]
+          }
           text={text}
         />
       )}
@@ -54,10 +60,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 4,
   },
   text: {
-    fontSize: 13,
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
 });
 

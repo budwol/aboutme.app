@@ -1,60 +1,193 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { DEFAULT_APP_DATA, loadAppData, normalizeAppData } from "@/app-data";
+import { defaultAppData, loadAppData, normalizeAppData } from "@/app-data";
 
 describe("normalizeAppData", () => {
   it("deep-merges nested objects instead of dropping defaults", () => {
-    const data = normalizeAppData({
-      profile: { name: "Jane Doe" },
-      contact: { email: "jane@example.com" },
-    });
+    const data = normalizeAppData(
+      {
+        profile: { name: "Jane Doe" },
+        contact: { email: "jane@example.com" },
+      },
+      "en",
+    );
 
     expect(data.profile.name).toBe("Jane Doe");
-    expect(data.profile.title).toBe(DEFAULT_APP_DATA.profile.title);
+    expect(data.profile.title).toBe(defaultAppData.profile.title);
     expect(data.contact.email).toBe("jane@example.com");
-    expect(data.contact.addressCity).toBe(DEFAULT_APP_DATA.contact.addressCity);
+    expect(data.contact.addressCity).toBe(defaultAppData.contact.addressCity);
   });
 
-  it("normalizes project and experience lists with defaults", () => {
-    const data = normalizeAppData({
-      siteUrl: "https://portfolio.example.com/",
-      projects: [{ title: "Custom Project", imageM: "hero.png" }],
-      experience: [{ role: "Engineer" }],
-    });
+  it("prefers localized profile content for the selected language", () => {
+    const dataDe = normalizeAppData(
+      {
+        profile: {
+          titleDe: "Softwareentwickler",
+          titleEn: "Software Engineer",
+          descriptionDe: "Deutsch",
+          descriptionEn: "English",
+        },
+      },
+      "de",
+    );
+    const dataEn = normalizeAppData(
+      {
+        profile: {
+          titleDe: "Softwareentwickler",
+          titleEn: "Software Engineer",
+          descriptionDe: "Deutsch",
+          descriptionEn: "English",
+        },
+      },
+      "en",
+    );
+
+    expect(dataDe.profile.title).toBe("Softwareentwickler");
+    expect(dataDe.profile.description).toBe("Deutsch");
+    expect(dataEn.profile.title).toBe("Software Engineer");
+    expect(dataEn.profile.description).toBe("English");
+  });
+
+  it("normalizes project and experience lists with localized defaults", () => {
+    const data = normalizeAppData(
+      {
+        siteUrl: "https://portfolio.example.com/",
+        projectsSubtitleDe: "Private Arbeit",
+        projectsSubtitleEn: "Private work",
+        projectsContextDe: "Deutscher Projekthinweis",
+        projectsContextEn: "English project note",
+        projectDetailsContextDe: "Deutscher Detailhinweis",
+        projectDetailsContextEn: "English detail note",
+        projects: [
+          {
+            titleDe: "Benutzerdefiniertes Projekt",
+            titleEn: "Custom Project",
+            contextDe: "Deutscher Projektkontext",
+            contextEn: "English project context",
+            descriptionDe: "Deutsche Beschreibung",
+            descriptionEn: "English description",
+            repoUrl: "https://github.com/example/custom-project",
+            webUrl: "https://app.example.com/custom-project",
+            playStoreUrl:
+              "https://play.google.com/store/apps/details?id=com.example.customproject",
+            techstack: ["TypeScript", "React Native"],
+            imageM: "hero.png",
+          },
+        ],
+        experienceSubtitleDe: "Karriereweg",
+        experienceSubtitleEn: "Career path",
+        experience: [
+          {
+            roleDe: "Ingenieur",
+            roleEn: "Engineer",
+            periodDe: "seit 05/2024",
+            periodEn: "since 05/2024",
+            descriptionDe: "Deutsch",
+            descriptionEn: "English",
+          },
+        ],
+      },
+      "en",
+    );
 
     expect(data.siteUrl).toBe("https://portfolio.example.com");
+    expect(data.projectsSubtitle).toBe("Private work");
+    expect(data.projectsContext).toBe("English project note");
+    expect(data.projectDetailsContext).toBe("English detail note");
     expect(data.projects[0]).toMatchObject({
       title: "Custom Project",
+      context: "English project context",
+      description: "English description",
+      repoUrl: "https://github.com/example/custom-project",
+      webUrl: "https://app.example.com/custom-project",
+      playStoreUrl:
+        "https://play.google.com/store/apps/details?id=com.example.customproject",
+      techstack: ["TypeScript", "React Native"],
       imageM: "hero.png",
-      imageL: DEFAULT_APP_DATA.projects[0].imageL,
+      imageL: defaultAppData.projects[0].imageL,
     });
+    expect(data.experienceSubtitle).toBe("Career path");
     expect(data.experience[0]).toMatchObject({
       role: "Engineer",
-      company: DEFAULT_APP_DATA.experience[0].company,
+      period: "since 05/2024",
+      description: "English",
+      company: defaultAppData.experience[0].company,
     });
+    expect(data.experience[0].duration).toMatch(/yr|yrs|mo|mos/);
   });
 
   it("falls back safely for invalid top-level and nested values", () => {
-    const data = normalizeAppData({
-      siteUrl: 1234,
-      backgroundImage: null,
-      accentColor: [],
-      profile: {
-        description: [null, "", "Focused builder"] as unknown as string[],
+    const data = normalizeAppData(
+      {
+        siteUrl: 1234,
+        backgroundImage: null,
+        accentColor: [],
+        profile: {
+          descriptionDe: [null, "", "Focused builder"] as unknown as string[],
+        },
+        techStack: {
+          primary: "typescript" as unknown as string[],
+        },
+        contact: {
+          github: {},
+        },
+        experience: [{ periodDe: "..." }],
       },
-      techStack: {
-        primary: "typescript" as unknown as string[],
-      },
-      contact: {
-        github: {},
-      },
-    });
+      "de",
+    );
 
-    expect(data.siteUrl).toBe(DEFAULT_APP_DATA.siteUrl);
-    expect(data.backgroundImage).toBe(DEFAULT_APP_DATA.backgroundImage);
-    expect(data.accentColor).toBe(DEFAULT_APP_DATA.accentColor);
-    expect(data.profile.description).toEqual(["Focused builder"]);
-    expect(data.techStack.primary).toEqual(DEFAULT_APP_DATA.techStack.primary);
-    expect(data.contact.github).toBe(DEFAULT_APP_DATA.contact.github);
+    expect(data.siteUrl).toBe(defaultAppData.siteUrl);
+    expect(data.backgroundImage).toBe(defaultAppData.backgroundImage);
+    expect(data.accentColor).toBe(defaultAppData.accentColor);
+    expect(data.profile.description).toBe("Focused builder");
+    expect(data.techStack.primary).toEqual(defaultAppData.techStack.primary);
+    expect(data.contact.github).toBe(defaultAppData.contact.github);
+    expect(data.experience[0].duration).toBe("...");
+  });
+
+  it("calculates experience duration from the localized period", () => {
+    const data = normalizeAppData(
+      {
+        experience: [
+          {
+            periodDe: "09/2020 - 04/2024",
+            periodEn: "09/2020 - 04/2024",
+          },
+          {
+            periodDe: "06/2020 – 08/2020",
+            periodEn: "06/2020 – 08/2020",
+          },
+          {
+            periodDe: "01/2019 – 01/2020",
+            periodEn: "01/2019 – 01/2020",
+          },
+        ],
+      },
+      "de",
+    );
+
+    expect(data.experience[0].duration).toBe("3 J. 8 Mon.");
+    expect(data.experience[1].duration).toBe("3 Mon.");
+    expect(data.experience[2].duration).toBe("1 J. 1 Mon.");
+  });
+
+  it("falls back from localized fields to legacy ones", () => {
+    const data = normalizeAppData(
+      {
+        profile: {
+          title: "Legacy Title",
+          description: ["Legacy Description"],
+        },
+        projects: [{ title: "Legacy Project", imageM: "hero.png" }],
+      },
+      "en",
+    );
+
+    expect(data.profile.title).toBe("Legacy Title");
+    expect(data.profile.description).toBe("Legacy Description");
+    expect(data.projects[0].title).toBe("Legacy Project");
+    expect(data.projects[0].techstack).toEqual(
+      defaultAppData.projects[0].techstack,
+    );
   });
 
   it("normalizes the default fallback when app-data loading fails", async () => {
@@ -64,8 +197,8 @@ describe("normalizeAppData", () => {
       throw new Error("missing");
     });
 
-    expect(data).toEqual(normalizeAppData(DEFAULT_APP_DATA));
-    expect(data).not.toBe(DEFAULT_APP_DATA);
+    expect(data).toEqual(normalizeAppData(defaultAppData));
+    expect(data).not.toBe(defaultAppData);
     expect(warnSpy).toHaveBeenCalledWith(
       "app-data.json not found -> using defaults",
     );

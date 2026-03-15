@@ -2,10 +2,11 @@ import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import WnaSeparatorHorizontal from "@components/misc/WnaSeparatorHorizontal";
 import { getNavigationBaseUrl } from "@components/navigation/wnaNavigationRouteProvider";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
+import WnaContactFooter from "@components/screens/WnaContactFooter";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import WnaShareCard from "@components/welcome/WnaShareCard";
 import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
-import { SeoEntry } from "@constants/seoCatalog";
+import { Href } from "expo-router";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import Animated from "react-native-reanimated";
 import { FC, memo, ReactNode, useMemo } from "react";
@@ -18,15 +19,18 @@ export type WnaScrollViewScreenProps = {
   isBusyText?: string | null;
   backgroundImageUrl?: string;
   onCancel?: () => void;
+  backHref?: Href;
+  titleHref?: Href;
   preventBack?: boolean;
   askBeforeBack?: boolean;
-  seoEntry: SeoEntry;
+  headerTitle?: string;
   iconName?: keyof typeof iconMap;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
   headerButton2?: ReactNode;
   isRootPage?: boolean;
   showFooter?: boolean;
+  showContactFooter?: boolean;
   showHeaderShadow?: boolean;
   showAppStoreButtons?: boolean;
 };
@@ -49,13 +53,16 @@ WnaScrollViewFooter.displayName = "WnaScrollViewFooter";
 
 const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
   children,
-  seoEntry,
+  headerTitle,
   iconName,
+  backHref,
+  titleHref,
   headerButton0,
   headerButton1,
   headerButton2,
   isRootPage,
   showFooter,
+  showContactFooter = true,
   showAppStoreButtons,
 }) => {
   const { appStyle } = useWnaTheme();
@@ -76,8 +83,10 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
   return (
     <WnaBaseScreen
       isRootPage={isRootPage}
-      seoEntry={seoEntry}
+      headerTitle={headerTitle}
       icon={iconName}
+      backHref={backHref}
+      titleHref={titleHref}
       scrollY={scrollY}
       headerButton0={headerButton0}
       headerButton1={headerButton1}
@@ -94,6 +103,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
           {showFooter && (
             <WnaScrollViewFooter title={footerTitle} url={shareUrl} />
           )}
+          {showContactFooter && <WnaContactFooter />}
         </View>
       </Animated.ScrollView>
     </WnaBaseScreen>

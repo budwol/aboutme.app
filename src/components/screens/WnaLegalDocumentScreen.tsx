@@ -8,7 +8,6 @@ import {
   getDrawerNavigationPath,
   getNavigationLang,
 } from "@components/navigation/wnaNavigationRouteProvider";
-import { SeoEntry } from "@constants/seoCatalog";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { getLangCode } from "@services/i18n/i18n";
 import { convertHexToRgba } from "@utils/colorConverter";
@@ -18,12 +17,12 @@ import { View } from "react-native";
 import WnaScrollViewScreen from "./WnaScrollViewScreen";
 
 export type WnaLegalDocumentScreenProps = {
-  seoEntry: SeoEntry;
+  headerTitle: string;
   htmlContent: string;
 };
 
 export default function WnaLegalDocumentScreen({
-  seoEntry,
+  headerTitle,
   htmlContent,
 }: WnaLegalDocumentScreenProps): ReactNode {
   const { isAppInitialized } = useWnaAppLifecycle();
@@ -39,7 +38,7 @@ export default function WnaLegalDocumentScreen({
   }
 
   return (
-    <WnaScrollViewScreen seoEntry={seoEntry}>
+    <WnaScrollViewScreen headerTitle={headerTitle} showContactFooter={false}>
       <View
         style={{
           backgroundColor: appColors.white,

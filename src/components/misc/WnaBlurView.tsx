@@ -28,10 +28,10 @@ export function WnaBlurView(props: WnaBlurViewProps) {
   if (props.backgroundColor) backgroundColor = props.backgroundColor;
 
   const backgroundOpacity =
-    (props.backgroundOpacity ?? normalizedTint.includes("dark")) ||
-    normalizedTint.includes("default")
+    props.backgroundOpacity ??
+    (normalizedTint.includes("dark") || normalizedTint.includes("default")
       ? 0.5
-      : 1;
+      : 0.8);
 
   const intensity = props.blurIntensity ?? 30;
 
@@ -57,6 +57,7 @@ export function WnaBlurView(props: WnaBlurViewProps) {
     <>
       {props.forceExperimentalBlur ? (
         <BlurView
+          key={tint}
           style={[props.style ?? null]}
           experimentalBlurMethod={"dimezisBlurView"}
           tint={tint}

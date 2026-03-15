@@ -3,6 +3,7 @@ import Colors from "@constants/theme/colors";
 import { FontFamilies } from "@constants/theme/fontFamilies";
 import { fallbackHtml } from "@constants/htmlConstants";
 import { LinearGradient } from "expo-linear-gradient";
+import { sanitizeHtml } from "@utils/htmlSanitizer";
 import { CSSProperties, FC, memo } from "react";
 import { Platform } from "react-native";
 import RenderHtml, {
@@ -103,7 +104,7 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
     color: effectiveFontColor,
   };
 
-  const effectiveHtml = html === "" ? fallbackHtml : html;
+  const effectiveHtml = sanitizeHtml(html === "" ? fallbackHtml : html);
 
   return (
     <>

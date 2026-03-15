@@ -1,5 +1,6 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
+import AppStyle from "@services/wnaStyleService";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,6 +10,7 @@ import { Text, TextStyle, ViewStyle } from "react-native";
 
 export type WnaFooterProps = {
   appColors: Colors;
+  appStyle: AppStyle;
   isLandscape: boolean;
   isInternetReachable: boolean | null;
   t: TFunction<string[], undefined>;
@@ -16,7 +18,7 @@ export type WnaFooterProps = {
 };
 
 export const WnaFooter: FC<WnaFooterProps> = memo(
-  ({ appColors, isLandscape, isInternetReachable, t }) => {
+  ({ appColors, appStyle, isLandscape, isInternetReachable, t }) => {
     const currentInfoColor = isInternetReachable
       ? appColors.accent6
       : appColors.red4;
@@ -37,7 +39,9 @@ export const WnaFooter: FC<WnaFooterProps> = memo(
             locations={[0, 0.2, 0.5, 0.8, 1]}
             style={styles.gradient(isLandscape) as ViewStyle}
           >
-            <Text style={styles.text(appColors) as TextStyle}>
+            <Text
+              style={[appStyle.textMicro, styles.text(appColors) as TextStyle]}
+            >
               {t(i18nKeys.errorNoInternet).toUpperCase()}
             </Text>
           </LinearGradient>
@@ -61,7 +65,6 @@ const styles = {
     alignItems: isLandscape ? "flex-end" : "center",
   }),
   text: (appColors: Colors) => ({
-    fontSize: 8,
     color: appColors.staticWhite,
     alignSelf: "center",
   }),

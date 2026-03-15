@@ -5,7 +5,11 @@ import { Href, router, useNavigation, useSegments } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import WnaDrawerNavigationItem from "@/components/navigation/WnaDrawerNavigationItem";
-import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
+import {
+  useWnaAppData,
+  useWnaLayout,
+  useWnaTheme,
+} from "@components/WnaAppContext";
 import WnaPressable from "@components/buttons/WnaPressable";
 import currentAppVersion from "@components/currentAppVersion";
 import WnaNavigationList, {
@@ -18,12 +22,13 @@ import { i18nKeys } from "@services/i18n/i18nKeys";
 import WnaImage from "@components/images/WnaImage";
 import { getNavigationLang } from "@components/navigation/wnaNavigationRoutes";
 
-const LOGO_SIZE = 64;
-const HEADER_HEIGHT = 212;
+const logoSize = 64;
+const headerHeight = 212;
 
 export default function WnaDrawerMenu() {
   const status = useDrawerStatus();
   const navigation = useNavigation();
+  const { appData } = useWnaAppData();
   const { appStyle, appColors } = useWnaTheme();
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
@@ -146,7 +151,7 @@ export default function WnaDrawerMenu() {
             <WnaImage
               imageUrl="/logo_96.webp"
               appColors={appColors}
-              imageTitle="logo"
+              imageTitle={t(i18nKeys.appBrand)}
               style={styles.logo}
             />
           </View>
@@ -156,7 +161,7 @@ export default function WnaDrawerMenu() {
               {t(i18nKeys.appBrand)}
             </Text>
             <Text style={[appStyle.textSmall, { opacity: 0.7 }]}>
-              SOFTWARE ENGINEER
+              {appData.profile.title.toUpperCase()}
             </Text>
           </View>
         </View>
@@ -200,21 +205,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerPressable: {
-    height: HEADER_HEIGHT,
+    height: headerHeight,
   },
   headerContent: {
     alignItems: "center",
   },
   logoWrapper: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    borderRadius: LOGO_SIZE / 2,
+    width: logoSize,
+    height: logoSize,
+    borderRadius: logoSize / 2,
     overflow: "hidden",
     marginBottom: 16,
   },
   logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
+    width: logoSize,
+    height: logoSize,
   },
   centered: {
     alignItems: "center",

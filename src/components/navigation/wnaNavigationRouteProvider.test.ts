@@ -76,6 +76,9 @@ describe("wnaNavigationRouteProvider", () => {
     expect(routes.getDrawerNavigationPath("projects", "en")).toBe(
       "/(drawer)/(tabs-en)/projects",
     );
+    expect(
+      routes.getDrawerProjectNavigationPath("custom-project-1", "de"),
+    ).toBe("/(drawer)/(tabs-de)/projekte/custom-project-1");
     expect(routes.getDrawerNavigationPath("disclaimer", "de")).toBe(
       "/(drawer)/(tabs-de)/menu/impressum",
     );

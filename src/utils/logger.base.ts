@@ -10,7 +10,7 @@ import {
 type LoggerMethod = (message: string) => void;
 
 // ALL muted warnings go here
-const IGNORED_LOGS: RegExp[] = [
+const ignoredLogs: RegExp[] = [
   /Support for defaultProps will be removed from function components/i,
   /"start" method does not exist in console/i,
   /"end" method does not exist in console/i,
@@ -20,10 +20,10 @@ const IGNORED_LOGS: RegExp[] = [
 ];
 
 // Metro / RedBox
-LogBox.ignoreLogs(IGNORED_LOGS.map((r) => r.source));
+LogBox.ignoreLogs(ignoredLogs.map((r) => r.source));
 
 export const shouldIgnoreLogMessage = (message: string) =>
-  IGNORED_LOGS.some((regex) => regex.test(message));
+  ignoredLogs.some((regex) => regex.test(message));
 
 const withoutIgnoredMessage = <T extends LoggerMethod>(fn: T): T =>
   ((message: string) => {

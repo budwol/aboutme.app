@@ -1,53 +1,24 @@
-import { getNavigationBaseUrl } from "@components/navigation/wnaNavigationRouteProvider";
-import { SeoEntry } from "@constants/seoCatalog";
-import { getLangCode } from "@services/i18n/i18n";
-import { applySeoMetadata } from "@utils/seoDom";
-import { Stack, useFocusEffect, usePathname } from "expo-router";
-import { FC, ReactNode, useCallback, useRef } from "react";
+import { useIsFocused } from "@react-navigation/native";
+import { Stack } from "expo-router";
+import { FC, ReactNode, useEffect } from "react";
 
 export type WnaWebBaseScreenProps = {
   children?: ReactNode;
-  seoEntry: SeoEntry;
+  title?: string;
 };
 
-const WnaWebBaseScreen: FC<WnaWebBaseScreenProps> = ({
-  children,
-  seoEntry,
-}) => {
-  const pathname = usePathname();
-  const appliedCanonicalRef = useRef<string | null>(null);
+const WnaWebBaseScreen: FC<WnaWebBaseScreenProps> = ({ children, title }) => {
+  const isFocused = useIsFocused();
 
-  const refreshMetatags = useCallback(() => {
-    const rawLang = getLangCode();
-    const lang = rawLang === "de" ? "de" : "en";
-    appliedCanonicalRef.current = applySeoMetadata({
-      seoEntry,
-      lang,
-      baseUrl: getNavigationBaseUrl(),
-    });
-  }, [seoEntry]);
+  useEffect(() => {
+    if (!title || !isFocused) return;
 
-  useFocusEffect(
-    useCallback(() => {
-      const rawLang = getLangCode();
-      const lang = rawLang === "de" ? "de" : "en";
-      const canonical = seoEntry.canonical[lang]().toString();
-      if (
-        appliedCanonicalRef.current !== canonical ||
-        !window.location.pathname.endsWith(pathname)
-      ) {
-        requestAnimationFrame(refreshMetatags);
-      }
+    document.title = title;
+  }, [isFocused, title]);
 
-      return () => {
-        appliedCanonicalRef.current = null;
-      };
-    }, [pathname, seoEntry, refreshMetatags]),
-  );
-
-  return !seoEntry ? null : (
+  return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen options={{ headerShown: false, title }} />
       {children}
     </>
   );

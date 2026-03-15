@@ -8,7 +8,6 @@ import {
   getNavigationLang,
 } from "@components/navigation/wnaNavigationRouteProvider";
 import WnaSeparatorHorizontal from "@components/misc/WnaSeparatorHorizontal";
-import { seoCatalog } from "@constants/seoCatalog";
 import { getLangCode } from "@services/i18n/i18n";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { useNavigation, useRouter } from "expo-router";
@@ -37,7 +36,8 @@ export default function WnaMenuRoute(): ReactNode {
   return (
     <WnaScrollViewScreen
       isRootPage
-      seoEntry={seoCatalog.menu}
+      headerTitle={t(i18nKeys.screenTitleMenuWithoutDots)}
+      showContactFooter={false}
       showAppStoreButtons={false}
       headerButton0={
         <WnaNavigationHeaderButtonRight

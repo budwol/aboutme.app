@@ -98,10 +98,7 @@ const WnaListCardWhiteImageComponent: FC<WnaListCardWhiteImageProps> = ({
             appStyle={appStyle}
             fontFamily={FontFamilies.UI}
             fontColor={appColors.staticWhite}
-            style={{
-              fontSize: 22,
-              fontWeight: "600",
-            }}
+            style={[appStyle.textExtraLarge, { fontWeight: "600" }]}
             text={imageTitle || "Tagebucheintrag"}
           />
         </View>

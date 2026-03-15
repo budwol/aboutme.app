@@ -22,7 +22,7 @@ const WnaWelcomeTitle = ({
 }: WnaWelcomeTitleProps) => {
   const titleStyle = useMemo(
     () => [
-      appStyle.textTitleLarge,
+      appStyle.textExtraLarge,
       styles.title,
       { color: titleTextColor ?? appColors.black },
     ],
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 24,
     letterSpacing: 2,
   },
 });

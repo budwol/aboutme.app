@@ -2,64 +2,96 @@
   "siteUrl": "https://my.portfolio.org",
   "profile": {
     "name": "John Doe",
-    "title": "Software Engineer",
+    "titleDe": "Softwareentwickler",
+    "titleEn": "Software Engineer",
     "avatar": "default_avatar.webp",
-    "description": [
+    "descriptionDe": [
+      "Hallo, ich bin John Doe.",
+      "Ich schreibe gerne sauberen Code.",
+      "Ich baue Produkte, die wirklich genutzt werden."
+    ],
+    "descriptionEn": [
       "Hi, I'm John Doe.",
-      "I can write code.",
-      "I'm a coolest monkey in town."
+      "I enjoy writing clean code.",
+      "I build products people actually use."
     ]
   },
   "techStack": {
     "primary": ["PHP", "Basic"],
     "secondary": ["Perl", "Java"]
   },
-  "projectsSubtitle": "Some private side projects",
+  "projectsSubtitleDe": "Einige private Nebenprojekte",
+  "projectsSubtitleEn": "Some private side projects",
   "projects": [
     {
-      "title": "Pizza App",
-      "subtitle": "Android / iOS / Web-App",
-      "tech": "Flutter",
-      "imageL": "app1_1024.webp",
-      "imageM": "app1_300.webp",
-      "imageS": "app1_300.webp"
+      "titleDe": "Pizza-App",
+      "titleEn": "Pizza App",
+      "subtitleDe": "Bestell-App",
+      "subtitleEn": "Ordering App",
+      "descriptionDe": "Mobile und Web-App zum Bestellen von Pizza mit gemeinsamer Codebasis.",
+      "descriptionEn": "Mobile and web app for ordering pizza with a shared codebase.",
+      "repoUrl": "https://github.com/JohnDoe/pizza-app",
+      "techstack": ["Flutter", "Dart", "Firebase"],
+      "imageL": "default_project.webp",
+      "imageM": "default_project.webp",
+      "imageS": "default_project.webp"
     },
     {
-      "title": "API",
-      "subtitle": "ContainerApp",
-      "tech": "C# / ASP / .NET 9",
-      "imageL": "api_1024.webp",
-      "imageM": "api_300.webp",
-      "imageS": "api_300.webp"
+      "titleDe": "API",
+      "titleEn": "API",
+      "subtitleDe": "Containerisierte Backend-API",
+      "subtitleEn": "Containerized Backend API",
+      "descriptionDe": "REST-API für Authentifizierung, Produktdaten und Bestellprozesse.",
+      "descriptionEn": "REST API for authentication, product data, and order workflows.",
+      "repoUrl": "https://github.com/JohnDoe/backend-api",
+      "techstack": ["C#", "ASP.NET Core", ".NET 9", "Docker"],
+      "imageL": "default_project.webp",
+      "imageM": "default_project.webp",
+      "imageS": "default_project.webp"
     },
     {
-      "title": "E-Commerce Platform",
-      "subtitle": "Code Snippet Store",
-      "tech": "Python / React",
-      "imageL": "concept_1024.webp",
-      "imageM": "concept_300.webp",
-      "imageS": "concept_300.webp"
+      "titleDe": "E-Commerce-Plattform",
+      "titleEn": "E-Commerce Platform",
+      "subtitleDe": "Shop für Code-Snippets",
+      "subtitleEn": "Store for Code Snippets",
+      "descriptionDe": "Konzept für eine Plattform zum Kaufen, Verkaufen und Bewerten von Code-Snippets.",
+      "descriptionEn": "Concept for a platform to buy, sell, and review code snippets.",
+      "repoUrl": "https://github.com/JohnDoe/code-snippet-store",
+      "techstack": ["Python", "React", "PostgreSQL"],
+      "imageL": "default_project.webp",
+      "imageM": "default_project.webp",
+      "imageS": "default_project.webp"
     }
   ],
-  "experienceSubtitle": "My career path",
+  "experienceSubtitleDe": "Beruflicher Werdegang",
+  "experienceSubtitleEn": "My career path",
   "experience": [
     {
-      "period": "since 2020",
-      "role": "Software Developer",
+      "periodDe": "seit 2020",
+      "periodEn": "since 2020",
+      "roleDe": "Softwareentwickler",
+      "roleEn": "Software Developer",
       "company": "Cool Company Ltd.",
-      "description": "Code monkey suff"
+      "descriptionDe": "Entwicklung und Weiterentwicklung digitaler Produkte.",
+      "descriptionEn": "Built and improved digital products."
     },
     {
-      "period": "2015 - 2020",
-      "role": "Software Developer",
+      "periodDe": "2015 - 2020",
+      "periodEn": "2015 - 2020",
+      "roleDe": "Softwareentwickler",
+      "roleEn": "Software Developer",
       "company": "Rocket Science Ltd.",
-      "description": "Code monkey suff"
+      "descriptionDe": "Entwicklung von Anwendungen und Backend-Systemen.",
+      "descriptionEn": "Developed applications and backend systems."
     },
     {
-      "period": "2010 - 2015",
-      "role": "Software Developer",
+      "periodDe": "2010 - 2015",
+      "periodEn": "2010 - 2015",
+      "roleDe": "Softwareentwickler",
+      "roleEn": "Software Developer",
       "company": "Code Fabric Ltd.",
-      "description": "Code monkey suff"
+      "descriptionDe": "Umsetzung von Features und Pflege bestehender Systeme.",
+      "descriptionEn": "Implemented features and maintained existing systems."
     }
   ],
   "contact": {

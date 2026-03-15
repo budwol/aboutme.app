@@ -1,10 +1,68 @@
 import { ConfigContext, ExpoConfig } from "expo/config";
 
-const appName = process.env.APP_NAME ?? "APP_NAME";
-const appDescription = process.env.APP_DESCRIPTION ?? "APP_DESCRIPTION";
+function isStrictConfigMode(): boolean {
+  const ciValue = process.env.CI?.trim().toLowerCase();
+  const nodeEnv = process.env.NODE_ENV?.trim().toLowerCase();
+  const expoExport = process.env.EXPO_EXPORT?.trim().toLowerCase();
+  const easBuild = process.env.EAS_BUILD?.trim().toLowerCase();
+
+  return (
+    ciValue === "true" ||
+    nodeEnv === "production" ||
+    expoExport === "true" ||
+    easBuild === "true"
+  );
+}
+
+function getRequiredEnv(name: keyof NodeJS.ProcessEnv): string {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}
+
+function getEnvForMode(
+  name: keyof NodeJS.ProcessEnv,
+  fallback: string,
+): string {
+  return isStrictConfigMode()
+    ? getRequiredEnv(name)
+    : getOptionalEnv(name, fallback);
+}
+
+function getOptionalEnv(
+  name: keyof NodeJS.ProcessEnv,
+  fallback: string,
+): string {
+  const value = process.env[name]?.trim();
+
+  return value || fallback;
+}
+
+function getOptionalOwner(): string | undefined {
+  const value = process.env.EXPO_OWNER?.trim();
+
+  return value || undefined;
+}
+
+const appName = getRequiredEnv("APP_NAME");
+const appDescription = getRequiredEnv("APP_DESCRIPTION");
 const appVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? "1.0.0";
 const publicLogo1024 = "./public/logo_1024.png";
 const publicLogo192 = "./public/logo_192.png";
+const appSlug = getOptionalEnv(
+  "EXPO_SLUG",
+  appName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, ""),
+);
+const appOwner = getOptionalOwner();
+const appScheme = getEnvForMode("SCHEME", appSlug);
+const resolvedAppSlug = appSlug;
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -12,8 +70,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   jsEngine: "hermes",
   name: appName,
   description: appDescription,
-  slug: process.env.EXPO_SLUG ?? "EXPO_SLUG",
-  owner: process.env.EXPO_OWNER ?? "EXPO_OWNER",
+  slug: resolvedAppSlug,
+  owner: appOwner,
   version: appVersion,
   orientation: "default",
   icon: publicLogo1024,
@@ -52,7 +110,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     themeColor: "#181818",
     display: "fullscreen",
     orientation: "portrait-primary",
-    sourceMaps: true,
+    sourceMaps: false,
   },
   plugins: [
     "expo-font",
@@ -60,5 +118,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-localization",
   ],
-  scheme: process.env.SCHEME ?? "SCHEME",
+  scheme: appScheme,
 });

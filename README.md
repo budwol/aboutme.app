@@ -43,20 +43,39 @@ AboutMe is built with a React Native for Web setup powered by Expo.
    npm install
    ```
 
-2. Take a look at `app-data.example.json` and fill in your data  
-   (most fields are required).
-
-3. Replace `/public/logo.svg` with your own logo.
-
-4. Navigate to the `/scripts` directory.
-
-5. Bootstrap the app:
+2. Run the initializer:
 
    ```bash
    ./init.sh
    ```
 
-6. Start locally:
+   On first run it creates `.aboutme/`, `.aboutme/app-data.json`, `.aboutme/images/`, and `.env` (from `.env.example` if present), then seeds placeholder assets from the repo defaults.
+
+3. Adjust `.aboutme/app-data.json` and replace the placeholder files in `.aboutme/images/` when you want to use your own assets.
+
+4. Run the initializer again whenever data or images change:
+
+   ```bash
+   ./init.sh
+   ```
+
+   The script is idempotent. It syncs `.aboutme/app-data.json` into the ignored root `app-data.json` and regenerates:
+   - `public/images/*`
+   - generated logo and favicon assets
+   - `public/site.webmanifest`
+   - `public/robots.txt`
+   - `public/sitemap.xml`
+   - `nginx/site.conf`
+
+   Preview the same process without writing files:
+
+   ```bash
+   ./init.sh --dry-run
+   ```
+
+   Useful for local checks and CI validation. It runs through the same decisions, but does not create, overwrite, or regenerate files.
+
+5. Start locally:
 
    ```bash
    npm run web
@@ -68,13 +87,42 @@ AboutMe is built with a React Native for Web setup powered by Expo.
 
 ## Configuration
 
-Drop your images into:
+Drop your source images into:
 
 ```
-/public/images/
+.aboutme/images/
 ```
 
-Then map them inside your `app-data.json`.
+The repo already ships with these placeholders:
+
+- `logo.svg`
+- `bg.webp`
+- `default_avatar.webp`
+- `default_project.webp`
+
+Reference the files you want to use inside `.aboutme/app-data.json`.
+
+### Local Environment
+
+Create a local env file when needed:
+
+```bash
+cp .env.example .env
+```
+
+`./init.sh` already creates `.env` automatically when `.env.example` exists and `.env` is still missing.
+
+`.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Generated files such as root `app-data.json`, public assets, and nginx config are intentionally ignored by Git.
+
+### Navigation & Content
+
+The app ships with:
+
+- a localized home page
+- project list and detail pages
+- experience page
+- dedicated contact page
+- menu/legal pages (imprint, privacy, terms, licenses)
 
 ### Recommended Image Ratios
 
@@ -87,7 +135,11 @@ Then map them inside your `app-data.json`.
 
 ## Deployment
 
-1. Create a `.env` file (see `.env.example`).
+1. Create a `.env` file if your deployment needs one:
+
+   ```bash
+   cp .env.example .env
+   ```
 
 2. Export the app:
 
@@ -110,6 +162,23 @@ Then map them inside your `app-data.json`.
    ```bash
    npm run deploy:web
    ```
+
+### Quality Checks
+
+- `npm run lint`
+- `npm run test:unit`
+- `npm run test:types`
+- `npm run test:prettier`
+- `npm run test:all`
+- `./init.sh --dry-run`
+
+For a full local maintenance pass there is also:
+
+```bash
+npm run cleanup
+```
+
+`cleanup` recreates `package-lock.json`, runs `expo-doctor`, Prettier, TypeScript, and ESLint fixes. It may require network access and working Git hook permissions in your local environment.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

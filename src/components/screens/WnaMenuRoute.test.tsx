@@ -111,6 +111,9 @@ describe("WnaMenuRoute", () => {
     });
 
     const items = tree!.root.findAllByType("WnaNavigationItem");
+    const scrollViewScreen = tree!.root.findByType("WnaScrollViewScreen");
+
+    expect(scrollViewScreen.props.showContactFooter).toBe(false);
 
     act(() => items[0].props.onPress());
     act(() => items[1].props.onPress());

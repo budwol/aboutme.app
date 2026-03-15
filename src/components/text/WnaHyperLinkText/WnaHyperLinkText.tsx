@@ -8,6 +8,7 @@ const WnaHyperLinkTextComponent: FC<WnaHyperLinkTextProps> = ({
   appColors,
   text,
   onHyperLinkClick,
+  icon,
   isExternal,
   bold,
   textTransform,
@@ -42,6 +43,15 @@ const WnaHyperLinkTextComponent: FC<WnaHyperLinkTextProps> = ({
         cursor: "pointer",
       }}
     >
+      {icon ? (
+        <WnaIcon
+          iconName={icon}
+          size={appStyle.textNeutralMedium.fontSize! - 1}
+          style={{ marginRight: 6, top: 1 }}
+          color={color}
+        />
+      ) : null}
+
       <Text
         style={[
           appStyle.textNeutralMedium,

@@ -19,8 +19,8 @@ export type WnaTextWithIconProps = {
   width?: number;
 };
 
-const LINE_SIZE = 24;
-const DEFAULT_ICON_SIZE = 18;
+const lineSize = 24;
+const defaultIconSize = 18;
 
 const WnaTextWithIcon = ({
   appStyle,
@@ -30,7 +30,7 @@ const WnaTextWithIcon = ({
   iconRotation = 0,
   text,
   textColor,
-  iconSize = DEFAULT_ICON_SIZE,
+  iconSize = defaultIconSize,
   postfix,
   postfixColor,
   width,
@@ -93,18 +93,18 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     gap: 8,
-    height: LINE_SIZE,
+    height: lineSize,
     overflow: "hidden",
   },
   iconWrapper: {
-    width: LINE_SIZE,
-    height: LINE_SIZE,
+    width: lineSize,
+    height: lineSize,
     justifyContent: "center",
     alignItems: "center",
   },
   textWrapper: {
     alignSelf: "center",
-    height: LINE_SIZE,
+    height: lineSize,
     justifyContent: "center",
   },
 });

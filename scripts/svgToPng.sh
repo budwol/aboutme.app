@@ -14,6 +14,7 @@ if [ ! -f "$INPUT_SVG" ]; then
 fi
 
 OUTPUT_PNG="$(dirname "$INPUT_SVG")/logo.png"
+OUTPUT_DIR="$(dirname "$INPUT_SVG")"
 
 INKSCAPE_BIN="$(command -v inkscape)" || {
   echo "ERROR: inkscape not found"
@@ -36,6 +37,6 @@ else
     -w 1024
 fi
 
-cp "$INPUT_SVG" "./favicon.svg"
+cp "$INPUT_SVG" "$OUTPUT_DIR/favicon.svg"
 
 echo "Done."

@@ -1,4 +1,3 @@
-import { buildRootHtmlMetadata } from "@app/rootHtmlMetadata";
 import { ScrollViewStyleReset } from "expo-router/html";
 import { PropsWithChildren, useEffect } from "react";
 
@@ -8,8 +7,6 @@ import { PropsWithChildren, useEffect } from "react";
 // do not have access to the DOM or browser APIs.
 // https://docs.expo.dev/guides/progressive-web-apps/
 export default function Root({ children }: PropsWithChildren) {
-  const { baseUrl, lang, ogImageUrl, schemaOrg } = buildRootHtmlMetadata();
-
   useEffect(() => {
     // remove expo-generated-fonts element
     const el = document.getElementById("expo-generated-fonts");
@@ -17,24 +14,15 @@ export default function Root({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <html lang={lang}>
+    <html lang="de">
       <head>
         {/* Core */}
         <meta charSet="utf-8" />
-        <meta name="robots" content="index,follow" />
         <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+          name="robots"
+          content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
         />
-        {process.env.EXPO_PUBLIC_GOOGLE_SITE_VERIFICATION ? (
-          <meta
-            name="google-site-verification"
-            content={process.env.EXPO_PUBLIC_GOOGLE_SITE_VERIFICATION}
-          />
-        ) : null}
-        {/* Performance Hints */}
-        <link rel="preconnect" href={baseUrl} />
-        <link rel="dns-prefetch" href={baseUrl} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
           rel="preload"
           as="font"
@@ -49,23 +37,6 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo_180.png" />
 
-        {/*open graph*/}
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Portfolio" />
-        <meta property="og:image" content={ogImageUrl} />
-        <meta property="og:image:secure_url" content={ogImageUrl} />
-        <meta property="og:image:width" content="300" />
-        <meta property="og:image:height" content="366" />
-        <meta property="og:image:alt" content="Portfolio" />
-        <meta property="og:image:type" content="image/png" />
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(schemaOrg),
-          }}
-        />
         <style>{`
                     @font-face {
                       font-family: "Manrope";

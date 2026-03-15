@@ -1,4 +1,4 @@
-import { DEFAULT_APP_DATA } from "@/app-data";
+import { defaultAppData } from "@/app-data";
 import { describe, expect, it, jest } from "@jest/globals";
 import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
 import React from "react";
@@ -30,12 +30,12 @@ jest.mock("@components/cards/WnaCardSmallVertical", () => {
 describe("WnaExperienceCard", () => {
   it("renders one timeline card per experience entry", () => {
     const appData = {
-      ...DEFAULT_APP_DATA,
+      ...defaultAppData,
       experienceSubtitle: "Career path",
       experience: [
-        ...DEFAULT_APP_DATA.experience,
+        ...defaultAppData.experience,
         {
-          ...DEFAULT_APP_DATA.experience[0],
+          ...defaultAppData.experience[0],
           period: "2016-2020",
           role: "Senior Engineer",
         },
@@ -65,6 +65,36 @@ describe("WnaExperienceCard", () => {
     expect(title.props.subtitle).toBe("CAREER PATH");
     expect(cards).toHaveLength(2);
     expect(cards[0].props.title).toBe(appData.experience[0].role);
+    expect(cards[0].props.badgeText).toBe(appData.experience[0].duration);
     expect(cards[1].props.title).toBe("Senior Engineer");
+  });
+
+  it("uses ellipsis when an experience duration is empty", () => {
+    const appData = {
+      ...defaultAppData,
+      experience: [
+        {
+          ...defaultAppData.experience[0],
+          duration: "",
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={{ accent5: "#0aa", coolgray6: "#666" } as never}
+          appData={appData}
+          appStyle={{ textNeutralSmall: {} } as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const card = tree!.root.findByType("WnaCardSmallVertical");
+
+    expect(card.props.badgeText).toBe("...");
   });
 });
