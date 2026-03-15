@@ -49,7 +49,7 @@ export default function WnaContactCard({
         onPress={() => handleOpenUrl(appData.contact.github, "github")}
         checkInternetConnection={false}
         toolTipPosition="top"
-        toolTip={"GitHub"}
+        toolTip={t(i18nKeys.actionGithub)}
         t={t}
       />
       <WnaButtonIcon
@@ -60,7 +60,7 @@ export default function WnaContactCard({
         onPress={() => handleOpenUrl(appData.contact.linkedin, "linkedin")}
         checkInternetConnection={false}
         toolTipPosition="top"
-        toolTip={"LinkedIn"}
+        toolTip={t(i18nKeys.actionLinkedin)}
         t={t}
       />
       <WnaButtonIcon
@@ -71,7 +71,7 @@ export default function WnaContactCard({
         onPress={() => handleOpenUrl(appData.contact.xing, "xing")}
         checkInternetConnection={false}
         toolTipPosition="top"
-        toolTip={"Xing"}
+        toolTip={t(i18nKeys.actionXing)}
         t={t}
       />
       {phone && (

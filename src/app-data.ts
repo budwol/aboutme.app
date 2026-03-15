@@ -1,7 +1,11 @@
+import { i18n } from "@services/i18n/i18n";
 import { normalizeSiteUrl } from "@utils/appConfig";
+
+type SupportedLang = "de" | "en";
 
 export type ExperienceEntry = {
   period: string;
+  duration: string;
   role: string;
   company: string;
   description: string;
@@ -11,7 +15,12 @@ export type ExperienceEntry = {
 export type ProjectEntry = {
   title: string;
   subtitle?: string;
-  tech?: string;
+  context?: string;
+  description?: string;
+  repoUrl?: string;
+  webUrl?: string;
+  playStoreUrl?: string;
+  techstack: string[];
   opacity?: number;
   imageL: string;
   imageM: string;
@@ -26,7 +35,7 @@ export type AppData = {
     name: string;
     title: string;
     avatar: string;
-    description: string[];
+    description: string;
   };
   techStack: {
     primary: string[];
@@ -34,6 +43,8 @@ export type AppData = {
   };
   projects: ProjectEntry[];
   projectsSubtitle?: string;
+  projectsContext?: string;
+  projectDetailsContext?: string;
   experience: ExperienceEntry[];
   experienceSubtitle?: string;
   contact: {
@@ -49,7 +60,7 @@ export type AppData = {
   };
 };
 
-export const DEFAULT_APP_DATA: AppData = {
+export const defaultAppData: AppData = {
   siteUrl: "http://localhost:8081",
   backgroundImage: "bg.webp",
   accentColor: "#61afa7",
@@ -57,22 +68,28 @@ export const DEFAULT_APP_DATA: AppData = {
     name: "Your Name",
     title: "Software Developer",
     avatar: "default_avatar.webp",
-    description: ["Lorem Impsum", "Lorem Impsum", "Lorem Impsum"],
+    description: "Lorem Ipsum\nLorem Ipsum\nLorem Ipsum",
   },
   techStack: {
     primary: ["Primary 1", "Primary 2", "Primary 3"],
     secondary: ["Secondary 1", "Secondary 2", "Secondary 3"],
   },
   projectsSubtitle: "Some private side projects",
+  projectsContext:
+    "Private end-to-end projects from concept and architecture to deployment and operation.",
+  projectDetailsContext:
+    "This project is part of a private end-to-end portfolio and reflects responsibility across conception, architecture, implementation, deployment, and operation.",
   projects: [
     {
       title: "Project 1",
       subtitle: "Container App",
-      tech: "Code",
+      description: "Short project summary.",
+      repoUrl: "https://github.com/example/project-1",
+      techstack: ["Code"],
       opacity: 1,
-      imageL: "app1_1024.webp",
-      imageM: "app1_300.webp",
-      imageS: "app1_300.webp",
+      imageL: "default_project.webp",
+      imageM: "default_project.webp",
+      imageS: "default_project.webp",
     },
   ],
   experienceSubtitle: "My career path",
@@ -81,6 +98,7 @@ export const DEFAULT_APP_DATA: AppData = {
       company: "Company",
       role: "Software Dev",
       period: "2010-2015",
+      duration: "3Y 5M",
       description: "Wrote code.",
       opacity: 1,
     },
@@ -88,7 +106,7 @@ export const DEFAULT_APP_DATA: AppData = {
   contact: {
     phone: "0118999",
     email: "your@email.com",
-    addressCountry: "Detuschland",
+    addressCountry: "Deutschland",
     addressStreet: "Straße 1",
     addressZipCode: "01234",
     addressCity: "Berlin",
@@ -98,16 +116,51 @@ export const DEFAULT_APP_DATA: AppData = {
   },
 };
 
-type AppDataInput = Partial<AppData> & {
-  profile?: Partial<AppData["profile"]>;
-  techStack?: Partial<AppData["techStack"]>;
-  contact?: Partial<AppData["contact"]>;
-  projects?: Partial<ProjectEntry>[];
-  experience?: Partial<ExperienceEntry>[];
+type ProfileInput = Partial<AppData["profile"]> & {
+  titleDe?: string;
+  titleEn?: string;
+  descriptionDe?: string | string[];
+  descriptionEn?: string | string[];
 };
 
-const DEFAULT_PROJECT_ENTRY = DEFAULT_APP_DATA.projects[0];
-const DEFAULT_EXPERIENCE_ENTRY = DEFAULT_APP_DATA.experience[0];
+type ProjectEntryInput = Partial<ProjectEntry> & {
+  titleDe?: string;
+  titleEn?: string;
+  subtitleDe?: string;
+  subtitleEn?: string;
+  contextDe?: string;
+  contextEn?: string;
+  descriptionDe?: string;
+  descriptionEn?: string;
+};
+
+type ExperienceEntryInput = Partial<ExperienceEntry> & {
+  periodDe?: string;
+  periodEn?: string;
+  roleDe?: string;
+  roleEn?: string;
+  descriptionDe?: string;
+  descriptionEn?: string;
+};
+
+type AppDataInput = Partial<AppData> & {
+  profile?: ProfileInput;
+  techStack?: Partial<AppData["techStack"]>;
+  contact?: Partial<AppData["contact"]>;
+  projectsSubtitleDe?: string;
+  projectsSubtitleEn?: string;
+  projectsContextDe?: string;
+  projectsContextEn?: string;
+  projectDetailsContextDe?: string;
+  projectDetailsContextEn?: string;
+  projects?: ProjectEntryInput[];
+  experienceSubtitleDe?: string;
+  experienceSubtitleEn?: string;
+  experience?: ExperienceEntryInput[];
+};
+
+const defaultProjectEntry = defaultAppData.projects[0];
+const defaultExperienceEntry = defaultAppData.experience[0];
 
 function asString(value: unknown, fallback: string) {
   return typeof value === "string" && value.trim() !== "" ? value : fallback;
@@ -130,105 +183,372 @@ function asNumberOrUndefined(value: unknown, fallback?: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
-function normalizeProjectEntry(entry: Partial<ProjectEntry>): ProjectEntry {
+function getSupportedLang(
+  lang = i18n.resolvedLanguage ?? i18n.language,
+): SupportedLang {
+  return lang === "de" ? "de" : "en";
+}
+
+function firstNonEmptyString(...values: unknown[]): string | undefined {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim() !== "") {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function getLocalizedString(
+  lang: SupportedLang,
+  fallback: string,
+  plainValue?: unknown,
+  deValue?: unknown,
+  enValue?: unknown,
+) {
+  const preferred = lang === "de" ? deValue : enValue;
+  const alternate = lang === "de" ? enValue : deValue;
+
+  return asString(
+    firstNonEmptyString(preferred, plainValue, alternate),
+    fallback,
+  );
+}
+
+function asMultilineString(value: unknown, fallback: string) {
+  if (typeof value === "string" && value.trim() !== "") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    const items = value.filter(
+      (entry): entry is string =>
+        typeof entry === "string" && entry.trim() !== "",
+    );
+
+    if (items.length > 0) {
+      return items.join("\n");
+    }
+  }
+
+  return fallback;
+}
+
+function firstNonEmptyMultilineString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim() !== "") {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      const items = value.filter(
+        (entry): entry is string =>
+          typeof entry === "string" && entry.trim() !== "",
+      );
+
+      if (items.length > 0) {
+        return items.join("\n");
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function getLocalizedMultilineString(
+  lang: SupportedLang,
+  fallback: string,
+  plainValue?: unknown,
+  deValue?: unknown,
+  enValue?: unknown,
+) {
+  const preferred = lang === "de" ? deValue : enValue;
+  const alternate = lang === "de" ? enValue : deValue;
+
+  return asMultilineString(
+    firstNonEmptyMultilineString(preferred, plainValue, alternate),
+    fallback,
+  );
+}
+
+function parsePeriodStartMonth(period: string) {
+  const normalized = period.trim().toLowerCase();
+  const match = normalized.match(/(\d{2})\/(\d{4})/);
+
+  if (!match) {
+    return null;
+  }
+
+  const month = Number(match[1]);
+  const year = Number(match[2]);
+
+  if (month < 1 || month > 12) {
+    return null;
+  }
+
+  return { month, year };
+}
+
+function parsePeriodEndMonth(period: string) {
+  const normalized = period.trim().toLowerCase();
+
+  if (normalized === "..." || normalized.length === 0) {
+    return null;
+  }
+
+  if (normalized.startsWith("seit ") || normalized.startsWith("since ")) {
+    const now = new Date();
+
+    return {
+      month: now.getMonth() + 1,
+      year: now.getFullYear(),
+    };
+  }
+
+  const matches = [...normalized.matchAll(/(\d{2})\/(\d{4})/g)];
+
+  if (matches.length < 2) {
+    return null;
+  }
+
+  const endMatch = matches[matches.length - 1];
+  const month = Number(endMatch[1]);
+  const year = Number(endMatch[2]);
+
+  if (month < 1 || month > 12) {
+    return null;
+  }
+
+  return { month, year };
+}
+
+function formatDuration(lang: SupportedLang, totalMonths: number) {
+  if (totalMonths <= 0) {
+    return "...";
+  }
+
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+
+  if (lang === "de") {
+    if (years > 0 && months > 0) {
+      return `${years} J. ${months} Mon.`;
+    }
+
+    if (years > 0) {
+      return `${years} J.`;
+    }
+
+    return `${months} Mon.`;
+  }
+
+  if (years > 0 && months > 0) {
+    return `${years} ${years === 1 ? "yr" : "yrs"} ${months} ${months === 1 ? "mo" : "mos"}`;
+  }
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? "yr" : "yrs"}`;
+  }
+
+  return `${months} ${months === 1 ? "mo" : "mos"}`;
+}
+
+function getDurationFromPeriod(period: string, lang: SupportedLang) {
+  const start = parsePeriodStartMonth(period);
+  const end = parsePeriodEndMonth(period);
+
+  if (!start || !end) {
+    return "...";
+  }
+
+  const totalMonths =
+    (end.year - start.year) * 12 + (end.month - start.month) + 1;
+
+  return formatDuration(lang, totalMonths);
+}
+
+function normalizeProjectEntry(
+  entry: ProjectEntryInput,
+  lang: SupportedLang,
+): ProjectEntry {
   return {
-    title: asString(entry.title, DEFAULT_PROJECT_ENTRY.title),
-    subtitle: asString(entry.subtitle, DEFAULT_PROJECT_ENTRY.subtitle ?? ""),
-    tech: asString(entry.tech, DEFAULT_PROJECT_ENTRY.tech ?? ""),
-    opacity: asNumberOrUndefined(entry.opacity, DEFAULT_PROJECT_ENTRY.opacity),
-    imageL: asString(entry.imageL, DEFAULT_PROJECT_ENTRY.imageL),
-    imageM: asString(entry.imageM, DEFAULT_PROJECT_ENTRY.imageM),
-    imageS: asString(entry.imageS, DEFAULT_PROJECT_ENTRY.imageS),
+    title: getLocalizedString(
+      lang,
+      defaultProjectEntry.title,
+      entry.title,
+      entry.titleDe,
+      entry.titleEn,
+    ),
+    subtitle: getLocalizedString(
+      lang,
+      defaultProjectEntry.subtitle ?? "",
+      entry.subtitle,
+      entry.subtitleDe,
+      entry.subtitleEn,
+    ),
+    context: getLocalizedString(
+      lang,
+      defaultProjectEntry.context ?? "",
+      entry.context,
+      entry.contextDe,
+      entry.contextEn,
+    ),
+    description: getLocalizedString(
+      lang,
+      defaultProjectEntry.description ?? "",
+      entry.description,
+      entry.descriptionDe,
+      entry.descriptionEn,
+    ),
+    repoUrl: firstNonEmptyString(entry.repoUrl, defaultProjectEntry.repoUrl),
+    webUrl: firstNonEmptyString(entry.webUrl),
+    playStoreUrl: firstNonEmptyString(entry.playStoreUrl),
+    techstack: asStringArray(
+      entry.techstack,
+      defaultProjectEntry.techstack ?? [],
+    ),
+    opacity: asNumberOrUndefined(entry.opacity, defaultProjectEntry.opacity),
+    imageL: asString(entry.imageL, defaultProjectEntry.imageL),
+    imageM: asString(entry.imageM, defaultProjectEntry.imageM),
+    imageS: asString(entry.imageS, defaultProjectEntry.imageS),
   };
 }
 
 function normalizeExperienceEntry(
-  entry: Partial<ExperienceEntry>,
+  entry: ExperienceEntryInput,
+  lang: SupportedLang,
 ): ExperienceEntry {
+  const period = getLocalizedString(
+    lang,
+    defaultExperienceEntry.period,
+    entry.period,
+    entry.periodDe,
+    entry.periodEn,
+  );
+
   return {
-    period: asString(entry.period, DEFAULT_EXPERIENCE_ENTRY.period),
-    role: asString(entry.role, DEFAULT_EXPERIENCE_ENTRY.role),
-    company: asString(entry.company, DEFAULT_EXPERIENCE_ENTRY.company),
-    description: asString(
+    period,
+    duration: getDurationFromPeriod(period, lang),
+    role: getLocalizedString(
+      lang,
+      defaultExperienceEntry.role,
+      entry.role,
+      entry.roleDe,
+      entry.roleEn,
+    ),
+    company: asString(entry.company, defaultExperienceEntry.company),
+    description: getLocalizedString(
+      lang,
+      defaultExperienceEntry.description,
       entry.description,
-      DEFAULT_EXPERIENCE_ENTRY.description,
+      entry.descriptionDe,
+      entry.descriptionEn,
     ),
-    opacity: asNumberOrUndefined(
-      entry.opacity,
-      DEFAULT_EXPERIENCE_ENTRY.opacity,
-    ),
+    opacity: asNumberOrUndefined(entry.opacity, defaultExperienceEntry.opacity),
   };
 }
 
-export function normalizeAppData(input: unknown): AppData {
+export function normalizeAppData(
+  input: unknown,
+  lang = getSupportedLang(),
+): AppData {
   const data = (
     typeof input === "object" && input !== null ? input : {}
   ) as AppDataInput;
 
   return {
-    siteUrl: normalizeSiteUrl(data.siteUrl ?? DEFAULT_APP_DATA.siteUrl),
+    siteUrl: normalizeSiteUrl(data.siteUrl ?? defaultAppData.siteUrl),
     backgroundImage: asString(
       data.backgroundImage,
-      DEFAULT_APP_DATA.backgroundImage,
+      defaultAppData.backgroundImage,
     ),
-    accentColor: asString(data.accentColor, DEFAULT_APP_DATA.accentColor),
+    accentColor: asString(data.accentColor, defaultAppData.accentColor),
     profile: {
-      name: asString(data.profile?.name, DEFAULT_APP_DATA.profile.name),
-      title: asString(data.profile?.title, DEFAULT_APP_DATA.profile.title),
-      avatar: asString(data.profile?.avatar, DEFAULT_APP_DATA.profile.avatar),
-      description: asStringArray(
+      name: asString(data.profile?.name, defaultAppData.profile.name),
+      title: getLocalizedString(
+        lang,
+        defaultAppData.profile.title,
+        data.profile?.title,
+        data.profile?.titleDe,
+        data.profile?.titleEn,
+      ),
+      avatar: asString(data.profile?.avatar, defaultAppData.profile.avatar),
+      description: getLocalizedMultilineString(
+        lang,
+        defaultAppData.profile.description,
         data.profile?.description,
-        DEFAULT_APP_DATA.profile.description,
+        data.profile?.descriptionDe,
+        data.profile?.descriptionEn,
       ),
     },
     techStack: {
       primary: asStringArray(
         data.techStack?.primary,
-        DEFAULT_APP_DATA.techStack.primary,
+        defaultAppData.techStack.primary,
       ),
       secondary: asStringArray(
         data.techStack?.secondary,
-        DEFAULT_APP_DATA.techStack.secondary,
+        defaultAppData.techStack.secondary,
       ),
     },
-    projectsSubtitle: asString(
+    projectsSubtitle: getLocalizedString(
+      lang,
+      defaultAppData.projectsSubtitle ?? "",
       data.projectsSubtitle,
-      DEFAULT_APP_DATA.projectsSubtitle ?? "",
+      data.projectsSubtitleDe,
+      data.projectsSubtitleEn,
+    ),
+    projectsContext: getLocalizedString(
+      lang,
+      defaultAppData.projectsContext ?? "",
+      data.projectsContext,
+      data.projectsContextDe,
+      data.projectsContextEn,
+    ),
+    projectDetailsContext: getLocalizedString(
+      lang,
+      defaultAppData.projectDetailsContext ?? "",
+      data.projectDetailsContext,
+      data.projectDetailsContextDe,
+      data.projectDetailsContextEn,
     ),
     projects:
-      data.projects?.map((entry) => normalizeProjectEntry(entry)) ??
-      DEFAULT_APP_DATA.projects,
-    experienceSubtitle: asString(
+      data.projects?.map((entry) => normalizeProjectEntry(entry, lang)) ??
+      defaultAppData.projects,
+    experienceSubtitle: getLocalizedString(
+      lang,
+      defaultAppData.experienceSubtitle ?? "",
       data.experienceSubtitle,
-      DEFAULT_APP_DATA.experienceSubtitle ?? "",
+      data.experienceSubtitleDe,
+      data.experienceSubtitleEn,
     ),
     experience:
-      data.experience?.map((entry) => normalizeExperienceEntry(entry)) ??
-      DEFAULT_APP_DATA.experience,
+      data.experience?.map((entry) => normalizeExperienceEntry(entry, lang)) ??
+      defaultAppData.experience,
     contact: {
-      phone: asString(data.contact?.phone, DEFAULT_APP_DATA.contact.phone),
-      email: asString(data.contact?.email, DEFAULT_APP_DATA.contact.email),
+      phone: asString(data.contact?.phone, defaultAppData.contact.phone),
+      email: asString(data.contact?.email, defaultAppData.contact.email),
       addressCountry: asString(
         data.contact?.addressCountry,
-        DEFAULT_APP_DATA.contact.addressCountry,
+        defaultAppData.contact.addressCountry,
       ),
       addressStreet: asString(
         data.contact?.addressStreet,
-        DEFAULT_APP_DATA.contact.addressStreet,
+        defaultAppData.contact.addressStreet,
       ),
       addressZipCode: asString(
         data.contact?.addressZipCode,
-        DEFAULT_APP_DATA.contact.addressZipCode,
+        defaultAppData.contact.addressZipCode,
       ),
       addressCity: asString(
         data.contact?.addressCity,
-        DEFAULT_APP_DATA.contact.addressCity,
+        defaultAppData.contact.addressCity,
       ),
-      github: asString(data.contact?.github, DEFAULT_APP_DATA.contact.github),
-      xing: asString(data.contact?.xing, DEFAULT_APP_DATA.contact.xing),
+      github: asString(data.contact?.github, defaultAppData.contact.github),
+      xing: asString(data.contact?.xing, defaultAppData.contact.xing),
       linkedin: asString(
         data.contact?.linkedin,
-        DEFAULT_APP_DATA.contact.linkedin,
+        defaultAppData.contact.linkedin,
       ),
     },
   };
@@ -246,6 +566,6 @@ export const loadAppData = async (
     return normalizeAppData(data.default);
   } catch {
     console.warn("app-data.json not found -> using defaults");
-    return normalizeAppData(DEFAULT_APP_DATA);
+    return normalizeAppData(defaultAppData);
   }
 };

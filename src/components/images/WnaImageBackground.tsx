@@ -9,6 +9,7 @@ export type WnaImageBackgroundProps = {
   appColors: Colors;
   imageStyle?: ImageStyle;
   children: ReactNode;
+  isDarkMode: boolean;
 };
 
 const WnaImageBackground = React.memo(
@@ -17,6 +18,7 @@ const WnaImageBackground = React.memo(
     appColors,
     imageStyle: _imageStyle,
     children,
+    isDarkMode,
   }: WnaImageBackgroundProps) => {
     const resolvedUri = useMemo(() => {
       return imageUri && imageUri.trim() !== "" ? imageUri : undefined;
@@ -45,7 +47,7 @@ const WnaImageBackground = React.memo(
           forceExperimentalBlur
           isBackground
           style={styles.container}
-          blurTint="dark"
+          blurTint={isDarkMode ? "dark" : "dark"}
           blurIntensity={40}
         >
           {children}

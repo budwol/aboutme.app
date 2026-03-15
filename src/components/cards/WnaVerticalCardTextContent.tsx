@@ -56,13 +56,7 @@ const WnaVerticalCardTextContent: FC<WnaVerticalCardTextContentProps> = ({
     ) : null}
 
     {!!description && (
-      <Text
-        style={{
-          color: appColors.black,
-          fontSize: 12,
-          lineHeight: 18,
-        }}
-      >
+      <Text style={appStyle?.textNeutralMicro ?? { color: appColors.black }}>
         {description}
       </Text>
     )}

@@ -16,6 +16,16 @@ jest.mock("@components/cards/WnaVerticalCardTextContent", () => {
   };
 });
 
+jest.mock("@components/misc/WnaBadge", () => {
+  const { createElement } = jest.requireActual(
+    "react",
+  ) as typeof import("react");
+
+  return function MockWnaBadge(props: unknown) {
+    return createElement("WnaBadge", props as Record<string, unknown>);
+  };
+});
+
 describe("WnaCardSmallVertical", () => {
   it("forwards title, subtitle and description to the shared content component", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -30,16 +40,23 @@ describe("WnaCardSmallVertical", () => {
               black: "#000000",
             } as never
           }
-          appStyle={{} as never}
+          appStyle={
+            {
+              textMicro: { lineHeight: 16 },
+              textNeutralMicro: {},
+            } as never
+          }
           title="Engineer"
           subtitle="Example Inc."
           description="Built features."
+          badgeText="3 yrs 5 mos"
           opacity={0.7}
         />,
       );
     });
 
     const content = tree!.root.findByType("WnaVerticalCardTextContent");
+    const badge = tree!.root.findByType("WnaBadge");
     const container = tree!.root
       .findAll((node: { props?: { style?: { opacity?: number } } }) =>
         Boolean(node.props?.style?.opacity),
@@ -48,7 +65,8 @@ describe("WnaCardSmallVertical", () => {
 
     expect(content.props.title).toBe("Engineer");
     expect(content.props.subtitle).toBe("Example Inc.");
-    expect(content.props.description).toBe("Built features.");
+    expect(content.props.description).toBeUndefined();
+    expect(badge.props.text).toBe("3 yrs 5 mos");
     expect(container?.props.style.opacity).toBe(0.7);
   });
 });

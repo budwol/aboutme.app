@@ -8,19 +8,24 @@ import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import WnaSeparatorHorizontal from "@components/misc/WnaSeparatorHorizontal";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
+import WnaContactFooter from "@components/screens/WnaContactFooter";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
-import WnaContactCard from "@components/welcome/WnaContactCard";
 import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
 import WnaProjectsCard from "@components/welcome/WnaProjectsCard";
 import WnaWelcomeCard from "@components/welcome/WnaWelcomeCard";
-import { seoCatalog } from "@constants/seoCatalog";
+import { i18nKeys } from "@services/i18n/i18nKeys";
+import {
+  getDrawerProjectNavigationPath,
+  getNavigationLang,
+} from "@components/navigation/wnaNavigationRouteProvider";
+import { createProjectSlug } from "@utils/projectRoutes";
 import { useNavigation, useRouter } from "expo-router";
 import Animated from "react-native-reanimated";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ElementRef, ReactNode, useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-const SEPARATOR_SPACE = 16;
+const separatorSpace = 16;
 
 const styles = StyleSheet.create({
   content: {
@@ -36,6 +41,8 @@ export default function WnaHomeRoute(): ReactNode {
   const router = useRouter();
   const navigation = useNavigation();
   const { scrollY, onScroll } = useWnaScrollY();
+  const lang = getNavigationLang();
+  const scrollViewRef = useRef<ElementRef<typeof Animated.ScrollView>>(null);
 
   const contentContainerStyle = useMemo(
     () => ({
@@ -51,17 +58,37 @@ export default function WnaHomeRoute(): ReactNode {
         <WnaListCardWhiteDecent appColors={appColors}>
           {children}
         </WnaListCardWhiteDecent>
-        <WnaSeparatorHorizontal transparent space={SEPARATOR_SPACE} />
+        <WnaSeparatorHorizontal transparent space={separatorSpace} />
       </>
     ),
     [appColors],
   );
 
+  const handleProjectPress = useCallback(
+    (index: number) => {
+      const project = appData.projects[index];
+      if (!project) return;
+
+      router.push(
+        getDrawerProjectNavigationPath(
+          createProjectSlug(project.title, index),
+          lang,
+        ),
+      );
+    },
+    [appData.projects, lang, router],
+  );
+
+  const handleTitlePress = useCallback(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  }, []);
+
   return (
     <WnaBaseScreen
       isRootPage
-      seoEntry={seoCatalog.root}
+      headerTitle={t(i18nKeys.appBrand)}
       icon="home"
+      onTitlePress={handleTitlePress}
       scrollY={scrollY}
       headerButton0={
         <WnaNavigationHeaderButtonRight
@@ -82,6 +109,7 @@ export default function WnaHomeRoute(): ReactNode {
       }
     >
       <Animated.ScrollView
+        ref={scrollViewRef}
         contentContainerStyle={contentContainerStyle}
         scrollEventThrottle={appLayout.scrollEventThrottle}
         onScroll={onScroll}
@@ -102,6 +130,7 @@ export default function WnaHomeRoute(): ReactNode {
               appData={appData}
               appStyle={appStyle}
               t={t}
+              onProjectPress={handleProjectPress}
             />
           </SectionCard>
 
@@ -115,12 +144,7 @@ export default function WnaHomeRoute(): ReactNode {
           </SectionCard>
 
           <View style={styles.content}>
-            <WnaContactCard
-              appColors={appColors}
-              appData={appData}
-              appStyle={appStyle}
-              t={t}
-            />
+            <WnaContactFooter showTopSpacing={false} />
           </View>
         </View>
       </Animated.ScrollView>

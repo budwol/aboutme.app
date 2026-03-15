@@ -1,13 +1,16 @@
-import { seoCatalog } from "@constants/seoCatalog";
+import { i18nKeys } from "@services/i18n/i18nKeys";
 import { ReactNode } from "react";
-import { licensesHtmlContent } from "./legalContent";
+import { useTranslation } from "react-i18next";
+import { getLicensesHtmlContent } from "./legalContent";
 import WnaLegalDocumentScreen from "./WnaLegalDocumentScreen";
 
 export default function WnaLicensesRoute(): ReactNode {
+  const { t } = useTranslation(["common"]);
+
   return (
     <WnaLegalDocumentScreen
-      seoEntry={seoCatalog.licenses}
-      htmlContent={licensesHtmlContent}
+      headerTitle={t(i18nKeys.screenTitleLicenses)}
+      htmlContent={getLicensesHtmlContent()}
     />
   );
 }

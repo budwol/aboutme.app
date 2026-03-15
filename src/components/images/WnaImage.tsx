@@ -49,6 +49,19 @@ type ImageSourceInput = Pick<
 const _blurHash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
+function normalizeLocalImageUrl(imageUrl: string): string {
+  if (
+    imageUrl === "" ||
+    imageUrl.startsWith("http") ||
+    imageUrl.startsWith("/") ||
+    imageUrl.startsWith("data:")
+  ) {
+    return imageUrl;
+  }
+
+  return `/${imageUrl.replace(/^\/+/, "")}`;
+}
+
 function resolveImageState(props: ImageSourceInput): ImageState {
   try {
     let imageUrl = props.imageUrl;
@@ -62,9 +75,10 @@ function resolveImageState(props: ImageSourceInput): ImageState {
     }
 
     if (!imageUrl.startsWith("http")) {
+      const normalizedImageUrl = normalizeLocalImageUrl(imageUrl);
       return {
-        cachedImageBase64Url: imageUrl,
-        loadedImageUrl: imageUrl,
+        cachedImageBase64Url: normalizedImageUrl,
+        loadedImageUrl: normalizedImageUrl,
       };
     }
 
@@ -95,6 +109,10 @@ function shouldRenderImage(prevProps: WnaImageProps, nextProps: WnaImageProps) {
 
 function WnaImage(props: WnaImageProps) {
   const { imageUrl, placeholderUrl, thumbnailUrl } = props;
+  const normalizedImageUrl = useMemo(
+    () => normalizeLocalImageUrl(imageUrl),
+    [imageUrl],
+  );
   const imageState = useMemo(
     () => resolveImageState({ imageUrl, placeholderUrl, thumbnailUrl }),
     [imageUrl, placeholderUrl, thumbnailUrl],
@@ -114,7 +132,7 @@ function WnaImage(props: WnaImageProps) {
     [props.imageTitle, props.imageUrl],
   );
 
-  const needsToLoadImage = imageState.loadedImageUrl !== props.imageUrl;
+  const needsToLoadImage = imageState.loadedImageUrl !== normalizedImageUrl;
   const needsToShowActivityIndicator =
     needsToLoadImage || imageState.cachedImageBase64Url === "";
   const contentFit = props.contentFit ?? "cover";

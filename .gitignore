@@ -44,11 +44,26 @@ yarn-error.*
 .env
 expo-env.d.ts
 .env*.local
+.aboutme/
 
 # typescript
 *.tsbuildinfo
 
 # app
+# remove them after fork
 app-data.json
-public/images/*_*.png
-public/images/*_*.webp
+public/images/
+public/logo.png
+public/logo.svg
+public/logo.ico
+public/logo_*.png
+public/logo_*.webp
+public/favicon.ico
+public/favicon.png
+public/favicon.svg
+public/bg.jpg
+public/bg.webp
+public/site.webmanifest
+public/robots.txt
+public/sitemap.xml
+nginx/site.conf
