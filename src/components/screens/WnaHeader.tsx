@@ -185,7 +185,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
 
     return (
       <Animated.View style={[headerStyle, headerShadowStyle]}>
-        <Animated.View style={[headerStyle, { pointerEvents: pointerEvents }]}>
+        <Animated.View
+          style={[
+            headerStyle,
+            { pointerEvents: pointerEvents as ViewStyle["pointerEvents"] },
+          ]}
+        >
           <Animated.View
             style={[
               headerStyle,
@@ -200,12 +205,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               style={headerStyle}
             />
             <Animated.View
-              pointerEvents="none"
               style={[
                 headerStyle,
                 {
                   position: "absolute",
                   backgroundColor: appColors.staticWarmgray8,
+                  pointerEvents: "none",
                 },
                 blurOverlayStyle,
               ]}
