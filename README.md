@@ -148,6 +148,32 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
 
    The container build only includes generated runtime assets and nginx config from the project root. Local source data like `.aboutme/`, `.env`, tests, and dev files stay out of the Docker build context. Nginx serves the app on port `8080` inside the container, just quietly doing its job like a happy little cloud drifting across the top of the scene.
 
+   If you want to inspect the sharp edges first:
+
+   ```bash
+   npm run deploy:local -- --dry-run
+   npm run deploy:container -- --dry-run
+   ```
+
+   And if you want the scripts to stop asking and just do the thing:
+
+   ```bash
+   npm run deploy:local -- --yes
+   npm run deploy:container -- --yes
+   ```
+
+## Security Tradeoffs
+
+This little canvas is hardened in the plain, useful places, but a few corners are still honest tradeoffs. No hidden dragons here, just a couple of sharp palette knives sitting next to the paint.
+
+- `deploy-local.sh` is one of those palette knives. It only works inside `/var/www/*` and refuses `/var/www` itself, but it still replaces the current target contents under `sudo`. That is fine for a small owner-run box. Just not something you want to kick over with your elbow while reaching for a cloud.
+- `deploy-container.sh` reads the registry settings from `.env`, exports the web build, then builds and pushes an image. That is the right move for this setup, but it is still a real shipping button, not a harmless little practice stroke.
+- The default local checks stay mostly offline and repeatable. `npm run test:security` covers the repo-specific work here: env parsing, URL and HTML hardening, init generation, dependency tree shape, and dry-run behavior. It is a good steady brush. It is not pretending to be a live advisory feed from the sky.
+- There is no `SECURITY.md` and no GitHub advisory workflow wired in right now. For a small personal repo that is a process choice, not a secret hole in the barn wall.
+- If you want a live dependency advisory check, run `npm audit` when network access is available. That bit stays manual on purpose, because clean local repeatability won the toss against pretending a network check happened when it did not.
+
+Short version: the app path is meant to stay calm and safe, the deploy scripts are meant to be clear and a little sharp, and the repo does not wear fake enterprise shoulder pads just to look important. Just a few happy little guard rails and enough honesty to leave the rough edges where they really are.
+
 ### Quality Checks
 
 - `npm run lint`
