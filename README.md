@@ -2,7 +2,17 @@
 
 AboutMe is my little portfolio app built with Expo and React Native Web.
 
-Clone it, throw in your own data and images, run `./init.sh`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
+Clone it, throw in your own data and images, run `npm run init`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
+
+If you just want the happy path, it is this:
+
+```bash
+npm install
+npm run init
+npm run web
+```
+
+That gets you from clone to a running template without wandering through the whole forest first.
 
 ## Tech Stack
 
@@ -37,7 +47,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 2. Run the initializer.
 
    ```bash
-   ./init.sh
+   npm run init
    ```
 
    On the first run it creates `.aboutme/`, `.aboutme/app-data.json`, `.aboutme/images/`, and `.env` if `.env.example` exists. It also seeds the default placeholder assets from the repo, so you do not have to paint the first little tree by hand. We start with a little bit of structure, then we can get wild in a controlled way.
@@ -47,7 +57,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 4. Run the initializer again whenever you change data or images.
 
    ```bash
-   ./init.sh
+   npm run init
    ```
 
    The script is idempotent. Run it as often as you want. No mistakes here, just happy little rebuilds. Every pass lays down another calm little layer of paint. It syncs `.aboutme/app-data.json` into the ignored root `app-data.json` and regenerates:
@@ -61,7 +71,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
    If you just want to peek without writing files:
 
    ```bash
-   ./init.sh --dry-run
+   npm run init -- --dry-run
    ```
 
    Good for local checks and CI. Same decisions, no writes, just a quiet little rehearsal before the real brush hits the canvas.
@@ -71,6 +81,27 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
    ```bash
    npm run web
    ```
+
+## Customize Your Portfolio
+
+If you want this to stop looking like my little template and start looking like your thing, these are the main brushes to grab first:
+
+- `.aboutme/app-data.json`
+  this is the heart of the content: profile, projects, links, experience, legal pages
+- `.aboutme/images/`
+  drop in your avatar, project images, logo, and background here
+- `src/locales/`
+  adjust copy and translations if the default wording is not your voice
+- `src/components/`
+  shape the UI if you want to push the layout further than content swapping
+
+In practice the usual flow is:
+
+1. run `npm run init`
+2. edit `.aboutme/app-data.json`
+3. replace files in `.aboutme/images/`
+4. run `npm run init` again
+5. refresh `npm run web`
 
 ## Configuration
 
@@ -97,7 +128,7 @@ If you need a local `.env`:
 cp .env.example .env
 ```
 
-`./init.sh` already creates `.env` when `.env.example` exists and `.env` is still missing.
+`npm run init` already creates `.env` when `.env.example` exists and `.env` is still missing.
 
 `.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Everything generated from them, like root `app-data.json`, public assets, and nginx config, is intentionally ignored by Git. Nice and tidy, like cleaning the brushes before the paint dries and giving the canvas one last friendly nod.
 
@@ -117,6 +148,14 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
 - **L** – whatever ratio makes sense for your work
 
 ## Deployment
+
+If you are just using this as a portfolio template, you can ignore Docker for a while. The normal path is:
+
+- `npm run web` for local work
+- `npm run export:web` when you want a static build
+- `npm run deploy:local` if you want to copy that build onto a box you control
+
+Docker is there for people who actually want that delivery path, not as a rite of passage before the app is allowed to exist.
 
 1. Create a `.env` file if your deploy setup needs one.
 
@@ -146,7 +185,7 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
    npm run deploy:web
    ```
 
-   The container build only includes generated runtime assets and nginx config from the project root. Local source data like `.aboutme/`, `.env`, tests, and dev files stay out of the Docker build context. Nginx serves the app on port `8080` inside the container, just quietly doing its job like a happy little cloud drifting across the top of the scene.
+   This is the optional path. The container build only includes generated runtime assets and nginx config from the project root. Local source data like `.aboutme/`, `.env`, tests, and dev files stay out of the Docker build context. Nginx serves the app on port `8080` inside the container, just quietly doing its job like a happy little cloud drifting across the top of the scene.
 
    If you want to inspect the sharp edges first:
 
@@ -184,7 +223,9 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 - `npm run test:types`
 - `npm run test:prettier`
 - `npm run test:all`
-- `./init.sh --dry-run`
+- `npm run init -- --dry-run`
+
+There is also a tiny GitHub Actions CI now. It runs `lint`, `test:security`, and `test:all` on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
 
 If you want the full cleanup pass:
 
