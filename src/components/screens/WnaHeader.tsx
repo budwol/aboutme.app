@@ -1,5 +1,6 @@
 import { WnaShadowStyle } from "@components/misc/WnaShadowStyle";
 import { getNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
 import { animationSpeed } from "@constants/animationSpeed";
 import { Href, useRouter } from "expo-router";
@@ -66,6 +67,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     onTitlePress,
   }) => {
     const router = useRouter();
+    const navigationRouter = useWnaNavigationTransition(router);
     const { appColors, appStyle, setAppColors, theme, setTheme } =
       useWnaTheme();
     const { appLayout, isLandscape } = useWnaLayout();
@@ -133,16 +135,16 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       if (isBusy) return;
 
       if (backHref) {
-        router.replace(backHref);
+        navigationRouter.replace(backHref);
         return;
       }
 
       if (router.canGoBack()) {
-        router.back();
+        navigationRouter.back();
       } else {
-        router.navigate(getNavigationPath("root"));
+        navigationRouter.navigate(getNavigationPath("root"));
       }
-    }, [backHref, router, isBusy]);
+    }, [backHref, isBusy, navigationRouter, router]);
 
     const handleTitlePress = useCallback(() => {
       if (isBusy) return;
@@ -153,12 +155,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       }
 
       if (titleHref) {
-        router.replace(titleHref);
+        navigationRouter.replace(titleHref);
         return;
       }
 
       handleBack();
-    }, [handleBack, isBusy, onTitlePress, router, titleHref]);
+    }, [handleBack, isBusy, navigationRouter, onTitlePress, titleHref]);
 
     const toggleTheme = async () => {
       const currentTheme = (await getThemeFromStorageAsync()) ?? theme;

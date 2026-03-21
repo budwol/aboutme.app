@@ -33,16 +33,15 @@ describe("app config", () => {
   it("uses the first valid configured site url", () => {
     expect(
       getConfiguredSiteUrlFromSources({
-        appDataSiteUrl: "https://app-data.example.com/",
         publicSiteUrl: "https://public.example.com",
         baseUrl: "https://base.example.com",
       }),
-    ).toBe("https://app-data.example.com");
+    ).toBe("https://public.example.com");
   });
 
   it("throws on missing or invalid configured site urls", () => {
     expect(() => getConfiguredSiteUrlFromSources({})).toThrow(
-      /Missing site URL configuration/,
+      /Set EXPO_PUBLIC_SITE_URL or BASE_URL/,
     );
     expect(() =>
       getConfiguredSiteUrlFromSources({

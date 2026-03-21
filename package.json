@@ -9,7 +9,7 @@
     "deploy:container": "./scripts/deploy-container.sh",
     "deploy:local": "./scripts/deploy-local.sh",
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
-    "export:web": "npm run cleanup && npx expo export -p web",
+    "export:web": "node ./scripts/sync-web-app-data.cjs && npm run cleanup && npx expo export -p web",
     "fix:prettier": "prettier --write .",
     "init": "./init.sh",
     "lint": "eslint ./src --no-cache",
@@ -25,7 +25,7 @@
     "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcessSecurity.test.ts src/scripts/initScript.test.ts src/utils/appConfig.test.ts src/utils/htmlSanitizer.test.ts src/scripts/envParser.test.ts && npm run test:dry-run",
     "test:types": "tsc --skipLibCheck",
     "test:unit": "jest --runInBand --watchAll=false",
-    "web": "expo start --web"
+    "web": "node ./scripts/sync-web-app-data.cjs && expo start --web"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

@@ -3,6 +3,7 @@ import Logger from "@/utils/logger";
 import { cleanAndTruncate } from "@/utils/stringHelper";
 import WnaActivityIndicator from "@components/misc/WnaActivityIndicator";
 import Colors from "@constants/theme/colors";
+import { ImageProps, ImageSource } from "expo-image";
 import { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import WnaImageElement from "./WnaImageElement/WnaImageElement";
@@ -27,6 +28,7 @@ export type WnaImageProps = {
   imageUrl: string;
   imageTitle: string;
   style?: WnaImageStyleProps | WnaImageStyleProps[];
+  sources?: WnaResponsiveImageSource[];
   thumbnailUrl?: string | null;
   placeholderUrl?: string | null;
   hideBackground?: boolean;
@@ -34,6 +36,15 @@ export type WnaImageProps = {
   grayScale?: boolean;
   contentFit?: "contain" | "cover";
   overwriteAnimationSpeed?: number;
+  priority?: ImageProps["priority"];
+  responsivePolicy?: ImageProps["responsivePolicy"];
+};
+
+export type WnaResponsiveImageSource = {
+  imageUrl: string;
+  width: number;
+  height?: number;
+  webMaxViewportWidth?: number;
 };
 
 type ImageState = {
@@ -99,11 +110,14 @@ function shouldRenderImage(prevProps: WnaImageProps, nextProps: WnaImageProps) {
     nextProps.hideBackground !== prevProps.hideBackground ||
     nextProps.placeholderUrl !== prevProps.placeholderUrl ||
     nextProps.style !== prevProps.style ||
+    nextProps.sources !== prevProps.sources ||
     nextProps.thumbnailUrl !== prevProps.thumbnailUrl ||
     nextProps.grayScale !== prevProps.grayScale ||
     nextProps.contentFit !== prevProps.contentFit ||
     nextProps.showActivityIndicator !== prevProps.showActivityIndicator ||
-    nextProps.overwriteAnimationSpeed !== prevProps.overwriteAnimationSpeed
+    nextProps.overwriteAnimationSpeed !== prevProps.overwriteAnimationSpeed ||
+    nextProps.priority !== prevProps.priority ||
+    nextProps.responsivePolicy !== prevProps.responsivePolicy
   );
 }
 
@@ -131,6 +145,18 @@ function WnaImage(props: WnaImageProps) {
     () => cleanAndTruncate(props.imageTitle ?? props.imageUrl),
     [props.imageTitle, props.imageUrl],
   );
+  const normalizedSources = useMemo<ImageSource[] | undefined>(() => {
+    if (!props.sources || props.sources.length === 0) {
+      return undefined;
+    }
+
+    return props.sources.map((source) => ({
+      uri: normalizeLocalImageUrl(source.imageUrl),
+      width: source.width,
+      height: source.height ?? source.width,
+      webMaxViewportWidth: source.webMaxViewportWidth,
+    }));
+  }, [props.sources]);
 
   const needsToLoadImage = imageState.loadedImageUrl !== normalizedImageUrl;
   const needsToShowActivityIndicator =
@@ -159,10 +185,13 @@ function WnaImage(props: WnaImageProps) {
           appColors={props.appColors}
           style={props.style}
           imageUrl={displayImageUrl}
+          source={normalizedSources ?? displayImageUrl}
           altText={altText}
           grayScale={props.grayScale}
           contentFit={contentFit}
           overwriteAnimationSpeed={props.overwriteAnimationSpeed}
+          priority={props.priority}
+          responsivePolicy={props.responsivePolicy}
         />
       )}
     </View>
