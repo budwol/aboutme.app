@@ -20,6 +20,23 @@ describe("htmlSanitizer", () => {
     expect(sanitizeHtml(input)).toBe("<p>Hello</p><a>x</a>");
   });
 
+  it("keeps only explicitly allowed anchor href protocols", () => {
+    expect(
+      sanitizeHtml(
+        '<a href="https://example.com" target="_blank" rel="noopener">safe</a>',
+      ),
+    ).toBe('<a href="https://example.com" target="_blank">safe</a>');
+    expect(sanitizeHtml('<a href="data:text/html;base64,abc">unsafe</a>')).toBe(
+      "<a>unsafe</a>",
+    );
+  });
+
+  it("removes disallowed tags instead of passing them through", () => {
+    expect(
+      sanitizeHtml('<iframe src="https://example.com"></iframe><p>safe</p>'),
+    ).toBe("<p>safe</p>");
+  });
+
   it("keeps basic helpers working", () => {
     expect(isHtml("<p>hello</p>")).toBe(true);
     expect(stripHtml("<p>hello</p>")).toBe("hello");

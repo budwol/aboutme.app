@@ -2,12 +2,15 @@
 set -euo pipefail
 
 ENV_FILE="${1:-.env}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARSER="$SCRIPT_DIR/env-parser.cjs"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "Missing env file: $ENV_FILE" >&2
-  exit 1
+  return 1 2>/dev/null || exit 1
 fi
 
-set -a
-. "$ENV_FILE"
-set +a
+while IFS= read -r -d '' key && IFS= read -r -d '' value; do
+  printf -v "$key" '%s' "$value"
+  export "$key"
+done < <(node "$PARSER" "$ENV_FILE")
