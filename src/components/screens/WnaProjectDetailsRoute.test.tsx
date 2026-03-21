@@ -135,6 +135,11 @@ jest.mock("expo-router", () => {
       ReactModule.createElement("Redirect", props as Record<string, unknown>),
     useLocalSearchParams: jestModule.fn(),
     useNavigation: () => ({}),
+    useRouter: () => ({
+      push: jestModule.fn(),
+      replace: jestModule.fn(),
+      back: jestModule.fn(),
+    }),
   };
 });
 

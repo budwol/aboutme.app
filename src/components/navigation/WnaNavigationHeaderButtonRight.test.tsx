@@ -3,6 +3,14 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 
+jest.mock("@components/navigation/useWnaNavigationTransition", () => ({
+  useWnaNavigationTransition: (router: {
+    push: (...args: unknown[]) => void;
+  }) => ({
+    push: (...args: unknown[]) => router.push(...args),
+  }),
+}));
+
 jest.mock("@components/buttons/WnaButtonHeader", () => {
   const { createElement } = jest.requireActual(
     "react",
