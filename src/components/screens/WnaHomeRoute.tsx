@@ -6,6 +6,7 @@ import {
 } from "@components/WnaAppContext";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import WnaSeparatorHorizontal from "@components/misc/WnaSeparatorHorizontal";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
 import WnaContactFooter from "@components/screens/WnaContactFooter";
@@ -13,6 +14,7 @@ import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
 import WnaProjectsCard from "@components/welcome/WnaProjectsCard";
 import WnaWelcomeCard from "@components/welcome/WnaWelcomeCard";
+import { appLayoutConstants } from "@constants/layoutConstants";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import {
   getDrawerNavigationPath,
@@ -26,7 +28,7 @@ import { ElementRef, ReactNode, useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
-const separatorSpace = 16;
+const separatorSpace = appLayoutConstants.contentPaddingBottom;
 
 const styles = StyleSheet.create({
   content: {
@@ -40,6 +42,7 @@ export default function WnaHomeRoute(): ReactNode {
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const router = useRouter();
+  const navigationRouter = useWnaNavigationTransition(router);
   const navigation = useNavigation();
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
@@ -70,14 +73,14 @@ export default function WnaHomeRoute(): ReactNode {
       const project = appData.projects[index];
       if (!project) return;
 
-      router.push(
+      navigationRouter.push(
         getDrawerProjectNavigationPath(
           createProjectSlug(project.title, index),
           lang,
         ),
       );
     },
-    [appData.projects, lang, router],
+    [appData.projects, lang, navigationRouter],
   );
 
   const handleTitlePress = useCallback(() => {
@@ -85,8 +88,8 @@ export default function WnaHomeRoute(): ReactNode {
   }, []);
 
   const handleExperiencePress = useCallback(() => {
-    router.push(getDrawerNavigationPath("experience", lang));
-  }, [lang, router]);
+    navigationRouter.push(getDrawerNavigationPath("experience", lang));
+  }, [lang, navigationRouter]);
 
   return (
     <WnaBaseScreen

@@ -1,5 +1,6 @@
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { getNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import AppStyle from "@services/wnaStyleService";
 import Colors from "@constants/theme/colors";
@@ -51,6 +52,7 @@ function WnaNavigationHeaderButtonRight({
   route,
 }: WnaNavigationHeaderButtonRightProps) {
   const config = getHeaderButtonConfig(route, t);
+  const navigationRouter = useWnaNavigationTransition(router);
 
   return (
     <View style={{ alignItems: "center" }}>
@@ -59,7 +61,7 @@ function WnaNavigationHeaderButtonRight({
         appColors={appColors}
         text={config.title}
         iconName={config.icon}
-        onPress={() => router.push(config.route)}
+        onPress={() => navigationRouter.push(config.route)}
         t={t}
         checkInternetConnection={false}
       />

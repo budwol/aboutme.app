@@ -175,6 +175,37 @@ describe("normalizeAppData", () => {
     expect(data.experience[2].duration).toBe("1 J. 1 Mon.");
   });
 
+  it("calculates open-ended experience durations for since/seit periods", () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-03-21T12:00:00Z"));
+
+    const dataEn = normalizeAppData(
+      {
+        experience: [
+          {
+            periodEn: "since 05/2024",
+          },
+        ],
+      },
+      "en",
+    );
+
+    const dataDe = normalizeAppData(
+      {
+        experience: [
+          {
+            periodDe: "seit 05/2024",
+          },
+        ],
+      },
+      "de",
+    );
+
+    expect(dataEn.experience[0].duration).toBe("1 yr 11 mos");
+    expect(dataDe.experience[0].duration).toBe("1 J. 11 Mon.");
+
+    jest.useRealTimers();
+  });
+
   it("falls back from localized fields to legacy ones", () => {
     const data = normalizeAppData(
       {
@@ -216,6 +247,20 @@ describe("normalizeAppData", () => {
       siteUrl: "https://portfolio.example.com/",
       profile: {
         name: "budwol",
+      },
+    }));
+
+    expect(data.siteUrl).toBe("https://portfolio.example.com");
+    expect(data.profile.name).toBe("budwol");
+  });
+
+  it("loads app-data from a default export wrapper", async () => {
+    const data = await loadAppData(async () => ({
+      default: {
+        siteUrl: "https://portfolio.example.com/",
+        profile: {
+          name: "budwol",
+        },
       },
     }));
 

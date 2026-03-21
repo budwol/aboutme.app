@@ -3,6 +3,7 @@ import WnaListCardWhiteDecent from "@components/cards/WnaListCardWhiteDecent";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import WnaNavigationItem from "@components/navigation/WnaNavigationItem";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import {
   getDrawerNavigationPath,
   getNavigationLang,
@@ -20,6 +21,7 @@ export default function WnaMenuRoute(): ReactNode {
   const { isAppInitialized } = useWnaAppLifecycle();
   const { appColors, appStyle } = useWnaTheme();
   const router = useRouter();
+  const navigationRouter = useWnaNavigationTransition(router);
   const navigation = useNavigation();
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
@@ -67,7 +69,9 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"scale-balance"}
           type={"first"}
           onPress={() =>
-            router.navigate(getDrawerNavigationPath("disclaimer", lang))
+            navigationRouter.navigate(
+              getDrawerNavigationPath("disclaimer", lang),
+            )
           }
           t={t}
         />
@@ -78,7 +82,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"shield-account"}
           type={"middle"}
           onPress={() =>
-            router.navigate(getDrawerNavigationPath("privacy", lang))
+            navigationRouter.navigate(getDrawerNavigationPath("privacy", lang))
           }
           t={t}
         />
@@ -89,7 +93,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"file-sign"}
           type={"middle"}
           onPress={() =>
-            router.navigate(getDrawerNavigationPath("terms", lang))
+            navigationRouter.navigate(getDrawerNavigationPath("terms", lang))
           }
           t={t}
         />
@@ -100,7 +104,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"certificate-outline"}
           type={"last"}
           onPress={() =>
-            router.navigate(getDrawerNavigationPath("licenses", lang))
+            navigationRouter.navigate(getDrawerNavigationPath("licenses", lang))
           }
           t={t}
         />

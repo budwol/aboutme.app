@@ -8,6 +8,7 @@ import WnaListCardWhiteDecent from "@components/cards/WnaListCardWhiteDecent";
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import { getProjectImageForWidth } from "@components/images/wnaImageAssetResolver";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
+import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import {
   getDrawerNavigationPath,
@@ -20,7 +21,12 @@ import { getLangCode } from "@services/i18n/i18n";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { findProjectBySlug } from "@utils/projectRoutes";
-import { Redirect, useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  Redirect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
 import { ReactNode, useMemo } from "react";
 import { Linking, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -193,6 +199,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
   const { currentWindowWidth } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const navigation = useNavigation();
+  const router = useRouter();
   const params = useLocalSearchParams<{ slug?: string | string[] }>();
   const rawSlug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const projectMatch = useMemo(
@@ -246,6 +253,15 @@ export default function WnaProjectDetailsRoute(): ReactNode {
       backHref={getDrawerNavigationPath("projects", lang)}
       titleHref={getDrawerNavigationPath("projects", lang)}
       showFooter={false}
+      headerButton0={
+        <WnaNavigationHeaderButtonRight
+          appStyle={appStyle}
+          appColors={appColors}
+          router={router}
+          route="home"
+          t={t}
+        />
+      }
       headerButton1={
         <WnaMenuHeaderRight
           appStyle={appStyle}
