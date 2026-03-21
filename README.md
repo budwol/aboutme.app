@@ -43,6 +43,8 @@ AboutMe is built with a React Native for Web setup powered by Expo.
    npm install
    ```
 
+   The project is currently aligned with Node `20.19.4` and npm `11.5.2`.
+
 2. Run the initializer:
 
    ```bash
@@ -163,10 +165,15 @@ The app ships with:
    npm run deploy:web
    ```
 
+   The container build only includes the generated runtime assets and nginx config from the project root. Local source data such as `.aboutme/`, `.env`, tests, and development files are excluded from the Docker build context. The bundled nginx serves the app on port `8080` inside the container.
+
 ### Quality Checks
 
 - `npm run lint`
+- `npm run test:deps`
+- `npm run test:dry-run`
 - `npm run test:unit`
+- `npm run test:security`
 - `npm run test:types`
 - `npm run test:prettier`
 - `npm run test:all`
