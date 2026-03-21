@@ -6,21 +6,21 @@ import {
   stripHtml,
 } from "@utils/htmlSanitizer";
 
-describe("htmlSanitizer", () => {
-  it("escapes dynamic text for html interpolation", () => {
+describe("html sanitizer", () => {
+  it("escapes plain text before html interpolation", () => {
     expect(escapeHtml(`Tom & "<Jerry>"`)).toBe(
       "Tom &amp; &quot;&lt;Jerry&gt;&quot;",
     );
   });
 
-  it("removes unsafe tags and attributes from html", () => {
+  it("strips unsafe tags and attributes", () => {
     const input =
       '<p onclick="alert(1)">Hello</p><script>alert(1)</script><a href="javascript:alert(1)">x</a>';
 
     expect(sanitizeHtml(input)).toBe("<p>Hello</p><a>x</a>");
   });
 
-  it("keeps only explicitly allowed anchor href protocols", () => {
+  it("keeps only the allowed link protocols", () => {
     expect(
       sanitizeHtml(
         '<a href="https://example.com" target="_blank" rel="noopener">safe</a>',
@@ -31,13 +31,13 @@ describe("htmlSanitizer", () => {
     );
   });
 
-  it("removes disallowed tags instead of passing them through", () => {
+  it("drops tags that are not on the allowlist", () => {
     expect(
       sanitizeHtml('<iframe src="https://example.com"></iframe><p>safe</p>'),
     ).toBe("<p>safe</p>");
   });
 
-  it("keeps basic helpers working", () => {
+  it("keeps the helper functions working", () => {
     expect(isHtml("<p>hello</p>")).toBe(true);
     expect(stripHtml("<p>hello</p>")).toBe("hello");
   });

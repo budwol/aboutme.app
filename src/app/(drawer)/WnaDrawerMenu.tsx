@@ -123,7 +123,6 @@ export default function WnaDrawerMenu() {
         },
       ]}
     >
-      {/* HEADER */}
       <WnaPressable
         ripple={undefined}
         disableHover
@@ -167,20 +166,18 @@ export default function WnaDrawerMenu() {
         </View>
       </WnaPressable>
 
-      {/* NAVIGATION */}
       <View style={styles.navWrapper}>
         <WnaNavigationList
           appStyle={appStyle}
           appLayout={appLayout}
           items={items}
-          overWritePaddingTop={1}
-          overWriteGap={1}
+          overridePaddingTop={1}
+          overrideGap={1}
           style={styles.navList}
           renderItem={renderItem}
         />
       </View>
 
-      {/* FOOTER */}
       <View style={styles.footer}>
         <Text
           onPress={() =>
