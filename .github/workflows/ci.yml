@@ -30,5 +30,8 @@ jobs:
       - name: security checks
         run: npm run test:security
 
+      - name: export smoke check
+        run: npm run test:smoke
+
       - name: full test pass
         run: npm run test:all
