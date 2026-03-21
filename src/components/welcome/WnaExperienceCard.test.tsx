@@ -22,6 +22,12 @@ type BadgeNode = {
   };
 };
 
+type CardNode = {
+  props: {
+    title?: string;
+  };
+};
+
 function flattenText(children: unknown): string {
   if (Array.isArray(children)) {
     return children.map((child) => flattenText(child)).join("");
@@ -77,15 +83,9 @@ jest.mock("react-native-reanimated", () => {
           (props as { children?: React.ReactNode }).children,
         ),
     },
-    FadeInDown: {
-      duration: () => ({}),
-    },
-    FadeOutUp: {
-      duration: () => ({}),
-    },
-    LinearTransition: {
-      duration: () => ({}),
-    },
+    useAnimatedStyle: (factory: () => unknown) => factory(),
+    useSharedValue: (value: unknown) => ({ value }),
+    withTiming: (value: unknown) => value,
   };
 });
 
@@ -177,7 +177,14 @@ describe("WnaExperienceCard", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaExperienceCard
-          appColors={{ accent5: "#0aa", coolgray6: "#666" } as never}
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
           appData={appData}
           appStyle={
             {
@@ -261,5 +268,90 @@ describe("WnaExperienceCard", () => {
       "C#",
       ".NET",
     ]);
+  });
+
+  it("can render a reduced home teaser with a footer action", () => {
+    const onFooterActionPress = jest.fn();
+    const appData = {
+      ...defaultAppData,
+      experience: [
+        {
+          ...defaultAppData.experience[0],
+          role: "Role A",
+        },
+        {
+          ...defaultAppData.experience[0],
+          role: "Role B",
+        },
+        {
+          ...defaultAppData.experience[0],
+          role: "Role C",
+        },
+        {
+          ...defaultAppData.experience[0],
+          role: "Role D",
+        },
+        {
+          ...defaultAppData.experience[0],
+          role: "Role E",
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+          maxItems={4}
+          showDetails={false}
+          footerActionLabel="actionShowMore"
+          onFooterActionPress={onFooterActionPress}
+        />,
+      );
+    });
+
+    const cards = tree!.root.findAllByType("WnaCardSmallVertical");
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => flattenText(node.props.children));
+    const pressable = tree!.root.findAll(
+      (node: PressableNode) => typeof node.props.onPress === "function",
+    )[0];
+
+    act(() => {
+      pressable.props.onPress?.();
+    });
+
+    expect(cards).toHaveLength(4);
+    expect(cards.map((card: CardNode) => card.props.title)).toEqual([
+      "Role A",
+      "Role B",
+      "Role C",
+      "Role D",
+    ]);
+    expect(textValues).toContain("actionShowMore →");
+    expect(textValues).not.toContain("actionShowDetails ↓");
+    expect(onFooterActionPress).toHaveBeenCalledTimes(1);
   });
 });

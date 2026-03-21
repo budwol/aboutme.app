@@ -10,7 +10,7 @@ const mockNavigate = jest.fn();
 const mockCanGoBack = jest.fn(() => false);
 const mockToastShow = jest.fn();
 
-function MockToast(props: unknown) {
+function MockToast(_props: unknown) {
   return null;
 }
 

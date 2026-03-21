@@ -1,6 +1,8 @@
 export const appLayoutConstants = {
   contentPaddingBottom: 16,
   contentPaddingBottomWhenActionButton: 72,
+  contentSectionGap: 24,
+  contentSectionPaddingVertical: 16,
   footerHeight: 12,
   maxContentWidth: 1120,
   globalCornerRadius: 8,
@@ -13,6 +15,14 @@ export const appLayoutConstants = {
   scrollEventThrottle: 32,
   tabBarHeight: 32,
   textInputHeight: 42,
+  experiencePeriodWidth: 128,
+  experienceDotColumnWidth: 18,
+  experienceCompactBreakpoint: 720,
+  experienceCompactSidePadding: 8,
+  experienceMinCardWidth: 404,
+  experienceMaxCardWidth: 620,
+  experienceDetailsTopSpacing: 10,
+  experienceDetailsHeightBuffer: 4,
 };
 
 export interface AppLayout {
