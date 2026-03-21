@@ -201,6 +201,39 @@ Docker is there for people who actually want that delivery path, not as a rite o
    npm run deploy:container -- --yes
    ```
 
+## Runtime Guarantees
+
+The runtime path is meant to stay plain and inspectable, not clever.
+
+- The container serves the exported app with nginx on internal port `8080`.
+- The image healthcheck hits `http://127.0.0.1:8080/` with `wget`, so the check and the runtime speak the same language.
+- Runtime assets are only the exported `dist` output plus generated nginx config. Source content like `.aboutme/`, `.env`, tests, and other workshop clutter stays out of the image.
+- The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Resource-Policy`, and `X-Robots-Tag`.
+- Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
+
+## Ops Checks
+
+If you want a quick little field check after deploy, these are the three strokes that matter:
+
+1. confirm the generated nginx config still listens on `8080`
+2. confirm the container answers on `127.0.0.1:8080`
+3. confirm the active healthcheck is the one you think it is
+
+For example:
+
+```bash
+docker inspect <container> --format '{{json .Config.Healthcheck}}'
+docker exec -it <container> wget -S -O - http://127.0.0.1:8080/
+docker exec -it <container> grep -n "listen " /etc/nginx/http.d/default.conf
+```
+
+If a deploy goes sideways, the first boring questions are usually the right ones:
+
+- did `npm run init` run before the build?
+- does the generated `nginx/site.conf` still say `listen 8080 default_server;`?
+- does your compose or proxy config also point at `8080`?
+- is the running container actually using the expected healthcheck?
+
 ## Security Tradeoffs
 
 This little canvas is hardened in the plain, useful places, but a few corners are still honest tradeoffs. No hidden dragons here, just a couple of sharp palette knives sitting next to the paint.
