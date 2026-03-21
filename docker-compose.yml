@@ -1,6 +1,11 @@
 services:
-  app:
+  about-me:
     build: .
     restart: unless-stopped
     ports:
-      - "5110:80"
+      - "5110:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5

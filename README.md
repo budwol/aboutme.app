@@ -208,6 +208,7 @@ The runtime path is meant to stay plain and inspectable, not clever.
 - The container serves the exported app with nginx on internal port `8080`.
 - The image healthcheck hits `http://127.0.0.1:8080/` with `wget`, so the check and the runtime speak the same language.
 - Runtime assets are only the exported `dist` output plus generated nginx config. Source content like `.aboutme/`, `.env`, tests, and other workshop clutter stays out of the image.
+- HTML content goes through `sanitize-html` with a small allowlist. That path is meant for trusted portfolio content, but it is no longer hanging off a homegrown regex filter.
 - The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Resource-Policy`, and `X-Robots-Tag`.
 - Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
 
@@ -254,7 +255,7 @@ This little canvas is hardened in the plain, useful places, but a few corners ar
 - `deploy-local.sh` is one of those palette knives. It only works inside `/var/www/*` and refuses `/var/www` itself, but it still replaces the current target contents under `sudo`. That is fine for a small owner-run box. Just not something you want to kick over with your elbow while reaching for a cloud.
 - `deploy-container.sh` reads the registry settings from `.env`, exports the web build, then builds and pushes an image. That is the right move for this setup, but it is still a real shipping button, not a harmless little practice stroke.
 - The default local checks stay mostly offline and repeatable. `npm run test:security` covers the repo-specific work here: env parsing, URL and HTML hardening, init generation, dependency tree shape, and dry-run behavior. It is a good steady brush. It is not pretending to be a live advisory feed from the sky.
-- There is no `SECURITY.md` and no GitHub advisory workflow wired in right now. For a small personal repo that is a process choice, not a secret hole in the barn wall.
+- There is a small `SECURITY.md` now, so there is at least a clear place to send reports. There is still no grand enterprise advisory machine behind it, and that is fine for this kind of project.
 - If you want a live dependency advisory check, run `npm audit` when network access is available. That bit stays manual on purpose, because clean local repeatability won the toss against pretending a network check happened when it did not.
 
 Short version: the app path is meant to stay calm and safe, the deploy scripts are meant to be clear and a little sharp, and the repo does not wear fake enterprise shoulder pads just to look important. Just a few happy little guard rails and enough honesty to leave the rough edges where they really are.

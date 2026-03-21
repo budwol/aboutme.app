@@ -26,6 +26,9 @@ describe("html sanitizer", () => {
         '<a href="https://example.com" target="_blank" rel="noopener">safe</a>',
       ),
     ).toBe('<a href="https://example.com" target="_blank">safe</a>');
+    expect(sanitizeHtml('<a href="/contact">local</a>')).toBe(
+      '<a href="/contact">local</a>',
+    );
     expect(sanitizeHtml('<a href="data:text/html;base64,abc">unsafe</a>')).toBe(
       "<a>unsafe</a>",
     );
