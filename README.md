@@ -211,6 +211,19 @@ The runtime path is meant to stay plain and inspectable, not clever.
 - The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Resource-Policy`, and `X-Robots-Tag`.
 - Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
 
+## Production Checklist
+
+If you want the short answer to "is this thing still standing right?", this is the little checklist:
+
+- `npm run test:security`
+- `npm run test:all`
+- `npm run test:smoke`
+- CI passing on the current branch
+- generated `nginx/site.conf` still listening on `8080`
+- container healthcheck still hitting `127.0.0.1:8080`
+
+That is not enterprise theater. It is just the small pile of proof I would want before calling the current state production ready for this kind of project.
+
 ## Ops Checks
 
 If you want a quick little field check after deploy, these are the three strokes that matter:
@@ -253,12 +266,13 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 - `npm run test:dry-run`
 - `npm run test:unit`
 - `npm run test:security`
+- `npm run test:smoke`
 - `npm run test:types`
 - `npm run test:prettier`
 - `npm run test:all`
 - `npm run init -- --dry-run`
 
-There is also a tiny GitHub Actions CI now. It runs `lint`, `test:security`, and `test:all` on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
+There is also a tiny GitHub Actions CI now. It runs `lint`, `test:security`, `test:smoke`, and `test:all` on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
 
 If you want the full cleanup pass:
 
