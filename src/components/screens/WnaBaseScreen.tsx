@@ -150,11 +150,11 @@ const WnaBusyOverlay = memo(
 
     return (
       <Animated.View
-        pointerEvents={isBusy ? "auto" : "none"}
         style={[
           styles.busyOverlay,
           {
             backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
+            pointerEvents: isBusy ? "auto" : "none",
           },
           animatedStyle,
         ]}

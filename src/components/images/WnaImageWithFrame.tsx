@@ -1,5 +1,5 @@
 import React, { FC, memo } from "react";
-import { View, StyleSheet } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { ImageProps } from "expo-image";
 
 import WnaImage, { WnaImageStyleProps } from "@components/images/WnaImage";
@@ -49,11 +49,13 @@ const styles = StyleSheet.create({
     elevation: 8, // Android shadow
     width: 200,
     margin: 16,
-
-    // iOS shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    ...(Platform.OS === "web"
+      ? { boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.25)" }
+      : {
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.25,
+          shadowRadius: 10,
+        }),
   },
 });

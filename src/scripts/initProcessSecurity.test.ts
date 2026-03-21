@@ -53,8 +53,7 @@ describe("init-process security helpers", () => {
     expect(generated.nginxConfig).toContain(
       "add_header 'Cross-Origin-Resource-Policy' 'same-origin' always;",
     );
-    expect(generated.manifest).toContain(
-      '"scope": "https://portfolio.example.com/"',
-    );
+    expect(generated.manifest).toContain('"scope": "/"');
+    expect(generated.manifest).toContain('"start_url": "/"');
   });
 });

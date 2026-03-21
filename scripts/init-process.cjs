@@ -254,7 +254,7 @@ Disallow: /
       name: appName,
       short_name: appName,
       description: profileName,
-      scope: `${normalizedSiteUrl}/`,
+      scope: "/",
       start_url: "/",
       display: "standalone",
       background_color: "#ffffff",

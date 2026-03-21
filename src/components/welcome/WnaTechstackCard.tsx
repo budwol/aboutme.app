@@ -59,6 +59,7 @@ export default function WnaTechStackCard({
 
   const renderCard = (title: string, stack: string[], groupKey: string) => (
     <View
+      key={groupKey}
       style={{
         flex: 1,
         minWidth: 280,
