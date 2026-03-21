@@ -9,6 +9,8 @@ export type ExperienceEntry = {
   role: string;
   company: string;
   description: string;
+  details: string[];
+  techstack: string[];
   opacity?: number;
 };
 
@@ -100,6 +102,8 @@ export const defaultAppData: AppData = {
       period: "2010-2015",
       duration: "3Y 5M",
       description: "Wrote code.",
+      details: [],
+      techstack: [],
       opacity: 1,
     },
   ],
@@ -141,6 +145,8 @@ type ExperienceEntryInput = Partial<ExperienceEntry> & {
   roleEn?: string;
   descriptionDe?: string;
   descriptionEn?: string;
+  detailsDe?: string[];
+  detailsEn?: string[];
 };
 
 type AppDataInput = Partial<AppData> & {
@@ -269,6 +275,39 @@ function getLocalizedMultilineString(
     firstNonEmptyMultilineString(preferred, plainValue, alternate),
     fallback,
   );
+}
+
+function getLocalizedStringArray(
+  lang: SupportedLang,
+  fallback: string[],
+  plainValue?: unknown,
+  deValue?: unknown,
+  enValue?: unknown,
+) {
+  const preferred = lang === "de" ? deValue : enValue;
+  const alternate = lang === "de" ? enValue : deValue;
+
+  return asStringArray(
+    firstNonEmptyStringArray(preferred, plainValue, alternate),
+    fallback,
+  );
+}
+
+function firstNonEmptyStringArray(...values: unknown[]) {
+  for (const value of values) {
+    if (Array.isArray(value)) {
+      const items = value.filter(
+        (entry): entry is string =>
+          typeof entry === "string" && entry.trim() !== "",
+      );
+
+      if (items.length > 0) {
+        return items;
+      }
+    }
+  }
+
+  return undefined;
 }
 
 function parsePeriodStartMonth(period: string) {
@@ -444,6 +483,17 @@ function normalizeExperienceEntry(
       entry.descriptionDe,
       entry.descriptionEn,
     ),
+    details: getLocalizedStringArray(
+      lang,
+      defaultExperienceEntry.details,
+      entry.details,
+      entry.detailsDe,
+      entry.detailsEn,
+    ),
+    techstack: asStringArray(
+      entry.techstack,
+      defaultExperienceEntry.techstack ?? [],
+    ),
     opacity: asNumberOrUndefined(entry.opacity, defaultExperienceEntry.opacity),
   };
 }
@@ -555,7 +605,7 @@ export function normalizeAppData(
 }
 
 type AppDataModule = {
-  default: unknown;
+  default?: unknown;
 };
 
 async function readAppDataModule(): Promise<AppDataModule> {
@@ -566,11 +616,16 @@ async function readAppDataModule(): Promise<AppDataModule> {
 }
 
 export const loadAppData = async (
-  loadModule: () => Promise<AppDataModule> = readAppDataModule,
+  loadModule: () => Promise<unknown> = readAppDataModule,
 ): Promise<AppData> => {
   try {
     const data = await loadModule();
-    return normalizeAppData(data.default);
+    const input =
+      typeof data === "object" && data !== null && "default" in data
+        ? data.default
+        : data;
+
+    return normalizeAppData(input);
   } catch {
     console.warn("app-data.json not found -> using defaults");
     return normalizeAppData(defaultAppData);
