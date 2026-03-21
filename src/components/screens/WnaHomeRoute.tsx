@@ -15,6 +15,7 @@ import WnaProjectsCard from "@components/welcome/WnaProjectsCard";
 import WnaWelcomeCard from "@components/welcome/WnaWelcomeCard";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import {
+  getDrawerNavigationPath,
   getDrawerProjectNavigationPath,
   getNavigationLang,
 } from "@components/navigation/wnaNavigationRouteProvider";
@@ -83,6 +84,10 @@ export default function WnaHomeRoute(): ReactNode {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   }, []);
 
+  const handleExperiencePress = useCallback(() => {
+    router.push(getDrawerNavigationPath("experience", lang));
+  }, [lang, router]);
+
   return (
     <WnaBaseScreen
       isRootPage
@@ -130,6 +135,10 @@ export default function WnaHomeRoute(): ReactNode {
               appData={appData}
               appStyle={appStyle}
               t={t}
+              maxItems={4}
+              showDetails={false}
+              footerActionLabel={t(i18nKeys.actionShowMore)}
+              onFooterActionPress={handleExperiencePress}
             />
           </SectionCard>
 

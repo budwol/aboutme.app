@@ -20,7 +20,13 @@ export default function WnaProjectsCard({
 }: WnaProjectsCardProps) {
   const _btnWidth = 256;
   return (
-    <View style={{ width: "100%", gap: 24, paddingVertical: 16 }}>
+    <View
+      style={{
+        width: "100%",
+        gap: appLayoutConstants.contentSectionGap,
+        paddingVertical: appLayoutConstants.contentSectionPaddingVertical,
+      }}
+    >
       <WnaWelcomeTitle
         appColors={appColors}
         appStyle={appStyle}

@@ -11,7 +11,7 @@ export default function WnaWelcomeCard({
   t,
 }: WnaWelcomeProps) {
   return (
-    <View style={{ width: "100%", gap: 24 }}>
+    <View style={{ width: "100%", gap: appLayoutConstants.contentSectionGap }}>
       <WnaWelcomeHero
         appColors={appColors}
         appData={appData}
