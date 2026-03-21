@@ -296,7 +296,7 @@ See `LICENSE.txt` for more information.
 
 ## Contact
 
-**Wolf Budgenhagen**  
+**budwol**  
 Email: info@nosys-productions.com  
 Signal: https://signal.me/#eu/iPbKoW4uezUd1bRX8SHa-col_0NLmjNKI2hVZBdTuhUWyWW1eTlIn5c8YLo-IAKf
 
