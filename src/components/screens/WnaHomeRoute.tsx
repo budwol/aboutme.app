@@ -125,21 +125,21 @@ export default function WnaHomeRoute(): ReactNode {
           </SectionCard>
 
           <SectionCard>
+            <WnaExperienceCard
+              appColors={appColors}
+              appData={appData}
+              appStyle={appStyle}
+              t={t}
+            />
+          </SectionCard>
+
+          <SectionCard>
             <WnaProjectsCard
               appColors={appColors}
               appData={appData}
               appStyle={appStyle}
               t={t}
               onProjectPress={handleProjectPress}
-            />
-          </SectionCard>
-
-          <SectionCard>
-            <WnaExperienceCard
-              appColors={appColors}
-              appData={appData}
-              appStyle={appStyle}
-              t={t}
             />
           </SectionCard>
 
