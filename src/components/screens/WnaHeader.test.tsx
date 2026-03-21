@@ -8,6 +8,20 @@ const mockReplace = jest.fn();
 const mockBack = jest.fn();
 const mockNavigate = jest.fn();
 const mockCanGoBack = jest.fn(() => false);
+const mockToastShow = jest.fn();
+
+function MockToast(props: unknown) {
+  return null;
+}
+
+MockToast.show = mockToastShow;
+
+type HeaderButtonNode = {
+  props: {
+    text?: string;
+    onPress?: () => Promise<void> | void;
+  };
+};
 
 jest.mock("@components/WnaAppContext", () => {
   const { jest: jestModule } = require("@jest/globals");
@@ -96,11 +110,13 @@ jest.mock("@services/wnaAsyncStorageProvider", () => ({
 
 jest.mock("@utils/themeColors", () => ({
   getNextTheme: () => "light",
-  resolveAppColors: () => ({}),
+  resolveAppColors: () => ({ id: 2, isDark: false }),
 }));
 
 jest.mock("react-native-toast-message", () => ({
-  show: jest.fn(),
+  __esModule: true,
+  default: MockToast,
+  show: mockToastShow,
 }));
 
 jest.mock("react-native-reanimated", () => {
@@ -130,6 +146,7 @@ describe("WnaHeader", () => {
     mockBack.mockClear();
     mockNavigate.mockClear();
     mockCanGoBack.mockReturnValue(false);
+    mockToastShow.mockClear();
   });
 
   it("uses onTitlePress before navigation", () => {
@@ -174,5 +191,29 @@ describe("WnaHeader", () => {
     });
 
     expect(mockReplace).toHaveBeenCalledWith("/projects");
+  });
+
+  it("passes the next theme colors into the toast when toggling the theme", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaHeader headerTitle="Start" />);
+    });
+
+    const buttons = tree!.root.findAllByType("WnaButtonHeader");
+    const themeButton = buttons.find(
+      (button: HeaderButtonNode) => button.props.text === "Theme",
+    );
+
+    await act(async () => {
+      await themeButton?.props.onPress();
+    });
+
+    expect(mockToastShow).toHaveBeenCalledWith({
+      type: "themeChange",
+      text1: "Appearance",
+      text2: "Light mode",
+      props: { appColors: { id: 2, isDark: false } },
+    });
   });
 });

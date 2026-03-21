@@ -63,6 +63,32 @@ jest.mock("@components/misc/WnaBadge", () => {
   };
 });
 
+jest.mock("react-native-reanimated", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ReactModule = require("react");
+
+  return {
+    __esModule: true,
+    default: {
+      View: (props: unknown) =>
+        ReactModule.createElement(
+          "AnimatedView",
+          props as Record<string, unknown>,
+          (props as { children?: React.ReactNode }).children,
+        ),
+    },
+    FadeInDown: {
+      duration: () => ({}),
+    },
+    FadeOutUp: {
+      duration: () => ({}),
+    },
+    LinearTransition: {
+      duration: () => ({}),
+    },
+  };
+});
+
 describe("WnaExperienceCard", () => {
   it("renders one timeline card per experience entry", () => {
     const appData = {
