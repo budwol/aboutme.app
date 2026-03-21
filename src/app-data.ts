@@ -558,8 +558,15 @@ type AppDataModule = {
   default: unknown;
 };
 
+async function readAppDataModule(): Promise<AppDataModule> {
+  return Promise.resolve().then(() => {
+    // app-data.json is generated locally and intentionally ignored by git
+    return require("../app-data.json") as AppDataModule;
+  });
+}
+
 export const loadAppData = async (
-  loadModule: () => Promise<AppDataModule> = () => import("../app-data.json"),
+  loadModule: () => Promise<AppDataModule> = readAppDataModule,
 ): Promise<AppData> => {
   try {
     const data = await loadModule();
