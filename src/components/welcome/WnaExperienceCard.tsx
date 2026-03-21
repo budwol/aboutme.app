@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   DimensionValue,
+  LayoutChangeEvent,
   Pressable,
   StyleSheet,
   Text,
@@ -14,23 +15,112 @@ import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
-import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-const periodWidth = 128;
-const dotColumnWidth = 18;
-const cardWidth = 404;
-const compactBreakpoint = 720;
-const compactSidePadding = 8;
+const periodWidth = appLayoutConstants.experiencePeriodWidth;
+const dotColumnWidth = appLayoutConstants.experienceDotColumnWidth;
+const minCardWidth = appLayoutConstants.experienceMinCardWidth;
+const maxCardWidth = appLayoutConstants.experienceMaxCardWidth;
+const compactBreakpoint = appLayoutConstants.experienceCompactBreakpoint;
+const compactSidePadding = appLayoutConstants.experienceCompactSidePadding;
+const detailsTopSpacing = appLayoutConstants.experienceDetailsTopSpacing;
+const detailsHeightBuffer = appLayoutConstants.experienceDetailsHeightBuffer;
+
+type WnaExperienceCardProps = WnaWelcomeProps & {
+  maxItems?: number;
+  showDetails?: boolean;
+  footerActionLabel?: string;
+  onFooterActionPress?: () => void;
+};
+
+type ExperienceDetailsBoxProps = {
+  isExpanded: boolean;
+  backgroundColor: string;
+  borderColor: string;
+  children: ReactNode;
+};
+
+function ExperienceDetailsBox({
+  isExpanded,
+  backgroundColor,
+  borderColor,
+  children,
+}: ExperienceDetailsBoxProps) {
+  const [contentHeight, setContentHeight] = useState(0);
+  const animatedHeight = useSharedValue(0);
+
+  useEffect(() => {
+    animatedHeight.value = withTiming(
+      isExpanded ? contentHeight + detailsTopSpacing + detailsHeightBuffer : 0,
+      {
+        duration: 220,
+      },
+    );
+  }, [animatedHeight, contentHeight, isExpanded]);
+
+  function handleLayout(event: LayoutChangeEvent) {
+    const nextHeight = event.nativeEvent.layout.height;
+
+    if (nextHeight !== contentHeight) {
+      setContentHeight(nextHeight);
+    }
+  }
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+  }));
+
+  return (
+    <Animated.View style={[styles.detailsClip, animatedStyle]}>
+      <View
+        onLayout={handleLayout}
+        style={[
+          styles.detailsBox,
+          {
+            borderColor,
+            backgroundColor,
+          },
+        ]}
+      >
+        {children}
+      </View>
+    </Animated.View>
+  );
+}
 
 export default function WnaExperienceCard({
   appColors,
   appData,
   appStyle,
   t,
-}: WnaWelcomeProps) {
+  maxItems,
+  showDetails = true,
+  footerActionLabel,
+  onFooterActionPress,
+}: WnaExperienceCardProps) {
   const { width } = useWindowDimensions();
   const isCompactLayout = width < compactBreakpoint;
   const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
+  const [hoveredDetailIndex, setHoveredDetailIndex] = useState<number | null>(
+    null,
+  );
+  const [isFooterActionHovered, setIsFooterActionHovered] = useState(false);
+  const experienceItems = useMemo(
+    () => appData.experience.slice(0, maxItems ?? appData.experience.length),
+    [appData.experience, maxItems],
+  );
+  const effectiveCardWidth = useMemo(() => {
+    if (isCompactLayout) {
+      return undefined;
+    }
+
+    const availableWidth = width - 320;
+    return Math.min(maxCardWidth, Math.max(minCardWidth, availableWidth));
+  }, [isCompactLayout, width]);
 
   const { timelineWidth, lineLeft } = useMemo(() => {
     let nextTimelineWidth: DimensionValue;
@@ -45,13 +135,13 @@ export default function WnaExperienceCard({
         appLayoutConstants.globalListGap +
         dotColumnWidth +
         appLayoutConstants.globalListGap +
-        cardWidth;
+        (effectiveCardWidth ?? minCardWidth);
       nextLineLeft =
         periodWidth + appLayoutConstants.globalListGap + dotColumnWidth / 2;
     }
 
     return { timelineWidth: nextTimelineWidth, lineLeft: nextLineLeft };
-  }, [isCompactLayout]);
+  }, [effectiveCardWidth, isCompactLayout]);
 
   function toggleExperienceDetails(index: number) {
     setExpandedIndexes((current) =>
@@ -59,6 +149,10 @@ export default function WnaExperienceCard({
         ? current.filter((entry) => entry !== index)
         : [...current, index],
     );
+  }
+
+  function setDetailsHover(index: number | null) {
+    setHoveredDetailIndex(index);
   }
 
   return (
@@ -88,10 +182,11 @@ export default function WnaExperienceCard({
             ]}
           />
 
-          {appData.experience.map((item, index) => {
-            const hasMore =
+          {experienceItems.map((item, index) => {
+            const hasDetails =
               item.details.length > 0 || item.techstack.length > 0;
             const isExpanded = expandedIndexes.includes(index);
+            const isDetailsHovered = hoveredDetailIndex === index;
             const detailItems = item.details.map((detail, detailIndex) => (
               <View
                 key={`${detailIndex}-${detail}`}
@@ -123,7 +218,7 @@ export default function WnaExperienceCard({
             ));
 
             return (
-              <Animated.View
+              <View
                 key={`${item.period}-${item.role}-${index}`}
                 style={[styles.row, isCompactLayout && styles.rowCompact]}
               >
@@ -157,6 +252,9 @@ export default function WnaExperienceCard({
                 <View
                   style={[
                     styles.cardColumn,
+                    effectiveCardWidth
+                      ? { width: effectiveCardWidth }
+                      : undefined,
                     isCompactLayout && styles.cardColumnCompact,
                   ]}
                 >
@@ -184,19 +282,21 @@ export default function WnaExperienceCard({
                     opacity={item.opacity ?? 1}
                   />
 
-                  {hasMore ? (
+                  {showDetails && hasDetails ? (
                     <Pressable
                       onPress={() => toggleExperienceDetails(index)}
+                      onHoverIn={() => setDetailsHover(index)}
+                      onHoverOut={() => setDetailsHover(null)}
                       style={[
                         styles.expandButton,
                         {
                           backgroundColor: convertHexToRgba(
                             appColors.accent5,
-                            0.08,
+                            isDetailsHovered ? 0.14 : 0.08,
                           ),
                           borderColor: convertHexToRgba(
                             appColors.accent5,
-                            0.25,
+                            isDetailsHovered ? 0.38 : 0.25,
                           ),
                         },
                       ]}
@@ -218,20 +318,14 @@ export default function WnaExperienceCard({
                     </Pressable>
                   ) : null}
 
-                  {hasMore && isExpanded ? (
-                    <Animated.View
-                      style={[
-                        styles.detailsBox,
-                        {
-                          borderColor: appColors.coolgray2,
-                          backgroundColor: convertHexToRgba(
-                            appColors.coolgray1,
-                            0.85,
-                          ),
-                        },
-                      ]}
-                      entering={FadeInDown.duration(220)}
-                      exiting={FadeOutUp.duration(180)}
+                  {showDetails && hasDetails ? (
+                    <ExperienceDetailsBox
+                      isExpanded={isExpanded}
+                      borderColor={appColors.coolgray2}
+                      backgroundColor={convertHexToRgba(
+                        appColors.coolgray1,
+                        0.85,
+                      )}
                     >
                       {detailItems.length > 0 ? detailItems : null}
 
@@ -239,9 +333,8 @@ export default function WnaExperienceCard({
                         <View style={styles.techSection}>
                           <Text
                             style={[
-                              appStyle.textNeutralMicro,
+                              appStyle.textNeutralLabel,
                               styles.techLabel,
-                              { color: appColors.coolgray6 },
                             ]}
                           >
                             {t(i18nKeys.titleProjectTechstack)}
@@ -249,14 +342,46 @@ export default function WnaExperienceCard({
                           <View style={styles.techList}>{techBadges}</View>
                         </View>
                       ) : null}
-                    </Animated.View>
+                    </ExperienceDetailsBox>
                   ) : null}
                 </View>
-              </Animated.View>
+              </View>
             );
           })}
         </View>
       </View>
+
+      {footerActionLabel && onFooterActionPress ? (
+        <Pressable
+          onPress={onFooterActionPress}
+          onHoverIn={() => setIsFooterActionHovered(true)}
+          onHoverOut={() => setIsFooterActionHovered(false)}
+          style={[
+            styles.footerActionButton,
+            {
+              alignSelf: isCompactLayout ? "flex-start" : "center",
+              borderColor: convertHexToRgba(
+                appColors.accent5,
+                isFooterActionHovered ? 0.4 : 0.26,
+              ),
+              backgroundColor: convertHexToRgba(
+                appColors.accent5,
+                isFooterActionHovered ? 0.14 : 0.08,
+              ),
+            },
+          ]}
+        >
+          <Text
+            style={[
+              appStyle.textMicro,
+              styles.footerActionButtonText,
+              { color: appColors.accent5 },
+            ]}
+          >
+            {footerActionLabel} →
+          </Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -264,8 +389,8 @@ export default function WnaExperienceCard({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    gap: 24,
-    paddingVertical: 16,
+    gap: appLayoutConstants.contentSectionGap,
+    paddingVertical: appLayoutConstants.contentSectionPaddingVertical,
   },
   centerWrapper: {
     alignItems: "center",
@@ -328,7 +453,7 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   cardColumn: {
-    width: cardWidth,
+    width: minCardWidth,
   },
   cardColumnCompact: {
     flex: 1,
@@ -347,12 +472,24 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   detailsBox: {
-    marginTop: 10,
+    marginTop: detailsTopSpacing,
     padding: 12,
     gap: 10,
     borderWidth: 1,
     borderRadius: appLayoutConstants.globalCornerRadius,
     minWidth: 0,
+  },
+  detailsClip: {
+    overflow: "hidden",
+  },
+  footerActionButton: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  footerActionButtonText: {
+    letterSpacing: 0.2,
   },
   detailCard: {
     flexDirection: "row",
@@ -379,9 +516,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   techLabel: {
-    lineHeight: 18,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+    opacity: 0.9,
   },
   techList: {
     flexDirection: "row",
