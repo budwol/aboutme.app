@@ -14,6 +14,7 @@ import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 
 const periodWidth = 128;
 const dotColumnWidth = 18;
@@ -122,7 +123,7 @@ export default function WnaExperienceCard({
             ));
 
             return (
-              <View
+              <Animated.View
                 key={`${item.period}-${item.role}-${index}`}
                 style={[styles.row, isCompactLayout && styles.rowCompact]}
               >
@@ -218,7 +219,7 @@ export default function WnaExperienceCard({
                   ) : null}
 
                   {hasMore && isExpanded ? (
-                    <View
+                    <Animated.View
                       style={[
                         styles.detailsBox,
                         {
@@ -229,6 +230,8 @@ export default function WnaExperienceCard({
                           ),
                         },
                       ]}
+                      entering={FadeInDown.duration(220)}
+                      exiting={FadeOutUp.duration(180)}
                     >
                       {detailItems.length > 0 ? detailItems : null}
 
@@ -246,10 +249,10 @@ export default function WnaExperienceCard({
                           <View style={styles.techList}>{techBadges}</View>
                         </View>
                       ) : null}
-                    </View>
+                    </Animated.View>
                   ) : null}
                 </View>
-              </View>
+              </Animated.View>
             );
           })}
         </View>
