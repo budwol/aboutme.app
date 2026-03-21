@@ -23,6 +23,42 @@ function readAppDataJson(): AppDataJson {
   }
 }
 
+function isLocalHttpHost(hostname: string): boolean {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    hostname === "[::1]"
+  );
+}
+
+function normalizeParsedSiteUrl(url: URL): string {
+  const pathname = url.pathname === "/" ? "" : url.pathname.replace(/\/+$/, "");
+  return `${url.protocol}//${url.host}${pathname}`;
+}
+
+export function isAllowedSiteUrl(value?: unknown): boolean {
+  if (typeof value !== "string" || value.trim() === "") {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(value.trim());
+
+    if (parsed.username || parsed.password || parsed.search || parsed.hash) {
+      return false;
+    }
+
+    if (parsed.protocol === "https:") {
+      return true;
+    }
+
+    return parsed.protocol === "http:" && isLocalHttpHost(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function normalizeSiteUrl(value?: unknown): string {
   const normalized = typeof value === "string" ? value.trim() : "";
 
@@ -30,7 +66,34 @@ export function normalizeSiteUrl(value?: unknown): string {
     return defaultAppData.siteUrl;
   }
 
-  return normalized.replace(/\/+$/, "");
+  if (!isAllowedSiteUrl(normalized)) {
+    return defaultAppData.siteUrl;
+  }
+
+  return normalizeParsedSiteUrl(new URL(normalized));
+}
+
+export function getConfiguredSiteUrlFromSources(sources: {
+  appDataSiteUrl?: string;
+  publicSiteUrl?: string;
+  baseUrl?: string;
+}): string {
+  const configuredSiteUrl =
+    sources.appDataSiteUrl || sources.publicSiteUrl || sources.baseUrl || "";
+
+  if (!configuredSiteUrl) {
+    throw new Error(
+      "Missing site URL configuration. Set app-data.json siteUrl, EXPO_PUBLIC_SITE_URL, or BASE_URL.",
+    );
+  }
+
+  if (!isAllowedSiteUrl(configuredSiteUrl)) {
+    throw new Error(
+      "Invalid site URL configuration. Only https:// URLs and local http:// URLs are allowed.",
+    );
+  }
+
+  return normalizeSiteUrl(configuredSiteUrl);
 }
 
 export function getConfiguredSiteUrl(): string {
@@ -44,15 +107,11 @@ export function getConfiguredSiteUrl(): string {
   const baseUrl =
     typeof process.env.BASE_URL === "string" ? process.env.BASE_URL.trim() : "";
 
-  if (!appDataSiteUrl && !publicSiteUrl && !baseUrl) {
-    throw new Error(
-      "Missing site URL configuration. Set app-data.json siteUrl, EXPO_PUBLIC_SITE_URL, or BASE_URL.",
-    );
-  }
-
-  return normalizeSiteUrl(
-    appDataSiteUrl || publicSiteUrl || baseUrl || defaultAppData.siteUrl,
-  );
+  return getConfiguredSiteUrlFromSources({
+    appDataSiteUrl,
+    publicSiteUrl,
+    baseUrl,
+  });
 }
 
 export function getConfiguredProfileName(): string {

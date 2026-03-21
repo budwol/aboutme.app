@@ -115,11 +115,39 @@ function findBackgroundSource(sourceImagesDir) {
 }
 
 function normalizeSiteUrl(siteUrl) {
-  const trimmed = `${siteUrl ?? ""}`
-    .trim()
-    .replace(/^http:\/\//, "")
-    .replace(/^https:\/\//, "");
-  return `https://${trimmed}`;
+  const normalized = `${siteUrl ?? ""}`.trim();
+
+  if (!normalized) {
+    throw new Error("Missing siteUrl for generated files.");
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(normalized);
+  } catch {
+    throw new Error(`Invalid siteUrl: ${normalized}`);
+  }
+
+  if (
+    parsedUrl.username ||
+    parsedUrl.password ||
+    parsedUrl.search ||
+    parsedUrl.hash
+  ) {
+    throw new Error(`Invalid siteUrl: ${normalized}`);
+  }
+
+  const isLocalHttp =
+    parsedUrl.protocol === "http:" &&
+    ["localhost", "127.0.0.1", "::1", "[::1]"].includes(parsedUrl.hostname);
+
+  if (parsedUrl.protocol !== "https:" && !isLocalHttp) {
+    throw new Error(`Invalid siteUrl: ${normalized}`);
+  }
+
+  const pathname =
+    parsedUrl.pathname === "/" ? "" : parsedUrl.pathname.replace(/\/+$/, "");
+  return `${parsedUrl.protocol}//${parsedUrl.host}${pathname}`;
 }
 
 function buildGeneratedFiles({ siteUrl, profileName, appName }) {
@@ -141,13 +169,15 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
       : `com.${parts[parts.length - 2]}.${parts[0]}`;
 
   const nginxConfig = `server {
-    listen 80 default_server;
+    listen 8080 default_server;
 
     charset utf-8;
 
     add_header 'X-Content-Type-Options' 'nosniff' always;
+    add_header 'X-Frame-Options' 'DENY' always;
     add_header 'Cross-Origin-Opener-Policy' 'unsafe-none' always;
     add_header 'Cross-Origin-Embedder-Policy' 'same-origin' always;
+    add_header 'Cross-Origin-Resource-Policy' 'same-origin' always;
     add_header 'Strict-Transport-Security' 'max-age=31536000; includeSubDomains; preload' always;
     add_header 'Referrer-Policy' 'same-origin' always;
     add_header 'Permissions-Policy' 'geolocation=(self),midi=(),sync-xhr=(),microphone=(),camera=(self),magnetometer=(self),gyroscope=(),fullscreen=(self),payment=()' always;
@@ -157,7 +187,7 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     server_tokens off;
 
     access_log off;
-    error_log /var/log/nginx/app-error.log;
+    error_log /dev/stderr warn;
 
     root /usr/share/nginx/html;
     index index.html;

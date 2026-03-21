@@ -10,6 +10,16 @@ cd "$PROJECT_DIR"
 : "${CONTAINER_REGISTRY:?Missing CONTAINER_REGISTRY}"
 : "${IMAGE:?Missing IMAGE}"
 
+if [[ "$CONTAINER_REGISTRY" =~ [[:space:]] ]] || [[ "$IMAGE" =~ [[:space:]] ]]; then
+  echo "Container registry and image must not contain whitespace." >&2
+  exit 1
+fi
+
+if [[ ! "$IMAGE" =~ ^[a-z0-9._/-]+$ ]]; then
+  echo "Invalid IMAGE value: $IMAGE" >&2
+  exit 1
+fi
+
 npm run export:web
 IMAGE_REF="$CONTAINER_REGISTRY/$IMAGE:latest"
 echo "$IMAGE_REF"
