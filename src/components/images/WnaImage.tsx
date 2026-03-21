@@ -1,6 +1,7 @@
 import { convertHexToRgba } from "@/utils/colorConverter";
 import Logger from "@/utils/logger";
 import { cleanAndTruncate } from "@/utils/stringHelper";
+import { getVersionedLocalAssetUrl } from "@/utils/versionedAssetUrl";
 import WnaActivityIndicator from "@components/misc/WnaActivityIndicator";
 import Colors from "@constants/theme/colors";
 import { ImageProps, ImageSource } from "expo-image";
@@ -64,13 +65,12 @@ function normalizeLocalImageUrl(imageUrl: string): string {
   if (
     imageUrl === "" ||
     imageUrl.startsWith("http") ||
-    imageUrl.startsWith("/") ||
     imageUrl.startsWith("data:")
   ) {
     return imageUrl;
   }
 
-  return `/${imageUrl.replace(/^\/+/, "")}`;
+  return getVersionedLocalAssetUrl(`/${imageUrl.replace(/^\/+/, "")}`);
 }
 
 function resolveImageState(props: ImageSourceInput): ImageState {

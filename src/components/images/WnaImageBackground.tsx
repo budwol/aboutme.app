@@ -1,4 +1,5 @@
 import Colors from "@constants/theme/colors";
+import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
 import { ImageStyle } from "expo-image";
 import React, { ReactNode, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
@@ -21,7 +22,9 @@ const WnaImageBackground = React.memo(
     isDarkMode,
   }: WnaImageBackgroundProps) => {
     const resolvedUri = useMemo(() => {
-      return imageUri && imageUri.trim() !== "" ? imageUri : undefined;
+      return imageUri && imageUri.trim() !== ""
+        ? getVersionedLocalAssetUrl(imageUri)
+        : undefined;
     }, [imageUri]);
 
     if (!resolvedUri) {
