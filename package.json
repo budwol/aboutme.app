@@ -1,22 +1,26 @@
 {
   "name": "about-me",
   "main": "expo-router/entry",
+  "packageManager": "npm@11.5.2",
   "version": "1.0.0",
   "scripts": {
     "clean-install": "rm -rf node_modules && rm package-lock.json && npm install",
-    "cleanup": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && HUSKY=0 npm i --package-lock-only && npx expo-doctor && npm run fix:prettier && npm run test:prettier && npm run test:types && npm run lint-fix && echo cleanup done.",
+    "cleanup": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && npm prune && HUSKY=0 npm i --package-lock-only && npx expo-doctor && npm run fix:prettier && npm run test:prettier && npm run test:types && npm run lint-fix && echo cleanup done.",
     "deploy:container": "./scripts/deploy-container.sh",
     "deploy:local": "./scripts/deploy-local.sh",
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
     "export:web": "npm run cleanup && npx expo export -p web",
-    "fix:prettier": "prettier --write --plugin-search-dir=. .",
+    "fix:prettier": "prettier --write .",
     "lint": "eslint ./src --no-cache",
     "lint-fix": "eslint ./src --fix --no-cache",
     "prepare": "husky",
     "start": "expo start",
     "test": "jest --watchAll",
     "test:all": "npm run test:prettier && npm run test:types && npm run test:unit",
-    "test:prettier": "prettier --check --plugin-search-dir=. .",
+    "test:deps": "npm ls --depth=0",
+    "test:dry-run": "./init.sh --dry-run",
+    "test:prettier": "prettier --check .",
+    "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcessSecurity.test.ts src/scripts/initScript.test.ts src/utils/appConfig.test.ts src/utils/htmlSanitizer.test.ts src/scripts/envParser.test.ts && npm run test:dry-run",
     "test:types": "tsc --skipLibCheck",
     "test:unit": "jest --runInBand --watchAll=false",
     "web": "expo start --web"
@@ -76,6 +80,10 @@
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": ">=20.19.4 <21",
+    "npm": ">=11.5.2 <12"
   },
   "private": true
 }
