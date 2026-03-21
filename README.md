@@ -88,7 +88,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
    npm run web
    ```
 
-   `npm run web` automatically syncs `.aboutme/app-data.json` into `public/app-data.json` before the dev server starts. For plain content changes in the JSON, restarting the web server is enough. Run `npm run init` again when you changed images or want all generated runtime artifacts refreshed.
+   `npm run web` automatically syncs `.aboutme/app-data.json` into `public/app-data.json`, mirrors `.aboutme/images/*` into `public/images/*`, and bumps the web asset version before the dev server starts. Run `npm run init` again when you want all generated runtime artifacts refreshed, such as root `app-data.json`, background/logo derivations, manifests, or nginx config.
 
 ## Customize Your Portfolio
 
@@ -108,10 +108,10 @@ In practice the usual flow is:
 1. run `npm run init`
 2. edit `.aboutme/app-data.json`
 3. replace files in `.aboutme/images/`
-4. run `npm run init` again
-5. refresh `npm run web`
+4. refresh `npm run web`
+5. run `npm run init` again only when you need regenerated runtime artifacts beyond `public/images`
 
-If you only changed text or structured content in `.aboutme/app-data.json`, `npm run web` and `npm run export:web` already resync the web copy for you. The second `npm run init` is mainly for regenerated images, manifests, nginx config, and the root `app-data.json` artifact used outside the web fetch path.
+If you only changed text, structured content, or regular image files inside `.aboutme/images/`, `npm run web` and `npm run export:web` already resync the web copies for you. The extra `npm run init` run is mainly for regenerated background/logo artifacts, manifests, nginx config, and the root `app-data.json` artifact used outside the web fetch path.
 
 ## Configuration
 
@@ -165,7 +165,7 @@ If you are just using this as a portfolio template, you can ignore Docker for a 
 - `npm run export:web` when you want a static build
 - `npm run deploy:local` if you want to copy that build onto a box you control
 
-Both `npm run web` and `npm run export:web` sync `.aboutme/app-data.json` into `public/app-data.json` first, so the web app always starts from the latest source content.
+Both `npm run web` and `npm run export:web` sync `.aboutme/app-data.json` into `public/app-data.json`, mirror `.aboutme/images/*` into `public/images/*`, and bump the web asset version first, so the web app always starts from the latest source content and image files.
 
 Docker is there for people who actually want that delivery path, not as a rite of passage before the app is allowed to exist.
 
