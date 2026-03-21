@@ -1,7 +1,11 @@
-import { defaultAppData } from "@/app-data";
+const DEFAULT_SITE_URL = "http://localhost:8081";
+const DEFAULT_PROFILE_NAME = "Your Name";
 
-type AppDataJson = Partial<typeof defaultAppData> & {
-  profile?: Partial<typeof defaultAppData.profile>;
+type AppDataJson = {
+  siteUrl?: string;
+  profile?: {
+    name?: string;
+  };
 };
 
 function readAppDataJson(): AppDataJson {
@@ -63,11 +67,11 @@ export function normalizeSiteUrl(value?: unknown): string {
   const normalized = typeof value === "string" ? value.trim() : "";
 
   if (!normalized) {
-    return defaultAppData.siteUrl;
+    return DEFAULT_SITE_URL;
   }
 
   if (!isAllowedSiteUrl(normalized)) {
-    return defaultAppData.siteUrl;
+    return DEFAULT_SITE_URL;
   }
 
   return normalizeParsedSiteUrl(new URL(normalized));
@@ -123,5 +127,5 @@ export function getConfiguredProfileName(): string {
   const envAppName =
     typeof process.env.APP_NAME === "string" ? process.env.APP_NAME.trim() : "";
 
-  return appDataProfileName || envAppName || defaultAppData.profile.name;
+  return appDataProfileName || envAppName || DEFAULT_PROFILE_NAME;
 }
