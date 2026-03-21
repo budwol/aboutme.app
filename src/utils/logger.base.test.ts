@@ -10,7 +10,7 @@ describe("shouldIgnoreLogMessage", () => {
     ).toBe(true);
   });
 
-  it("keeps unrelated messages visible", () => {
+  it("leaves unrelated messages alone", () => {
     expect(shouldIgnoreLogMessage("A real application error")).toBe(false);
   });
 });

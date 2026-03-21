@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { URL } = require("url");
 const { execFileSync } = require("child_process");
 
 const DEFAULT_ASSETS = [
@@ -118,14 +119,14 @@ function normalizeSiteUrl(siteUrl) {
   const normalized = `${siteUrl ?? ""}`.trim();
 
   if (!normalized) {
-    throw new Error("Missing siteUrl for generated files.");
+    throw new Error("siteUrl is missing for generated files.");
   }
 
   let parsedUrl;
   try {
     parsedUrl = new URL(normalized);
   } catch {
-    throw new Error(`Invalid siteUrl: ${normalized}`);
+    throw new Error(`invalid siteUrl: ${normalized}`);
   }
 
   if (
@@ -134,7 +135,7 @@ function normalizeSiteUrl(siteUrl) {
     parsedUrl.search ||
     parsedUrl.hash
   ) {
-    throw new Error(`Invalid siteUrl: ${normalized}`);
+    throw new Error(`invalid siteUrl: ${normalized}`);
   }
 
   const isLocalHttp =
@@ -142,7 +143,7 @@ function normalizeSiteUrl(siteUrl) {
     ["localhost", "127.0.0.1", "::1", "[::1]"].includes(parsedUrl.hostname);
 
   if (parsedUrl.protocol !== "https:" && !isLocalHttp) {
-    throw new Error(`Invalid siteUrl: ${normalized}`);
+    throw new Error(`invalid siteUrl: ${normalized}`);
   }
 
   const pathname =
@@ -152,6 +153,7 @@ function normalizeSiteUrl(siteUrl) {
 
 function buildGeneratedFiles({ siteUrl, profileName, appName }) {
   const normalizedSiteUrl = normalizeSiteUrl(siteUrl);
+  // shave the host down to something we can reuse for csp and the manifest id
   const host = normalizedSiteUrl
     .replace(/^https:\/\//, "")
     .split("/")[0]
@@ -328,7 +330,7 @@ function logDryRunDefaultAssets(rootDir, sourceImagesDir, logger) {
     const targetPath = path.join(sourceImagesDir, asset.targetName);
 
     if (fs.existsSync(sourcePath) && !fs.existsSync(targetPath)) {
-      logger(`Would seed default asset ${asset.label}`);
+      logger(`would seed default asset ${asset.label}`);
       seeded = true;
     }
   }
@@ -337,7 +339,11 @@ function logDryRunDefaultAssets(rootDir, sourceImagesDir, logger) {
 }
 
 function runInitProcess(rootDir, options = {}) {
-  const logger = options.logger ?? console.log;
+  const logger =
+    options.logger ??
+    ((...parts) => {
+      process.stdout.write(`${parts.join(" ")}\n`);
+    });
   const processLogo = options.processLogo ?? defaultProcessLogo;
   const convertBackground =
     options.convertBackground ?? defaultConvertBackground;
@@ -364,7 +370,7 @@ function runInitProcess(rootDir, options = {}) {
   logger(" AboutMe Initialization");
   logger("---------------------------------------------");
   if (dryRun) {
-    logger(" Dry run enabled");
+    logger(" dry run");
     logger("---------------------------------------------");
   }
 
@@ -376,14 +382,14 @@ function runInitProcess(rootDir, options = {}) {
         copyFile(targetAppDataFile, sourceAppDataFile);
       }
       logger(
-        `${dryRun ? "Would migrate" : "Migrated existing"} app-data.json to .aboutme/app-data.json`,
+        `${dryRun ? "would migrate" : "migrated"} app-data.json to .aboutme/app-data.json`,
       );
     } else {
       if (!dryRun) {
         copyFile(appDataExampleFile, sourceAppDataFile);
       }
       logger(
-        `${dryRun ? "Would create" : "Created"} .aboutme/app-data.json from app-data.example.json`,
+        `${dryRun ? "would create" : "created"} .aboutme/app-data.json from app-data.example.json`,
       );
     }
     migrated = true;
@@ -396,7 +402,7 @@ function runInitProcess(rootDir, options = {}) {
       copyFile(publicLogoSvg, sourceLogoSvg);
     }
     logger(
-      `${dryRun ? "Would migrate" : "Migrated existing"} logo.svg to .aboutme/images/logo.svg`,
+      `${dryRun ? "would migrate" : "migrated"} logo.svg to .aboutme/images/logo.svg`,
     );
     migrated = true;
   }
@@ -412,7 +418,7 @@ function runInitProcess(rootDir, options = {}) {
           );
         }
         logger(
-          `${dryRun ? "Would migrate" : "Migrated existing"} ${backgroundFile} to .aboutme/images/${backgroundFile}`,
+          `${dryRun ? "would migrate" : "migrated"} ${backgroundFile} to .aboutme/images/${backgroundFile}`,
         );
         migrated = true;
         break;
@@ -427,7 +433,7 @@ function runInitProcess(rootDir, options = {}) {
         copyFile(existingFile, targetFile);
       }
       logger(
-        `${dryRun ? "Would migrate" : "Migrated existing"} image to .aboutme/images/${path.basename(existingFile)}`,
+        `${dryRun ? "would migrate" : "migrated"} image to .aboutme/images/${path.basename(existingFile)}`,
       );
       migrated = true;
     }
@@ -449,7 +455,7 @@ function runInitProcess(rootDir, options = {}) {
       ? !fs.existsSync(envFile) && fs.existsSync(envExampleFile)
       : copyFileIfMissing(envExampleFile, envFile)
   ) {
-    logger(`${dryRun ? "Would create" : "Created"} .env from .env.example`);
+    logger(`${dryRun ? "would create" : "created"} .env from .env.example`);
     logger("");
   }
 
@@ -457,7 +463,7 @@ function runInitProcess(rootDir, options = {}) {
     copyFile(sourceAppDataFile, targetAppDataFile);
   }
   logger(
-    `${dryRun ? "Would sync" : "Synced"} .aboutme/app-data.json -> app-data.json`,
+    `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> app-data.json`,
   );
 
   const appData = readJson(
@@ -496,22 +502,23 @@ function runInitProcess(rootDir, options = {}) {
 
   if (missingAssets.length > 0) {
     logger("");
-    logger("Initialization source directory is ready:");
+    logger("source directory is ready:");
     logger(`  ${sourceDir}`);
     logger("");
-    logger("Add the following files before running ./init.sh again:");
+    // we stop here on purpose so public/ never drifts off into weird little accidents
+    logger("add these files before running ./init.sh again:");
     for (const missingAsset of missingAssets) {
       logger(`  - ${missingAsset}`);
     }
     logger("");
-    logger("Nothing in public/ was regenerated yet.");
+    logger("public/ was not regenerated.");
     return { generated: false, migrated };
   }
 
   if (dryRun) {
     logger("");
-    logger(`Would regenerate public assets from ${sourceDir}`);
-    logger("Dry run completed.");
+    logger(`would regenerate public assets from ${sourceDir}`);
+    logger("dry run finished");
     logger("---------------------------------------------");
     return { generated: true, migrated };
   }
@@ -551,8 +558,8 @@ function runInitProcess(rootDir, options = {}) {
   writeTextFile(path.join(publicDir, "site.webmanifest"), `${manifest}\n`);
 
   logger("");
-  logger(`Generated public assets from ${sourceDir}`);
-  logger("Initialization completed.");
+  logger(`generated public assets from ${sourceDir}`);
+  logger("init finished");
   logger("---------------------------------------------");
 
   return { generated: true, migrated };

@@ -1,4 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
+import fs from "fs";
+import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { parseEnvText } = require("../../scripts/env-parser.cjs") as {
   parseEnvText: (
@@ -8,6 +10,12 @@ const { parseEnvText } = require("../../scripts/env-parser.cjs") as {
 };
 
 describe("env-parser", () => {
+  it("exists where load-env.sh expects it", () => {
+    expect(
+      fs.existsSync(path.join(process.cwd(), "scripts", "env-parser.cjs")),
+    ).toBe(true);
+  });
+
   it("parses env values without evaluating shell expressions", () => {
     const env = parseEnvText(
       [

@@ -1,2 +1,2 @@
-// This is a shim for web and Android where the tab bar is generally opaque.
+// keep the default background on web and android
 export default undefined;

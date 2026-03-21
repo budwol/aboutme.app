@@ -9,7 +9,7 @@ import {
 
 type LoggerMethod = (message: string) => void;
 
-// ALL muted warnings go here
+// keep muted warnings in one place
 const ignoredLogs: RegExp[] = [
   /Support for defaultProps will be removed from function components/i,
   /"start" method does not exist in console/i,
@@ -19,13 +19,13 @@ const ignoredLogs: RegExp[] = [
   /Blocked aria-hidden on an element because its descendant retained focus/i,
 ];
 
-// Metro / RedBox
+// mute repeated dev overlay warnings
 LogBox.ignoreLogs(ignoredLogs.map((r) => r.source));
 
 export const shouldIgnoreLogMessage = (message: string) =>
   ignoredLogs.some((regex) => regex.test(message));
 
-const withoutIgnoredMessage = <T extends LoggerMethod>(fn: T): T =>
+const filterIgnoredMessages = <T extends LoggerMethod>(fn: T): T =>
   ((message: string) => {
     if (shouldIgnoreLogMessage(message)) return;
     fn(message);
@@ -72,11 +72,11 @@ if (Platform.OS !== "web") {
 // @ts-expect-error createLogger transport generics do not model the mixed transport setup used here.
 const reactLogger = logger.createLogger(config);
 
-// Patch react-native-logs
-reactLogger.log = withoutIgnoredMessage(reactLogger.log);
-reactLogger.info = withoutIgnoredMessage(reactLogger.info);
-reactLogger.warn = withoutIgnoredMessage(reactLogger.warn);
-reactLogger.error = withoutIgnoredMessage(reactLogger.error);
+// filter ignored messages before they reach the transports
+reactLogger.log = filterIgnoredMessages(reactLogger.log);
+reactLogger.info = filterIgnoredMessages(reactLogger.info);
+reactLogger.warn = filterIgnoredMessages(reactLogger.warn);
+reactLogger.error = filterIgnoredMessages(reactLogger.error);
 
 export enum LogPrefix {
   log,

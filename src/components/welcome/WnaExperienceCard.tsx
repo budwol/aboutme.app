@@ -64,7 +64,6 @@ export default function WnaExperienceCard({
         ]}
       >
         <View style={[styles.timelineWrapper, { width: timelineWidth }]}>
-          {/* Timeline Vertical Line */}
           <View
             style={[
               styles.timelineLine,
@@ -89,7 +88,6 @@ export default function WnaExperienceCard({
                 </View>
               ) : null}
 
-              {/* Dot */}
               <View
                 style={[
                   styles.dotColumn,
@@ -107,7 +105,6 @@ export default function WnaExperienceCard({
                 />
               </View>
 
-              {/* Card */}
               <View
                 style={[
                   styles.cardColumn,

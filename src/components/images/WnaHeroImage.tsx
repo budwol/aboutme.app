@@ -49,9 +49,9 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
       {showGradient && (
         <LinearGradient
           colors={[
-            convertHexToRgba(appColors.staticBlack, 0.24), // top
-            convertHexToRgba(appColors.staticBlack, 0.0), // center
-            convertHexToRgba(appColors.staticBlack, 0.55), // bottom
+            convertHexToRgba(appColors.staticBlack, 0.24),
+            convertHexToRgba(appColors.staticBlack, 0.0),
+            convertHexToRgba(appColors.staticBlack, 0.55),
           ]}
           locations={[0, 0.45, 1]}
           start={{ x: 0.5, y: 0 }}

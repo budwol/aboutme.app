@@ -38,6 +38,7 @@ type HeroShape = {
 };
 
 const heroShapes: HeroShape[] = [
+  // just a bunch of happy little shapes to keep the hero from feeling too stiff
   {
     top: 18,
     left: 18,

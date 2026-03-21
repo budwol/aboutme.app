@@ -125,7 +125,7 @@ describe("init.sh", () => {
     }
   });
 
-  it("creates the single source of truth structure on first run", () => {
+  it("sets up the local source directory on the first run", () => {
     const fixtureRoot = createFixtureRepo();
     createdFixtures.push(fixtureRoot);
 
@@ -139,22 +139,22 @@ describe("init.sh", () => {
     );
     expect(fs.existsSync(path.join(fixtureRoot, "app-data.json"))).toBe(true);
     expect(fs.existsSync(path.join(fixtureRoot, ".env"))).toBe(true);
-    expect(output).toContain("Created .aboutme/app-data.json");
-    expect(output).toContain("Created .env from .env.example");
+    expect(output).toContain("created .aboutme/app-data.json");
+    expect(output).toContain("created .env from .env.example");
     expect(output).toContain("Seeded default asset .aboutme/images/logo.svg");
-    expect(output).toContain("Generated public assets");
+    expect(output).toContain("generated public assets");
     expect(
       fs.existsSync(path.join(fixtureRoot, "public", "site.webmanifest")),
     ).toBe(true);
   });
 
-  it("generates derived files when source data and images exist", () => {
+  it("builds the public files when the source data is there", () => {
     const fixtureRoot = createFixtureRepo();
     createdFixtures.push(fixtureRoot);
 
     const output = runInit(fixtureRoot);
 
-    expect(output).toContain("Generated public assets");
+    expect(output).toContain("generated public assets");
     expect(
       fs.readFileSync(path.join(fixtureRoot, "app-data.json"), "utf8"),
     ).toBe(
@@ -196,7 +196,7 @@ describe("init.sh", () => {
     );
   });
 
-  it("is idempotent across repeated runs", () => {
+  it("stays idempotent across repeated runs", () => {
     const fixtureRoot = createFixtureRepo();
     createdFixtures.push(fixtureRoot);
 
@@ -220,24 +220,24 @@ describe("init.sh", () => {
 
     const output = runInit(fixtureRoot);
 
-    expect(output).not.toContain("Migrated existing");
-    expect(output).not.toContain("Created .env from .env.example");
+    expect(output).not.toContain("migrated");
+    expect(output).not.toContain("created .env from .env.example");
     expect(fs.readFileSync(manifestPath, "utf8")).toBe(beforeManifest);
     expect(fs.readFileSync(nginxPath, "utf8")).toBe(beforeNginx);
     expect(fs.readFileSync(publicImagePath, "utf8")).toBe(beforeImage);
     expect(fs.readFileSync(envPath, "utf8")).toBe(beforeEnv);
   });
 
-  it("supports a dry run without writing generated files", () => {
+  it("supports a dry run without writing files", () => {
     const fixtureRoot = createFixtureRepo();
     createdFixtures.push(fixtureRoot);
 
     const output = runInit(fixtureRoot, { dryRun: true });
 
-    expect(output).toContain("Dry run enabled");
-    expect(output).toContain("Would create .aboutme/app-data.json");
-    expect(output).toContain("Would create .env from .env.example");
-    expect(output).toContain("Would regenerate public assets");
+    expect(output).toContain("dry run");
+    expect(output).toContain("would create .aboutme/app-data.json");
+    expect(output).toContain("would create .env from .env.example");
+    expect(output).toContain("would regenerate public assets");
     expect(fs.existsSync(path.join(fixtureRoot, ".aboutme"))).toBe(false);
     expect(
       fs.existsSync(path.join(fixtureRoot, ".aboutme", "app-data.json")),

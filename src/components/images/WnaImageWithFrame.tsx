@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   frame: {
     borderWidth: 16,
     overflow: "hidden",
-    elevation: 8, // Android shadow
+    elevation: 8,
     width: 200,
     margin: 16,
     ...(Platform.OS === "web"

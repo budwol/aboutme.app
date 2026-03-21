@@ -1,19 +1,12 @@
-<a name="readme-top"></a>
-
 # AboutMe
 
-AboutMe is a web app that emerged as a “by-product” of one of my projects.  
-That’s why it is built with React Native Web.
+AboutMe is my little portfolio app built with Expo and React Native Web.
 
-It’s simple and straightforward: swap out a few images, fill in one file, and you’ll end up with a solid portfolio featuring information about projects, experience, tech stack, and contact details.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
+Clone it, throw in your own data and images, run `./init.sh`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
 
 ## Tech Stack
 
-AboutMe is built with a React Native for Web setup powered by Expo.
+This thing runs on React Native Web with Expo. No wizard cave, no enchanted build forest, just a web app with a few happy little layers and enough room to put a mountain where you want one.
 
 ### Core
 
@@ -31,37 +24,33 @@ AboutMe is built with a React Native for Web setup powered by Expo.
 - Husky (Git hooks)
 - Jest (jest-expo)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
 ## Setup
 
-1. Install dependencies:
+1. Install dependencies.
 
    ```bash
    npm install
    ```
 
-   The project is currently aligned with Node `20.19.4` and npm `11.5.2`.
+   Current baseline is Node `20.19.4` and npm `11.5.2`.
 
-2. Run the initializer:
-
-   ```bash
-   ./init.sh
-   ```
-
-   On first run it creates `.aboutme/`, `.aboutme/app-data.json`, `.aboutme/images/`, and `.env` (from `.env.example` if present), then seeds placeholder assets from the repo defaults.
-
-3. Adjust `.aboutme/app-data.json` and replace the placeholder files in `.aboutme/images/` when you want to use your own assets.
-
-4. Run the initializer again whenever data or images change:
+2. Run the initializer.
 
    ```bash
    ./init.sh
    ```
 
-   The script is idempotent. It syncs `.aboutme/app-data.json` into the ignored root `app-data.json` and regenerates:
+   On the first run it creates `.aboutme/`, `.aboutme/app-data.json`, `.aboutme/images/`, and `.env` if `.env.example` exists. It also seeds the default placeholder assets from the repo, so you do not have to paint the first little tree by hand. We start with a little bit of structure, then we can get wild in a controlled way.
+
+3. Fill `.aboutme/app-data.json` with your stuff and replace the placeholder files in `.aboutme/images/` when you are ready.
+
+4. Run the initializer again whenever you change data or images.
+
+   ```bash
+   ./init.sh
+   ```
+
+   The script is idempotent. Run it as often as you want. No mistakes here, just happy little rebuilds. Every pass lays down another calm little layer of paint. It syncs `.aboutme/app-data.json` into the ignored root `app-data.json` and regenerates:
    - `public/images/*`
    - generated logo and favicon assets
    - `public/site.webmanifest`
@@ -69,56 +58,52 @@ AboutMe is built with a React Native for Web setup powered by Expo.
    - `public/sitemap.xml`
    - `nginx/site.conf`
 
-   Preview the same process without writing files:
+   If you just want to peek without writing files:
 
    ```bash
    ./init.sh --dry-run
    ```
 
-   Useful for local checks and CI validation. It runs through the same decisions, but does not create, overwrite, or regenerate files.
+   Good for local checks and CI. Same decisions, no writes, just a quiet little rehearsal before the real brush hits the canvas.
 
-5. Start locally:
+5. Start the app.
 
    ```bash
    npm run web
    ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
 ## Configuration
 
-Drop your source images into:
+Put your source images here:
 
 ```
 .aboutme/images/
 ```
 
-The repo already ships with these placeholders:
+The repo already comes with these placeholders:
 
 - `logo.svg`
 - `bg.webp`
 - `default_avatar.webp`
 - `default_project.webp`
 
-Reference the files you want to use inside `.aboutme/app-data.json`.
+Point to the files you want in `.aboutme/app-data.json`, and let the generator do its thing. Maybe it needs a tree. Maybe it needs a mountain. Maybe it just needs your face in `default_avatar.webp`.
 
 ### Local Environment
 
-Create a local env file when needed:
+If you need a local `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-`./init.sh` already creates `.env` automatically when `.env.example` exists and `.env` is still missing.
+`./init.sh` already creates `.env` when `.env.example` exists and `.env` is still missing.
 
-`.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Generated files such as root `app-data.json`, public assets, and nginx config are intentionally ignored by Git.
+`.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Everything generated from them, like root `app-data.json`, public assets, and nginx config, is intentionally ignored by Git. Nice and tidy, like cleaning the brushes before the paint dries and giving the canvas one last friendly nod.
 
 ### Navigation & Content
 
-The app ships with:
+Right now the app gives you a nice little set of pages. Nothing overcooked, just enough room for a tree here, a cloud there, and your work in the middle:
 
 - a localized home page
 - project list and detail pages
@@ -129,43 +114,39 @@ The app ships with:
 ### Recommended Image Ratios
 
 - **S** – 4:3 (e.g. 256x192)
-- **L** – define your preferred ratio
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
+- **L** – whatever ratio makes sense for your work
 
 ## Deployment
 
-1. Create a `.env` file if your deployment needs one:
+1. Create a `.env` file if your deploy setup needs one.
 
    ```bash
    cp .env.example .env
    ```
 
-2. Export the app:
+2. Export the app.
 
    ```bash
    npm run export:web
    ```
 
-   This generates the production build inside the `dist` directory.
+   That writes the production build into `dist`, all neat and dry, like we set it out in the sun for a minute.
 
-3. Deploy locally:
+3. Deploy locally.
 
    ```bash
    npm run deploy:local
    ```
 
-   This exports the app to `/var/www/html/`.
+   That exports the app to `/var/www/html/`, where it can sit there peacefully and be a website. Sometimes a website just wants a quiet place to be.
 
-4. Build and deploy to your registry:
+4. Build and push the container.
 
    ```bash
    npm run deploy:web
    ```
 
-   The container build only includes the generated runtime assets and nginx config from the project root. Local source data such as `.aboutme/`, `.env`, tests, and development files are excluded from the Docker build context. The bundled nginx serves the app on port `8080` inside the container.
+   The container build only includes generated runtime assets and nginx config from the project root. Local source data like `.aboutme/`, `.env`, tests, and dev files stay out of the Docker build context. Nginx serves the app on port `8080` inside the container, just quietly doing its job like a happy little cloud drifting across the top of the scene.
 
 ### Quality Checks
 
@@ -179,27 +160,19 @@ The app ships with:
 - `npm run test:all`
 - `./init.sh --dry-run`
 
-For a full local maintenance pass there is also:
+If you want the full cleanup pass:
 
 ```bash
 npm run cleanup
 ```
 
-`cleanup` recreates `package-lock.json`, runs `expo-doctor`, Prettier, TypeScript, and ESLint fixes. It may require network access and working Git hook permissions in your local environment.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
+`cleanup` recreates `package-lock.json`, runs `expo-doctor`, Prettier, TypeScript, and ESLint fixes. It may need network access locally. Basically the repo gets a bath, a haircut, and a gentle little whisper that says, "let's put one more tree right here."
 
 ## License
 
 **ALL RIGHTS RESERVED**
 
 See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
 
 ## Contact
 
@@ -209,5 +182,3 @@ Signal: https://signal.me/#eu/iPbKoW4uezUd1bRX8SHa-col_0NLmjNKI2hVZBdTuhUWyWW1eT
 
 Project Link:  
 https://github.com/budwol/AboutMe.App
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>

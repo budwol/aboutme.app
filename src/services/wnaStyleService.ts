@@ -43,7 +43,7 @@ const setAppStyle = (colors: Colors) => {
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
     },
-    // VIEW CONTAINER
+    // view containers
     containerMaxWidth: {
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
@@ -101,7 +101,7 @@ const setAppStyle = (colors: Colors) => {
       width: "100%",
     },
 
-    // NAVIGATION
+    // navigation
     navigationHeaderTitleStyle: {
       fontFamily: FontFamilies.UI,
       fontWeight: "bold",
@@ -110,7 +110,7 @@ const setAppStyle = (colors: Colors) => {
       borderBottomWidth: 0,
     },
 
-    // tabbar
+    // tab bar
     tabBarStyle: {
       backgroundColor: colors.white,
       borderTopWidth: 0,
@@ -122,7 +122,7 @@ const setAppStyle = (colors: Colors) => {
       color: colors.staticWhite,
     },
 
-    // Buttons
+    // buttons
     buttonWithText: {
       padding: 16,
       borderRadius: 8,
@@ -135,7 +135,7 @@ const setAppStyle = (colors: Colors) => {
       width: "80%",
     },
 
-    // TEXT
+    // text
 
     textExtraLarge: {
       fontSize: 24,
@@ -257,7 +257,7 @@ const setAppStyle = (colors: Colors) => {
       fontFamily: FontFamilies.UI,
     },
 
-    // SEPARATOR
+    // separators
     separatorHorizontal: {
       minHeight: 1,
       margin: 16,

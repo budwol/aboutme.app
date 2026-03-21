@@ -19,8 +19,8 @@ export type WnaNavigationListProps = {
   appLayout: AppLayout;
   items: WnaMenuItem[];
   renderItem: (item: WnaMenuItem) => ReactNode;
-  overWriteGap?: number;
-  overWritePaddingTop?: number;
+  overrideGap?: number;
+  overridePaddingTop?: number;
   style?: ViewStyle;
 };
 
@@ -29,8 +29,8 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
     appLayout,
     appStyle,
     items,
-    overWriteGap,
-    overWritePaddingTop,
+    overrideGap,
+    overridePaddingTop,
     renderItem,
     style,
   } = props;
@@ -38,7 +38,7 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
   const listStyle = useMemo(
     () => [
       {
-        paddingTop: overWritePaddingTop ?? appLayout.contentListPaddingTop,
+        paddingTop: overridePaddingTop ?? appLayout.contentListPaddingTop,
         paddingBottom: appLayout.contentPaddingBottom,
       },
       style ?? null,
@@ -46,12 +46,12 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
     [
       appLayout.contentListPaddingTop,
       appLayout.contentPaddingBottom,
-      overWritePaddingTop,
+      overridePaddingTop,
       style,
     ],
   );
 
-  const separatorHeight = overWriteGap ?? appLayout.globalListGap;
+  const separatorHeight = overrideGap ?? appLayout.globalListGap;
 
   const renderMenuItem = useCallback(
     ({ item }: { item: WnaMenuItem }) =>
