@@ -4,6 +4,10 @@ import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
+type RenderedNode = {
+  type: unknown;
+};
+
 const mockPush = jest.fn();
 const mockScrollTo = jest.fn();
 
@@ -205,5 +209,29 @@ describe("WnaHomeRoute", () => {
 
     expect(mockScrollTo).toHaveBeenCalledWith({ y: 0, animated: true });
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("renders experience before private projects on the home route", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const renderedSections = tree!.root
+      .findAll(
+        (node: RenderedNode) =>
+          typeof node.type === "string" &&
+          (node.type === "WnaWelcomeCard" ||
+            node.type === "WnaExperienceCard" ||
+            node.type === "WnaProjectsCard"),
+      )
+      .map((node: RenderedNode) => node.type);
+
+    expect(renderedSections).toEqual([
+      "WnaWelcomeCard",
+      "WnaExperienceCard",
+      "WnaProjectsCard",
+    ]);
   });
 });

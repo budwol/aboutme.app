@@ -83,6 +83,9 @@ describe("normalizeAppData", () => {
             periodEn: "since 05/2024",
             descriptionDe: "Deutsch",
             descriptionEn: "English",
+            detailsDe: ["Fokus Deutsch"],
+            detailsEn: ["Focus English"],
+            techstack: ["C#", ".NET"],
           },
         ],
       },
@@ -111,6 +114,8 @@ describe("normalizeAppData", () => {
       period: "since 05/2024",
       description: "English",
       company: defaultAppData.experience[0].company,
+      details: ["Focus English"],
+      techstack: ["C#", ".NET"],
     });
     expect(data.experience[0].duration).toMatch(/yr|yrs|mo|mos/);
   });
@@ -204,5 +209,17 @@ describe("normalizeAppData", () => {
     );
 
     warnSpy.mockRestore();
+  });
+
+  it("loads app-data from a direct json object export", async () => {
+    const data = await loadAppData(async () => ({
+      siteUrl: "https://portfolio.example.com/",
+      profile: {
+        name: "budwol",
+      },
+    }));
+
+    expect(data.siteUrl).toBe("https://portfolio.example.com");
+    expect(data.profile.name).toBe("budwol");
   });
 });
