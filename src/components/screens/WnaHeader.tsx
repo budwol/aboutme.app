@@ -83,6 +83,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const headerShadowStyle = useAnimatedStyle(() => {
       const scrollValue = scrollY?.value ?? 0;
       const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
+      // ease the shadow in nice and slow so the header does not slap you in the face
       const shadowOpacity =
         showShadow === true
           ? 1
@@ -98,6 +99,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const blurContainerStyle = useAnimatedStyle(() => {
       const scrollValue = scrollY?.value ?? 0;
       const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
+      // same trick here, just a little fog rolling in as you scroll
       const calculatedBlur = Math.min(1, Math.max(0, baseOpacity * 2.4));
       const blurOpacity =
         showShadow === true && calculatedBlur < 0.2 ? 0.2 : calculatedBlur;
@@ -148,16 +150,16 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     }, [handleBack, isBusy, onTitlePress, router, titleHref]);
 
     const toggleTheme = async () => {
-      const currentVal = (await getThemeFromStorageAsync()) ?? theme;
-      const nextVal = getNextTheme(currentVal);
-      const nextColors = resolveAppColors(nextVal, colorScheme);
+      const currentTheme = (await getThemeFromStorageAsync()) ?? theme;
+      const nextTheme = getNextTheme(currentTheme);
+      const nextColors = resolveAppColors(nextTheme, colorScheme);
 
       setAppColors(nextColors);
-      setTheme(nextVal);
+      setTheme(nextTheme);
 
-      Toast.show({ type: "info", text1: `Switched Theme to ${nextVal}` });
+      Toast.show({ type: "info", text1: `theme: ${nextTheme}` });
 
-      await setThemeToStorageAsync(nextVal);
+      await setThemeToStorageAsync(nextTheme);
     };
 
     const backButtonVisible =
@@ -181,14 +183,16 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       elevation: 2,
     };
 
-    const pointerEvents = isBusy ? "none" : "auto";
+    const headerPointerEvents = isBusy ? "none" : "auto";
 
     return (
       <Animated.View style={[headerStyle, headerShadowStyle]}>
         <Animated.View
           style={[
             headerStyle,
-            { pointerEvents: pointerEvents as ViewStyle["pointerEvents"] },
+            {
+              pointerEvents: headerPointerEvents as ViewStyle["pointerEvents"],
+            },
           ]}
         >
           <Animated.View
@@ -218,7 +222,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
           </Animated.View>
 
           <View style={headerContentStyle}>
-            {/* LEFT */}
             <View>
               {backButtonVisible ? (
                 <View style={{ paddingLeft: isLandscape ? 8 : 0 }}>
@@ -236,7 +239,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               )}
             </View>
 
-            {/* TITLE */}
             <View
               style={{
                 flex: 1,
@@ -257,7 +259,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               )}
             </View>
 
-            {/* RIGHT */}
             <Animated.View
               style={[
                 animatedStyle,
