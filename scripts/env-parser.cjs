@@ -79,7 +79,7 @@ if (require.main === module) {
   const filePath = process.argv[2];
 
   if (!filePath) {
-    console.error("env file path is missing.");
+    console.error("env file path is missing");
     process.exit(1);
   }
 
