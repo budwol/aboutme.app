@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "clean-install": "rm -rf node_modules && rm package-lock.json && npm install",
-    "cleanup": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && npm prune && HUSKY=0 npm i --package-lock-only && npx expo-doctor && npm run fix:prettier && npm run test:prettier && npm run test:types && npm run lint-fix && echo cleanup done.",
+    "cleanup": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && npm prune && HUSKY=0 npm i --package-lock-only && npx expo-doctor && npm run fix:prettier && npm run lint-fix && npm run test:security && npm run test:all && echo cleanup done.",
     "deploy:container": "./scripts/deploy-container.sh",
     "deploy:local": "./scripts/deploy-local.sh",
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
