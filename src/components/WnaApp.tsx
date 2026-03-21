@@ -1,4 +1,4 @@
-import Toast from "react-native-toast-message";
+import Toast, { ToastConfig } from "react-native-toast-message";
 import { AppData } from "@/app-data";
 import { Dimensions, Text, useColorScheme, View } from "react-native";
 import { ErrorBoundaryProps } from "expo-router";
@@ -25,7 +25,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
     >
       <Text style={{ color: "white", marginBottom: 12 }}>{error.message}</Text>
       <Text style={{ color: "white" }} onPress={retry}>
-        Try Again?
+        retry
       </Text>
     </View>
   );
@@ -36,6 +36,47 @@ export type AppComponentProps = PropsWithChildren<{
   theme: Theme;
 }>;
 
+function renderToastCard(accentColor: string, text1?: string, text2?: string) {
+  return (
+    <View
+      style={{
+        width: "100%",
+        maxWidth: 420,
+        borderRadius: 12,
+        borderLeftWidth: 4,
+        borderLeftColor: accentColor,
+        backgroundColor: "#ffffff",
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+      }}
+    >
+      {text1 ? (
+        <Text style={{ fontSize: 15, fontWeight: "700", color: "#181818" }}>
+          {text1}
+        </Text>
+      ) : null}
+      {text2 ? (
+        <Text
+          style={{
+            marginTop: text1 ? 4 : 0,
+            fontSize: 13,
+            lineHeight: 18,
+            color: "#404040",
+          }}
+        >
+          {text2}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
+const toastConfig: ToastConfig = {
+  success: ({ text1, text2 }) => renderToastCard("#69C779", text1, text2),
+  info: ({ text1, text2 }) => renderToastCard("#87CEFA", text1, text2),
+  error: ({ text1, text2 }) => renderToastCard("#FE6301", text1, text2),
+};
+
 const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const colorScheme = useColorScheme();
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,9 +86,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const { setAppColors, setTheme } = useWnaTheme();
   const { setAppData } = useWnaAppData();
 
-  /**
-   * ✅ Dimensions Listener (kein Multi-State-Setzen mehr)
-   */
   useEffect(() => {
     const handleChange = () => {
       if (dimensionTimerRef.current) {
@@ -55,13 +93,13 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       }
 
       dimensionTimerRef.current = setTimeout(() => {
-        setDimensions(); // 🔥 nur EIN Context Update
+        setDimensions();
       }, 100);
     };
 
     const subscription = Dimensions.addEventListener("change", handleChange);
 
-    // Initial einmal setzen
+    // set the initial layout once on mount
     setDimensions();
 
     return () => {
@@ -72,9 +110,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     };
   }, [setDimensions]);
 
-  /**
-   * ✅ Initialisierung (nur einmal!)
-   */
   useEffect(() => {
     setTheme(theme);
     setAppData(appData);
@@ -108,6 +143,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     >
       {children}
       <Toast
+        config={toastConfig}
         position="bottom"
         bottomOffset={(appLayout?.footerHeight ?? 0) + 16}
       />

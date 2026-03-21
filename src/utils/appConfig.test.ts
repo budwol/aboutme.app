@@ -5,7 +5,7 @@ import {
   normalizeSiteUrl,
 } from "@utils/appConfig";
 
-describe("appConfig", () => {
+describe("app config", () => {
   it("normalizes valid https urls", () => {
     expect(normalizeSiteUrl("https://portfolio.example.com/")).toBe(
       "https://portfolio.example.com",
@@ -30,7 +30,7 @@ describe("appConfig", () => {
     expect(isAllowedSiteUrl("/relative/path")).toBe(false);
   });
 
-  it("uses the first configured valid site url source", () => {
+  it("uses the first valid configured site url", () => {
     expect(
       getConfiguredSiteUrlFromSources({
         appDataSiteUrl: "https://app-data.example.com/",
