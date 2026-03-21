@@ -33,6 +33,7 @@ const detailsHeightBuffer = appLayoutConstants.experienceDetailsHeightBuffer;
 type WnaExperienceCardProps = WnaWelcomeProps & {
   maxItems?: number;
   showDetails?: boolean;
+  expandAllDetailsByDefault?: boolean;
   footerActionLabel?: string;
   onFooterActionPress?: () => void;
 };
@@ -99,12 +100,12 @@ export default function WnaExperienceCard({
   t,
   maxItems,
   showDetails = true,
+  expandAllDetailsByDefault = false,
   footerActionLabel,
   onFooterActionPress,
 }: WnaExperienceCardProps) {
   const { width } = useWindowDimensions();
   const isCompactLayout = width < compactBreakpoint;
-  const [expandedIndexes, setExpandedIndexes] = useState<number[]>([]);
   const [hoveredDetailIndex, setHoveredDetailIndex] = useState<number | null>(
     null,
   );
@@ -112,6 +113,32 @@ export default function WnaExperienceCard({
   const experienceItems = useMemo(
     () => appData.experience.slice(0, maxItems ?? appData.experience.length),
     [appData.experience, maxItems],
+  );
+  const [expandedIndexes, setExpandedIndexes] = useState<number[]>(() =>
+    expandAllDetailsByDefault ? experienceItems.map((_, index) => index) : [],
+  );
+
+  useEffect(() => {
+    setExpandedIndexes(
+      expandAllDetailsByDefault ? experienceItems.map((_, index) => index) : [],
+    );
+  }, [expandAllDetailsByDefault, experienceItems]);
+
+  const accentSurfaceColor = useMemo(
+    () => convertHexToRgba(appColors.accent5, 0.08),
+    [appColors.accent5],
+  );
+  const accentHoverSurfaceColor = useMemo(
+    () => convertHexToRgba(appColors.accent5, 0.14),
+    [appColors.accent5],
+  );
+  const accentBorderColor = useMemo(
+    () => convertHexToRgba(appColors.accent5, 0.25),
+    [appColors.accent5],
+  );
+  const accentHoverBorderColor = useMemo(
+    () => convertHexToRgba(appColors.accent5, 0.38),
+    [appColors.accent5],
   );
   const effectiveCardWidth = useMemo(() => {
     if (isCompactLayout) {
@@ -183,17 +210,40 @@ export default function WnaExperienceCard({
           />
 
           {experienceItems.map((item, index) => {
+            const hasDescription = item.description.trim().length > 0;
+            const hasExplicitDetails = item.details.length > 0;
             const hasDetails =
-              item.details.length > 0 || item.techstack.length > 0;
+              hasExplicitDetails || item.techstack.length > 0 || hasDescription;
             const isExpanded = expandedIndexes.includes(index);
             const isDetailsHovered = hoveredDetailIndex === index;
+            const descriptionDetail =
+              hasDescription && !hasExplicitDetails ? (
+                <View
+                  style={[
+                    styles.detailCard,
+                    {
+                      backgroundColor: accentSurfaceColor,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.detailMarker,
+                      { backgroundColor: appColors.accent5 },
+                    ]}
+                  />
+                  <Text style={[appStyle.textNeutralMicro, styles.detailText]}>
+                    {item.description}
+                  </Text>
+                </View>
+              ) : null;
             const detailItems = item.details.map((detail, detailIndex) => (
               <View
                 key={`${detailIndex}-${detail}`}
                 style={[
                   styles.detailCard,
                   {
-                    backgroundColor: convertHexToRgba(appColors.accent5, 0.08),
+                    backgroundColor: accentSurfaceColor,
                   },
                 ]}
               >
@@ -216,6 +266,42 @@ export default function WnaExperienceCard({
                 appStyle={appStyle}
               />
             ));
+            const detailsToggle =
+              showDetails && hasDetails ? (
+                <View style={styles.actionRow}>
+                  <Pressable
+                    onPress={() => toggleExperienceDetails(index)}
+                    onHoverIn={() => setDetailsHover(index)}
+                    onHoverOut={() => setDetailsHover(null)}
+                    style={[
+                      styles.expandButton,
+                      {
+                        backgroundColor: isDetailsHovered
+                          ? accentHoverSurfaceColor
+                          : accentSurfaceColor,
+                        borderColor: isDetailsHovered
+                          ? accentHoverBorderColor
+                          : accentBorderColor,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        appStyle.textMicro,
+                        styles.expandButtonText,
+                        { color: appColors.accent5 },
+                      ]}
+                    >
+                      {t(
+                        isExpanded
+                          ? i18nKeys.actionHideDetails
+                          : i18nKeys.actionShowDetails,
+                      )}
+                      {isExpanded ? " ↑" : " ↓"}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null;
 
             return (
               <View
@@ -280,43 +366,8 @@ export default function WnaExperienceCard({
                     description={item.description}
                     badgeText={item.duration || "..."}
                     opacity={item.opacity ?? 1}
+                    footerContent={detailsToggle}
                   />
-
-                  {showDetails && hasDetails ? (
-                    <Pressable
-                      onPress={() => toggleExperienceDetails(index)}
-                      onHoverIn={() => setDetailsHover(index)}
-                      onHoverOut={() => setDetailsHover(null)}
-                      style={[
-                        styles.expandButton,
-                        {
-                          backgroundColor: convertHexToRgba(
-                            appColors.accent5,
-                            isDetailsHovered ? 0.14 : 0.08,
-                          ),
-                          borderColor: convertHexToRgba(
-                            appColors.accent5,
-                            isDetailsHovered ? 0.38 : 0.25,
-                          ),
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          appStyle.textMicro,
-                          styles.expandButtonText,
-                          { color: appColors.accent5 },
-                        ]}
-                      >
-                        {t(
-                          isExpanded
-                            ? i18nKeys.actionHideDetails
-                            : i18nKeys.actionShowDetails,
-                        )}
-                        {isExpanded ? " ↑" : " ↓"}
-                      </Text>
-                    </Pressable>
-                  ) : null}
 
                   {showDetails && hasDetails ? (
                     <ExperienceDetailsBox
@@ -327,6 +378,7 @@ export default function WnaExperienceCard({
                         0.85,
                       )}
                     >
+                      {descriptionDetail}
                       {detailItems.length > 0 ? detailItems : null}
 
                       {techBadges.length > 0 ? (
@@ -352,35 +404,34 @@ export default function WnaExperienceCard({
       </View>
 
       {footerActionLabel && onFooterActionPress ? (
-        <Pressable
-          onPress={onFooterActionPress}
-          onHoverIn={() => setIsFooterActionHovered(true)}
-          onHoverOut={() => setIsFooterActionHovered(false)}
-          style={[
-            styles.footerActionButton,
-            {
-              alignSelf: isCompactLayout ? "flex-start" : "center",
-              borderColor: convertHexToRgba(
-                appColors.accent5,
-                isFooterActionHovered ? 0.4 : 0.26,
-              ),
-              backgroundColor: convertHexToRgba(
-                appColors.accent5,
-                isFooterActionHovered ? 0.14 : 0.08,
-              ),
-            },
-          ]}
-        >
-          <Text
+        <View style={styles.footerActionRow}>
+          <Pressable
+            onPress={onFooterActionPress}
+            onHoverIn={() => setIsFooterActionHovered(true)}
+            onHoverOut={() => setIsFooterActionHovered(false)}
             style={[
-              appStyle.textMicro,
-              styles.footerActionButtonText,
-              { color: appColors.accent5 },
+              styles.footerActionButton,
+              {
+                borderColor: isFooterActionHovered
+                  ? accentHoverBorderColor
+                  : accentBorderColor,
+                backgroundColor: isFooterActionHovered
+                  ? accentHoverSurfaceColor
+                  : accentSurfaceColor,
+              },
             ]}
           >
-            {footerActionLabel} →
-          </Text>
-        </Pressable>
+            <Text
+              style={[
+                appStyle.textMicro,
+                styles.footerActionButtonText,
+                { color: appColors.accent5 },
+              ]}
+            >
+              {footerActionLabel} →
+            </Text>
+          </Pressable>
+        </View>
       ) : null}
     </View>
   );
@@ -460,8 +511,16 @@ const styles = StyleSheet.create({
     minWidth: 0,
     width: undefined,
   },
+  actionRow: {
+    width: "100%",
+    alignItems: "flex-end",
+  },
+  footerActionRow: {
+    marginTop: 24,
+    width: "100%",
+    alignItems: "center",
+  },
   expandButton: {
-    alignSelf: "flex-start",
     marginTop: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,

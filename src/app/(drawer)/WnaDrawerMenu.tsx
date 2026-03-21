@@ -15,6 +15,7 @@ import currentAppVersion from "@components/currentAppVersion";
 import WnaNavigationList, {
   WnaMenuItem,
 } from "@components/navigation/WnaNavigationList";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { getDrawerNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { getLangCode } from "@services/i18n/i18n";
@@ -33,6 +34,7 @@ export default function WnaDrawerMenu() {
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const segments = useSegments();
+  const navigationRouter = useWnaNavigationTransition(router);
 
   const langCode = getNavigationLang(getLangCode());
   const lastSegment = segments.at(-1);
@@ -84,10 +86,13 @@ export default function WnaDrawerMenu() {
     }
   }, [status, navigation]);
 
-  const handleNavigate = useCallback((route?: string, isActive?: boolean) => {
-    if (!route || isActive) return;
-    router.push(route as Href);
-  }, []);
+  const handleNavigate = useCallback(
+    (route?: string, isActive?: boolean) => {
+      if (!route || isActive) return;
+      navigationRouter.push(route as Href);
+    },
+    [navigationRouter],
+  );
 
   const renderItem = useCallback(
     (item: WnaMenuItem) => {
@@ -129,7 +134,7 @@ export default function WnaDrawerMenu() {
         t={t}
         checkInternetConnection={false}
         style={styles.headerPressable}
-        onPress={() => router.push(baseRoute)}
+        onPress={() => navigationRouter.push(baseRoute)}
       >
         <View
           style={[
@@ -181,7 +186,9 @@ export default function WnaDrawerMenu() {
       <View style={styles.footer}>
         <Text
           onPress={() =>
-            router.push(getDrawerNavigationPath("disclaimer", langCode))
+            navigationRouter.push(
+              getDrawerNavigationPath("disclaimer", langCode) as Href,
+            )
           }
           accessibilityRole="link"
           style={[appStyle.textNeutralSmall, styles.footerLink]}

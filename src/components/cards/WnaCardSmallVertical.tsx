@@ -5,7 +5,7 @@ import {
 import WnaBadge from "@components/misc/WnaBadge";
 import WnaVerticalCardTextContent from "@components/cards/WnaVerticalCardTextContent";
 import { createVerticalCardContainerStyle } from "@components/cards/wnaVerticalCardStyles";
-import { FC, memo } from "react";
+import { FC, memo, ReactNode } from "react";
 import { Text, View } from "react-native";
 export interface IWnaCardSmallVerticalProps
   extends WnaBaseCardProps, WnaVerticalTextCardContent {
@@ -13,6 +13,7 @@ export interface IWnaCardSmallVerticalProps
   badgeText?: string;
   width?: number;
   opacity?: number;
+  footerContent?: ReactNode;
 }
 
 const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
@@ -23,6 +24,7 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
   description,
   badgeText,
   opacity,
+  footerContent,
 }) => (
   <View
     style={{
@@ -53,7 +55,9 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
           appColors={appColors}
           appStyle={appStyle}
           text={badgeText}
+          fontColor={appColors.coolgray8}
           style={{
+            backgroundColor: appColors.coolgray1,
             paddingHorizontal: 4,
             paddingVertical: 2,
             borderRadius: 3,
@@ -67,6 +71,10 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
     {!!description ? (
       <Text style={appStyle.textNeutralMicro}>{description}</Text>
     ) : null}
+
+    {footerContent ? (
+      <View style={{ marginTop: 2 }}>{footerContent}</View>
+    ) : null}
   </View>
 );
 
@@ -78,6 +86,7 @@ const WnaCardSmallVertical = memo(
     prevProps.subtitle === nextProps.subtitle &&
     prevProps.description === nextProps.description &&
     prevProps.badgeText === nextProps.badgeText &&
+    prevProps.footerContent === nextProps.footerContent &&
     prevProps.width === nextProps.width,
 );
 

@@ -2,12 +2,13 @@ import Toast, { ToastConfig } from "react-native-toast-message";
 import { AppData } from "@/app-data";
 import {
   Dimensions,
+  LayoutChangeEvent,
   StyleSheet,
   Text,
   useColorScheme,
   View,
 } from "react-native";
-import { ErrorBoundaryProps } from "expo-router";
+import { ErrorBoundaryProps, usePathname } from "expo-router";
 import {
   FC,
   PropsWithChildren,
@@ -36,6 +37,69 @@ import Colors from "@constants/theme/colors";
 import { resolveAppColors } from "@utils/themeColors";
 import { WnaHeroField } from "@components/welcome/WnaWelcomeHero";
 import { convertHexToRgba } from "@utils/colorConverter";
+
+type WnaLoadingCopyProps = {
+  appColors: Colors;
+  appData: AppData;
+};
+
+function useWnaShrinkingBarAnimation() {
+  const barWidth = useSharedValue(220);
+
+  useEffect(() => {
+    barWidth.value = 220;
+    barWidth.value = withTiming(8, {
+      duration: 820,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [barWidth]);
+
+  return useAnimatedStyle(() => ({
+    width: barWidth.value,
+  }));
+}
+
+function WnaShrinkingBar({ appColors }: { appColors: Colors }) {
+  const barAnimatedStyle = useWnaShrinkingBarAnimation();
+
+  return (
+    <View style={styles.waveBarRow}>
+      <Animated.View
+        style={[
+          styles.waveBar,
+          {
+            backgroundColor: appColors.accent5,
+            shadowColor: appColors.accent5,
+          },
+          barAnimatedStyle,
+        ]}
+      />
+    </View>
+  );
+}
+
+function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
+  return (
+    <View style={styles.introCopy}>
+      <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
+        {appData.profile.name}
+      </Text>
+      <WnaShrinkingBar appColors={appColors} />
+      <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
+        {appData.profile.title.toUpperCase()}
+      </Text>
+    </View>
+  );
+}
+
+function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
+  return (
+    <View style={styles.transitionContent}>
+      <WnaHeroField appColors={appColors} compact />
+      <WnaShrinkingBar appColors={appColors} />
+    </View>
+  );
+}
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
@@ -160,18 +224,35 @@ function renderToastCard(appColors: Colors, text1?: string, text2?: string) {
 
 const introDelay = 700;
 const introDuration = 620;
+const navigationTransitionDurationIn = 420;
+const navigationTransitionDurationOut = 560;
 
 const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealFrameRef = useRef<number | null>(null);
+  const navigationRevealFrameRef = useRef<number | null>(null);
+  const previousPathnameRef = useRef(pathname);
   const [showIntro, setShowIntro] = useState(true);
+  const [showNavigationTransition, setShowNavigationTransition] =
+    useState(false);
+  const [hasContentLayout, setHasContentLayout] = useState(false);
+  const [isContentReadyForReveal, setIsContentReadyForReveal] = useState(false);
   const introOpacity = useSharedValue(1);
   const introTranslateY = useSharedValue(0);
   const introScale = useSharedValue(1);
+  const navigationTransitionOpacity = useSharedValue(0);
+  const navigationTransitionScale = useSharedValue(1);
   const contentOpacity = useSharedValue(0.92);
   const contentTranslateY = useSharedValue(10);
 
-  const { isAppInitialized, setIsAppInitialized } = useWnaAppLifecycle();
+  const {
+    finishNavigationTransition,
+    isAppInitialized,
+    isNavigationTransitionActive,
+    setIsAppInitialized,
+  } = useWnaAppLifecycle();
   const { setDimensions } = useWnaLayout();
   const { appColors, setAppColors, setTheme } = useWnaTheme();
   const { setAppData } = useWnaAppData();
@@ -246,7 +327,95 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   ]);
 
   useEffect(() => {
+    if (!hasContentLayout || isContentReadyForReveal) {
+      return;
+    }
+
+    revealFrameRef.current = requestAnimationFrame(() => {
+      revealFrameRef.current = requestAnimationFrame(() => {
+        setIsContentReadyForReveal(true);
+      });
+    });
+
+    return () => {
+      if (revealFrameRef.current !== null) {
+        cancelAnimationFrame(revealFrameRef.current);
+      }
+    };
+  }, [hasContentLayout, isContentReadyForReveal]);
+
+  useEffect(() => {
+    if (!isNavigationTransitionActive || showIntro) {
+      return;
+    }
+
+    setShowNavigationTransition(true);
+    navigationTransitionOpacity.value = 0;
+    navigationTransitionScale.value = 1;
+
+    navigationTransitionOpacity.value = withTiming(1, {
+      duration: navigationTransitionDurationIn,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [
+    isNavigationTransitionActive,
+    navigationTransitionOpacity,
+    navigationTransitionScale,
+    showIntro,
+  ]);
+
+  useEffect(() => {
+    const previousPathname = previousPathnameRef.current;
+    previousPathnameRef.current = pathname;
+
+    if (
+      previousPathname === pathname ||
+      !isNavigationTransitionActive ||
+      showIntro
+    ) {
+      return;
+    }
+
+    navigationRevealFrameRef.current = requestAnimationFrame(() => {
+      navigationRevealFrameRef.current = requestAnimationFrame(() => {
+        navigationTransitionOpacity.value = withTiming(
+          0,
+          {
+            duration: navigationTransitionDurationOut,
+            easing: Easing.out(Easing.cubic),
+          },
+          (finished) => {
+            if (!finished) {
+              return;
+            }
+
+            runOnJS(setShowNavigationTransition)(false);
+            runOnJS(finishNavigationTransition)();
+          },
+        );
+      });
+    });
+
+    return () => {
+      if (navigationRevealFrameRef.current !== null) {
+        cancelAnimationFrame(navigationRevealFrameRef.current);
+      }
+    };
+  }, [
+    finishNavigationTransition,
+    isNavigationTransitionActive,
+    navigationTransitionOpacity,
+    navigationTransitionScale,
+    pathname,
+    showIntro,
+  ]);
+
+  useEffect(() => {
     if (!isAppInitialized || !showIntro) {
+      return;
+    }
+
+    if (!isContentReadyForReveal) {
       return;
     }
 
@@ -298,6 +467,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     introScale,
     introTranslateY,
     isAppInitialized,
+    isContentReadyForReveal,
     showIntro,
   ]);
 
@@ -313,6 +483,16 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     opacity: contentOpacity.value,
     transform: [{ translateY: contentTranslateY.value }],
   }));
+  const navigationTransitionAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: navigationTransitionOpacity.value,
+    transform: [{ scale: navigationTransitionScale.value }],
+  }));
+
+  function handleContentLayout(_event: LayoutChangeEvent) {
+    if (!hasContentLayout) {
+      setHasContentLayout(true);
+    }
+  }
 
   if (!isAppInitialized) {
     return (
@@ -330,7 +510,10 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       style={{ flex: 1, overflow: "hidden" }}
       edges={["left", "right", "bottom"]}
     >
-      <Animated.View style={[styles.content, contentAnimatedStyle]}>
+      <Animated.View
+        onLayout={handleContentLayout}
+        style={[styles.content, contentAnimatedStyle]}
+      >
         {children}
       </Animated.View>
 
@@ -347,15 +530,23 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
         >
           <View style={styles.introContent}>
             <WnaHeroField appColors={appColors} compact />
-            <View style={styles.introCopy}>
-              <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
-                {appData.profile.name}
-              </Text>
-              <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
-                {appData.profile.title}
-              </Text>
-            </View>
+            <WnaLoadingCopy appColors={appColors} appData={appData} />
           </View>
+        </Animated.View>
+      ) : null}
+
+      {showNavigationTransition ? (
+        <Animated.View
+          pointerEvents="auto"
+          style={[
+            styles.introOverlay,
+            {
+              backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
+            },
+            navigationTransitionAnimatedStyle,
+          ]}
+        >
+          <WnaNavigationTransitionOverlay appColors={appColors} />
         </Animated.View>
       ) : null}
 
@@ -380,10 +571,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
   },
+  transitionContent: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 22,
+    paddingHorizontal: 24,
+  },
   introCopy: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 10,
     paddingHorizontal: 24,
   },
   introBrand: {
@@ -391,6 +589,19 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.8,
     textAlign: "center",
+  },
+  waveBarRow: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 220,
+  },
+  waveBar: {
+    width: 220,
+    height: 8,
+    borderRadius: 999,
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 0 },
   },
   introName: {
     fontSize: 13,

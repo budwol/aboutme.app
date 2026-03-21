@@ -51,6 +51,16 @@ jest.mock("@utils/themeColors", () => ({
   resolveAppColors: () => ({ resolved: true }),
 }));
 
+jest.mock("react-i18next", () => ({
+  initReactI18next: {
+    type: "3rdParty",
+    init: () => undefined,
+  },
+  useTranslation: () => ({
+    t: (value: string) => value,
+  }),
+}));
+
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: (props: unknown) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -138,6 +148,6 @@ describe("WnaApp", () => {
 
     expect(heroField.props.compact).toBe(true);
     expect(textValues).toContain(appData.profile.name);
-    expect(textValues).toContain(appData.profile.title);
+    expect(textValues).toContain(appData.profile.title.toUpperCase());
   });
 });

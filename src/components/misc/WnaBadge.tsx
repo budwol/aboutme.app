@@ -11,6 +11,7 @@ export type WnaBadgeProps = {
   appStyle: AppStyle;
   style?: ViewStyle;
   textStyle?: TextStyle | TextStyle[];
+  fontColor?: string;
   icon?: keyof typeof iconMap;
   text?: string;
 };
@@ -20,6 +21,7 @@ const WnaBadge = ({
   appStyle,
   style,
   textStyle,
+  fontColor,
   icon,
   text,
 }: WnaBadgeProps) => {
@@ -41,7 +43,7 @@ const WnaBadge = ({
         <WnaText
           appColors={appColors}
           appStyle={appStyle}
-          fontColor={appColors.white}
+          fontColor={fontColor ?? appColors.white}
           style={
             Array.isArray(textStyle)
               ? [appStyle.textMicro, styles.text, ...textStyle]
