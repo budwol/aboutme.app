@@ -1,7 +1,7 @@
 # AboutMe
 
 [![ci](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml/badge.svg)](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml)
-[![license](https://img.shields.io/github/license/budwol/aboutme.app)](./LICENSE.txt)
+[![license: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![node](https://img.shields.io/badge/node-20.19.4-339933?logo=node.js&logoColor=white)](./package.json)
 [![expo](https://img.shields.io/badge/expo-SDK%2054-000020?logo=expo&logoColor=white)](./package.json)
 
