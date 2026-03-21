@@ -1,5 +1,10 @@
 # AboutMe
 
+[![ci](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml/badge.svg)](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/budwol/aboutme.app)](./LICENSE.txt)
+[![node](https://img.shields.io/badge/node-20.19.4-339933?logo=node.js&logoColor=white)](./package.json)
+[![expo](https://img.shields.io/badge/expo-SDK%2054-000020?logo=expo&logoColor=white)](./package.json)
+
 AboutMe is my little portfolio app built with Expo and React Native Web.
 
 Clone it, throw in your own data and images, run `npm run init`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
