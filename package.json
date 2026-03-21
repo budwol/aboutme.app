@@ -11,6 +11,7 @@
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
     "export:web": "npm run cleanup && npx expo export -p web",
     "fix:prettier": "prettier --write .",
+    "init": "./init.sh",
     "lint": "eslint ./src --no-cache",
     "lint-fix": "eslint ./src --fix --no-cache",
     "prepare": "husky",
