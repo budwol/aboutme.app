@@ -1,9 +1,30 @@
 import Toast, { ToastConfig } from "react-native-toast-message";
 import { AppData } from "@/app-data";
-import { Dimensions, Text, useColorScheme, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from "react-native";
 import { ErrorBoundaryProps } from "expo-router";
-import { FC, PropsWithChildren, useEffect, useRef } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import {
   useWnaAppData,
   useWnaAppLifecycle,
@@ -11,7 +32,10 @@ import {
   useWnaTheme,
 } from "@components/WnaAppContext";
 import { Theme } from "@services/wnaAsyncStorageProvider";
+import Colors from "@constants/theme/colors";
 import { resolveAppColors } from "@utils/themeColors";
+import { WnaHeroField } from "@components/welcome/WnaWelcomeHero";
+import { convertHexToRgba } from "@utils/colorConverter";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
@@ -36,55 +60,151 @@ export type AppComponentProps = PropsWithChildren<{
   theme: Theme;
 }>;
 
-function renderToastCard(accentColor: string, text1?: string, text2?: string) {
+function renderToastCard(appColors: Colors, text1?: string, text2?: string) {
   return (
     <View
       style={{
         width: "100%",
-        maxWidth: 420,
-        borderRadius: 12,
-        borderLeftWidth: 4,
-        borderLeftColor: accentColor,
-        backgroundColor: "#ffffff",
-        paddingHorizontal: 16,
-        paddingVertical: 14,
+        maxWidth: 328,
+        minHeight: 78,
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: appColors.isDark
+          ? convertHexToRgba(appColors.coolgray4, 0.3)
+          : convertHexToRgba(appColors.coolgray2, 0.78),
+        backgroundColor: appColors.isDark
+          ? convertHexToRgba(appColors.background, 0.98)
+          : convertHexToRgba(appColors.white, 0.98),
+        paddingHorizontal: 18,
+        paddingVertical: 16,
+        shadowColor: appColors.staticBlack,
+        shadowOpacity: appColors.isDark ? 0.24 : 0.12,
+        shadowRadius: 22,
+        shadowOffset: { width: 0, height: 12 },
+        elevation: 7,
+        overflow: "hidden",
       }}
     >
-      {text1 ? (
-        <Text style={{ fontSize: 15, fontWeight: "700", color: "#181818" }}>
-          {text1}
-        </Text>
-      ) : null}
-      {text2 ? (
-        <Text
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "stretch",
+          gap: 14,
+          flex: 1,
+        }}
+      >
+        <View
           style={{
-            marginTop: text1 ? 4 : 0,
-            fontSize: 13,
-            lineHeight: 18,
-            color: "#404040",
+            width: 10,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          {text2}
-        </Text>
-      ) : null}
+          <View
+            style={{
+              width: 4,
+              alignSelf: "stretch",
+              minHeight: 42,
+              borderRadius: 999,
+              backgroundColor: appColors.accent5,
+              shadowColor: appColors.accent5,
+              shadowOpacity: appColors.isDark ? 0.28 : 0.18,
+              shadowRadius: 8,
+              shadowOffset: { width: 0, height: 0 },
+            }}
+          />
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            minWidth: 0,
+            justifyContent: "center",
+            paddingVertical: 2,
+          }}
+        >
+          {text1 ? (
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: "700",
+                letterSpacing: 1.1,
+                textTransform: "uppercase",
+                color: appColors.isDark
+                  ? convertHexToRgba(appColors.coolgray8, 0.64)
+                  : appColors.coolgray6,
+              }}
+            >
+              {text1}
+            </Text>
+          ) : null}
+          {text2 ? (
+            <Text
+              style={{
+                marginTop: text1 ? 7 : 0,
+                fontSize: 17,
+                lineHeight: 23,
+                fontWeight: "700",
+                letterSpacing: 0.15,
+                color: appColors.isDark ? appColors.coolgray8 : appColors.black,
+              }}
+            >
+              {text2}
+            </Text>
+          ) : null}
+        </View>
+      </View>
     </View>
   );
 }
 
-const toastConfig: ToastConfig = {
-  success: ({ text1, text2 }) => renderToastCard("#69C779", text1, text2),
-  info: ({ text1, text2 }) => renderToastCard("#87CEFA", text1, text2),
-  error: ({ text1, text2 }) => renderToastCard("#FE6301", text1, text2),
-};
+const introDelay = 700;
+const introDuration = 620;
 
 const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const colorScheme = useColorScheme();
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showIntro, setShowIntro] = useState(true);
+  const introOpacity = useSharedValue(1);
+  const introTranslateY = useSharedValue(0);
+  const introScale = useSharedValue(1);
+  const contentOpacity = useSharedValue(0.92);
+  const contentTranslateY = useSharedValue(10);
 
   const { isAppInitialized, setIsAppInitialized } = useWnaAppLifecycle();
-  const { appLayout, setDimensions } = useWnaLayout();
-  const { setAppColors, setTheme } = useWnaTheme();
+  const { setDimensions } = useWnaLayout();
+  const { appColors, setAppColors, setTheme } = useWnaTheme();
   const { setAppData } = useWnaAppData();
+
+  const toastConfig = useMemo<ToastConfig>(
+    () => ({
+      themeChange: ({ text1, text2, props }) =>
+        renderToastCard(
+          (props?.appColors as Colors) ?? appColors,
+          text1,
+          text2,
+        ),
+      success: ({ text1, text2, props }) =>
+        renderToastCard(
+          (props?.appColors as Colors) ?? appColors,
+          text1,
+          text2,
+        ),
+      info: ({ text1, text2, props }) =>
+        renderToastCard(
+          (props?.appColors as Colors) ?? appColors,
+          text1,
+          text2,
+        ),
+      error: ({ text1, text2, props }) =>
+        renderToastCard(
+          (props?.appColors as Colors) ?? appColors,
+          text1,
+          text2,
+        ),
+    }),
+    [appColors],
+  );
 
   useEffect(() => {
     const handleChange = () => {
@@ -125,6 +245,75 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     theme,
   ]);
 
+  useEffect(() => {
+    if (!isAppInitialized || !showIntro) {
+      return;
+    }
+
+    contentOpacity.value = withDelay(
+      introDelay,
+      withTiming(1, {
+        duration: introDuration,
+        easing: Easing.out(Easing.cubic),
+      }),
+    );
+    contentTranslateY.value = withDelay(
+      introDelay,
+      withTiming(0, {
+        duration: introDuration,
+        easing: Easing.out(Easing.cubic),
+      }),
+    );
+    introOpacity.value = withDelay(
+      introDelay,
+      withTiming(0, {
+        duration: introDuration,
+        easing: Easing.out(Easing.cubic),
+      }),
+    );
+    introTranslateY.value = withDelay(
+      introDelay,
+      withTiming(-18, {
+        duration: introDuration,
+        easing: Easing.out(Easing.cubic),
+      }),
+    );
+    introScale.value = withDelay(
+      introDelay,
+      withTiming(
+        1.03,
+        {
+          duration: introDuration,
+          easing: Easing.out(Easing.cubic),
+        },
+        () => {
+          runOnJS(setShowIntro)(false);
+        },
+      ),
+    );
+  }, [
+    contentOpacity,
+    contentTranslateY,
+    introOpacity,
+    introScale,
+    introTranslateY,
+    isAppInitialized,
+    showIntro,
+  ]);
+
+  const introAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: introOpacity.value,
+    transform: [
+      { translateY: introTranslateY.value },
+      { scale: introScale.value },
+    ],
+  }));
+
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: contentOpacity.value,
+    transform: [{ translateY: contentTranslateY.value }],
+  }));
+
   if (!isAppInitialized) {
     return (
       <View
@@ -141,14 +330,74 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       style={{ flex: 1, overflow: "hidden" }}
       edges={["left", "right", "bottom"]}
     >
-      {children}
-      <Toast
-        config={toastConfig}
-        position="bottom"
-        bottomOffset={(appLayout?.footerHeight ?? 0) + 16}
-      />
+      <Animated.View style={[styles.content, contentAnimatedStyle]}>
+        {children}
+      </Animated.View>
+
+      {showIntro ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.introOverlay,
+            {
+              backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
+            },
+            introAnimatedStyle,
+          ]}
+        >
+          <View style={styles.introContent}>
+            <WnaHeroField appColors={appColors} compact />
+            <View style={styles.introCopy}>
+              <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
+                {appData.profile.name}
+              </Text>
+              <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
+                {appData.profile.title}
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
+      ) : null}
+
+      <Toast config={toastConfig} position="top" topOffset={18} />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+  },
+  introOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 20,
+  },
+  introContent: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  introCopy: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 24,
+  },
+  introBrand: {
+    fontSize: 34,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    textAlign: "center",
+  },
+  introName: {
+    fontSize: 13,
+    letterSpacing: 1.8,
+    textAlign: "center",
+    textTransform: "uppercase",
+  },
+});
 
 export default WnaApp;
