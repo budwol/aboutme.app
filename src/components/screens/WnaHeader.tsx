@@ -23,6 +23,17 @@ import Toast from "react-native-toast-message";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 
+function getThemeLabel(theme: "light" | "dark" | "system") {
+  switch (theme) {
+    case "light":
+      return "Light mode";
+    case "dark":
+      return "Dark mode";
+    default:
+      return "System mode";
+  }
+}
+
 export type WnaHeaderProps = {
   headerTitle?: string;
   icon?: string;
@@ -157,7 +168,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       setAppColors(nextColors);
       setTheme(nextTheme);
 
-      Toast.show({ type: "info", text1: `theme: ${nextTheme}` });
+      Toast.show({
+        type: "themeChange",
+        text1: "Appearance",
+        text2: getThemeLabel(nextTheme),
+        props: { appColors: nextColors },
+      });
 
       await setThemeToStorageAsync(nextTheme);
     };

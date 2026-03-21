@@ -10,12 +10,17 @@ export default function WnaDefaultStackScreenOptions() {
       screenOptions={{
         headerShown: true,
         title: "...",
+        animation: "fade_from_bottom",
+        animationDuration: 240,
         headerStyle: {
           backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
         },
         headerTitleStyle: { fontFamily: FontFamilies.UI },
         headerTintColor: appColors.staticWhite,
         headerShadowVisible: false,
+        contentStyle: {
+          backgroundColor: "transparent",
+        },
       }}
     />
   );

@@ -40,6 +40,18 @@ jest.mock("@components/welcome/WnaTechstackCard", () => {
   };
 });
 
+jest.mock("@components/welcome/WnaWelcomeHero", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ReactModule = require("react");
+
+  return function MockWnaWelcomeHero(props: unknown) {
+    return ReactModule.createElement(
+      "WnaWelcomeHero",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
 jest.mock("react-native-reanimated", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
@@ -115,8 +127,7 @@ describe("WnaWelcomeCard", () => {
       );
     });
 
-    const title = tree!.root.findByType("WnaWelcomeTitle");
-    const avatar = tree!.root.findByType("WnaImage");
+    const hero = tree!.root.findByType("WnaWelcomeHero");
     const techstack = tree!.root.findByType("WnaTechStackCard");
     const textValues = tree!.root
       .findAllByType("Text")
@@ -125,9 +136,7 @@ describe("WnaWelcomeCard", () => {
           node.props.children,
       );
 
-    expect(title.props.title).toBe(appData.profile.name);
-    expect(title.props.subtitle).toBe(appData.profile.title.toUpperCase());
-    expect(avatar.props.imageUrl).toBe(`images/${appData.profile.avatar}`);
+    expect(hero.props.appData).toBe(appData);
     expect(textValues).toEqual(["Absatz eins", "Absatz zwei", "Absatz drei"]);
     expect(techstack.props.appData).toBe(appData);
   });
