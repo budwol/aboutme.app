@@ -234,4 +234,20 @@ describe("WnaHomeRoute", () => {
       "WnaProjectsCard",
     ]);
   });
+
+  it("navigates to the experience route from the home teaser", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const experiencePreview = tree!.root.findByType("WnaExperienceCard");
+
+    act(() => {
+      experiencePreview.props.onFooterActionPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/taetigkeiten");
+  });
 });

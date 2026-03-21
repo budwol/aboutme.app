@@ -13,6 +13,7 @@ const i18nKeys = {
   actionShareViaFacebook: "actionShareViaFacebook",
   actionShareViaTelegram: "actionShareViaTelegram",
   actionShareViaWhatsApp: "actionShareViaWhatsApp",
+  actionShowMore: "actionShowMore",
   actionWebApp: "actionWebApp",
   actionXing: "actionXing",
   actionPlayStore: "actionPlayStore",

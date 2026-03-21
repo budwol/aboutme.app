@@ -29,6 +29,7 @@ export default interface AppStyle {
   textNeutralMedium: TextStyle;
   textNeutralSmall: TextStyle;
   textNeutralMicro: TextStyle;
+  textNeutralLabel: TextStyle;
   textTitleLarge: TextStyle;
   textNeutralTitleLarge: TextStyle;
   textNeutralSubtitle: TextStyle;
@@ -213,6 +214,16 @@ const setAppStyle = (colors: Colors) => {
       fontSize: 12,
       fontWeight: "400",
       lineHeight: 18,
+      fontFamily: FontFamilies.UI,
+      color: colors.coolgray6,
+    },
+
+    textNeutralLabel: {
+      fontSize: 12,
+      fontWeight: "500",
+      lineHeight: 18,
+      letterSpacing: 0.8,
+      textTransform: "uppercase",
       fontFamily: FontFamilies.UI,
       color: colors.coolgray6,
     },
