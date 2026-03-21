@@ -130,17 +130,17 @@ WnaBaseScreenChrome.displayName = "WnaBaseScreenChrome";
 
 const WnaBusyOverlay = memo(
   ({ appColors, appStyle, isBusy, isBusyText }: WnaBusyOverlayProps) => {
-    const busyOpacity = useSharedValue(0);
+    const overlayOpacity = useSharedValue(0);
 
     const animatedStyle = useAnimatedStyle(() => ({
-      opacity: withTiming(busyOpacity.value, {
+      opacity: withTiming(overlayOpacity.value, {
         duration: animationSpeed,
         easing: Easing.bezier(0.5, 0.01, 0, 1),
       }),
     }));
 
     useEffect(() => {
-      busyOpacity.value = isBusy ? 1 : 0;
+      overlayOpacity.value = isBusy ? 1 : 0;
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isBusy]);
 

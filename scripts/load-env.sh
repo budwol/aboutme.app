@@ -6,11 +6,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARSER="$SCRIPT_DIR/env-parser.cjs"
 
 if [ ! -f "$ENV_FILE" ]; then
-  echo "Missing env file: $ENV_FILE" >&2
+  echo "env file not found: $ENV_FILE" >&2
   return 1 2>/dev/null || exit 1
 fi
 
 while IFS= read -r -d '' key && IFS= read -r -d '' value; do
-  printf -v "$key" '%s' "$value"
-  export "$key"
+  declare -gx "$key=$value"
 done < <(node "$PARSER" "$ENV_FILE")

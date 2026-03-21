@@ -38,7 +38,7 @@ export default function WnaTechStackCard({
     },
   ];
 
-  const renderTechGroup = (stack: string[], groupKey: string) => (
+  const renderBadges = (stack: string[], groupKey: string) => (
     <View
       style={{
         flexDirection: "row",
@@ -57,7 +57,11 @@ export default function WnaTechStackCard({
     </View>
   );
 
-  const renderCard = (title: string, stack: string[], groupKey: string) => (
+  const renderGroupCard = (
+    title: string,
+    stack: string[],
+    groupKey: string,
+  ) => (
     <View
       key={groupKey}
       style={{
@@ -84,7 +88,7 @@ export default function WnaTechStackCard({
         {title}
       </Text>
 
-      {renderTechGroup(stack, groupKey)}
+      {renderBadges(stack, groupKey)}
     </View>
   );
 
@@ -98,7 +102,7 @@ export default function WnaTechStackCard({
     >
       {resolvedGroups
         .filter((group) => group.stack.length > 0)
-        .map((group) => renderCard(group.title, group.stack, group.key))}
+        .map((group) => renderGroupCard(group.title, group.stack, group.key))}
     </View>
   );
 }

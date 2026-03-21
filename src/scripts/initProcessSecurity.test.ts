@@ -18,8 +18,8 @@ type InitProcessModule = {
 const initProcessModule: InitProcessModule = require("../../scripts/init-process.cjs");
 const { buildGeneratedFiles, normalizeSiteUrl } = initProcessModule;
 
-describe("init-process security helpers", () => {
-  it("normalizes valid https urls and local http urls", () => {
+describe("init process security", () => {
+  it("accepts https urls and local http urls", () => {
     expect(normalizeSiteUrl("https://portfolio.example.com/")).toBe(
       "https://portfolio.example.com",
     );
@@ -28,19 +28,19 @@ describe("init-process security helpers", () => {
     );
   });
 
-  it("rejects invalid or unsafe site urls", () => {
+  it("rejects unsafe site urls", () => {
     expect(() => normalizeSiteUrl("http://example.com")).toThrow(
-      /Invalid siteUrl/,
+      /invalid siteUrl/,
     );
     expect(() => normalizeSiteUrl("https://example.com?x=1")).toThrow(
-      /Invalid siteUrl/,
+      /invalid siteUrl/,
     );
     expect(() => normalizeSiteUrl("javascript:alert(1)")).toThrow(
-      /Invalid siteUrl/,
+      /invalid siteUrl/,
     );
   });
 
-  it("builds generated files with the normalized host", () => {
+  it("uses the normalized host in generated output", () => {
     const generated = buildGeneratedFiles({
       siteUrl: "https://portfolio.example.com/",
       profileName: "Jane Example",

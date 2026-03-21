@@ -1,14 +1,9 @@
 import { ScrollViewStyleReset } from "expo-router/html";
 import { PropsWithChildren, useEffect } from "react";
 
-// This file is web-only and used to configure the root HTML for every
-// web page during static rendering.
-// The contents of this function only run in Node.js environments and
-// do not have access to the DOM or browser APIs.
-// https://docs.expo.dev/guides/progressive-web-apps/
 export default function Root({ children }: PropsWithChildren) {
   useEffect(() => {
-    // remove expo-generated-fonts element
+    // remove the injected font node to avoid duplicate web fonts
     const el = document.getElementById("expo-generated-fonts");
     if (el) el.remove();
   }, []);
@@ -16,7 +11,7 @@ export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="de">
       <head>
-        {/* Core */}
+        <title>AboutMe</title>
         <meta charSet="utf-8" />
         <meta
           name="robots"
@@ -31,7 +26,6 @@ export default function Root({ children }: PropsWithChildren) {
           crossOrigin={"anonymous"}
         />
 
-        {/* Link the PWA manifest file. */}
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -46,13 +40,13 @@ export default function Root({ children }: PropsWithChildren) {
                       font-style: normal;
                     }
 
-                    /* Firefox + Brave */
+                    /* firefox and brave */
                     * {
                         scrollbar-width: thin;
                         scrollbar-color: rgba(155,155,155,.5) rgba(100,100,100,.5);
                     }
                     
-                    /* Chromium (außer Brave) */
+                    /* chromium except brave */
                     *::-webkit-scrollbar {
                         width: 4px;
                         height: 4px;

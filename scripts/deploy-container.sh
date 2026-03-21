@@ -11,12 +11,12 @@ cd "$PROJECT_DIR"
 : "${IMAGE:?Missing IMAGE}"
 
 if [[ "$CONTAINER_REGISTRY" =~ [[:space:]] ]] || [[ "$IMAGE" =~ [[:space:]] ]]; then
-  echo "Container registry and image must not contain whitespace." >&2
+  echo "container registry and image must not contain whitespace" >&2
   exit 1
 fi
 
 if [[ ! "$IMAGE" =~ ^[a-z0-9._/-]+$ ]]; then
-  echo "Invalid IMAGE value: $IMAGE" >&2
+  echo "invalid IMAGE value: $IMAGE" >&2
   exit 1
 fi
 
@@ -25,4 +25,4 @@ IMAGE_REF="$CONTAINER_REGISTRY/$IMAGE:latest"
 echo "$IMAGE_REF"
 docker build -t "$IMAGE_REF" .
 docker push "$IMAGE_REF"
-echo "deploy:container done."
+echo "container deploy finished"
