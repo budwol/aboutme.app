@@ -11,6 +11,7 @@ const { runInitProcess } = require("../../scripts/init-process.cjs") as {
       logger?: (...parts: string[]) => void;
       processLogo?: (rootDir: string, publicDir: string) => void;
       convertBackground?: (sourcePath: string, targetPath: string) => void;
+      createResponsiveAvatar?: (sourcePath: string, targetPath: string) => void;
     },
   ) => { generated: boolean; migrated: boolean };
 };
@@ -111,6 +112,9 @@ function runInit(fixtureRoot: string, options?: { dryRun?: boolean }): string {
     convertBackground: (_sourcePath, targetPath) => {
       fs.writeFileSync(targetPath, "converted-background", "utf8");
     },
+    createResponsiveAvatar: (_sourcePath, targetPath) => {
+      fs.writeFileSync(targetPath, "responsive-avatar", "utf8");
+    },
   });
 
   return `${output.join("\n")}\n`;
@@ -138,6 +142,9 @@ describe("init.sh", () => {
       true,
     );
     expect(fs.existsSync(path.join(fixtureRoot, "app-data.json"))).toBe(true);
+    expect(
+      fs.existsSync(path.join(fixtureRoot, "public", "app-data.json")),
+    ).toBe(true);
     expect(fs.existsSync(path.join(fixtureRoot, ".env"))).toBe(true);
     expect(output).toContain("created .aboutme/app-data.json");
     expect(output).toContain("created .env from .env.example");
@@ -164,6 +171,17 @@ describe("init.sh", () => {
       ),
     );
     expect(
+      fs.readFileSync(
+        path.join(fixtureRoot, "public", "app-data.json"),
+        "utf8",
+      ),
+    ).toBe(
+      fs.readFileSync(
+        path.join(fixtureRoot, ".aboutme", "app-data.json"),
+        "utf8",
+      ),
+    );
+    expect(
       fs.existsSync(path.join(fixtureRoot, "public", "site.webmanifest")),
     ).toBe(true);
     expect(fs.existsSync(path.join(fixtureRoot, "public", "robots.txt"))).toBe(
@@ -178,6 +196,11 @@ describe("init.sh", () => {
     expect(
       fs.existsSync(
         path.join(fixtureRoot, "public", "images", "default_avatar.webp"),
+      ),
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_300.webp"),
       ),
     ).toBe(true);
     expect(
@@ -205,6 +228,7 @@ describe("init.sh", () => {
     runInit(fixtureRoot);
 
     const manifestPath = path.join(fixtureRoot, "public", "site.webmanifest");
+    const publicAppDataPath = path.join(fixtureRoot, "public", "app-data.json");
     const nginxPath = path.join(fixtureRoot, "nginx", "site.conf");
     const publicImagePath = path.join(
       fixtureRoot,
@@ -214,6 +238,7 @@ describe("init.sh", () => {
     );
     const envPath = path.join(fixtureRoot, ".env");
     const beforeManifest = fs.readFileSync(manifestPath, "utf8");
+    const beforePublicAppData = fs.readFileSync(publicAppDataPath, "utf8");
     const beforeNginx = fs.readFileSync(nginxPath, "utf8");
     const beforeImage = fs.readFileSync(publicImagePath, "utf8");
     const beforeEnv = fs.readFileSync(envPath, "utf8");
@@ -223,6 +248,9 @@ describe("init.sh", () => {
     expect(output).not.toContain("migrated");
     expect(output).not.toContain("created .env from .env.example");
     expect(fs.readFileSync(manifestPath, "utf8")).toBe(beforeManifest);
+    expect(fs.readFileSync(publicAppDataPath, "utf8")).toBe(
+      beforePublicAppData,
+    );
     expect(fs.readFileSync(nginxPath, "utf8")).toBe(beforeNginx);
     expect(fs.readFileSync(publicImagePath, "utf8")).toBe(beforeImage);
     expect(fs.readFileSync(envPath, "utf8")).toBe(beforeEnv);
@@ -243,6 +271,14 @@ describe("init.sh", () => {
       fs.existsSync(path.join(fixtureRoot, ".aboutme", "app-data.json")),
     ).toBe(false);
     expect(fs.existsSync(path.join(fixtureRoot, ".env"))).toBe(false);
+    expect(
+      fs.existsSync(path.join(fixtureRoot, "public", "app-data.json")),
+    ).toBe(false);
+    expect(
+      fs.existsSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_300.webp"),
+      ),
+    ).toBe(false);
     expect(
       fs.existsSync(path.join(fixtureRoot, "public", "site.webmanifest")),
     ).toBe(false);

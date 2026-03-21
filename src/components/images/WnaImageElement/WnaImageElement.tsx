@@ -8,6 +8,7 @@ function WnaImageElement(props: WnaImageElementProps) {
   const webGrayScaleStyle = props.grayScale
     ? ({ filter: "grayscale(100%)" } as ReactNativeImageStyle)
     : undefined;
+  const source = props.source ?? props.imageUrl ?? "";
 
   return (
     <Image
@@ -15,9 +16,11 @@ function WnaImageElement(props: WnaImageElementProps) {
       alt={props.altText}
       accessibilityLabel={props.altText}
       cachePolicy="memory-disk"
-      source={props.imageUrl}
+      source={source}
       transition={props.overwriteAnimationSpeed ?? animationSpeed}
       contentFit={props.contentFit ?? "cover"}
+      priority={props.priority}
+      responsivePolicy={props.responsivePolicy}
     />
   );
 }

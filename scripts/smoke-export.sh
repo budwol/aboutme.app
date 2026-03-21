@@ -73,6 +73,7 @@ npm run init
 npx expo export -p web
 
 test -f dist/index.html
+test -f public/app-data.json
 test -f public/site.webmanifest
 test -f nginx/site.conf
 

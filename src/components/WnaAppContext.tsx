@@ -9,16 +9,23 @@ import React, {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Dimensions } from "react-native";
+
+const navigationTransitionDelay = 420;
 
 type WnaLifecycleState = {
   isAppInitialized: boolean;
   setIsAppInitialized: (value: boolean) => void;
   isStatusBarVisible: boolean;
   setIsStatusBarVisible: (value: boolean) => void;
+  isNavigationTransitionActive: boolean;
+  startNavigationTransition: (action: () => void) => void;
+  finishNavigationTransition: () => void;
 };
 
 type WnaLayoutState = {
@@ -97,9 +104,14 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
 
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isStatusBarVisible, setIsStatusBarVisible] = useState(true);
+  const [isNavigationTransitionActive, setIsNavigationTransitionActive] =
+    useState(false);
   const [appData, setAppData] = useState<AppData>(defaultAppData);
   const [theme, setTheme] = useState<Theme>("system");
   const [appColors, setAppColors] = useState<Colors>(initialColors);
+  const navigationTransitionTimerRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   const [currentScreenWidth, setCurrentScreenWidth] = useState(
     dimensions.screenWidth,
@@ -127,14 +139,60 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
   const appStyle = useMemo(() => setAppStyle(appColors), [appColors]);
   const appLayout = useMemo(() => getAppLayout(isLandscape), [isLandscape]);
 
+  const startNavigationTransition = useCallback(
+    (action: () => void) => {
+      if (isNavigationTransitionActive) {
+        return;
+      }
+
+      setIsNavigationTransitionActive(true);
+
+      if (navigationTransitionTimerRef.current) {
+        clearTimeout(navigationTransitionTimerRef.current);
+      }
+
+      navigationTransitionTimerRef.current = setTimeout(() => {
+        navigationTransitionTimerRef.current = null;
+        action();
+      }, navigationTransitionDelay);
+    },
+    [isNavigationTransitionActive],
+  );
+
+  const finishNavigationTransition = useCallback(() => {
+    if (navigationTransitionTimerRef.current) {
+      clearTimeout(navigationTransitionTimerRef.current);
+      navigationTransitionTimerRef.current = null;
+    }
+
+    setIsNavigationTransitionActive(false);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (navigationTransitionTimerRef.current) {
+        clearTimeout(navigationTransitionTimerRef.current);
+      }
+    };
+  }, []);
+
   const lifecycleValue = useMemo(
     () => ({
       isAppInitialized,
       setIsAppInitialized,
       isStatusBarVisible,
       setIsStatusBarVisible,
+      isNavigationTransitionActive,
+      startNavigationTransition,
+      finishNavigationTransition,
     }),
-    [isAppInitialized, isStatusBarVisible],
+    [
+      finishNavigationTransition,
+      isAppInitialized,
+      isNavigationTransitionActive,
+      isStatusBarVisible,
+      startNavigationTransition,
+    ],
   );
 
   const layoutValue = useMemo(

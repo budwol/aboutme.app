@@ -3,6 +3,14 @@ import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 
+jest.mock("@components/navigation/useWnaNavigationTransition", () => ({
+  useWnaNavigationTransition: (router: {
+    push: (...args: unknown[]) => void;
+  }) => ({
+    push: (...args: unknown[]) => router.push(...args),
+  }),
+}));
+
 jest.mock("@components/buttons/WnaButtonHeader", () => {
   const React = jest.requireActual("react") as typeof import("react");
   const { Pressable, Text } = jest.requireActual(

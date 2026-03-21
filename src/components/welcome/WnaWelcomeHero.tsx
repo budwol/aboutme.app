@@ -1,4 +1,5 @@
 import WnaImage from "@components/images/WnaImage";
+import { getAvatarImageSources } from "@components/images/wnaAvatarImageResolver";
 import WnaWelcomeTitle from "@components/text/WnaWelcomeTitle";
 import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -425,6 +426,7 @@ export default function WnaWelcomeHero({
   imageTitle = i18nKeys.imageTitleAvatar,
 }: WnaWelcomeHeroProps) {
   const avatarSize = compact ? 132 : 200;
+  const avatarSources = getAvatarImageSources(appData.profile.avatar);
 
   return (
     <View
@@ -449,6 +451,9 @@ export default function WnaWelcomeHero({
           appColors={appColors}
           imageUrl={`images/${appData.profile.avatar}`}
           imageTitle={imageTitle}
+          sources={avatarSources}
+          priority={compact ? "normal" : "high"}
+          responsivePolicy="static"
           style={{
             width: avatarSize,
             height: avatarSize,

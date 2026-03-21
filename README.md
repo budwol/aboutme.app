@@ -59,7 +59,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 
 3. Fill `.aboutme/app-data.json` with your stuff and replace the placeholder files in `.aboutme/images/` when you are ready.
 
-4. Run the initializer again whenever you change data or images.
+4. Run the initializer again whenever you change images or other generated runtime assets.
 
    ```bash
    npm run init
@@ -67,6 +67,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 
    The script is idempotent. Run it as often as you want. No mistakes here, just happy little rebuilds. Every pass lays down another calm little layer of paint. It syncs `.aboutme/app-data.json` into the ignored root `app-data.json` and regenerates:
    - `public/images/*`
+   - `public/app-data.json`
    - generated logo and favicon assets
    - `public/site.webmanifest`
    - `public/robots.txt`
@@ -86,6 +87,8 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
    ```bash
    npm run web
    ```
+
+   `npm run web` automatically syncs `.aboutme/app-data.json` into `public/app-data.json` before the dev server starts. For plain content changes in the JSON, restarting the web server is enough. Run `npm run init` again when you changed images or want all generated runtime artifacts refreshed.
 
 ## Customize Your Portfolio
 
@@ -107,6 +110,8 @@ In practice the usual flow is:
 3. replace files in `.aboutme/images/`
 4. run `npm run init` again
 5. refresh `npm run web`
+
+If you only changed text or structured content in `.aboutme/app-data.json`, `npm run web` and `npm run export:web` already resync the web copy for you. The second `npm run init` is mainly for regenerated images, manifests, nginx config, and the root `app-data.json` artifact used outside the web fetch path.
 
 ## Configuration
 
@@ -135,7 +140,7 @@ cp .env.example .env
 
 `npm run init` already creates `.env` when `.env.example` exists and `.env` is still missing.
 
-`.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Everything generated from them, like root `app-data.json`, public assets, and nginx config, is intentionally ignored by Git. Nice and tidy, like cleaning the brushes before the paint dries and giving the canvas one last friendly nod.
+`.aboutme/app-data.json` and `.aboutme/images/` are the single source of truth. Everything generated from them, like root `app-data.json`, `public/app-data.json`, public assets, and nginx config, is intentionally ignored by Git. Nice and tidy, like cleaning the brushes before the paint dries and giving the canvas one last friendly nod.
 
 ### Navigation & Content
 
@@ -159,6 +164,8 @@ If you are just using this as a portfolio template, you can ignore Docker for a 
 - `npm run web` for local work
 - `npm run export:web` when you want a static build
 - `npm run deploy:local` if you want to copy that build onto a box you control
+
+Both `npm run web` and `npm run export:web` sync `.aboutme/app-data.json` into `public/app-data.json` first, so the web app always starts from the latest source content.
 
 Docker is there for people who actually want that delivery path, not as a rite of passage before the app is allowed to exist.
 

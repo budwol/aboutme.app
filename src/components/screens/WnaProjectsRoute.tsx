@@ -9,6 +9,7 @@ import WnaHeroImage from "@components/images/WnaHeroImage";
 import { getProjectImageForWidth } from "@components/images/wnaImageAssetResolver";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
+import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import {
   getDrawerNavigationPath,
   getDrawerProjectNavigationPath,
@@ -86,6 +87,7 @@ export default function WnaProjectsRoute(): ReactNode {
   const { t } = useTranslation(["common"]);
   const navigation = useNavigation();
   const router = useRouter();
+  const navigationRouter = useWnaNavigationTransition(router);
   const { scrollY, onScroll } = useWnaScrollY();
   const projectImageWidth = currentWindowWidth;
   const lang = getNavigationLang();
@@ -110,7 +112,7 @@ export default function WnaProjectsRoute(): ReactNode {
           checkInternetConnection={false}
           t={t}
           onPress={() =>
-            router.push(
+            navigationRouter.push(
               getDrawerProjectNavigationPath(
                 createProjectSlug(item.title, index),
                 lang,
@@ -216,7 +218,7 @@ export default function WnaProjectsRoute(): ReactNode {
         </WnaPressable>
       </View>
     ),
-    [appColors, appStyle, lang, projectImageWidth, router, t],
+    [appColors, appStyle, lang, navigationRouter, projectImageWidth, t],
   );
 
   return (

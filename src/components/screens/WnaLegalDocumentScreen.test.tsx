@@ -50,6 +50,12 @@ jest.mock("expo-router", () => {
   return {
     Redirect: (props: unknown) =>
       createElement("Redirect", props as Record<string, unknown>),
+    useNavigation: () => ({}),
+    useRouter: () => ({
+      push: () => undefined,
+      replace: () => undefined,
+      back: () => undefined,
+    }),
   };
 });
 

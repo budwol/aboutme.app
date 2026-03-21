@@ -315,6 +315,20 @@ function defaultConvertBackground(sourcePath, targetPath) {
   execFileSync("convert", [sourcePath, targetPath], { stdio: "inherit" });
 }
 
+function buildAvatarVariantFileName(fileName, size) {
+  const extension = path.extname(fileName);
+  const baseName = path.basename(fileName, extension);
+  return `${baseName}_${size}.webp`;
+}
+
+function defaultCreateResponsiveAvatar(sourcePath, targetPath) {
+  execFileSync(
+    "convert",
+    [sourcePath, "-resize", "300x300", "-quality", "90", targetPath],
+    { stdio: "inherit" },
+  );
+}
+
 function parseCliArgs(argv) {
   return {
     dryRun: argv.includes("--dry-run"),
@@ -347,6 +361,8 @@ function runInitProcess(rootDir, options = {}) {
   const processLogo = options.processLogo ?? defaultProcessLogo;
   const convertBackground =
     options.convertBackground ?? defaultConvertBackground;
+  const createResponsiveAvatar =
+    options.createResponsiveAvatar ?? defaultCreateResponsiveAvatar;
   const dryRun = options.dryRun === true;
 
   const sourceDir = path.join(rootDir, ".aboutme");
@@ -354,6 +370,7 @@ function runInitProcess(rootDir, options = {}) {
   const sourceAppDataFile = path.join(sourceDir, "app-data.json");
   const targetAppDataFile = path.join(rootDir, "app-data.json");
   const publicDir = path.join(rootDir, "public");
+  const publicAppDataFile = path.join(publicDir, "app-data.json");
   const publicImagesDir = path.join(publicDir, "images");
   const nginxConfFile = path.join(rootDir, "nginx", "site.conf");
   const appDataExampleFile = path.join(rootDir, "app-data.example.json");
@@ -461,14 +478,29 @@ function runInitProcess(rootDir, options = {}) {
 
   if (!dryRun) {
     copyFile(sourceAppDataFile, targetAppDataFile);
+    copyFile(sourceAppDataFile, publicAppDataFile);
   }
   logger(
     `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> app-data.json`,
+  );
+  logger(
+    `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> public/app-data.json`,
   );
 
   const appData = readJson(
     fs.existsSync(sourceAppDataFile) ? sourceAppDataFile : appDataExampleFile,
   );
+  const avatarFileName =
+    typeof appData?.profile?.avatar === "string" ? appData.profile.avatar : "";
+  const responsiveAvatarFileName = avatarFileName
+    ? buildAvatarVariantFileName(avatarFileName, 300)
+    : "";
+  const sourceAvatarPath = avatarFileName
+    ? path.join(sourceImagesDir, avatarFileName)
+    : "";
+  const responsiveAvatarPath = responsiveAvatarFileName
+    ? path.join(sourceImagesDir, responsiveAvatarFileName)
+    : "";
   const missingAssets = [];
 
   if (
@@ -513,6 +545,23 @@ function runInitProcess(rootDir, options = {}) {
     logger("");
     logger("public/ was not regenerated.");
     return { generated: false, migrated };
+  }
+
+  if (
+    avatarFileName &&
+    fs.existsSync(sourceAvatarPath) &&
+    !fs.existsSync(responsiveAvatarPath)
+  ) {
+    if (dryRun) {
+      logger(
+        `would generate responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+      );
+    } else {
+      createResponsiveAvatar(sourceAvatarPath, responsiveAvatarPath);
+      logger(
+        `generated responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+      );
+    }
   }
 
   if (dryRun) {
@@ -566,7 +615,9 @@ function runInitProcess(rootDir, options = {}) {
 }
 
 module.exports = {
+  buildAvatarVariantFileName,
   buildGeneratedFiles,
+  defaultCreateResponsiveAvatar,
   findBackgroundSource,
   getRequiredImageFiles,
   normalizeSiteUrl,

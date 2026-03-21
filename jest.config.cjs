@@ -1,5 +1,6 @@
 module.exports = {
   preset: "jest-expo",
+  setupFiles: ["<rootDir>/jest.setup.cjs"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@app/(.*)$": "<rootDir>/src/app/$1",
