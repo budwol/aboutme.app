@@ -548,7 +548,9 @@ describe("WnaExperienceCard", () => {
     const timelineWrapper = tree!.root
       .findAllByType("View")
       .find(
-        (node: { props: { style?: { width?: string } | Array<{ width?: string }> } }) => {
+        (node: {
+          props: { style?: { width?: string } | { width?: string }[] };
+        }) => {
           const style = node.props.style;
 
           if (Array.isArray(style)) {
