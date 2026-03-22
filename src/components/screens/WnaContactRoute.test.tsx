@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { defaultAppData } from "@/app-data";
 import WnaContactRoute from "@components/screens/WnaContactRoute";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 jest.mock("@components/WnaAppContext", () => {
   const { jest: jestModule } = require("@jest/globals");
@@ -128,7 +128,7 @@ describe("WnaContactRoute", () => {
       appStyle: { textNeutralMedium: {} },
     });
     appContext.useWnaLayout.mockReturnValue({ currentWindowWidth: 1200 });
-    appContext.useWnaAppData.mockReturnValue({ appData: defaultAppData });
+    appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
   });
 
   it("disables the shared contact footer on the contact page", () => {
