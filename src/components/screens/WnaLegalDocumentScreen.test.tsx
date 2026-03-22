@@ -18,6 +18,16 @@ jest.mock("@services/i18n/i18n", () => ({
   getLangCode: jest.fn(() => "de"),
 }));
 
+jest.mock("react-i18next", () => ({
+  initReactI18next: {
+    type: "3rdParty",
+    init: () => undefined,
+  },
+  useTranslation: () => ({
+    t: (value: string) => value,
+  }),
+}));
+
 jest.mock("@components/misc/WnaHtmlRenderer", () => {
   const { createElement } = jest.requireActual(
     "react",
