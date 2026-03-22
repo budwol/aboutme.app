@@ -3,6 +3,10 @@ import WnaListCardWhiteDecent from "@components/cards/WnaListCardWhiteDecent";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import WnaNavigationItem from "@components/navigation/WnaNavigationItem";
+import {
+  getThemeIcon,
+  toggleWnaTheme,
+} from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import {
   getDrawerNavigationPath,
@@ -14,17 +18,18 @@ import { i18nKeys } from "@services/i18n/i18nKeys";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Text, ViewStyle } from "react-native";
+import { Text, useColorScheme, ViewStyle } from "react-native";
 import WnaScrollViewScreen from "./WnaScrollViewScreen";
 
 export default function WnaMenuRoute(): ReactNode {
   const { isAppInitialized } = useWnaAppLifecycle();
-  const { appColors, appStyle } = useWnaTheme();
+  const { appColors, appStyle, theme, setTheme, setAppColors } = useWnaTheme();
   const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const navigation = useNavigation();
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
+  const colorScheme = useColorScheme();
   const styleSectionHeadline = [
     appStyle.textNeutralMedium,
     {
@@ -59,6 +64,28 @@ export default function WnaMenuRoute(): ReactNode {
         />
       }
     >
+      <WnaListCardWhiteDecent appColors={appColors}>
+        <Text style={styleSectionHeadline}>{t(i18nKeys.settingsTheme)}</Text>
+        <WnaSeparatorHorizontal space={4} transparent={true} />
+        <WnaNavigationItem
+          appStyle={appStyle}
+          appColors={appColors}
+          text={`${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`}
+          iconName={getThemeIcon(theme)}
+          iconRightName={"chevron-right"}
+          type={"standalone"}
+          onPress={() =>
+            void toggleWnaTheme({
+              colorScheme,
+              theme,
+              setTheme,
+              setAppColors,
+            })
+          }
+          t={t}
+        />
+      </WnaListCardWhiteDecent>
+      <WnaSeparatorHorizontal space={12} transparent={true} />
       <WnaListCardWhiteDecent appColors={appColors}>
         <Text style={styleSectionHeadline}>{t(i18nKeys.wordLegal)}</Text>
         <WnaSeparatorHorizontal space={4} transparent={true} />

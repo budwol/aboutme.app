@@ -6,11 +6,11 @@ import WnaContactFooter from "@components/screens/WnaContactFooter";
 
 jest.mock("@components/WnaAppContext", () => ({
   useWnaAppData: () => {
-    const { defaultAppData } = jest.requireActual(
-      "@/app-data",
-    ) as typeof import("@/app-data");
+    const { testAppData } = jest.requireActual(
+      "@/test/testAppData",
+    ) as typeof import("@/test/testAppData");
 
-    return { appData: defaultAppData };
+    return { appData: testAppData };
   },
   useWnaTheme: () => ({
     appColors: {},

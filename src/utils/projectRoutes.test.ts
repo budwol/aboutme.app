@@ -1,4 +1,4 @@
-import { defaultAppData } from "@/app-data";
+import { testAppData } from "@/test/testAppData";
 import {
   createProjectSlug,
   findProjectBySlug,
@@ -13,9 +13,9 @@ describe("projectRoutes", () => {
   });
 
   it("finds projects by their derived slug", () => {
-    const match = findProjectBySlug(defaultAppData.projects, "project-1-1");
+    const match = findProjectBySlug(testAppData.projects, "pizza-app-1");
 
-    expect(match?.project.title).toBe(defaultAppData.projects[0].title);
+    expect(match?.project.title).toBe(testAppData.projects[0].title);
     expect(match?.index).toBe(0);
   });
 

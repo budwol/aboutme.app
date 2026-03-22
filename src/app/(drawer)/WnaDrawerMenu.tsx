@@ -11,10 +11,15 @@ import {
   useWnaTheme,
 } from "@components/WnaAppContext";
 import WnaPressable from "@components/buttons/WnaPressable";
+import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
 import currentAppVersion from "@components/currentAppVersion";
 import WnaNavigationList, {
   WnaMenuItem,
 } from "@components/navigation/WnaNavigationList";
+import {
+  getThemeIcon,
+  toggleWnaTheme,
+} from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { getDrawerNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -22,6 +27,7 @@ import { getLangCode } from "@services/i18n/i18n";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import WnaImage from "@components/images/WnaImage";
 import { getNavigationLang } from "@components/navigation/wnaNavigationRoutes";
+import { useColorScheme } from "react-native";
 
 const logoSize = 64;
 const headerHeight = 212;
@@ -30,11 +36,12 @@ export default function WnaDrawerMenu() {
   const status = useDrawerStatus();
   const navigation = useNavigation();
   const { appData } = useWnaAppData();
-  const { appStyle, appColors } = useWnaTheme();
+  const { appStyle, appColors, theme, setTheme, setAppColors } = useWnaTheme();
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const segments = useSegments();
   const navigationRouter = useWnaNavigationTransition(router);
+  const colorScheme = useColorScheme();
 
   const langCode = getNavigationLang(getLangCode());
   const lastSegment = segments.at(-1);
@@ -47,7 +54,7 @@ export default function WnaDrawerMenu() {
   const items: WnaMenuItem[] = useMemo(
     () => [
       {
-        text: t(i18nKeys.screenTitleStartPage),
+        text: t(i18nKeys.screenTitleProfile),
         iconName: "home",
         route: getDrawerNavigationPath("root", langCode),
         type: "nav",
@@ -97,9 +104,14 @@ export default function WnaDrawerMenu() {
   const renderItem = useCallback(
     (item: WnaMenuItem) => {
       const routeLast = item.route?.split("/").filter(Boolean).pop();
+      const isRootItem = item.route === baseRoute;
 
       const isActive =
-        routeLast === undefined ? isStartActive : routeLast === lastSegment;
+        isRootItem
+          ? isStartActive || routeLast === lastSegment
+          : routeLast === undefined
+            ? isStartActive
+            : routeLast === lastSegment;
 
       return (
         <WnaDrawerNavigationItem
@@ -110,11 +122,18 @@ export default function WnaDrawerMenu() {
           text={item.text}
           isSecondary={item.type === "secondary"}
           isActive={isActive}
-          onPress={() => handleNavigate(item.route, isActive)}
+          onPress={() => {
+            if (item.onPress) {
+              void item.onPress();
+              return;
+            }
+
+            handleNavigate(item.route, isActive);
+          }}
         />
       );
     },
-    [appStyle, appColors, lastSegment, isStartActive, handleNavigate],
+    [appStyle, appColors, baseRoute, lastSegment, isStartActive, handleNavigate],
   );
 
   return (
@@ -184,6 +203,25 @@ export default function WnaDrawerMenu() {
       </View>
 
       <View style={styles.footer}>
+        <WnaButtonIconText
+          appColors={appColors}
+          appStyle={appStyle}
+          text={`${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`}
+          iconName={getThemeIcon(theme)}
+          backgroundColor={appColors.isDark ? appColors.coolgray2 : appColors.white}
+          textColor={appColors.black}
+          borderWidth={1}
+          onPress={() =>
+            void toggleWnaTheme({
+              colorScheme,
+              theme,
+              setTheme,
+              setAppColors,
+            })
+          }
+          style={styles.themeButton}
+        />
+
         <Text
           onPress={() =>
             navigationRouter.push(
@@ -193,7 +231,7 @@ export default function WnaDrawerMenu() {
           accessibilityRole="link"
           style={[appStyle.textNeutralSmall, styles.footerLink]}
         >
-          © {t(i18nKeys.appBrand)}
+          © {appData.profile.name}
         </Text>
 
         <Text style={[appStyle.textNeutralSmall, styles.version]}>
@@ -244,6 +282,11 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     alignItems: "center",
     gap: 4,
+  },
+  themeButton: {
+    width: "100%",
+    marginBottom: 8,
+    borderRadius: 999,
   },
   footerLink: {
     textDecorationLine: "underline",

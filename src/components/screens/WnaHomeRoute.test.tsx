@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 type RenderedNode = {
   type: unknown;
@@ -168,9 +169,6 @@ describe("WnaHomeRoute", () => {
   beforeEach(() => {
     mockPush.mockClear();
     mockScrollTo.mockClear();
-    const { defaultAppData } = jest.requireActual(
-      "@/app-data",
-    ) as typeof import("@/app-data");
 
     const appContext = jest.requireMock("@components/WnaAppContext") as {
       useWnaAppData: jest.Mock;
@@ -184,7 +182,7 @@ describe("WnaHomeRoute", () => {
         containerCenterMaxWidth: {},
       },
     });
-    appContext.useWnaAppData.mockReturnValue({ appData: defaultAppData });
+    appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
     appContext.useWnaLayout.mockReturnValue({
       appLayout: {
         contentPaddingBottom: 16,

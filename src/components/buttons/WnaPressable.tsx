@@ -19,6 +19,7 @@ export type WnaPressableProps = {
   toolTip?: string;
   toolTipPosition?: "top" | "right" | "bottom" | "left" | undefined;
   style?: ViewStyle | ViewStyle[];
+  baseStyle?: ViewStyle | ViewStyle[];
   ripple: "light" | "dark" | undefined;
   disableHover?: boolean;
   disabled?: boolean;
@@ -91,6 +92,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
       <View style={[{ overflow: "hidden" }, props.style]}>
         <WnaBasePressable
           ripple={props.ripple}
+          baseStyle={props.baseStyle}
           onPress={onPress}
           isEnabled={isEnabled}
           onHoverIn={() => setIsToolTipVisible(true)}

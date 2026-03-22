@@ -1,8 +1,8 @@
-import { defaultAppData } from "@/app-data";
 import { describe, expect, it, jest } from "@jest/globals";
 import WnaProjectsCard from "@components/welcome/WnaProjectsCard";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 jest.mock("@components/text/WnaWelcomeTitle", () => {
   const { createElement } = jest.requireActual(
@@ -44,13 +44,13 @@ jest.mock("@components/buttons/WnaPressable", () => {
 describe("WnaProjectsCard", () => {
   it("renders one project card per project entry", () => {
     const appData = {
-      ...defaultAppData,
+      ...testAppData,
       projectsSubtitle: "Private work",
       projectsContext: "English project note",
       projects: [
-        ...defaultAppData.projects,
+        testAppData.projects[0],
         {
-          ...defaultAppData.projects[0],
+          ...testAppData.projects[0],
           title: "Project 2",
           imageS: "project-2.png",
         },
@@ -105,7 +105,7 @@ describe("WnaProjectsCard", () => {
               coolgray2: "#cccccc",
             } as never
           }
-          appData={defaultAppData}
+          appData={testAppData}
           appStyle={{} as never}
           t={((value: string) => value) as never}
           onProjectPress={onProjectPress}

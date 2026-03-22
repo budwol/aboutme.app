@@ -1,8 +1,8 @@
-import { defaultAppData } from "@/app-data";
 import WnaProjectsRoute from "@components/screens/WnaProjectsRoute";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 jest.mock("@components/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -179,7 +179,7 @@ describe("WnaProjectsRoute", () => {
         textNeutralMedium: {},
       },
     });
-    appContext.useWnaAppData.mockReturnValue({ appData: defaultAppData });
+    appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
     appContext.useWnaLayout.mockReturnValue({
       appLayout: {
         contentPaddingBottom: 16,
@@ -220,7 +220,7 @@ describe("WnaProjectsRoute", () => {
     const flatList = tree!.root.findByType("AnimatedFlatList");
     const renderItemOutput = flatList.props.renderItem({
       item: {
-        ...defaultAppData.projects[0],
+        ...testAppData.projects[0],
         subtitle: "Android / Web App",
         context: "Part of a cohesive fullstack system",
       },

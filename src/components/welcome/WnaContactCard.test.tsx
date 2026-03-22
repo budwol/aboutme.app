@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import { defaultAppData } from "@/app-data";
 import WnaContactCard from "@components/welcome/WnaContactCard";
 import { Linking } from "react-native";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 jest.mock("react-i18next", () => ({
   initReactI18next: {
@@ -45,9 +45,9 @@ describe("WnaContactCard", () => {
 
   it("opens the social, phone and email URLs via Linking", async () => {
     const appData = {
-      ...defaultAppData,
+      ...testAppData,
       contact: {
-        ...defaultAppData.contact,
+        ...testAppData.contact,
         github: "https://github.com/example",
         linkedin: "https://linkedin.com/in/example",
         xing: "https://xing.com/profile/example",

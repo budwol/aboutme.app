@@ -25,6 +25,7 @@ export default function WnaTechStackCard({
   t,
   groups,
 }: WnaTechStackCardProps) {
+  const groupGap = appLayoutConstants.globalListGap / 2;
   const resolvedGroups = groups ?? [
     {
       key: "primary",
@@ -96,7 +97,7 @@ export default function WnaTechStackCard({
     <View
       style={{
         flexDirection: "row",
-        gap: appLayoutConstants.globalListGap,
+        gap: groupGap,
         flexWrap: "wrap",
       }}
     >

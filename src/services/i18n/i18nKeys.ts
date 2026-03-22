@@ -39,6 +39,7 @@ const i18nKeys = {
   screenTitleMenu: "screenTitleMenu",
   screenTitleMenuWithoutDots: "screenTitleMenuWithoutDots",
   screenTitlePrivacy: "screenTitlePrivacy",
+  screenTitleProfile: "screenTitleProfile",
   screenTitleSettings: "screenTitleSettings",
   screenTitleSettingsAdvanced: "screenTitleSettingsAdvanced",
   screenTitleStartPage: "screenTitleStartPage",
