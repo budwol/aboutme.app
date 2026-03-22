@@ -5,6 +5,7 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/test/testAppData";
 import { createProjectSlug } from "@utils/projectRoutes";
+import { Linking } from "react-native";
 
 jest.mock("@components/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -146,6 +147,8 @@ jest.mock("expo-router", () => {
 
 describe("WnaProjectDetailsRoute", () => {
   beforeEach(() => {
+    jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
+
     const appContext = jest.requireMock("@components/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
@@ -235,9 +238,7 @@ describe("WnaProjectDetailsRoute", () => {
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
 
-    expect(scrollViewScreen.props.backHref).toBe(
-      "/(drawer)/(tabs-de)/projekte",
-    );
+    expect(scrollViewScreen.props.backHref).toBeUndefined();
     expect(scrollViewScreen.props.titleHref).toBe(
       "/(drawer)/(tabs-de)/projekte",
     );
@@ -264,6 +265,12 @@ describe("WnaProjectDetailsRoute", () => {
     for (const link of links) {
       expect(link.props.onPress).toEqual(expect.any(Function));
     }
+
+    await act(async () => {
+      await links[0].props.onPress();
+    });
+
+    expect(Linking.openURL).toHaveBeenCalledWith(appData.projects[0].repoUrl);
     expect(techstackCard.props.groups).toEqual([
       {
         key: "project-techstack",
