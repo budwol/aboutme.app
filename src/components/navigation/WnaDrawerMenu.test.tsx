@@ -1,12 +1,15 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@app/(drawer)/WnaDrawerMenu";
 
+const mockSetOptions = jest.fn();
 const mockPush = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
 const mockToastShow = jest.fn();
+let mockDrawerStatus = "closed";
+let mockSegments: string[] = ["(drawer)", "(tabs-de)"];
 
 type DrawerItemNode = {
   props: {
@@ -105,15 +108,15 @@ jest.mock("react-native-toast-message", () => ({
 }));
 
 jest.mock("@react-navigation/drawer", () => ({
-  useDrawerStatus: () => "closed",
+  useDrawerStatus: () => mockDrawerStatus,
 }));
 
 jest.mock("expo-router", () => ({
   router: {},
   useNavigation: () => ({
-    setOptions: jest.fn(),
+    setOptions: mockSetOptions,
   }),
-  useSegments: () => ["(drawer)", "(tabs-de)"],
+  useSegments: () => mockSegments,
 }));
 
 jest.mock("@components/navigation/useWnaNavigationTransition", () => ({
@@ -156,7 +159,10 @@ jest.mock("@components/images/WnaImage", () => {
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const ReactModule = jest.requireActual("react") as typeof import("react");
   return function MockIcon(props: unknown) {
-    return ReactModule.createElement("WnaIcon", props as Record<string, unknown>);
+    return ReactModule.createElement(
+      "WnaIcon",
+      props as Record<string, unknown>,
+    );
   };
 });
 
@@ -191,6 +197,16 @@ jest.mock("@/components/navigation/WnaDrawerNavigationItem", () => {
 });
 
 describe("WnaDrawerMenu", () => {
+  beforeEach(() => {
+    mockPush.mockClear();
+    mockSetOptions.mockClear();
+    mockSetTheme.mockClear();
+    mockSetAppColors.mockClear();
+    mockToastShow.mockClear();
+    mockDrawerStatus = "closed";
+    mockSegments = ["(drawer)", "(tabs-de)"];
+  });
+
   it("does not trigger a navigation transition when the header is pressed on the home route", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -205,6 +221,23 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("navigates to the root route when the header is pressed outside the home route", async () => {
+    mockSegments = ["(drawer)", "experience"];
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const headerPressable = tree!.root.findAllByType("WnaPressable")[0];
+
+    act(() => {
+      headerPressable.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)");
   });
 
   it("marks the profile entry as active on the initial home route", async () => {
@@ -223,6 +256,36 @@ describe("WnaDrawerMenu", () => {
     expect(profileItem!.props.isActive).toBe(true);
   });
 
+  it("disables drawer animation when the drawer is open", async () => {
+    mockDrawerStatus = "open";
+
+    await act(async () => {
+      TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    expect(mockSetOptions).toHaveBeenCalledWith({ animationEnabled: false });
+  });
+
+  it("navigates when an inactive drawer item is pressed", async () => {
+    mockSegments = ["(drawer)", "experience"];
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const items = tree!.root.findAllByType("WnaDrawerNavigationItem");
+    const projectsItem = items.find(
+      (item: DrawerItemNode) => item.props.text === "screenTitleProjects",
+    );
+
+    act(() => {
+      projectsItem!.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/projekte");
+  });
+
   it("renders the footer copyright with the profile name from app data", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -235,6 +298,24 @@ describe("WnaDrawerMenu", () => {
     );
 
     expect(footerLink.props.children.join("")).toBe("© John Doe");
+  });
+
+  it("navigates to the disclaimer route from the footer link", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const footerLink = tree!.root.find(
+      (node: FooterLinkNode) => node.props.accessibilityRole === "link",
+    );
+
+    act(() => {
+      footerLink.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/menu/impressum");
   });
 
   it("renders a theme button in the drawer footer and toggles the theme", async () => {
