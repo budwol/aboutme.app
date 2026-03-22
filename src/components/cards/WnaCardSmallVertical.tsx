@@ -2,6 +2,7 @@ import {
   WnaBaseCardProps,
   WnaVerticalTextCardContent,
 } from "@components/cards/wnaCardTypes";
+import WnaPressable from "@components/buttons/WnaPressable";
 import WnaBadge from "@components/misc/WnaBadge";
 import WnaVerticalCardTextContent from "@components/cards/WnaVerticalCardTextContent";
 import { createVerticalCardContainerStyle } from "@components/cards/wnaVerticalCardStyles";
@@ -14,6 +15,7 @@ export interface IWnaCardSmallVerticalProps
   width?: number;
   opacity?: number;
   footerContent?: ReactNode;
+  onPress?: () => void;
 }
 
 const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
@@ -25,58 +27,68 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
   badgeText,
   opacity,
   footerContent,
-}) => (
-  <View
-    style={{
-      ...createVerticalCardContainerStyle(appColors, opacity),
-      padding: 14,
-      gap: 6,
-    }}
-  >
+  onPress,
+}) => {
+  const cardContent = (
     <View
       style={{
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: 8,
+        ...createVerticalCardContainerStyle(appColors, opacity),
+        padding: 14,
+        gap: 6,
       }}
     >
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <WnaVerticalCardTextContent
-          appColors={appColors}
-          appStyle={appStyle}
-          title={title}
-          subtitle={subtitle}
-        />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <WnaVerticalCardTextContent
+            appColors={appColors}
+            appStyle={appStyle}
+            title={title}
+            subtitle={subtitle}
+          />
+        </View>
+
+        {badgeText ? (
+          <WnaBadge
+            appColors={appColors}
+            appStyle={appStyle}
+            text={badgeText}
+            fontColor={appColors.coolgray8}
+            style={{
+              backgroundColor: appColors.coolgray1,
+              paddingHorizontal: 4,
+              paddingVertical: 2,
+              borderRadius: 3,
+              minHeight: 18,
+              opacity: 0.7,
+            }}
+            textStyle={{ lineHeight: appStyle.textMicro.lineHeight }}
+          />
+        ) : null}
       </View>
 
-      {badgeText ? (
-        <WnaBadge
-          appColors={appColors}
-          appStyle={appStyle}
-          text={badgeText}
-          fontColor={appColors.coolgray8}
-          style={{
-            backgroundColor: appColors.coolgray1,
-            paddingHorizontal: 4,
-            paddingVertical: 2,
-            borderRadius: 3,
-            minHeight: 18,
-          }}
-          textStyle={{ lineHeight: appStyle.textMicro.lineHeight }}
-        />
+      {!!description ? (
+        <Text style={appStyle.textNeutralMicro}>{description}</Text>
       ) : null}
+
+      {footerContent ? <View style={{ marginTop: 2 }}>{footerContent}</View> : null}
     </View>
+  );
 
-    {!!description ? (
-      <Text style={appStyle.textNeutralMicro}>{description}</Text>
-    ) : null}
-
-    {footerContent ? (
-      <View style={{ marginTop: 2 }}>{footerContent}</View>
-    ) : null}
-  </View>
-);
+  return onPress ? (
+    <WnaPressable onPress={onPress} ripple="dark" style={{ width: "100%" }}>
+      {cardContent}
+    </WnaPressable>
+  ) : (
+    cardContent
+  );
+};
 
 const WnaCardSmallVertical = memo(
   WnaCardSmallVerticalComponent,
@@ -87,7 +99,8 @@ const WnaCardSmallVertical = memo(
     prevProps.description === nextProps.description &&
     prevProps.badgeText === nextProps.badgeText &&
     prevProps.footerContent === nextProps.footerContent &&
-    prevProps.width === nextProps.width,
+    prevProps.width === nextProps.width &&
+    prevProps.onPress === nextProps.onPress,
 );
 
 WnaCardSmallVertical.displayName = "WnaCardSmallVertical";
