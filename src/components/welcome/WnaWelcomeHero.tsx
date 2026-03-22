@@ -1,5 +1,6 @@
 import WnaImage from "@components/images/WnaImage";
 import { getAvatarImageSources } from "@components/images/wnaAvatarImageResolver";
+import WnaAccentBar from "@components/misc/WnaAccentBar";
 import WnaWelcomeTitle from "@components/text/WnaWelcomeTitle";
 import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -373,6 +374,10 @@ type WnaWelcomeHeroProps = Pick<
   imageTitle?: string;
 };
 
+const heroAccentBarWidth = 112;
+const heroAccentBarPulseWidth = 24;
+const heroAccentBarPulseDuration = 30000;
+
 export function WnaHeroField({
   appColors,
   compact = false,
@@ -479,6 +484,12 @@ export default function WnaWelcomeHero({
           >
             {appData.profile.name}
           </Text>
+          <WnaAccentBar
+            appColors={appColors}
+            width={heroAccentBarWidth}
+            pulseToWidth={heroAccentBarPulseWidth}
+            pulseDuration={heroAccentBarPulseDuration}
+          />
           <Text
             style={[
               styles.compactSubtitle,
@@ -498,6 +509,10 @@ export default function WnaWelcomeHero({
           appStyle={appStyle}
           title={appData.profile.name}
           subtitle={appData.profile.title.toUpperCase()}
+          showAccentBar
+          accentBarWidth={heroAccentBarWidth}
+          accentBarPulseToWidth={heroAccentBarPulseWidth}
+          accentBarPulseDuration={heroAccentBarPulseDuration}
         />
       )}
     </View>
