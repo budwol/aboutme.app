@@ -254,35 +254,34 @@ export default function WnaExperienceCard({
                 appStyle={appStyle}
               />
             ));
-            const detailsToggle =
-              showDetails ? (
-                <View style={styles.actionRow}>
-                  <View
+            const detailsToggle = showDetails ? (
+              <View style={styles.actionRow}>
+                <View
+                  style={[
+                    styles.expandButton,
+                    {
+                      backgroundColor: accentSurfaceColor,
+                      borderColor: accentBorderColor,
+                    },
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.expandButton,
-                      {
-                        backgroundColor: accentSurfaceColor,
-                        borderColor: accentBorderColor,
-                      },
+                      appStyle.textMicro,
+                      styles.expandButtonText,
+                      { color: appColors.accent5 },
                     ]}
                   >
-                    <Text
-                      style={[
-                        appStyle.textMicro,
-                        styles.expandButtonText,
-                        { color: appColors.accent5 },
-                      ]}
-                    >
-                      {t(
-                        isExpanded
-                          ? i18nKeys.actionHideDetails
-                          : i18nKeys.actionShowDetails,
-                      )}
-                      {isExpanded ? " ↑" : " ↓"}
-                    </Text>
-                  </View>
+                    {t(
+                      isExpanded
+                        ? i18nKeys.actionHideDetails
+                        : i18nKeys.actionShowDetails,
+                    )}
+                    {isExpanded ? " ↑" : " ↓"}
+                  </Text>
                 </View>
-              ) : null;
+              </View>
+            ) : null;
 
             return (
               <View

@@ -260,4 +260,20 @@ describe("WnaHomeRoute", () => {
 
     expect(experiencePreview.props.showDetails).toBeUndefined();
   });
+
+  it("does not navigate when a project index has no matching project", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+
+    act(() => {
+      projectsCard.props.onProjectPress(999);
+    });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
 });
