@@ -1,8 +1,8 @@
-import { defaultAppData } from "@/app-data";
 import WnaWelcomeCard from "@components/welcome/WnaWelcomeCard";
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 jest.mock("@components/text/WnaWelcomeTitle", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -93,9 +93,9 @@ jest.mock("react-native-reanimated", () => {
 describe("WnaWelcomeCard", () => {
   it("renders the profile text as separate paragraphs from a multiline string", () => {
     const appData = {
-      ...defaultAppData,
+      ...testAppData,
       profile: {
-        ...defaultAppData.profile,
+        ...testAppData.profile,
         description: "Absatz eins\n\nAbsatz zwei\nAbsatz drei",
       },
     };
