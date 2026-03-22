@@ -50,6 +50,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
     zIndex: _toolTipZindex,
     pointerEvents: "none",
   } as ViewStyle;
+  const tooltipHorizontalOffset = appLayoutConstants.headerButtonHeight;
 
   const toolTipStyleTop = [
     toolTipStyle,
@@ -64,8 +65,8 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
     toolTipStyle,
     {
       position: "absolute",
-      top: appLayoutConstants.headerButtonHeight / 2,
-      right: appLayoutConstants.headerButtonHeight,
+      top: tooltipHorizontalOffset / 2,
+      right: tooltipHorizontalOffset,
     },
   ] as ViewStyle[];
 
