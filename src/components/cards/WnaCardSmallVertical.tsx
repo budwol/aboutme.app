@@ -77,7 +77,9 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
         <Text style={appStyle.textNeutralMicro}>{description}</Text>
       ) : null}
 
-      {footerContent ? <View style={{ marginTop: 2 }}>{footerContent}</View> : null}
+      {footerContent ? (
+        <View style={{ marginTop: 2 }}>{footerContent}</View>
+      ) : null}
     </View>
   );
 

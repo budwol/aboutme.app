@@ -124,4 +124,35 @@ describe("WnaCardSmallVertical", () => {
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  it("renders the card without a pressable wrapper when onPress is missing", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardSmallVertical
+          appColors={
+            {
+              warmgray6: "#666666",
+              coolgray2: "#222222",
+              coolgray1: "#dddddd",
+              coolgray8: "#111111",
+              black: "#000000",
+            } as never
+          }
+          appStyle={
+            {
+              textMicro: { lineHeight: 16 },
+              textNeutralMicro: {},
+            } as never
+          }
+          title="Engineer"
+          subtitle="Example Inc."
+          description="Built features."
+        />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("WnaPressable")).toHaveLength(0);
+  });
 });

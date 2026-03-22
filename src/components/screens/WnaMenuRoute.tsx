@@ -3,10 +3,7 @@ import WnaListCardWhiteDecent from "@components/cards/WnaListCardWhiteDecent";
 import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
 import WnaNavigationItem from "@components/navigation/WnaNavigationItem";
-import {
-  getThemeIcon,
-  toggleWnaTheme,
-} from "@components/theme/wnaThemeToggle";
+import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import {
   getDrawerNavigationPath,

@@ -1,8 +1,9 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/test/testAppData";
+import * as ReactNative from "react-native";
 
 type RenderedTextNode = {
   props: {
@@ -95,6 +96,10 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaExperienceCard", () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("renders one timeline card per experience entry", () => {
     const appData = {
       ...testAppData,
@@ -447,6 +452,177 @@ describe("WnaExperienceCard", () => {
     expect(textValues).toContain("actionHideDetails ↑");
   });
 
+  it("collapses the details again when the experience card is pressed twice", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          details: ["Built the thing"],
+          techstack: ["C#"],
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+              textNeutralLabel: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const card = tree!.root.findByType("WnaCardSmallVertical");
+
+    act(() => {
+      card.props.onPress?.();
+    });
+
+    act(() => {
+      card.props.onPress?.();
+    });
+
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => flattenText(node.props.children));
+    const detailsClip = tree!.root.findByType("AnimatedView");
+    const detailsClipStyle = Array.isArray(detailsClip.props.style)
+      ? detailsClip.props.style
+      : [detailsClip.props.style];
+
+    expect(textValues).toContain("actionShowDetails ↓");
+    expect(
+      detailsClipStyle.some(
+        (entry: { height?: number } | undefined) => entry?.height === 0,
+      ),
+    ).toBe(true);
+  });
+
+  it("uses the compact timeline layout on narrow screens", () => {
+    jest
+      .spyOn(ReactNative, "useWindowDimensions")
+      .mockReturnValue({ width: 480, height: 900, scale: 1, fontScale: 1 });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={testAppData}
+          appStyle={{ textNeutralSmall: {}, textMicro: {} } as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const timelineWrapper = tree!.root
+      .findAllByType("View")
+      .find(
+        (node: { props: { style?: { width?: string } | Array<{ width?: string }> } }) => {
+          const style = node.props.style;
+
+          if (Array.isArray(style)) {
+            return style.some((entry) => entry?.width === "100%");
+          }
+
+          return style?.width === "100%";
+        },
+      );
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => flattenText(node.props.children));
+
+    expect(timelineWrapper).toBeDefined();
+    expect(textValues).toContain(testAppData.experience[0].period);
+  });
+
+  it("updates the detail box height when the content layout is measured", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          details: ["Built the thing"],
+          techstack: ["C#"],
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+              textNeutralLabel: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+          expandAllDetailsByDefault
+        />,
+      );
+    });
+
+    const measuredView = tree!.root.find(
+      (node: { props: { onLayout?: (event: unknown) => void } }) =>
+        typeof node.props.onLayout === "function",
+    );
+
+    act(() => {
+      measuredView.props.onLayout?.({
+        nativeEvent: { layout: { height: 48 } },
+      });
+    });
+
+    expect(tree!.root.findAllByType("AnimatedView")).toHaveLength(1);
+  });
+
   it("expands the description when no dedicated detail list exists", () => {
     const description = "Project development in the e-government domain";
     const appData = {
@@ -644,6 +820,63 @@ describe("WnaExperienceCard", () => {
     ]);
     expect(textValues).toContain("actionShowMore →");
     expect(textValues).not.toContain("actionShowDetails ↓");
+    expect(onFooterActionPress).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates the footer action hover state without affecting the action flow", () => {
+    const onFooterActionPress = jest.fn();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={testAppData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+          maxItems={1}
+          showDetails={false}
+          footerActionLabel="actionShowMore"
+          onFooterActionPress={onFooterActionPress}
+        />,
+      );
+    });
+
+    const footerPressable = tree!.root.find(
+      (node: {
+        props: {
+          onHoverIn?: () => void;
+          onHoverOut?: () => void;
+          onPress?: () => void;
+        };
+      }) =>
+        typeof node.props.onHoverIn === "function" &&
+        typeof node.props.onHoverOut === "function" &&
+        typeof node.props.onPress === "function",
+    );
+
+    act(() => {
+      footerPressable.props.onHoverIn?.();
+      footerPressable.props.onHoverOut?.();
+      footerPressable.props.onPress?.();
+    });
+
     expect(onFooterActionPress).toHaveBeenCalledTimes(1);
   });
 

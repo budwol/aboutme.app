@@ -2,10 +2,7 @@ import { WnaShadowStyle } from "@components/misc/WnaShadowStyle";
 import { getNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
-import {
-  getThemeIcon,
-  toggleWnaTheme,
-} from "@components/theme/wnaThemeToggle";
+import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { animationSpeed } from "@constants/animationSpeed";
 import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback, useEffect } from "react";
