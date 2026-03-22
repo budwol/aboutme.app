@@ -1,9 +1,10 @@
-import { defaultAppData } from "@/app-data";
 import WnaProjectDetailsRoute from "@components/screens/WnaProjectDetailsRoute";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
+import { createProjectSlug } from "@utils/projectRoutes";
 
 jest.mock("@components/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -167,7 +168,7 @@ describe("WnaProjectDetailsRoute", () => {
       },
     });
     appContext.useWnaLayout.mockReturnValue({ currentWindowWidth: 1200 });
-    appContext.useWnaAppData.mockReturnValue({ appData: defaultAppData });
+    appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
 
     const expoRouter = jest.requireMock("expo-router") as {
       useLocalSearchParams: jest.Mock;
@@ -202,10 +203,10 @@ describe("WnaProjectDetailsRoute", () => {
       useLocalSearchParams: jest.Mock;
     };
     const appData = {
-      ...defaultAppData,
+      ...testAppData,
       projects: [
         {
-          ...defaultAppData.projects[0],
+          ...testAppData.projects[0],
           context: "Part of a cohesive fullstack system",
           webUrl: "https://app.example.com",
           playStoreUrl: "https://play.example.com",
@@ -214,7 +215,9 @@ describe("WnaProjectDetailsRoute", () => {
     };
 
     appContext.useWnaAppData.mockReturnValue({ appData });
-    expoRouter.useLocalSearchParams.mockReturnValue({ slug: "project-1-1" });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -280,16 +283,18 @@ describe("WnaProjectDetailsRoute", () => {
 
     appContext.useWnaAppData.mockReturnValue({
       appData: {
-        ...defaultAppData,
+        ...testAppData,
         projects: [
           {
-            ...defaultAppData.projects[0],
+            ...testAppData.projects[0],
             description: "Einleitung\n- Punkt eins\n- Punkt zwei",
           },
         ],
       },
     });
-    expoRouter.useLocalSearchParams.mockReturnValue({ slug: "project-1-1" });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(testAppData.projects[0].title, 0),
+    });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

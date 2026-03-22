@@ -1,8 +1,8 @@
-import { defaultAppData } from "@/app-data";
 import WnaApp from "@components/WnaApp";
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { testAppData } from "@/test/testAppData";
 
 type RenderedTextNode = {
   props: {
@@ -123,9 +123,9 @@ jest.mock("react-native-reanimated", () => {
 describe("WnaApp", () => {
   it("renders the opener bubble field with the provided app data", () => {
     const appData = {
-      ...defaultAppData,
+      ...testAppData,
       profile: {
-        ...defaultAppData.profile,
+        ...testAppData.profile,
         name: "Test Person",
         title: "Platform Engineer",
       },

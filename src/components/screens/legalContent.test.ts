@@ -1,4 +1,3 @@
-import { defaultAppData } from "@/app-data";
 import { describe, expect, it } from "@jest/globals";
 import {
   buildDisclaimerHtml,
@@ -6,18 +5,19 @@ import {
   getLicensesHtmlContent,
   getTermsHtmlContent,
 } from "@components/screens/legalContent";
+import { testAppData } from "@/test/testAppData";
 
 describe("legalContent", () => {
   it("injects app data into disclaimer and privacy html", () => {
-    const disclaimer = buildDisclaimerHtml(defaultAppData, "de");
-    const privacy = buildPrivacyHtml(defaultAppData, "de");
+    const disclaimer = buildDisclaimerHtml(testAppData, "de");
+    const privacy = buildPrivacyHtml(testAppData, "de");
 
-    expect(disclaimer).toContain(defaultAppData.profile.name);
-    expect(disclaimer).toContain(defaultAppData.contact.addressStreet);
-    expect(disclaimer).toContain(defaultAppData.contact.phone);
+    expect(disclaimer).toContain(testAppData.profile.name);
+    expect(disclaimer).toContain(testAppData.contact.addressStreet);
+    expect(disclaimer).toContain(testAppData.contact.phone);
     expect(disclaimer).toContain("§ 5 DDG");
-    expect(privacy).toContain(defaultAppData.contact.email);
-    expect(privacy).toContain(defaultAppData.contact.addressCountry);
+    expect(privacy).toContain(testAppData.contact.email);
+    expect(privacy).toContain(testAppData.contact.addressCountry);
     expect(privacy).toContain("§ 25 Abs. 2 Nr. 2 TDDDG");
     expect(privacy).toContain(
       "Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde",
@@ -27,9 +27,9 @@ describe("legalContent", () => {
   it("escapes injected app data before rendering html", () => {
     const disclaimer = buildDisclaimerHtml(
       {
-        ...defaultAppData,
+        ...testAppData,
         profile: {
-          ...defaultAppData.profile,
+          ...testAppData.profile,
           name: `<img src=x onerror="alert(1)">`,
         },
       },
@@ -49,7 +49,7 @@ describe("legalContent", () => {
       "Verwendete Kerntechnologien",
     );
     expect(getLicensesHtmlContent("en")).toContain("Core technologies used");
-    expect(buildPrivacyHtml(defaultAppData, "en")).toContain("Privacy Policy");
-    expect(buildDisclaimerHtml(defaultAppData, "en")).toContain("Imprint");
+    expect(buildPrivacyHtml(testAppData, "en")).toContain("Privacy Policy");
+    expect(buildDisclaimerHtml(testAppData, "en")).toContain("Imprint");
   });
 });

@@ -2,6 +2,10 @@ import { WnaShadowStyle } from "@components/misc/WnaShadowStyle";
 import { getNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
+import {
+  getThemeIcon,
+  toggleWnaTheme,
+} from "@components/theme/wnaThemeToggle";
 import { animationSpeed } from "@constants/animationSpeed";
 import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback, useEffect } from "react";
@@ -16,24 +20,6 @@ import Animated, {
 import WnaButtonHeader from "../buttons/WnaButtonHeader";
 import { WnaBlurView } from "../misc/WnaBlurView";
 import WnaMultilineHeader from "@components/screens/WnaMultilineHeader";
-import {
-  getThemeFromStorageAsync,
-  setThemeToStorageAsync,
-} from "@services/wnaAsyncStorageProvider";
-import Toast from "react-native-toast-message";
-import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
-import { getNextTheme, resolveAppColors } from "@utils/themeColors";
-
-function getThemeLabel(theme: "light" | "dark" | "system") {
-  switch (theme) {
-    case "light":
-      return "Light mode";
-    case "dark":
-      return "Dark mode";
-    default:
-      return "System mode";
-  }
-}
 
 export type WnaHeaderProps = {
   headerTitle?: string;
@@ -73,12 +59,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const { appLayout, isLandscape } = useWnaLayout();
     const colorScheme = useColorScheme();
 
-    const themeIcon =
-      theme === "dark"
-        ? ("moon-waning-crescent" as keyof typeof iconMap)
-        : theme === "light"
-          ? ("white-balance-sunny" as keyof typeof iconMap)
-          : "theme-light-dark";
+    const themeIcon = getThemeIcon(theme);
 
     const lazyOpacity = useSharedValue(1);
 
@@ -161,24 +142,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
 
       handleBack();
     }, [handleBack, isBusy, navigationRouter, onTitlePress, titleHref]);
-
-    const toggleTheme = async () => {
-      const currentTheme = (await getThemeFromStorageAsync()) ?? theme;
-      const nextTheme = getNextTheme(currentTheme);
-      const nextColors = resolveAppColors(nextTheme, colorScheme);
-
-      setAppColors(nextColors);
-      setTheme(nextTheme);
-
-      Toast.show({
-        type: "themeChange",
-        text1: "Appearance",
-        text2: getThemeLabel(nextTheme),
-        props: { appColors: nextColors },
-      });
-
-      await setThemeToStorageAsync(nextTheme);
-    };
 
     const backButtonVisible =
       !isRootPage && (Boolean(backHref) || router.canGoBack());
@@ -283,13 +246,22 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
                 { flexDirection: "row", paddingRight: 16 },
               ]}
             >
-              <WnaButtonHeader
-                appStyle={appStyle}
-                appColors={appColors}
-                text={"Theme"}
-                iconName={themeIcon}
-                onPress={() => toggleTheme()}
-              />
+              {isLandscape ? (
+                <WnaButtonHeader
+                  appStyle={appStyle}
+                  appColors={appColors}
+                  text={"Theme"}
+                  iconName={themeIcon}
+                  onPress={() =>
+                    toggleWnaTheme({
+                      colorScheme,
+                      theme,
+                      setTheme,
+                      setAppColors,
+                    })
+                  }
+                />
+              ) : null}
               {headerButton0}
               {headerButton1}
               {headerButton2}
