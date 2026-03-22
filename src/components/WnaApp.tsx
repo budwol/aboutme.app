@@ -37,46 +37,12 @@ import Colors from "@constants/theme/colors";
 import { resolveAppColors } from "@utils/themeColors";
 import { WnaHeroField } from "@components/welcome/WnaWelcomeHero";
 import { convertHexToRgba } from "@utils/colorConverter";
+import WnaAccentBar from "@components/misc/WnaAccentBar";
 
 type WnaLoadingCopyProps = {
   appColors: Colors;
   appData: AppData;
 };
-
-function useWnaShrinkingBarAnimation() {
-  const barWidth = useSharedValue(220);
-
-  useEffect(() => {
-    barWidth.value = 220;
-    barWidth.value = withTiming(8, {
-      duration: 820,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [barWidth]);
-
-  return useAnimatedStyle(() => ({
-    width: barWidth.value,
-  }));
-}
-
-function WnaShrinkingBar({ appColors }: { appColors: Colors }) {
-  const barAnimatedStyle = useWnaShrinkingBarAnimation();
-
-  return (
-    <View style={styles.waveBarRow}>
-      <Animated.View
-        style={[
-          styles.waveBar,
-          {
-            backgroundColor: appColors.accent5,
-            shadowColor: appColors.accent5,
-          },
-          barAnimatedStyle,
-        ]}
-      />
-    </View>
-  );
-}
 
 function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
   return (
@@ -84,7 +50,7 @@ function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
       <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
         {appData.profile.name}
       </Text>
-      <WnaShrinkingBar appColors={appColors} />
+      <WnaAccentBar appColors={appColors} animated />
       <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
         {appData.profile.title.toUpperCase()}
       </Text>
@@ -96,7 +62,7 @@ function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
   return (
     <View style={styles.transitionContent}>
       <WnaHeroField appColors={appColors} compact />
-      <WnaShrinkingBar appColors={appColors} />
+      <WnaAccentBar appColors={appColors} animated />
     </View>
   );
 }
@@ -589,19 +555,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.8,
     textAlign: "center",
-  },
-  waveBarRow: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 220,
-  },
-  waveBar: {
-    width: 220,
-    height: 8,
-    borderRadius: 999,
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 0 },
   },
   introName: {
     fontSize: 13,
