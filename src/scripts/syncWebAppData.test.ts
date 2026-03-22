@@ -19,6 +19,7 @@ const { syncWebAppData } = require("../../scripts/sync-web-app-data.cjs") as {
 };
 
 const createdFixtures: string[] = [];
+const silentLogger = () => undefined;
 
 describe("sync-web-app-data", () => {
   afterEach(() => {
@@ -67,7 +68,9 @@ describe("sync-web-app-data", () => {
     );
     expect(result.deployVersion).toMatch(/^[a-z0-9]+$/);
     expect(result.envLocalFile).toBe(path.join(fixtureRoot, ".env.local"));
-    expect(result.targetImagesDir).toBe(path.join(fixtureRoot, "public", "images"));
+    expect(result.targetImagesDir).toBe(
+      path.join(fixtureRoot, "public", "images"),
+    );
     expect(
       fs.readFileSync(path.join(fixtureRoot, ".env.local"), "utf8"),
     ).toContain(`EXPO_PUBLIC_DEPLOY_VERSION=${result.deployVersion}`);
@@ -88,20 +91,28 @@ describe("sync-web-app-data", () => {
       JSON.stringify({ profile: { avatar: "ava.webp" } }, null, 2),
       "utf8",
     );
-    fs.writeFileSync(path.join(sourceImagesDir, "ava.webp"), "new-avatar", "utf8");
+    fs.writeFileSync(
+      path.join(sourceImagesDir, "ava.webp"),
+      "new-avatar",
+      "utf8",
+    );
     fs.writeFileSync(
       path.join(sourceImagesDir, "project.webp"),
       "project-image",
       "utf8",
     );
-    fs.writeFileSync(path.join(publicImagesDir, "ava.webp"), "old-avatar", "utf8");
+    fs.writeFileSync(
+      path.join(publicImagesDir, "ava.webp"),
+      "old-avatar",
+      "utf8",
+    );
     fs.writeFileSync(path.join(publicImagesDir, "stale.webp"), "stale", "utf8");
 
-    syncWebAppData(fixtureRoot);
+    syncWebAppData(fixtureRoot, silentLogger);
 
-    expect(fs.readFileSync(path.join(publicImagesDir, "ava.webp"), "utf8")).toBe(
-      "new-avatar",
-    );
+    expect(
+      fs.readFileSync(path.join(publicImagesDir, "ava.webp"), "utf8"),
+    ).toBe("new-avatar");
     expect(
       fs.readFileSync(path.join(publicImagesDir, "project.webp"), "utf8"),
     ).toBe("project-image");
@@ -125,7 +136,7 @@ describe("sync-web-app-data", () => {
       "utf8",
     );
 
-    const result = syncWebAppData(fixtureRoot);
+    const result = syncWebAppData(fixtureRoot, silentLogger);
     const envLocal = fs.readFileSync(
       path.join(fixtureRoot, ".env.local"),
       "utf8",
