@@ -2,6 +2,7 @@
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
+import { useWnaLayout } from "@components/WnaAppContext";
 import { WnaHeader } from "@components/screens/WnaHeader";
 
 const mockReplace = jest.fn();
@@ -43,7 +44,7 @@ jest.mock("@components/WnaAppContext", () => {
         headerButtonHeight: 56,
         globalCornerRadius: 8,
       },
-      isLandscape: false,
+      isLandscape: true,
     })),
   };
 });
@@ -215,5 +216,29 @@ describe("WnaHeader", () => {
       text2: "Light mode",
       props: { appColors: { id: 2, isDark: false } },
     });
+  });
+
+  it("does not render the theme button in portrait mode", () => {
+    (useWnaLayout as jest.Mock).mockReturnValue({
+      appLayout: {
+        headerHeight: 72,
+        headerButtonHeight: 56,
+        globalCornerRadius: 8,
+      },
+      isLandscape: false,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHeader headerTitle="Start" />);
+    });
+
+    const buttons = tree!.root.findAllByType("WnaButtonHeader");
+    const themeButton = buttons.find(
+      (button: HeaderButtonNode) => button.props.text === "Theme",
+    );
+
+    expect(themeButton).toBeUndefined();
   });
 });
