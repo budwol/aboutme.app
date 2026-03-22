@@ -46,17 +46,24 @@ export default function WnaDrawerMenu() {
   const langCode = getNavigationLang(getLangCode());
   const lastSegment = segments.at(-1);
 
-  const baseRoute = getDrawerNavigationPath("root", langCode);
+  const rootRoute = getDrawerNavigationPath("root", langCode);
 
   const isStartActive =
     !lastSegment || ["(tabs)", "(tabs-de)", "(tabs-en)"].includes(lastSegment);
+  const drawerBackgroundColor = appColors.isDark
+    ? appColors.staticCoolgray8
+    : appColors.warmgray1;
+  const headerSurfaceColor = appColors.isDark
+    ? appColors.accent7
+    : appColors.warmgray1;
+  const themeLabel = `${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`;
 
   const items: WnaMenuItem[] = useMemo(
     () => [
       {
         text: t(i18nKeys.screenTitleProfile),
         iconName: "home",
-        route: getDrawerNavigationPath("root", langCode),
+        route: rootRoute,
         type: "nav",
       },
       {
@@ -84,7 +91,7 @@ export default function WnaDrawerMenu() {
         type: "nav",
       },
     ],
-    [langCode, t],
+    [langCode, rootRoute, t],
   );
 
   useEffect(() => {
@@ -94,17 +101,25 @@ export default function WnaDrawerMenu() {
   }, [status, navigation]);
 
   const handleNavigate = useCallback(
-    (route?: string, isActive?: boolean) => {
-      if (!route || isActive) return;
-      navigationRouter.push(route as Href);
+    (targetRoute?: string, isActive?: boolean) => {
+      if (!targetRoute || isActive) return;
+      navigationRouter.push(targetRoute as Href);
     },
     [navigationRouter],
   );
 
+  const handleHeaderPress = useCallback(() => {
+    if (isStartActive) {
+      return;
+    }
+
+    handleNavigate(rootRoute, false);
+  }, [handleNavigate, isStartActive, rootRoute]);
+
   const renderItem = useCallback(
     (item: WnaMenuItem) => {
       const routeLast = item.route?.split("/").filter(Boolean).pop();
-      const isRootItem = item.route === baseRoute;
+      const isRootItem = item.route === rootRoute;
 
       const isActive =
         isRootItem
@@ -133,18 +148,14 @@ export default function WnaDrawerMenu() {
         />
       );
     },
-    [appStyle, appColors, baseRoute, lastSegment, isStartActive, handleNavigate],
+    [appStyle, appColors, rootRoute, lastSegment, isStartActive, handleNavigate],
   );
 
   return (
     <View
       style={[
         styles.container,
-        {
-          backgroundColor: appColors.isDark
-            ? appColors.staticCoolgray8
-            : appColors.warmgray1,
-        },
+        { backgroundColor: drawerBackgroundColor },
       ]}
     >
       <WnaPressable
@@ -153,7 +164,7 @@ export default function WnaDrawerMenu() {
         t={t}
         checkInternetConnection={false}
         style={styles.headerPressable}
-        onPress={() => navigationRouter.push(baseRoute)}
+        onPress={handleHeaderPress}
       >
         <View
           style={[
@@ -164,11 +175,7 @@ export default function WnaDrawerMenu() {
           <View
             style={[
               styles.logoWrapper,
-              {
-                backgroundColor: appColors.isDark
-                  ? appColors.accent7
-                  : appColors.warmgray1,
-              },
+              { backgroundColor: headerSurfaceColor },
             ]}
           >
             <WnaImage
@@ -206,7 +213,7 @@ export default function WnaDrawerMenu() {
         <WnaButtonIconText
           appColors={appColors}
           appStyle={appStyle}
-          text={`${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`}
+          text={themeLabel}
           iconName={getThemeIcon(theme)}
           backgroundColor={appColors.isDark ? appColors.coolgray2 : appColors.white}
           textColor={appColors.black}
