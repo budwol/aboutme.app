@@ -16,10 +16,7 @@ import currentAppVersion from "@components/currentAppVersion";
 import WnaNavigationList, {
   WnaMenuItem,
 } from "@components/navigation/WnaNavigationList";
-import {
-  getThemeIcon,
-  toggleWnaTheme,
-} from "@components/theme/wnaThemeToggle";
+import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
 import { getDrawerNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -121,12 +118,11 @@ export default function WnaDrawerMenu() {
       const routeLast = item.route?.split("/").filter(Boolean).pop();
       const isRootItem = item.route === rootRoute;
 
-      const isActive =
-        isRootItem
-          ? isStartActive || routeLast === lastSegment
-          : routeLast === undefined
-            ? isStartActive
-            : routeLast === lastSegment;
+      const isActive = isRootItem
+        ? isStartActive || routeLast === lastSegment
+        : routeLast === undefined
+          ? isStartActive
+          : routeLast === lastSegment;
 
       return (
         <WnaDrawerNavigationItem
@@ -148,15 +144,19 @@ export default function WnaDrawerMenu() {
         />
       );
     },
-    [appStyle, appColors, rootRoute, lastSegment, isStartActive, handleNavigate],
+    [
+      appStyle,
+      appColors,
+      rootRoute,
+      lastSegment,
+      isStartActive,
+      handleNavigate,
+    ],
   );
 
   return (
     <View
-      style={[
-        styles.container,
-        { backgroundColor: drawerBackgroundColor },
-      ]}
+      style={[styles.container, { backgroundColor: drawerBackgroundColor }]}
     >
       <WnaPressable
         ripple={undefined}
@@ -215,7 +215,9 @@ export default function WnaDrawerMenu() {
           appStyle={appStyle}
           text={themeLabel}
           iconName={getThemeIcon(theme)}
-          backgroundColor={appColors.isDark ? appColors.coolgray2 : appColors.white}
+          backgroundColor={
+            appColors.isDark ? appColors.coolgray2 : appColors.white
+          }
           textColor={appColors.black}
           borderWidth={1}
           onPress={() =>

@@ -25,21 +25,23 @@ describe("legalContent", () => {
   });
 
   it("escapes injected app data before rendering html", () => {
+    const maliciousName = `<script>alert("x")</script>`;
+
     const disclaimer = buildDisclaimerHtml(
       {
         ...testAppData,
         profile: {
           ...testAppData.profile,
-          name: `<img src=x onerror="alert(1)">`,
+          name: maliciousName,
         },
       },
       "de",
     );
 
     expect(disclaimer).toContain(
-      "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;",
+      "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;",
     );
-    expect(disclaimer).not.toContain('<img src=x onerror="alert(1)">');
+    expect(disclaimer).not.toContain(maliciousName);
   });
 
   it("returns translated legal documents", () => {
