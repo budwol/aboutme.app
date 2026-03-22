@@ -17,8 +17,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerActionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: appLayoutConstants.contentPaddingBottom,
+    paddingVertical: appLayoutConstants.globalCornerRadius,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
   },

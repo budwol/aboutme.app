@@ -6,7 +6,10 @@ import {
   WnaButtonTextAppearanceProps,
   WnaButtonThemeProps,
 } from "@components/buttons/wnaButtonTypes";
-import { actionButtonRightConstants } from "@constants/layoutConstants";
+import {
+  actionButtonRightConstants,
+  appLayoutConstants,
+} from "@constants/layoutConstants";
 import { FC, memo } from "react";
 import { StyleSheet } from "react-native";
 
@@ -63,7 +66,7 @@ const WnaButtonTextV2Component: FC<WnaButtonTextV2Props> = ({
 const componentStyle = StyleSheet.create({
   pressableContainer: {
     height: actionButtonRightConstants.size,
-    borderRadius: 8,
+    borderRadius: appLayoutConstants.globalCornerRadius,
     overflow: "hidden",
   },
 });

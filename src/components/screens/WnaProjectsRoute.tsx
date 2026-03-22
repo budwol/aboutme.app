@@ -260,7 +260,12 @@ export default function WnaProjectsRoute(): ReactNode {
               landscapeVariant && styles.projectCardLandscape,
               featured && styles.projectCardFeatured,
               {
-                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.14),
+                backgroundColor: convertHexToRgba(
+                  landscapeVariant
+                    ? appColors.staticWhite
+                    : appColors.warmgray6,
+                  landscapeVariant ? 0.78 : 0.14,
+                ),
                 borderColor: convertHexToRgba(
                   appColors.coolgray2,
                   landscapeVariant ? 0.44 : 0.54,
@@ -372,7 +377,7 @@ export default function WnaProjectsRoute(): ReactNode {
                   <View
                     style={[
                       styles.landscapeIntroLine,
-                      { backgroundColor: appColors.accent5 },
+                      { backgroundColor: appColors.staticAccent5 },
                     ]}
                   />
 
@@ -380,7 +385,7 @@ export default function WnaProjectsRoute(): ReactNode {
                     style={[
                       appStyle.textSmall,
                       styles.landscapeEyebrow,
-                      { color: appColors.coolgray6 },
+                      { color: appColors.staticCoolgray2 },
                     ]}
                   >
                     {(appData.projectsSubtitle ?? "").toUpperCase()}
@@ -390,7 +395,7 @@ export default function WnaProjectsRoute(): ReactNode {
                     style={[
                       appStyle.textExtraLarge,
                       styles.landscapeTitle,
-                      { color: appColors.black },
+                      { color: appColors.staticWhite },
                     ]}
                   >
                     {t(i18nKeys.screenTitleProjects)}
@@ -403,11 +408,11 @@ export default function WnaProjectsRoute(): ReactNode {
                       styles.landscapeIntroBox,
                       {
                         backgroundColor: convertHexToRgba(
-                          appColors.warmgray6,
-                          0.12,
+                          appColors.staticWhite,
+                          0.2,
                         ),
                         borderColor: convertHexToRgba(
-                          appColors.coolgray2,
+                          appColors.staticCoolgray8,
                           0.64,
                         ),
                       },
@@ -417,7 +422,7 @@ export default function WnaProjectsRoute(): ReactNode {
                       style={[
                         appStyle.textSmall,
                         styles.landscapeContext,
-                        { color: appColors.black, opacity: 0.82 },
+                        { color: appColors.staticWhite, opacity: 0.82 },
                       ]}
                     >
                       {appData.projectsContext}

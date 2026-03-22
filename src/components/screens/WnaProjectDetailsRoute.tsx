@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   actionButton: {
     minWidth: 160,
     marginHorizontal: 0,
-    height: 44,
+    height: appLayoutConstants.textInputHeight,
     borderRadius: appLayoutConstants.globalCornerRadius,
   },
   descriptionSection: {

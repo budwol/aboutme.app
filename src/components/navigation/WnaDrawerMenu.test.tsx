@@ -2,6 +2,10 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@app/(drawer)/WnaDrawerMenu";
+import { appLayoutConstants } from "@constants/layoutConstants";
+
+const mockHeaderButtonHeight = appLayoutConstants.headerButtonHeight;
+const mockGlobalCornerRadius = appLayoutConstants.globalCornerRadius;
 
 const mockSetOptions = jest.fn();
 const mockPush = jest.fn();
@@ -52,6 +56,8 @@ jest.mock("@components/WnaAppContext", () => ({
       contentPaddingBottom: 0,
       contentListPaddingTop: 0,
       globalListGap: 0,
+      headerButtonHeight: mockHeaderButtonHeight,
+      globalCornerRadius: mockGlobalCornerRadius,
       scrollEventThrottle: 16,
     },
   }),
@@ -332,6 +338,13 @@ describe("WnaDrawerMenu", () => {
     );
 
     expect(themeButton).toBeDefined();
+    expect(themeButton!.props.style).toEqual(
+      expect.objectContaining({
+        marginHorizontal: 0,
+        height: appLayoutConstants.textInputHeight,
+        borderRadius: appLayoutConstants.globalCornerRadius,
+      }),
+    );
 
     await act(async () => {
       await themeButton!.props.onPress();
