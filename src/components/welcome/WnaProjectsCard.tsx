@@ -1,14 +1,22 @@
 import WnaWelcomeTitle from "@components/text/WnaWelcomeTitle";
 import WnaPressable from "@components/buttons/WnaPressable";
+import WnaSectionFooterAction from "@components/welcome/WnaSectionFooterAction";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import WnaCardVerticalWithImage from "../cards/WnaCardVerticalWithImage";
 import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 
+const styles = StyleSheet.create({
+  footerActionWrap: {
+    marginTop: 8,
+  },
+});
+
 export type WnaProjectsCardProps = WnaWelcomeProps & {
   onProjectPress?: (index: number) => void;
+  onShowMorePress?: () => void;
 };
 
 export default function WnaProjectsCard({
@@ -17,8 +25,9 @@ export default function WnaProjectsCard({
   appStyle,
   t,
   onProjectPress,
+  onShowMorePress,
 }: WnaProjectsCardProps) {
-  const _btnWidth = 256;
+  const cardWidth = 256;
   return (
     <View
       style={{
@@ -51,7 +60,7 @@ export default function WnaProjectsCard({
               onPress={() => onProjectPress?.(index)}
             >
               <WnaCardVerticalWithImage
-                width={_btnWidth}
+                width={cardWidth}
                 appColors={appColors}
                 appStyle={appStyle}
                 imageUrl={`images/${project.imageS}`}
@@ -63,11 +72,22 @@ export default function WnaProjectsCard({
         ))}
       </View>
 
+      {onShowMorePress ? (
+        <View style={styles.footerActionWrap}>
+          <WnaSectionFooterAction
+            appColors={appColors}
+            appStyle={appStyle}
+            label={t(i18nKeys.actionShowMore)}
+            onPress={onShowMorePress}
+          />
+        </View>
+      ) : null}
+
       {appData.projectsContext ? (
         <View
           style={{
             paddingHorizontal: 16,
-            paddingVertical: 12,
+            paddingVertical: 14,
             borderWidth: 1,
             borderRadius: appLayoutConstants.globalCornerRadius,
             backgroundColor: convertHexToRgba(appColors.warmgray6, 0.16),

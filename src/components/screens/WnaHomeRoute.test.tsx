@@ -4,6 +4,7 @@ import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/test/testAppData";
+import { createProjectSlug } from "@utils/projectRoutes";
 
 type RenderedNode = {
   type: unknown;
@@ -259,6 +260,56 @@ describe("WnaHomeRoute", () => {
     const experiencePreview = tree!.root.findByType("WnaExperienceCard");
 
     expect(experiencePreview.props.showDetails).toBeUndefined();
+  });
+
+  it("navigates to the projects route from the projects teaser action", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+
+    act(() => {
+      projectsCard.props.onShowMorePress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/projekte");
+  });
+
+  it("navigates to the project details route from the projects teaser", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+
+    act(() => {
+      projectsCard.props.onProjectPress(0);
+    });
+
+    expect(mockPush).toHaveBeenCalledWith(
+      `/(drawer)/(tabs-de)/projekte/${createProjectSlug(testAppData.projects[0].title, 0)}`,
+    );
+  });
+
+  it("does not navigate when the projects teaser receives an invalid project index", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+
+    act(() => {
+      projectsCard.props.onProjectPress(999);
+    });
+
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it("does not navigate when a project index has no matching project", () => {
