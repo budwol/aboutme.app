@@ -248,4 +248,16 @@ describe("WnaHomeRoute", () => {
 
     expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/taetigkeiten");
   });
+
+  it("keeps the experience details toggle enabled on the home teaser", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHomeRoute />);
+    });
+
+    const experiencePreview = tree!.root.findByType("WnaExperienceCard");
+
+    expect(experiencePreview.props.showDetails).toBeUndefined();
+  });
 });

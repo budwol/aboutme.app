@@ -110,7 +110,9 @@ jest.mock("@react-navigation/drawer", () => ({
 
 jest.mock("expo-router", () => ({
   router: {},
-  useNavigation: () => ({ setOptions: jest.fn() }),
+  useNavigation: () => ({
+    setOptions: jest.fn(),
+  }),
   useSegments: () => ["(drawer)", "(tabs-de)"],
 }));
 
@@ -189,6 +191,22 @@ jest.mock("@/components/navigation/WnaDrawerNavigationItem", () => {
 });
 
 describe("WnaDrawerMenu", () => {
+  it("does not trigger a navigation transition when the header is pressed on the home route", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const headerPressable = tree!.root.findAllByType("WnaPressable")[0];
+
+    act(() => {
+      headerPressable.props.onPress();
+    });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   it("marks the profile entry as active on the initial home route", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

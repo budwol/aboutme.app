@@ -139,7 +139,6 @@ export default function WnaHomeRoute(): ReactNode {
               appStyle={appStyle}
               t={t}
               maxItems={4}
-              showDetails={false}
               footerActionLabel={t(i18nKeys.actionShowMore)}
               onFooterActionPress={handleExperiencePress}
             />
