@@ -3,6 +3,7 @@ import {
   WnaButtonTextAppearanceProps,
   WnaButtonThemeProps,
 } from "@components/buttons/wnaButtonTypes";
+import { appLayoutConstants } from "@constants/layoutConstants";
 import { FC, memo } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -17,6 +18,7 @@ export type WnaButtonTextDecentProps = WnaButtonThemeProps &
 
 const WnaButtonTextDecentComponent: FC<WnaButtonTextDecentProps> = ({
   appColors,
+  appStyle,
   text,
   textColor,
   textDecorationLine,
@@ -25,6 +27,8 @@ const WnaButtonTextDecentComponent: FC<WnaButtonTextDecentProps> = ({
   onPress,
 }) => {
   const effectiveTextColor = textColor ?? appColors.black;
+  const effectiveFontSize =
+    fontSize ?? appStyle?.textNeutralMedium?.fontSize ?? 16;
 
   return (
     <View style={[style, { overflow: "hidden" }]}>
@@ -37,9 +41,9 @@ const WnaButtonTextDecentComponent: FC<WnaButtonTextDecentProps> = ({
         <Text
           style={{
             color: effectiveTextColor,
-            fontSize: fontSize ?? 18,
+            fontSize: effectiveFontSize,
             textDecorationLine: textDecorationLine ?? "none",
-            paddingVertical: 8,
+            paddingVertical: appLayoutConstants.globalCornerRadius,
           }}
         >
           {text}

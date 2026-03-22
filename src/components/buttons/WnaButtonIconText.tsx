@@ -8,7 +8,10 @@ import {
 } from "@components/buttons/wnaButtonTypes";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { WnaShadowStyle } from "@components/misc/WnaShadowStyle";
-import { actionButtonRightConstants } from "@constants/layoutConstants";
+import {
+  actionButtonRightConstants,
+  appLayoutConstants,
+} from "@constants/layoutConstants";
 import { StaticColors } from "@constants/theme/staticColors";
 import { FC, memo } from "react";
 import { StyleSheet, ViewStyle } from "react-native";
@@ -74,7 +77,7 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
 const componentStyle = StyleSheet.create({
   pressableContainer: {
     height: actionButtonRightConstants.size,
-    borderRadius: 8,
+    borderRadius: appLayoutConstants.globalCornerRadius,
     overflow: "hidden",
     marginHorizontal: 16,
   },
