@@ -4,12 +4,15 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { useWnaLayout } from "@components/WnaAppContext";
 import { WnaHeader } from "@components/screens/WnaHeader";
+import { Platform } from "react-native";
 
 const mockReplace = jest.fn();
 const mockBack = jest.fn();
 const mockNavigate = jest.fn();
 const mockCanGoBack = jest.fn(() => false);
 const mockToastShow = jest.fn();
+const mockHistoryBack = jest.fn();
+const mockStartNavigationTransition = jest.fn((action: () => void) => action());
 
 function MockToast(_props: unknown) {
   return null;
@@ -28,6 +31,10 @@ jest.mock("@components/WnaAppContext", () => {
   const { jest: jestModule } = require("@jest/globals");
 
   return {
+    useWnaAppLifecycle: jestModule.fn(() => ({
+      isNavigationTransitionActive: false,
+      startNavigationTransition: mockStartNavigationTransition,
+    })),
     useWnaTheme: jestModule.fn(() => ({
       appColors: {
         staticWarmgray8: "#222",
@@ -148,6 +155,20 @@ describe("WnaHeader", () => {
     mockNavigate.mockClear();
     mockCanGoBack.mockReturnValue(false);
     mockToastShow.mockClear();
+    mockHistoryBack.mockClear();
+    mockStartNavigationTransition.mockClear();
+
+    Object.defineProperty(Platform, "OS", {
+      configurable: true,
+      value: "web",
+    });
+    Object.defineProperty(window, "history", {
+      configurable: true,
+      value: {
+        length: 2,
+        back: mockHistoryBack,
+      },
+    });
   });
 
   it("uses onTitlePress before navigation", () => {
@@ -240,5 +261,108 @@ describe("WnaHeader", () => {
     );
 
     expect(themeButton).toBeUndefined();
+  });
+
+  it("uses browser history back on web when no explicit backHref is provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" isRootPage={false} />,
+      );
+    });
+
+    const backButton = tree!.root.findAllByType("WnaButtonHeader")[0];
+
+    act(() => {
+      backButton.props.onPress();
+    });
+
+    expect(mockHistoryBack).toHaveBeenCalledTimes(1);
+    expect(mockStartNavigationTransition).toHaveBeenCalledTimes(1);
+    expect(mockBack).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it("prefers backHref over browser history", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader
+          headerTitle="Project"
+          isRootPage={false}
+          backHref="/projects"
+        />,
+      );
+    });
+
+    const backButton = tree!.root.findAllByType("WnaButtonHeader")[0];
+
+    act(() => {
+      backButton.props.onPress();
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith("/projects");
+    expect(mockHistoryBack).not.toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the root route when no back path is available", () => {
+    Object.defineProperty(window, "history", {
+      configurable: true,
+      value: {
+        length: 1,
+        back: mockHistoryBack,
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" isRootPage={false} />,
+      );
+    });
+
+    const title = tree!.root.findByType("WnaMultilineHeader");
+
+    act(() => {
+      title.props.onPress();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith("/");
+    expect(mockHistoryBack).not.toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
+  });
+
+  it("uses router back when browser history is not available but the router can go back", () => {
+    Object.defineProperty(window, "history", {
+      configurable: true,
+      value: {
+        length: 1,
+        back: mockHistoryBack,
+      },
+    });
+    mockCanGoBack.mockReturnValue(true);
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" isRootPage={false} />,
+      );
+    });
+
+    const backButton = tree!.root.findAllByType("WnaButtonHeader")[0];
+
+    act(() => {
+      backButton.props.onPress();
+    });
+
+    expect(mockBack).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockHistoryBack).not.toHaveBeenCalled();
   });
 });

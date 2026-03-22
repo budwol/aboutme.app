@@ -147,6 +147,12 @@ jest.mock("react-native-reanimated", () => {
   return {
     __esModule: true,
     default: {
+      ScrollView: (props: unknown) =>
+        ReactModule.createElement(
+          "AnimatedScrollView",
+          props as Record<string, unknown>,
+          (props as { children?: React.ReactNode }).children,
+        ),
       FlatList: (props: unknown) =>
         ReactModule.createElement(
           "AnimatedFlatList",
@@ -188,6 +194,7 @@ describe("WnaProjectsRoute", () => {
         scrollEventThrottle: 16,
       },
       currentWindowWidth: 1200,
+      isLandscape: false,
     });
   });
 
@@ -208,6 +215,45 @@ describe("WnaProjectsRoute", () => {
       "MockContactFooter",
     );
     expect(flatList.props.contentContainerStyle.paddingBottom).toBe(16);
+  });
+
+  it("renders the dedicated landscape projects layout when the screen is wide", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+
+    appContext.useWnaLayout.mockReturnValue({
+      appLayout: {
+        contentPaddingBottom: 16,
+        contentPaddingBottomWhenActionButton: 16,
+        contentListPaddingTop: 16,
+        scrollEventThrottle: 16,
+      },
+      currentWindowWidth: 1400,
+      isLandscape: true,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const scrollView = tree!.root.findByType("AnimatedScrollView");
+    const pressables = tree!.root.findAllByType("WnaPressable");
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(scrollView).toBeDefined();
+    expect(tree!.root.findAllByType("AnimatedFlatList")).toHaveLength(0);
+    expect(textValues).toContain("screenTitleProjects");
+    expect(textValues).toContain(testAppData.projectsSubtitle?.toUpperCase());
+    expect(textValues).toContain(testAppData.projectsContext);
+    expect(pressables).toHaveLength(testAppData.projects.length);
   });
 
   it("renders subtitle and context in the project overlay", () => {

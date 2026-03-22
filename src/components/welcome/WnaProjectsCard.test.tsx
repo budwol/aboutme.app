@@ -66,6 +66,7 @@ describe("WnaProjectsCard", () => {
             {
               warmgray6: "#999999",
               coolgray2: "#cccccc",
+              accent5: "#0aa",
             } as never
           }
           appData={appData}
@@ -103,6 +104,7 @@ describe("WnaProjectsCard", () => {
               isDark: false,
               warmgray6: "#999999",
               coolgray2: "#cccccc",
+              accent5: "#0aa",
             } as never
           }
           appData={testAppData}
@@ -120,5 +122,55 @@ describe("WnaProjectsCard", () => {
     });
 
     expect(onProjectPress).toHaveBeenCalledWith(0);
+  });
+
+  it("renders a show more action and calls the provided handler", () => {
+    const onShowMorePress = jest.fn();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProjectsCard
+          appColors={
+            {
+              isDark: false,
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              accent5: "#0aa",
+            } as never
+          }
+          appData={testAppData}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+          onShowMorePress={onShowMorePress}
+        />,
+      );
+    });
+
+    const texts = tree!.root.findAllByType("Text");
+    const textValues = texts.map(
+      (node: { props: { children?: React.ReactNode } }) => node.props.children,
+    );
+    const actionNodes = tree!.root.findAll(
+      (node: {
+        type: unknown;
+        props: {
+          onPress?: (() => void) | undefined;
+          children?: React.ReactNode;
+        };
+      }) =>
+        typeof node.props.onPress === "function" &&
+        node.type !== "WnaPressable" &&
+        node.props.children !== undefined,
+    );
+    const actionNode = actionNodes[actionNodes.length - 1];
+
+    expect(textValues).toContainEqual(["actionShowMore", " →"]);
+
+    act(() => {
+      actionNode?.props.onPress();
+    });
+
+    expect(onShowMorePress).toHaveBeenCalledTimes(1);
   });
 });

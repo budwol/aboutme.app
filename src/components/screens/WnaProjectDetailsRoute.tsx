@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
   },
   heroBadgeContainer: {
     position: "absolute",
-    top: 16,
-    right: 16,
+    bottom: 16,
+    left: 16,
     zIndex: 1,
   },
   heroBadge: {
@@ -250,7 +250,6 @@ export default function WnaProjectDetailsRoute(): ReactNode {
     <WnaScrollViewScreen
       headerTitle={project.title}
       iconName="rocket-launch-outline"
-      backHref={getDrawerNavigationPath("projects", lang)}
       titleHref={getDrawerNavigationPath("projects", lang)}
       showFooter={false}
       headerButton0={

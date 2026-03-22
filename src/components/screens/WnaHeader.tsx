@@ -6,7 +6,7 @@ import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { animationSpeed } from "@constants/animationSpeed";
 import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback, useEffect } from "react";
-import { useColorScheme, View, ViewStyle } from "react-native";
+import { Platform, useColorScheme, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   SharedValue,
@@ -57,6 +57,10 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const colorScheme = useColorScheme();
 
     const themeIcon = getThemeIcon(theme);
+    const canUseBrowserBack =
+      Platform.OS === "web" &&
+      typeof window !== "undefined" &&
+      window.history.length > 1;
 
     const lazyOpacity = useSharedValue(1);
 
@@ -117,12 +121,19 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
         return;
       }
 
+      if (canUseBrowserBack) {
+        navigationRouter.runNavigationTransition(() => {
+          window.history.back();
+        });
+        return;
+      }
+
       if (router.canGoBack()) {
         navigationRouter.back();
       } else {
         navigationRouter.navigate(getNavigationPath("root"));
       }
-    }, [backHref, isBusy, navigationRouter, router]);
+    }, [backHref, canUseBrowserBack, isBusy, navigationRouter, router]);
 
     const handleTitlePress = useCallback(() => {
       if (isBusy) return;
@@ -141,7 +152,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     }, [handleBack, isBusy, navigationRouter, onTitlePress, titleHref]);
 
     const backButtonVisible =
-      !isRootPage && (Boolean(backHref) || router.canGoBack());
+      !isRootPage &&
+      (Boolean(backHref) || canUseBrowserBack || router.canGoBack());
 
     const headerStyle: ViewStyle = {
       position: "absolute",

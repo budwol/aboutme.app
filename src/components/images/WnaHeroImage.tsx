@@ -26,6 +26,11 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
   borderRadius = appLayoutConstants.globalCornerRadius,
   ...imageProps
 }) => {
+  const imageStyle = imageProps.style as
+    | WnaImageStyleProps
+    | WnaImageStyleProps[]
+    | undefined;
+
   return (
     <View
       style={[
@@ -34,6 +39,7 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
           height: appLayoutConstants.globalHeroImageHeight,
           borderRadius,
         },
+        imageStyle,
       ]}
     >
       <WnaImage
@@ -43,7 +49,7 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
         imageTitle={imageTitle}
         contentFit="cover"
         grayScale={grayScale}
-        style={styles.image as unknown as WnaImageStyleProps}
+        style={[styles.image, imageStyle] as WnaImageStyleProps[]}
       />
 
       {showGradient && (
