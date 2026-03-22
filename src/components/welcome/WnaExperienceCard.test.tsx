@@ -28,6 +28,7 @@ type CardNode = {
     subtitle?: string;
     description?: string;
     badgeText?: string;
+    onPress?: () => void;
   };
 };
 
@@ -273,6 +274,54 @@ describe("WnaExperienceCard", () => {
     expect(toggle).toBeDefined();
   });
 
+  it("renders a details toggle even when an experience has no extra detail content", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          details: [],
+          techstack: [],
+          description: "",
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const toggle = tree!.root
+      .findAllByType("Text")
+      .find((node: RenderedTextNode) =>
+        flattenText(node.props.children).includes("actionShowDetails"),
+      );
+
+    expect(toggle).toBeDefined();
+  });
+
   it("expands details and tech badges when the toggle is pressed", () => {
     const description = "High-level summary";
     const appData = {
@@ -316,12 +365,10 @@ describe("WnaExperienceCard", () => {
       );
     });
 
-    const toggleButton = tree!.root.find(
-      (node: PressableNode) => typeof node.props.onPress === "function",
-    );
+    const card = tree!.root.findByType("WnaCardSmallVertical");
 
     act(() => {
-      toggleButton.props.onPress();
+      card.props.onPress?.();
     });
 
     const textValues = tree!.root
@@ -341,6 +388,63 @@ describe("WnaExperienceCard", () => {
       "C#",
       ".NET",
     ]);
+  });
+
+  it("expands details when the experience card itself is pressed", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          details: ["Built the thing"],
+          techstack: ["C#"],
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+              textNeutralLabel: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const card = tree!.root.findByType("WnaCardSmallVertical");
+
+    act(() => {
+      card.props.onPress?.();
+    });
+
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => flattenText(node.props.children));
+
+    expect(textValues).toContain("Built the thing");
+    expect(textValues).toContain("titleProjectTechstack");
+    expect(textValues).toContain("actionHideDetails ↑");
   });
 
   it("expands the description when no dedicated detail list exists", () => {
@@ -386,12 +490,10 @@ describe("WnaExperienceCard", () => {
       );
     });
 
-    const toggleButton = tree!.root.find(
-      (node: PressableNode) => typeof node.props.onPress === "function",
-    );
+    const card = tree!.root.findByType("WnaCardSmallVertical");
 
     act(() => {
-      toggleButton.props.onPress?.();
+      card.props.onPress?.();
     });
 
     const textValues = tree!.root
@@ -525,9 +627,9 @@ describe("WnaExperienceCard", () => {
     const textValues = tree!.root
       .findAllByType("Text")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
-    const pressable = tree!.root.findAll(
+    const pressable = tree!.root.find(
       (node: PressableNode) => typeof node.props.onPress === "function",
-    )[0];
+    );
 
     act(() => {
       pressable.props.onPress?.();
