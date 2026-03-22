@@ -54,6 +54,10 @@ export default function WnaDrawerMenu() {
     ? appColors.accent7
     : appColors.warmgray1;
   const themeLabel = `${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`;
+  const compactButtonHeight = Math.min(
+    appLayout.headerButtonHeight ?? appLayoutConstants.headerButtonHeight,
+    appLayoutConstants.textInputHeight,
+  );
 
   const items: WnaMenuItem[] = useMemo(
     () => [
@@ -228,7 +232,13 @@ export default function WnaDrawerMenu() {
               setAppColors,
             })
           }
-          style={styles.themeButton}
+          style={{
+            ...styles.themeButton,
+            height: compactButtonHeight,
+            borderRadius:
+              appLayout.globalCornerRadius ??
+              appLayoutConstants.globalCornerRadius,
+          }}
         />
 
         <Text
@@ -295,7 +305,7 @@ const styles = StyleSheet.create({
   themeButton: {
     width: "100%",
     marginBottom: 8,
-    borderRadius: 999,
+    marginHorizontal: 0,
   },
   footerLink: {
     textDecorationLine: "underline",

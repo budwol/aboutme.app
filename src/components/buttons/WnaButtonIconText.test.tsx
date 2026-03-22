@@ -2,6 +2,10 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
+import {
+  actionButtonRightConstants,
+  appLayoutConstants,
+} from "@constants/layoutConstants";
 
 jest.mock("@components/buttons/WnaPressable", () => {
   const { createElement } = jest.requireActual(
@@ -65,6 +69,14 @@ describe("WnaButtonIconText", () => {
     const pressable = tree!.root.findByType("WnaPressable");
     const content = tree!.root.findByType("WnaButtonTextContent");
     expect(pressable.props.disabled).toBe(true);
+    expect(pressable.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          height: actionButtonRightConstants.size,
+          borderRadius: appLayoutConstants.globalCornerRadius,
+        }),
+      ]),
+    );
     expect(content.props.text).toBe("Open profile");
     expect(content.props.childrenLeft.props.iconName).toBe("account");
   });
