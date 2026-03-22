@@ -36,6 +36,23 @@ const styles = StyleSheet.create({
   },
 });
 
+function SectionCard({
+  appColors,
+  children,
+}: {
+  appColors: ReturnType<typeof useWnaTheme>["appColors"];
+  children: ReactNode;
+}) {
+  return (
+    <>
+      <WnaListCardWhiteDecent appColors={appColors}>
+        {children}
+      </WnaListCardWhiteDecent>
+      <WnaSeparatorHorizontal transparent space={separatorSpace} />
+    </>
+  );
+}
+
 export default function WnaHomeRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
@@ -54,18 +71,6 @@ export default function WnaHomeRoute(): ReactNode {
       paddingBottom: appLayout.contentPaddingBottom,
     }),
     [appLayout.contentListPaddingTop, appLayout.contentPaddingBottom],
-  );
-
-  const SectionCard = useCallback(
-    ({ children }: { children: ReactNode }) => (
-      <>
-        <WnaListCardWhiteDecent appColors={appColors}>
-          {children}
-        </WnaListCardWhiteDecent>
-        <WnaSeparatorHorizontal transparent space={separatorSpace} />
-      </>
-    ),
-    [appColors],
   );
 
   const handleProjectPress = useCallback(
@@ -89,6 +94,10 @@ export default function WnaHomeRoute(): ReactNode {
 
   const handleExperiencePress = useCallback(() => {
     navigationRouter.push(getDrawerNavigationPath("experience", lang));
+  }, [lang, navigationRouter]);
+
+  const handleProjectsPress = useCallback(() => {
+    navigationRouter.push(getDrawerNavigationPath("projects", lang));
   }, [lang, navigationRouter]);
 
   return (
@@ -123,7 +132,7 @@ export default function WnaHomeRoute(): ReactNode {
         onScroll={onScroll}
       >
         <View style={appStyle.containerCenterMaxWidth}>
-          <SectionCard>
+          <SectionCard appColors={appColors}>
             <WnaWelcomeCard
               appColors={appColors}
               appData={appData}
@@ -132,7 +141,7 @@ export default function WnaHomeRoute(): ReactNode {
             />
           </SectionCard>
 
-          <SectionCard>
+          <SectionCard appColors={appColors}>
             <WnaExperienceCard
               appColors={appColors}
               appData={appData}
@@ -144,13 +153,14 @@ export default function WnaHomeRoute(): ReactNode {
             />
           </SectionCard>
 
-          <SectionCard>
+          <SectionCard appColors={appColors}>
             <WnaProjectsCard
               appColors={appColors}
               appData={appData}
               appStyle={appStyle}
               t={t}
               onProjectPress={handleProjectPress}
+              onShowMorePress={handleProjectsPress}
             />
           </SectionCard>
 

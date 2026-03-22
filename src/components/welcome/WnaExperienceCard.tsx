@@ -2,7 +2,6 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   DimensionValue,
   LayoutChangeEvent,
-  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -11,6 +10,7 @@ import {
 import WnaWelcomeTitle from "@components/text/WnaWelcomeTitle";
 import WnaBadge from "@components/misc/WnaBadge";
 import WnaCardSmallVertical from "../cards/WnaCardSmallVertical";
+import WnaSectionFooterAction from "@components/welcome/WnaSectionFooterAction";
 import { WnaWelcomeProps } from "@components/welcome/WnaWelcomeProps";
 import { i18nKeys } from "@services/i18n/i18nKeys";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -106,7 +106,6 @@ export default function WnaExperienceCard({
 }: WnaExperienceCardProps) {
   const { width } = useWindowDimensions();
   const isCompactLayout = width < compactBreakpoint;
-  const [isFooterActionHovered, setIsFooterActionHovered] = useState(false);
   const experienceItems = useMemo(
     () => appData.experience.slice(0, maxItems ?? appData.experience.length),
     [appData.experience, maxItems],
@@ -127,10 +126,6 @@ export default function WnaExperienceCard({
   );
   const accentBorderColor = useMemo(
     () => convertHexToRgba(appColors.accent5, 0.25),
-    [appColors.accent5],
-  );
-  const accentHoverBorderColor = useMemo(
-    () => convertHexToRgba(appColors.accent5, 0.38),
     [appColors.accent5],
   );
   const effectiveCardWidth = useMemo(() => {
@@ -390,32 +385,12 @@ export default function WnaExperienceCard({
 
       {footerActionLabel && onFooterActionPress ? (
         <View style={styles.footerActionRow}>
-          <Pressable
+          <WnaSectionFooterAction
+            appColors={appColors}
+            appStyle={appStyle}
+            label={footerActionLabel}
             onPress={onFooterActionPress}
-            onHoverIn={() => setIsFooterActionHovered(true)}
-            onHoverOut={() => setIsFooterActionHovered(false)}
-            style={[
-              styles.footerActionButton,
-              {
-                borderColor: isFooterActionHovered
-                  ? accentHoverBorderColor
-                  : accentBorderColor,
-                backgroundColor: isFooterActionHovered
-                  ? convertHexToRgba(appColors.accent5, 0.14)
-                  : accentSurfaceColor,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                appStyle.textMicro,
-                styles.footerActionButtonText,
-                { color: appColors.accent5 },
-              ]}
-            >
-              {footerActionLabel} →
-            </Text>
-          </Pressable>
+          />
         </View>
       ) : null}
     </View>
@@ -525,15 +500,6 @@ const styles = StyleSheet.create({
   },
   detailsClip: {
     overflow: "hidden",
-  },
-  footerActionButton: {
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  footerActionButtonText: {
-    letterSpacing: 0.2,
   },
   detailCard: {
     flexDirection: "row",
