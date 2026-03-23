@@ -27,7 +27,7 @@ jest.mock("@components/buttons/WnaButtonIconInnerIcon", () => {
 });
 
 jest.mock("@components/effects/WnaShadowStyle", () => ({
-  WnaShadowStyle: () => ({ shadowColor: "#000000", shadowOpacity: 0.2 }),
+  WnaShadowStyle: () => ({ boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)" }),
 }));
 
 describe("WnaButtonIcon", () => {
@@ -66,7 +66,9 @@ describe("WnaButtonIcon", () => {
 
     expect(view.props.style).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ shadowColor: "#000000" }),
+        expect.objectContaining({
+          boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)",
+        }),
         expect.objectContaining({ marginTop: 12 }),
       ]),
     );

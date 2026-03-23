@@ -79,7 +79,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       const scrollValue = scrollY?.value ?? 0;
       const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
       // ease the shadow in nice and slow so the header does not slap you in the face
-      const shadowOpacity =
+      const shadowStrength =
         showShadow === true
           ? 1
           : showShadow === false
@@ -88,7 +88,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               ? 1
               : baseOpacity;
 
-      return WnaShadowStyle(shadowOpacity);
+      return WnaShadowStyle(shadowStrength);
     }, [scrollY, showShadow]);
 
     const blurContainerStyle = useAnimatedStyle(() => {
@@ -170,7 +170,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       flexDirection: "row",
       alignItems: "center",
       zIndex: 2,
-      elevation: 2,
     };
 
     const headerPointerEvents = isBusy ? "none" : "auto";
@@ -186,11 +185,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
           ]}
         >
           <Animated.View
-            style={[
-              headerStyle,
-              { zIndex: 1, elevation: 1 },
-              blurContainerStyle,
-            ]}
+            style={[headerStyle, { zIndex: 1 }, blurContainerStyle]}
           >
             <WnaBlurView
               forceExperimentalBlur
