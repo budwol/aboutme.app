@@ -55,7 +55,6 @@ export default function WnaTabLayout({ screens }: WnaTabLayoutProps) {
           : appColors.staticCoolgray6,
         tabBarStyle: {
           backgroundColor: appColors.white,
-          elevation: 8,
           borderWidth: 0,
           height: tabBarHeight,
           display: "none",
