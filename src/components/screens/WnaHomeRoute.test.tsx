@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
@@ -12,6 +19,25 @@ type RenderedNode = {
 
 const mockPush = jest.fn();
 const mockScrollTo = jest.fn();
+const mockRequestAnimationFrame =
+  jest.fn<(callback: FrameRequestCallback) => number>();
+const mockCancelAnimationFrame = jest.fn();
+
+function renderHomeRoute(flushDeferredSections = false) {
+  let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+  act(() => {
+    tree = TestRenderer.create(<WnaHomeRoute />);
+  });
+
+  if (flushDeferredSections) {
+    act(() => {
+      jest.runAllTimers();
+    });
+  }
+
+  return tree!;
+}
 
 jest.mock("@components/WnaAppContext", () => {
   const { jest: jestModule } = require("@jest/globals");
@@ -168,8 +194,21 @@ jest.mock("react-native-reanimated", () => {
 
 describe("WnaHomeRoute", () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     mockPush.mockClear();
     mockScrollTo.mockClear();
+    mockRequestAnimationFrame.mockClear();
+    mockCancelAnimationFrame.mockClear();
+    mockRequestAnimationFrame.mockImplementation((callback) => {
+      return setTimeout(() => callback(0), 0) as unknown as number;
+    });
+    mockCancelAnimationFrame.mockImplementation((frameId) => {
+      clearTimeout(frameId as unknown as ReturnType<typeof setTimeout>);
+    });
+    global.requestAnimationFrame =
+      mockRequestAnimationFrame as typeof requestAnimationFrame;
+    global.cancelAnimationFrame =
+      mockCancelAnimationFrame as typeof cancelAnimationFrame;
 
     const appContext = jest.requireMock("@components/WnaAppContext") as {
       useWnaAppData: jest.Mock;
@@ -193,14 +232,16 @@ describe("WnaHomeRoute", () => {
     });
   });
 
-  it("scrolls to the top when the header title is pressed", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
+  afterEach(() => {
     act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
+      jest.runOnlyPendingTimers();
     });
+    jest.useRealTimers();
+  });
 
-    const baseScreen = tree!.root.findByType("WnaBaseScreen");
+  it("scrolls to the top when the header title is pressed", () => {
+    const tree = renderHomeRoute();
+    const baseScreen = tree.root.findByType("WnaBaseScreen");
 
     act(() => {
       baseScreen.props.onTitlePress();
@@ -210,14 +251,26 @@ describe("WnaHomeRoute", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("renders experience before private projects on the home route", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+  it("defer-mounts the lower home sections until after the first paint", () => {
+    const tree = renderHomeRoute();
+
+    let renderedSections = tree.root
+      .findAll(
+        (node: RenderedNode) =>
+          typeof node.type === "string" &&
+          (node.type === "WnaWelcomeCard" ||
+            node.type === "WnaExperienceCard" ||
+            node.type === "WnaProjectsCard"),
+      )
+      .map((node: RenderedNode) => node.type);
+
+    expect(renderedSections).toEqual(["WnaWelcomeCard"]);
 
     act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
+      jest.runAllTimers();
     });
 
-    const renderedSections = tree!.root
+    renderedSections = tree.root
       .findAll(
         (node: RenderedNode) =>
           typeof node.type === "string" &&
@@ -235,13 +288,8 @@ describe("WnaHomeRoute", () => {
   });
 
   it("navigates to the experience route from the home teaser", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const experiencePreview = tree!.root.findByType("WnaExperienceCard");
+    const tree = renderHomeRoute(true);
+    const experiencePreview = tree.root.findByType("WnaExperienceCard");
 
     act(() => {
       experiencePreview.props.onFooterActionPress();
@@ -251,25 +299,15 @@ describe("WnaHomeRoute", () => {
   });
 
   it("keeps the experience details toggle enabled on the home teaser", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const experiencePreview = tree!.root.findByType("WnaExperienceCard");
+    const tree = renderHomeRoute(true);
+    const experiencePreview = tree.root.findByType("WnaExperienceCard");
 
     expect(experiencePreview.props.showDetails).toBeUndefined();
   });
 
   it("navigates to the projects route from the projects teaser action", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+    const tree = renderHomeRoute(true);
+    const projectsCard = tree.root.findByType("WnaProjectsCard");
 
     act(() => {
       projectsCard.props.onShowMorePress();
@@ -279,13 +317,8 @@ describe("WnaHomeRoute", () => {
   });
 
   it("navigates to the project details route from the projects teaser", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+    const tree = renderHomeRoute(true);
+    const projectsCard = tree.root.findByType("WnaProjectsCard");
 
     act(() => {
       projectsCard.props.onProjectPress(0);
@@ -297,13 +330,8 @@ describe("WnaHomeRoute", () => {
   });
 
   it("does not navigate when the projects teaser receives an invalid project index", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+    const tree = renderHomeRoute(true);
+    const projectsCard = tree.root.findByType("WnaProjectsCard");
 
     act(() => {
       projectsCard.props.onProjectPress(999);
@@ -313,13 +341,8 @@ describe("WnaHomeRoute", () => {
   });
 
   it("does not navigate when a project index has no matching project", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(<WnaHomeRoute />);
-    });
-
-    const projectsCard = tree!.root.findByType("WnaProjectsCard");
+    const tree = renderHomeRoute(true);
+    const projectsCard = tree.root.findByType("WnaProjectsCard");
 
     act(() => {
       projectsCard.props.onProjectPress(999);

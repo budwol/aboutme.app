@@ -24,11 +24,20 @@ import {
 import { createProjectSlug } from "@utils/projectRoutes";
 import { useNavigation, useRouter } from "expo-router";
 import Animated from "react-native-reanimated";
-import { ElementRef, ReactNode, useCallback, useMemo, useRef } from "react";
+import {
+  ElementRef,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 
 const separatorSpace = appLayoutConstants.contentPaddingBottom;
+const deferredSectionsDelayMs = 120;
 
 const styles = StyleSheet.create({
   content: {
@@ -64,6 +73,28 @@ export default function WnaHomeRoute(): ReactNode {
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
   const scrollViewRef = useRef<ElementRef<typeof Animated.ScrollView>>(null);
+  const [showDeferredSections, setShowDeferredSections] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let animationFrameId: number | null = null;
+
+    animationFrameId = requestAnimationFrame(() => {
+      timeoutId = setTimeout(() => {
+        setShowDeferredSections(true);
+      }, deferredSectionsDelayMs);
+    });
+
+    return () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   const contentContainerStyle = useMemo(
     () => ({
@@ -141,32 +172,36 @@ export default function WnaHomeRoute(): ReactNode {
             />
           </SectionCard>
 
-          <SectionCard appColors={appColors}>
-            <WnaExperienceCard
-              appColors={appColors}
-              appData={appData}
-              appStyle={appStyle}
-              t={t}
-              maxItems={4}
-              footerActionLabel={t(i18nKeys.actionShowMore)}
-              onFooterActionPress={handleExperiencePress}
-            />
-          </SectionCard>
+          {showDeferredSections ? (
+            <>
+              <SectionCard appColors={appColors}>
+                <WnaExperienceCard
+                  appColors={appColors}
+                  appData={appData}
+                  appStyle={appStyle}
+                  t={t}
+                  maxItems={4}
+                  footerActionLabel={t(i18nKeys.actionShowMore)}
+                  onFooterActionPress={handleExperiencePress}
+                />
+              </SectionCard>
 
-          <SectionCard appColors={appColors}>
-            <WnaProjectsCard
-              appColors={appColors}
-              appData={appData}
-              appStyle={appStyle}
-              t={t}
-              onProjectPress={handleProjectPress}
-              onShowMorePress={handleProjectsPress}
-            />
-          </SectionCard>
+              <SectionCard appColors={appColors}>
+                <WnaProjectsCard
+                  appColors={appColors}
+                  appData={appData}
+                  appStyle={appStyle}
+                  t={t}
+                  onProjectPress={handleProjectPress}
+                  onShowMorePress={handleProjectsPress}
+                />
+              </SectionCard>
 
-          <View style={styles.content}>
-            <WnaContactFooter showTopSpacing={false} />
-          </View>
+              <View style={styles.content}>
+                <WnaContactFooter showTopSpacing={false} />
+              </View>
+            </>
+          ) : null}
         </View>
       </Animated.ScrollView>
     </WnaBaseScreen>
