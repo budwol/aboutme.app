@@ -29,11 +29,19 @@ jobs:
       - name: e2e
         id: e2e
         continue-on-error: true
-        run: npm run test:e2e
+        run: |
+          set -o pipefail
+          npm run test:e2e 2>&1 | tee e2e-output.log
 
       - name: print playwright failure context
         if: steps.e2e.outcome == 'failure'
         run: |
+          if [ -f e2e-output.log ]; then
+            echo "::group::e2e-output tail"
+            tail -n 200 e2e-output.log
+            echo "::endgroup::"
+          fi
+
           if [ -d test-results ]; then
             echo "::group::test-results files"
             find test-results -maxdepth 3 -type f | sort
@@ -54,6 +62,7 @@ jobs:
         with:
           name: playwright-artifacts
           path: |
+            e2e-output.log
             playwright-report
             test-results
           if-no-files-found: ignore
