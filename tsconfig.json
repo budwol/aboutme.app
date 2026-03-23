@@ -13,7 +13,6 @@
       "@components/*": ["src/components/*"],
       "@constants/*": ["src/constants/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@services/*": ["src/services/*"],
       "@utils/*": ["src/utils/*"],
       "@secrets/*": ["secrets/*"],
       "wna-logger": ["src/utils/logger.ts"]

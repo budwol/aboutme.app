@@ -290,7 +290,7 @@ describe("WnaProjectsRoute", () => {
     expect(pressables).toHaveLength(testAppData.projects.length);
   });
 
-  it("renders subtitle and context in the project overlay", () => {
+  it("renders subtitle and title in the project overlay", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -302,7 +302,6 @@ describe("WnaProjectsRoute", () => {
       item: {
         ...testAppData.projects[0],
         subtitle: "Android / Web App",
-        context: "Part of a cohesive fullstack system",
       },
       index: 0,
     }) as React.ReactElement;
@@ -320,10 +319,10 @@ describe("WnaProjectsRoute", () => {
       );
 
     expect(textValues).toContain("Android / Web App");
-    expect(textValues).toContain("Part of a cohesive fullstack system");
+    expect(textValues).toContain(testAppData.projects[0].title);
   });
 
-  it("allows longer landscape overlay titles and context to wrap across multiple lines", () => {
+  it("allows longer landscape overlay titles to wrap across multiple lines", () => {
     const appContext = jest.requireMock("@components/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
@@ -336,8 +335,6 @@ describe("WnaProjectsRoute", () => {
             ...testAppData.projects[0],
             title:
               "Event-Driven Backend for Tour Workflows with Extended Title",
-            context:
-              "Architecture, offline support, synchronization, and export workflows in one cohesive system.",
           },
           ...testAppData.projects.slice(1),
         ],
@@ -368,17 +365,6 @@ describe("WnaProjectsRoute", () => {
           node.props.children ===
           "Event-Driven Backend for Tour Workflows with Extended Title",
       );
-    const featuredContext = tree!.root
-      .findAllByType("Text")
-      .find(
-        (node: {
-          props: { children?: React.ReactNode; numberOfLines?: number };
-        }) =>
-          node.props.children ===
-          "Architecture, offline support, synchronization, and export workflows in one cohesive system.",
-      );
-
     expect(featuredTitle?.props.numberOfLines).toBe(3);
-    expect(featuredContext?.props.numberOfLines).toBe(4);
   });
 });
