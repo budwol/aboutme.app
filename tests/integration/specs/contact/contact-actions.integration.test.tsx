@@ -30,6 +30,12 @@ function ContactCardHost() {
   );
 }
 
+function getActionButtons(
+  tree: Awaited<ReturnType<typeof renderWithAppContext>>,
+) {
+  return tree.root.findAllByType("WnaButtonIcon");
+}
+
 jest.mock("react-i18next", () => ({
   initReactI18next: {
     type: "3rdParty",
@@ -40,15 +46,19 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
-jest.mock("wna-logger", () => ({
-   
-  __esModule: true,
-  default: {
-    error: require("@jest/globals").jest.fn(),
-    info: require("@jest/globals").jest.fn(),
-    warn: require("@jest/globals").jest.fn(),
-  },
-}));
+jest.mock("wna-logger", () => {
+  // This mock is hoisted, so it needs its own jest reference.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+  return {
+    __esModule: true,
+    default: {
+      error: jestModule.fn(),
+      info: jestModule.fn(),
+      warn: jestModule.fn(),
+    },
+  };
+});
 
 jest.mock("@components/buttons/WnaButtonIcon", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -79,7 +89,7 @@ describe("WnaContactCard action integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("logs unsupported links instead of opening them", async () => {
+  it("keeps unsupported links from opening and logs the reason", async () => {
     const appData = {
       ...testAppData,
       contact: {
@@ -92,7 +102,7 @@ describe("WnaContactCard action integration", () => {
     canOpenURL.mockResolvedValue(false);
 
     const tree = await renderWithAppContext(<ContactCardHost />, { appData });
-    const githubButton = tree.root.findAllByType("WnaButtonIcon")[0];
+    const [githubButton] = getActionButtons(tree);
 
     await act(async () => {
       await githubButton.props.onPress();
@@ -106,7 +116,7 @@ describe("WnaContactCard action integration", () => {
     );
   });
 
-  it("logs runtime errors while preserving the rendered action set", async () => {
+  it("keeps the action row intact when opening a link throws", async () => {
     const appData = {
       ...testAppData,
       contact: {
@@ -124,7 +134,7 @@ describe("WnaContactCard action integration", () => {
     openURL.mockRejectedValue(failure);
 
     const tree = await renderWithAppContext(<ContactCardHost />, { appData });
-    const buttons = tree.root.findAllByType("WnaButtonIcon");
+    const buttons = getActionButtons(tree);
 
     expect(buttons).toHaveLength(5);
 

@@ -11,6 +11,10 @@ export class ExperiencePage {
     this.page = page;
   }
 
+  private body() {
+    return this.page.locator("body");
+  }
+
   async navigateToPage() {
     await this.page.goto("/experience");
   }
@@ -21,39 +25,33 @@ export class ExperiencePage {
 
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/experience$/);
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.experience.title,
-    );
+    await expect(this.body()).toContainText(exampleAppData.experience.title);
   }
 
   async assertGermanIsOnPage() {
     await expect(this.page).toHaveURL(/\/taetigkeiten$/);
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.experience.title,
-    );
+    await expect(this.body()).toContainText(exampleAppDataDe.experience.title);
   }
 
   async assertContent() {
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.experience.subtitle,
-    );
+    await expect(this.body()).toContainText(exampleAppData.experience.subtitle);
 
     for (const item of exampleAppData.experience.items) {
-      await expect(this.page.locator("body")).toContainText(item.company);
-      await expect(this.page.locator("body")).toContainText(item.role);
-      await expect(this.page.locator("body")).toContainText(item.description);
+      await expect(this.body()).toContainText(item.company);
+      await expect(this.body()).toContainText(item.role);
+      await expect(this.body()).toContainText(item.description);
     }
   }
 
   async assertGermanContent() {
-    await expect(this.page.locator("body")).toContainText(
+    await expect(this.body()).toContainText(
       exampleAppDataDe.experience.subtitle,
     );
 
     for (const item of exampleAppDataDe.experience.items) {
-      await expect(this.page.locator("body")).toContainText(item.company);
-      await expect(this.page.locator("body")).toContainText(item.role);
-      await expect(this.page.locator("body")).toContainText(item.description);
+      await expect(this.body()).toContainText(item.company);
+      await expect(this.body()).toContainText(item.role);
+      await expect(this.body()).toContainText(item.description);
     }
   }
 }
