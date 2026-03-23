@@ -22,6 +22,14 @@ const exampleAppDataInput = {
     primary: ["PHP", "Basic"],
     secondary: ["Perl", "Java"],
   },
+  projectsContextDe:
+    "Private End-to-End-Projekte von Konzeption und Architektur bis Deployment und Betrieb.",
+  projectsContextEn:
+    "Private end-to-end projects from concept and architecture to deployment and operation.",
+  projectDetailsContextDe:
+    "Dieses Projekt ist Teil eines privaten End-to-End-Portfolios und zeigt Verantwortung über Konzeption, Architektur, Implementierung, Deployment und Betrieb hinweg.",
+  projectDetailsContextEn:
+    "This project is part of a private end-to-end portfolio and reflects responsibility across conception, architecture, implementation, deployment, and operation.",
   projectsHighlights: [
     {
       icon: "phone",
@@ -30,8 +38,8 @@ const exampleAppDataInput = {
     },
     {
       icon: "map-outline",
-      textDe: "Geodaten",
-      textEn: "Geospatial Data",
+      textDe: "Geoinformationen",
+      textEn: "Geo Data",
     },
   ],
   projectsSubtitleDe: "Einige private Nebenprojekte",
@@ -42,12 +50,16 @@ const exampleAppDataInput = {
       titleEn: "Pizza App",
       subtitleDe: "Bestell-App",
       subtitleEn: "Ordering App",
+      contextDe:
+        "Plattform für Bestellungen, Nutzerkonten und Bestellverwaltung.",
+      contextEn: "Platform for ordering, user accounts, and order management.",
       descriptionDe:
         "Mobile und Web-App zum Bestellen von Pizza mit gemeinsamer Codebasis.",
       descriptionEn:
         "Mobile and web app for ordering pizza with a shared codebase.",
       repoUrl: "https://github.com/JohnDoe/pizza-app",
       repoVisibility: "private",
+      webUrl: "https://pizza-app.example.com",
       techstack: ["Flutter", "Dart", "Firebase"],
       imageL: "default_project.webp",
       imageM: "default_project.webp",
@@ -58,6 +70,10 @@ const exampleAppDataInput = {
       titleEn: "API",
       subtitleDe: "Containerisierte Backend-API",
       subtitleEn: "Containerized Backend API",
+      contextDe:
+        "Backend für Authentifizierung, Datenhaltung und Bestellabläufe.",
+      contextEn:
+        "Backend for authentication, persistence, and order workflows.",
       descriptionDe:
         "REST-API für Authentifizierung, Produktdaten und Bestellprozesse.",
       descriptionEn:
@@ -74,6 +90,10 @@ const exampleAppDataInput = {
       titleEn: "E-Commerce Platform",
       subtitleDe: "Shop für Code-Snippets",
       subtitleEn: "Store for Code Snippets",
+      contextDe:
+        "Konzeptstudie für Verkauf, Bewertung und Verwaltung digitaler Produkte.",
+      contextEn:
+        "Concept study for selling, reviewing, and managing digital products.",
       descriptionDe:
         "Konzept für eine Plattform zum Kaufen, Verkaufen und Bewerten von Code-Snippets.",
       descriptionEn:
@@ -92,29 +112,45 @@ const exampleAppDataInput = {
     {
       periodDe: "seit 2020",
       periodEn: "since 2020",
+      duration: "5Y 0M",
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Cool Company Ltd.",
       descriptionDe: "Entwicklung und Weiterentwicklung digitaler Produkte.",
       descriptionEn: "Built and improved digital products.",
+      detailsDe: ["Verantwortung für Frontend, Backend und Deployment."],
+      detailsEn: ["Responsible for frontend, backend, and deployment."],
+      techstack: ["TypeScript", "React", "Docker"],
     },
     {
       periodDe: "2015 - 2020",
       periodEn: "2015 - 2020",
+      duration: "5Y 0M",
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Rocket Science Ltd.",
       descriptionDe: "Entwicklung von Anwendungen und Backend-Systemen.",
       descriptionEn: "Developed applications and backend systems.",
+      detailsDe: [
+        "Umsetzung neuer Features und Betreuung bestehender Systeme.",
+      ],
+      detailsEn: ["Implemented new features and maintained existing systems."],
+      techstack: ["C#", ".NET", "SQL"],
     },
     {
       periodDe: "2010 - 2015",
       periodEn: "2010 - 2015",
+      duration: "5Y 0M",
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Code Fabric Ltd.",
       descriptionDe: "Umsetzung von Features und Pflege bestehender Systeme.",
       descriptionEn: "Implemented features and maintained existing systems.",
+      detailsDe: ["Arbeit an internen Tools und webbasierten Fachanwendungen."],
+      detailsEn: [
+        "Worked on internal tools and web-based business applications.",
+      ],
+      techstack: ["PHP", "JavaScript", "MySQL"],
     },
   ],
   contact: {
