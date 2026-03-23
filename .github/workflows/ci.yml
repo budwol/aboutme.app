@@ -11,43 +11,21 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  checks:
-    runs-on: ubuntu-latest
+  lint_prettier:
+    uses: ./.github/workflows/ci-lint-prettier.yml
 
-    steps:
-      - name: check out repo
-        uses: actions/checkout@v4
+  unit:
+    needs: lint_prettier
+    uses: ./.github/workflows/ci-unit.yml
 
-      - name: set up node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.4
-          cache: npm
+  integration:
+    needs: unit
+    uses: ./.github/workflows/ci-integration.yml
 
-      - name: install deps
-        run: npm ci
+  smoke:
+    needs: integration
+    uses: ./.github/workflows/ci-smoke.yml
 
-      - name: install playwright chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: lint
-        run: npm run lint
-
-      - name: security checks
-        run: npm run test:security
-
-      - name: export smoke check
-        run: npm run test:smoke
-
-      - name: full test pass
-        run: npm run test:all
-
-      - name: upload playwright artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-artifacts
-          path: |
-            playwright-report
-            test-results
-          if-no-files-found: ignore
+  e2e:
+    needs: smoke
+    uses: ./.github/workflows/ci-e2e.yml
