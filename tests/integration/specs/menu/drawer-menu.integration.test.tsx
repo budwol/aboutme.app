@@ -1,8 +1,6 @@
-import { testAppData } from "@/app-data/testAppData";
 import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRouteProvider";
 import { appMotionConstants } from "@constants/motionConstants";
 import WnaDrawerMenu from "@/app/(drawer)/WnaDrawerMenu";
-import { toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import {
   afterEach,
   beforeEach,
@@ -19,6 +17,27 @@ import { renderWithAppContext } from "../../../helpers/renderWithAppContext";
 const mockPush = jest.fn();
 const mockSetOptions = jest.fn();
 const mockToggleWnaTheme = jest.fn(async (_params?: unknown) => undefined);
+
+type DrawerItemElement = React.ReactElement<{
+  text?: string;
+  isActive?: boolean;
+  onPress?: () => void;
+}>;
+
+function getRenderedDrawerItems(
+  tree: Awaited<ReturnType<typeof renderWithAppContext>>,
+) {
+  const navigationList = tree.root.findByType("WnaNavigationList");
+  const items = navigationList.props.items as unknown[];
+
+  return {
+    navigationList,
+    items,
+    renderedItems: items.map(
+      (item) => navigationList.props.renderItem(item) as DrawerItemElement,
+    ),
+  };
+}
 
 jest.mock("react-i18next", () => ({
   initReactI18next: {
@@ -142,14 +161,9 @@ describe("WnaDrawerMenu integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("renders drawer items from app data and marks the matching route as active", async () => {
+  it("shows the expected drawer entries and highlights the current route", async () => {
     const tree = await renderWithAppContext(<WnaDrawerMenu />);
-    const navigationList = tree.root.findByType("WnaNavigationList");
-    const items = navigationList.props.items;
-    const renderedItems = items.map(
-      (item: unknown) =>
-        navigationList.props.renderItem(item) as React.ReactElement,
-    );
+    const { navigationList, renderedItems } = getRenderedDrawerItems(tree);
 
     expect(mockSetOptions).toHaveBeenCalledWith({ animationEnabled: false });
     expect(navigationList.props.items).toHaveLength(5);
@@ -158,14 +172,10 @@ describe("WnaDrawerMenu integration", () => {
     expect(renderedItems[2].props.isActive).toBe(true);
   });
 
-  it("runs delayed navigation pushes and forwards footer actions", async () => {
+  it("forwards header, drawer, theme, and footer actions through the real seams", async () => {
     const tree = await renderWithAppContext(<WnaDrawerMenu />);
     const pressables = tree.root.findAllByType("WnaPressable");
-    const navigationList = tree.root.findByType("WnaNavigationList");
-    const drawerItems = navigationList.props.items.map(
-      (item: unknown) =>
-        navigationList.props.renderItem(item) as React.ReactElement,
-    );
+    const { renderedItems: drawerItems } = getRenderedDrawerItems(tree);
     const themeButton = tree.root.findByType("WnaButtonIconText");
     const footerLink = tree.root.find(
       (node: {
@@ -176,8 +186,8 @@ describe("WnaDrawerMenu integration", () => {
 
     await act(async () => {
       pressables[0].props.onPress();
-      drawerItems[0].props.onPress();
-      drawerItems[3].props.onPress();
+      drawerItems[0].props.onPress!();
+      drawerItems[3].props.onPress!();
       jest.advanceTimersByTime(appMotionConstants.navigationTransitionDelay);
     });
 
@@ -198,7 +208,6 @@ describe("WnaDrawerMenu integration", () => {
       await themeButton.props.onPress();
     });
 
-    expect(toggleWnaTheme).toBeDefined();
     expect(mockToggleWnaTheme).toHaveBeenCalledTimes(1);
 
     await act(async () => {
