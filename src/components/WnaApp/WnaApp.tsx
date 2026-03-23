@@ -92,6 +92,13 @@ export type AppComponentProps = PropsWithChildren<{
 }>;
 
 function renderToastCard(appColors: Colors, text1?: string, text2?: string) {
+  const toastShadowColor = appColors.isDark
+    ? convertHexToRgba(appColors.staticBlack, 0.24)
+    : convertHexToRgba(appColors.staticBlack, 0.12);
+  const accentShadowColor = appColors.isDark
+    ? convertHexToRgba(appColors.accent5, 0.28)
+    : convertHexToRgba(appColors.accent5, 0.18);
+
   return (
     <View
       style={{
@@ -108,11 +115,7 @@ function renderToastCard(appColors: Colors, text1?: string, text2?: string) {
           : convertHexToRgba(appColors.white, 0.98),
         paddingHorizontal: 18,
         paddingVertical: 16,
-        shadowColor: appColors.staticBlack,
-        shadowOpacity: appColors.isDark ? 0.24 : 0.12,
-        shadowRadius: 22,
-        shadowOffset: { width: 0, height: 12 },
-        elevation: 7,
+        boxShadow: `0px 12px 22px ${toastShadowColor}`,
         overflow: "hidden",
       }}
     >
@@ -138,10 +141,7 @@ function renderToastCard(appColors: Colors, text1?: string, text2?: string) {
               minHeight: 42,
               borderRadius: 999,
               backgroundColor: appColors.accent5,
-              shadowColor: appColors.accent5,
-              shadowOpacity: appColors.isDark ? 0.28 : 0.18,
-              shadowRadius: 8,
-              shadowOffset: { width: 0, height: 0 },
+              boxShadow: `0px 0px 8px ${accentShadowColor}`,
             }}
           />
         </View>
