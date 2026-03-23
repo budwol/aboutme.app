@@ -89,6 +89,18 @@ jest.mock("@components/buttons/WnaButtonIconText", () => {
   };
 });
 
+jest.mock("@components/buttons/WnaButtonIcon", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ReactModule = require("react");
+
+  return function MockButtonIcon(props: unknown) {
+    return ReactModule.createElement(
+      "WnaButtonIcon",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
 jest.mock("@components/sections/WnaTechStackCard", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
@@ -159,6 +171,7 @@ describe("WnaProjectDetailsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         staticWhite: "#ffffff",
+        staticCoolgray2: "#cccccc",
         staticCoolgray8: "#222222",
         coolgray2: "#cccccc",
         coolgray8: "#222222",
@@ -171,7 +184,10 @@ describe("WnaProjectDetailsRoute", () => {
         textNeutralMedium: {},
       },
     });
-    appContext.useWnaLayout.mockReturnValue({ currentWindowWidth: 1200 });
+    appContext.useWnaLayout.mockReturnValue({
+      currentWindowWidth: 1200,
+      isLandscape: true,
+    });
     appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
 
     const expoRouter = jest.requireMock("expo-router") as {
@@ -335,12 +351,18 @@ describe("WnaProjectDetailsRoute", () => {
     );
     const modalActions = tree!.root
       .findAllByType("WnaButtonIconText")
-      .slice(-3);
+      .slice(-2);
 
     expect(modal.props.visible).toBe(true);
     expect(textValues).toContain(i18nKeys.titlePrivateRepo);
-    expect(textValues).toContain(i18nKeys.infoPrivateRepoHint);
-    expect(textValues).toContain(i18nKeys.infoPrivateRepoBody);
+    expect(textValues).toContainEqual([
+      i18nKeys.infoPrivateRepoHint,
+      " ",
+      i18nKeys.infoPrivateRepoBody,
+    ]);
+    expect(modalActions).toHaveLength(2);
+    expect(modalActions[0].props.style).toMatchObject({ flexBasis: 208 });
+    expect(modalActions[1].props.style).toMatchObject({ flexBasis: 208 });
 
     await act(async () => {
       await modalActions[0].props.onPress();
@@ -372,6 +394,23 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(Linking.openURL).toHaveBeenCalledWith(appData.projects[0].repoUrl);
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const linksAfterSecondRerender =
+      tree!.root.findAllByType("WnaButtonIconText");
+
+    await act(async () => {
+      await linksAfterSecondRerender[0].props.onPress();
+    });
+
+    await act(async () => {
+      tree!.root.findByType("Modal").props.onRequestClose();
+    });
+
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
   });
 
   it("renders bullet lines in project descriptions as separate bullet rows", async () => {
@@ -414,5 +453,58 @@ describe("WnaProjectDetailsRoute", () => {
     expect(textValues).toContain("•");
     expect(textValues).toContain("Punkt eins");
     expect(textValues).toContain("Punkt zwei");
+  });
+
+  it("renders compact icon actions in portrait mode", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaLayout: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          repoVisibility: "public",
+          webUrl: "https://app.example.com",
+          playStoreUrl: "https://play.example.com",
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    appContext.useWnaLayout.mockReturnValue({
+      currentWindowWidth: 420,
+      isLandscape: false,
+    });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const iconButtons = tree!.root.findAllByType("WnaButtonIcon");
+    const textButtons = tree!.root.findAllByType("WnaButtonIconText");
+
+    expect(iconButtons).toHaveLength(3);
+    expect(
+      iconButtons.map(
+        (button: { props: { iconName?: string } }) => button.props.iconName,
+      ),
+    ).toEqual(["github", "web", "google-play"]);
+    expect(
+      iconButtons.map(
+        (button: { props: { toolTipPosition?: string } }) =>
+          button.props.toolTipPosition,
+      ),
+    ).toEqual(["top", "top", "top"]);
+    expect(textButtons).toHaveLength(0);
   });
 });
