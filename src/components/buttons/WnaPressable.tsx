@@ -14,6 +14,7 @@ export type WnaPressableState = Readonly<{
 export type WnaPressableProps = {
   children: ReactNode;
   onPress: () => void;
+  accessibilityLabel?: string;
   checkInternetConnection?: boolean;
   t?: TFunction<string[], undefined>;
   toolTip?: string;
@@ -92,6 +93,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
         )}
       <View style={[{ overflow: "hidden" }, props.style]}>
         <WnaBasePressable
+          accessibilityLabel={props.accessibilityLabel}
           ripple={props.ripple}
           baseStyle={props.baseStyle}
           onPress={onPress}

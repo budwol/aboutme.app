@@ -8,10 +8,15 @@ module.exports = {
     "^@components/(.*)$": "<rootDir>/src/components/$1",
     "^@constants/(.*)$": "<rootDir>/src/constants/$1",
     "^@hooks/(.*)$": "<rootDir>/src/hooks/$1",
-    "^@services/(.*)$": "<rootDir>/src/services/$1",
     "^@utils/(.*)$": "<rootDir>/src/utils/$1",
     "^@secrets/(.*)$": "<rootDir>/secrets/$1",
     "^wna-logger$": "<rootDir>/src/utils/logger.ts",
   },
-  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "/dist/",
+    "<rootDir>/tests/e2e/",
+    "/playwright-report/",
+    "/test-results/",
+  ],
 };

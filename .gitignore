@@ -10,6 +10,7 @@ docs/
 coverage/
 playwright-report/
 tests/playwright/results
+test-results/
 
 # Expo
 .expo/

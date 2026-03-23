@@ -38,6 +38,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 - Prettier
 - Husky (Git hooks)
 - Jest (jest-expo)
+- Playwright
 
 ## Setup
 
@@ -277,6 +278,8 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 
 ### Quality Checks
 
+Local Git hooks stop at unit level. Smoke and E2E stay out of the hooks and are meant to run in CI or manually when needed.
+
 - `npm run lint`
 - `npm run test:deps`
 - `npm run test:dry-run`
@@ -286,17 +289,28 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 - `npm run test:types`
 - `npm run test:prettier`
 - `npm run test:all`
+- `npm run test:e2e`
+- `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
-There is also a tiny GitHub Actions CI now. It runs `lint`, `test:security`, `test:smoke`, and `test:all` on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
+The Git hook path is intentionally smaller:
 
-If you want the full cleanup pass:
+- `npx lint-staged`
+- `npm run lint`
+- `npm run test:types`
+- `npm run test:unit`
+
+There is also a tiny GitHub Actions CI now. It runs the broader quality gate, including `test:smoke` and `test:e2e`, on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
+
+If you want the full local CI pass:
 
 ```bash
-npm run cleanup
+npm run ci:local
 ```
 
-`cleanup` recreates `package-lock.json`, runs `expo-doctor`, Prettier, TypeScript, and ESLint fixes. It may need network access locally. Basically the repo gets a bath, a haircut, and a gentle little whisper that says, "let's put one more tree right here."
+`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, TypeScript, ESLint fixes, security checks, unit tests, and E2Es. It is a local full-gate, not a tiny cleanup helper.
+
+The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 
 ## License
 

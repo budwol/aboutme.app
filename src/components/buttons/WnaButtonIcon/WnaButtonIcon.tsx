@@ -16,6 +16,7 @@ export type WnaButtonIconProps = WnaButtonThemeProps &
   Pick<WnaButtonActionProps, "checkInternetConnection" | "t"> & {
     iconName?: keyof typeof iconMap;
     toolTip?: string;
+    accessibilityLabel?: string;
     color?: string;
     style?: object;
     toolTipPosition?: "top" | "right" | "bottom" | "left" | undefined;
@@ -28,6 +29,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
   onPress,
   t,
   toolTip,
+  accessibilityLabel,
   color,
   style,
   toolTipPosition,
@@ -36,6 +38,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
     <WnaPressable
       ripple={"light"}
       toolTip={toolTip}
+      accessibilityLabel={accessibilityLabel ?? toolTip}
       toolTipPosition={toolTipPosition}
       style={createRoundIconButtonStyle(appColors)}
       t={t}

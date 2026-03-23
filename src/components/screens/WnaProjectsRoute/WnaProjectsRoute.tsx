@@ -405,6 +405,7 @@ export default function WnaProjectsRoute(): ReactNode {
         <WnaPressable
           ripple={appColors.isDark ? "light" : "dark"}
           checkInternetConnection={false}
+          accessibilityLabel={`Open project ${item.title}`}
           t={t}
           onPress={() =>
             navigationRouter.push(
@@ -483,24 +484,6 @@ export default function WnaProjectsRoute(): ReactNode {
                 >
                   {item.title}
                 </Text>
-
-                {item.context ? (
-                  <Text
-                    style={[
-                      appStyle.textSmall,
-                      styles.projectContext,
-                      featured && styles.projectContextFeatured,
-                      {
-                        color: convertHexToRgba(appColors.staticWhite, 0.9),
-                        fontStyle:
-                          landscapeVariant && !featured ? "italic" : "normal",
-                      },
-                    ]}
-                    numberOfLines={featured ? 4 : 3}
-                  >
-                    {item.context}
-                  </Text>
-                ) : null}
               </View>
             </View>
           </View>

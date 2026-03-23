@@ -27,6 +27,9 @@ jobs:
       - name: install deps
         run: npm ci
 
+      - name: install playwright chromium
+        run: npx playwright install --with-deps chromium
+
       - name: lint
         run: npm run lint
 
@@ -38,3 +41,13 @@ jobs:
 
       - name: full test pass
         run: npm run test:all
+
+      - name: upload playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
