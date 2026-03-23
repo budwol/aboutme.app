@@ -4,7 +4,7 @@ import { useDrawerStatus } from "@react-navigation/drawer";
 import { Href, router, useNavigation, useSegments } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-import WnaDrawerNavigationItem from "@/components/navigation/WnaDrawerNavigationItem";
+import WnaDrawerNavigationItem from "@/navigation/components/WnaDrawerNavigationItem";
 import {
   useWnaAppData,
   useWnaLayout,
@@ -15,19 +15,20 @@ import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
 import currentAppVersion from "@components/currentAppVersion";
 import WnaNavigationList, {
   WnaMenuItem,
-} from "@components/navigation/WnaNavigationList";
+} from "@/navigation/components/WnaNavigationList";
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
-import { useWnaNavigationTransition } from "@components/navigation/useWnaNavigationTransition";
-import { getDrawerNavigationPath } from "@components/navigation/wnaNavigationRouteProvider";
+import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
+import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRouteProvider";
 import { appLayoutConstants } from "@constants/layoutConstants";
-import { getLangCode } from "@services/i18n/i18n";
-import { i18nKeys } from "@services/i18n/i18nKeys";
+import { navigationLayoutConstants } from "@constants/navigationLayoutConstants";
+import { getLangCode } from "@/i18n/i18n";
+import { i18nKeys } from "@/i18n/i18nKeys";
 import WnaImage from "@components/images/WnaImage";
-import { getNavigationLang } from "@components/navigation/wnaNavigationRoutes";
+import { getNavigationLang } from "@/navigation/routes/wnaNavigationRoutes";
 import { useColorScheme } from "react-native";
 
-const logoSize = 64;
-const headerHeight = 212;
+const logoSize = navigationLayoutConstants.drawerLogoSize;
+const headerHeight = navigationLayoutConstants.drawerHeaderHeight;
 
 export default function WnaDrawerMenu() {
   const status = useDrawerStatus();
