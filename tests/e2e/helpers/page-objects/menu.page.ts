@@ -8,36 +8,26 @@ export class MenuPage {
     this.page = page;
   }
 
+  private body() {
+    return this.page.locator("body");
+  }
+
   async navigateToPage() {
     await this.page.goto("/menu");
   }
 
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/menu$/);
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.title,
-    );
+    await expect(this.body()).toContainText(exampleAppData.menu.title);
   }
 
   async assertContent() {
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.theme,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.legal,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.disclaimer,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.privacy,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.terms,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.menu.licenses,
-    );
+    await expect(this.body()).toContainText(exampleAppData.menu.theme);
+    await expect(this.body()).toContainText(exampleAppData.menu.legal);
+    await expect(this.body()).toContainText(exampleAppData.menu.disclaimer);
+    await expect(this.body()).toContainText(exampleAppData.menu.privacy);
+    await expect(this.body()).toContainText(exampleAppData.menu.terms);
+    await expect(this.body()).toContainText(exampleAppData.menu.licenses);
   }
 
   async openDisclaimerPage() {

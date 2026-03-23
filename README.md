@@ -283,15 +283,16 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 
 ### Quality Checks
 
-Local Git hooks stop at unit level. Smoke and E2E stay out of the hooks and are meant to run in CI or manually when needed.
+Local Git hooks stop at unit level. Integration, dry-run, smoke, and E2E stay out of the hooks and are meant to run in CI or manually when needed.
 
 The quality gates are meant to run in this order:
 
 1. `lint + prettier + types`
 2. `unit`
 3. `integration`
-4. `smoke`
-5. `e2e`
+4. `dry-run`
+5. `smoke`
+6. `e2e`
 
 - `npm run lint`
 - `npm run test:deps`
@@ -321,8 +322,9 @@ There is also a small GitHub Actions CI now. It runs the same gate sequence as s
 flowchart LR
   A["lint + prettier + types"] --> B["unit"]
   B --> C["integration"]
-  C --> D["smoke"]
-  D --> E["e2e"]
+  C --> D["dry-run"]
+  D --> E["smoke"]
+  E --> F["e2e"]
 ```
 
 The orchestration lives in [`.github/workflows/ci.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci.yml). Each gate sits in its own reusable workflow file:
@@ -330,6 +332,7 @@ The orchestration lives in [`.github/workflows/ci.yml`](/home/wna/code/AboutMe.A
 - [`.github/workflows/ci-lint-prettier.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-lint-prettier.yml)
 - [`.github/workflows/ci-unit.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-unit.yml)
 - [`.github/workflows/ci-integration.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-integration.yml)
+- [`.github/workflows/ci-dry-run.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-dry-run.yml)
 - [`.github/workflows/ci-smoke.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-smoke.yml)
 - [`.github/workflows/ci-e2e.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-e2e.yml)
 

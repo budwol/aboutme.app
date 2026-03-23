@@ -14,7 +14,7 @@ import {
   jest,
 } from "@jest/globals";
 import React from "react";
-import TestRenderer, { act } from "react-test-renderer";
+import { act } from "react-test-renderer";
 import { mockDimensions } from "../../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../../helpers/renderWithAppContext";
 
@@ -220,7 +220,7 @@ describe("WnaHomeRoute integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("wires seeded app data into the deferred home sections", async () => {
+  it("starts with the profile card and fills in the deferred sections afterwards", async () => {
     const tree = await renderWithAppContext(<WnaHomeRoute />);
 
     expect(
@@ -243,7 +243,7 @@ describe("WnaHomeRoute integration", () => {
     expect(tree.root.findByType("WnaContactFooter")).toBeTruthy();
   });
 
-  it("routes the deferred home actions to the localized targets", async () => {
+  it("forwards the deferred section actions to the localized targets", async () => {
     const tree = await renderWithAppContext(<WnaHomeRoute />);
 
     await act(async () => {
@@ -274,7 +274,7 @@ describe("WnaHomeRoute integration", () => {
     );
   });
 
-  it("routes a secondary project selection to the matching localized project path", async () => {
+  it("keeps secondary project selections on the correct localized route", async () => {
     const tree = await renderWithAppContext(<WnaHomeRoute />);
 
     await act(async () => {
@@ -293,7 +293,7 @@ describe("WnaHomeRoute integration", () => {
     );
   });
 
-  it("still mounts deferred sections when experience and projects are empty", async () => {
+  it("still renders the deferred section shells when experience and projects are empty", async () => {
     const tree = await renderWithAppContext(<WnaHomeRoute />, {
       appData: {
         ...testAppData,

@@ -214,7 +214,7 @@ describe("WnaProjectsRoute integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("renders project context and navigates to the selected project", async () => {
+  it("renders the intro copy and opens the selected project", async () => {
     const tree = await renderWithAppContext(<WnaProjectsRoute />);
 
     const textValues = tree.root
@@ -240,7 +240,7 @@ describe("WnaProjectsRoute integration", () => {
     );
   });
 
-  it("navigates to a secondary project card with the correct localized slug", async () => {
+  it("keeps secondary project cards on the correct localized slug", async () => {
     const tree = await renderWithAppContext(<WnaProjectsRoute />);
     const projectPressables = tree.root.findAllByType("WnaPressable");
 
@@ -254,7 +254,7 @@ describe("WnaProjectsRoute integration", () => {
     );
   });
 
-  it("renders projects without optional intro copy and highlights", async () => {
+  it("stays stable when optional intro copy and highlights are missing", async () => {
     const tree = await renderWithAppContext(<WnaProjectsRoute />, {
       appData: {
         ...testAppData,

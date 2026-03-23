@@ -18,6 +18,30 @@ import { renderWithAppContext } from "../../../helpers/renderWithAppContext";
 const mockOpenURL = jest.fn();
 const mockUseLocalSearchParams = jest.fn();
 
+function createProjectDetailsAppData(
+  project: (typeof testAppData.projects)[number],
+) {
+  return {
+    ...testAppData,
+    projects: [project],
+  };
+}
+
+function getTextActions(
+  tree: Awaited<ReturnType<typeof renderWithAppContext>>,
+) {
+  return tree.root.findAllByType("WnaButtonIconText");
+}
+
+function findActionByText(
+  tree: Awaited<ReturnType<typeof renderWithAppContext>>,
+  text: string,
+) {
+  return getTextActions(tree).find(
+    (node: { props: { text?: string } }) => node.props.text === text,
+  );
+}
+
 jest.mock("react-i18next", () => ({
   initReactI18next: {
     type: "3rdParty",
@@ -193,7 +217,7 @@ describe("WnaProjectDetailsRoute action integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("opens public project links directly in landscape mode", async () => {
+  it("opens the public landscape actions directly", async () => {
     const project = {
       ...testAppData.projects[0],
       repoVisibility: "public" as const,
@@ -206,13 +230,10 @@ describe("WnaProjectDetailsRoute action integration", () => {
     });
 
     const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: {
-        ...testAppData,
-        projects: [project],
-      },
+      appData: createProjectDetailsAppData(project),
     });
 
-    const actions = tree.root.findAllByType("WnaButtonIconText");
+    const actions = getTextActions(tree);
 
     await act(async () => {
       await actions[0].props.onPress();
@@ -225,7 +246,7 @@ describe("WnaProjectDetailsRoute action integration", () => {
     expect(mockOpenURL).toHaveBeenNthCalledWith(3, project.playStoreUrl);
   });
 
-  it("routes private repository modal actions to email and continue links", async () => {
+  it("opens the private repo modal and forwards both modal actions", async () => {
     const project = {
       ...testAppData.projects[0],
       repoVisibility: "private" as const,
@@ -236,13 +257,10 @@ describe("WnaProjectDetailsRoute action integration", () => {
     });
 
     const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: {
-        ...testAppData,
-        projects: [project],
-      },
+      appData: createProjectDetailsAppData(project),
     });
 
-    const githubAction = tree.root.findAllByType("WnaButtonIconText")[0];
+    const [githubAction] = getTextActions(tree);
 
     await act(async () => {
       await githubAction.props.onPress();
@@ -250,14 +268,7 @@ describe("WnaProjectDetailsRoute action integration", () => {
 
     expect(tree.root.findByType("Modal").props.visible).toBe(true);
 
-    const modalButtons = tree.root.findAllByType("WnaButtonIconText");
-    const emailButton = modalButtons.find(
-      (node: { props: { text?: string } }) => node.props.text === "actionEmail",
-    );
-    const continueButton = modalButtons.find(
-      (node: { props: { text?: string } }) =>
-        node.props.text === "actionContinueToPage",
-    );
+    const emailButton = findActionByText(tree, "actionEmail");
 
     await act(async () => {
       await emailButton?.props.onPress();
@@ -271,10 +282,9 @@ describe("WnaProjectDetailsRoute action integration", () => {
       await githubAction.props.onPress();
     });
 
-    const reopenedModalButtons = tree.root.findAllByType("WnaButtonIconText");
-    const reopenedContinueButton = reopenedModalButtons.find(
-      (node: { props: { text?: string } }) =>
-        node.props.text === "actionContinueToPage",
+    const reopenedContinueButton = findActionByText(
+      tree,
+      "actionContinueToPage",
     );
 
     await act(async () => {

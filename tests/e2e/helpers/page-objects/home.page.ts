@@ -11,6 +11,10 @@ export class HomePage {
     this.page = page;
   }
 
+  private body() {
+    return this.page.locator("body");
+  }
+
   async navigateToPage() {
     await this.page.goto("/");
   }
@@ -29,11 +33,11 @@ export class HomePage {
     await expect(this.page.getByText("Portfolio").first()).toBeVisible();
   }
 
-  introName(): Locator {
+  private introName(): Locator {
     return this.page.getByText(exampleAppData.profile.name).first();
   }
 
-  introTitle(): Locator {
+  private introTitle(): Locator {
     return this.page.getByText(exampleAppData.profile.title).first();
   }
 
@@ -79,11 +83,11 @@ export class HomePage {
     await expect(this.page.getByText("Secondary Techstack")).toBeVisible();
 
     for (const item of exampleAppData.profile.primaryTechStack) {
-      await expect(this.page.locator("body")).toContainText(item);
+      await expect(this.body()).toContainText(item);
     }
 
     for (const item of exampleAppData.profile.secondaryTechStack) {
-      await expect(this.page.locator("body")).toContainText(item);
+      await expect(this.body()).toContainText(item);
     }
   }
 
@@ -186,20 +190,10 @@ export class HomePage {
   }
 
   async assertGermanContent() {
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.profile.name,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.profile.title,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.experience.title,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.projects.title,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.contact.title,
-    );
+    await expect(this.body()).toContainText(exampleAppDataDe.profile.name);
+    await expect(this.body()).toContainText(exampleAppDataDe.profile.title);
+    await expect(this.body()).toContainText(exampleAppDataDe.experience.title);
+    await expect(this.body()).toContainText(exampleAppDataDe.projects.title);
+    await expect(this.body()).toContainText(exampleAppDataDe.contact.title);
   }
 }

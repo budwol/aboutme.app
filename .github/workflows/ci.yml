@@ -22,8 +22,12 @@ jobs:
     needs: unit
     uses: ./.github/workflows/ci-integration.yml
 
-  smoke:
+  dry_run:
     needs: integration
+    uses: ./.github/workflows/ci-dry-run.yml
+
+  smoke:
+    needs: dry_run
     uses: ./.github/workflows/ci-smoke.yml
 
   e2e:

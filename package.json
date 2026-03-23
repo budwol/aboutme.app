@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "clean-install": "rm -rf node_modules && rm package-lock.json && npm install",
-    "ci:local": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && npm prune && HUSKY=0 npm i --package-lock-only && ./node_modules/.bin/expo-doctor && npm run fix:prettier && npm run lint-fix && npm run test:security && npm run test:all && node ./scripts/sync-web-app-data.cjs && echo ci:local done.",
+    "ci:local": "[ ! -e ./package-lock.json ] || rm ./package-lock.json && rm -rf dist web-build .expo .expo/web .cache && npm prune && HUSKY=0 npm i --package-lock-only && ./node_modules/.bin/expo-doctor && npm run test:prettier && npm run lint && npm run test:types && npm run test:unit && npm run test:integration && npm run test:dry-run && npm run test:smoke && npm run test:e2e && node ./scripts/sync-web-app-data.cjs && echo ci:local done.",
     "deploy:container": "./scripts/deploy-container.sh",
     "deploy:local": "./scripts/deploy-local.sh",
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
@@ -35,6 +35,9 @@
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
       "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
     ]
   },
   "dependencies": {

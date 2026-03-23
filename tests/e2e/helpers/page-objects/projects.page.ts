@@ -11,6 +11,14 @@ export class ProjectsPage {
     this.page = page;
   }
 
+  private body() {
+    return this.page.locator("body");
+  }
+
+  private projectButton(title: string) {
+    return this.page.getByLabel(`Open project ${title}`).last();
+  }
+
   async navigateToPage() {
     await this.page.goto("/projects");
   }
@@ -21,78 +29,58 @@ export class ProjectsPage {
 
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/projects$/);
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.projects.title,
-    );
+    await expect(this.body()).toContainText(exampleAppData.projects.title);
   }
 
   async assertGermanIsOnPage() {
     await expect(this.page).toHaveURL(/\/projekte$/);
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.projects.title,
-    );
-    await expect(this.page.locator("body")).toContainText(
+    await expect(this.body()).toContainText(exampleAppDataDe.projects.title);
+    await expect(this.body()).toContainText(
       exampleAppDataDe.projects.highlights[0],
     );
   }
 
   async assertContent() {
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.projects.subtitle,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppData.projects.context,
-    );
+    await expect(this.body()).toContainText(exampleAppData.projects.subtitle);
+    await expect(this.body()).toContainText(exampleAppData.projects.context);
 
     for (const item of exampleAppData.projects.highlights) {
-      await expect(this.page.locator("body")).toContainText(item);
+      await expect(this.body()).toContainText(item);
     }
 
     for (const item of exampleAppData.projects.items) {
-      await expect(this.page.locator("body")).toContainText(item.title);
-      await expect(this.page.locator("body")).toContainText(item.subtitle);
+      await expect(this.body()).toContainText(item.title);
+      await expect(this.body()).toContainText(item.subtitle);
     }
   }
 
   async assertGermanContent() {
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.projects.subtitle,
-    );
-    await expect(this.page.locator("body")).toContainText(
-      exampleAppDataDe.projects.context,
-    );
+    await expect(this.body()).toContainText(exampleAppDataDe.projects.subtitle);
+    await expect(this.body()).toContainText(exampleAppDataDe.projects.context);
 
     for (const item of exampleAppDataDe.projects.highlights) {
-      await expect(this.page.locator("body")).toContainText(item);
+      await expect(this.body()).toContainText(item);
     }
 
     for (const item of exampleAppDataDe.projects.items) {
-      await expect(this.page.locator("body")).toContainText(item.title);
-      await expect(this.page.locator("body")).toContainText(item.subtitle);
+      await expect(this.body()).toContainText(item.title);
+      await expect(this.body()).toContainText(item.subtitle);
     }
   }
 
   async assertMobileContent() {
-    await expect(this.page.locator("body")).toContainText("Mobile First");
-    await expect(this.page.locator("body")).toContainText("Geo Data");
-    await expect(this.page.locator("body")).toContainText(
+    await expect(this.body()).toContainText("Mobile First");
+    await expect(this.body()).toContainText("Geo Data");
+    await expect(this.body()).toContainText(
       exampleAppData.projects.items[0].title,
     );
   }
 
   async openFirstProject() {
-    const firstProject = this.page.getByLabel(
-      `Open project ${exampleAppData.projects.items[0].title}`,
-    );
-
-    await firstProject.last().click();
+    await this.projectButton(exampleAppData.projects.items[0].title).click();
   }
 
   async openSecondProject() {
-    const secondProject = this.page.getByLabel(
-      `Open project ${exampleAppData.projects.items[1].title}`,
-    );
-
-    await secondProject.last().click();
+    await this.projectButton(exampleAppData.projects.items[1].title).click();
   }
 }

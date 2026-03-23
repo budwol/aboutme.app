@@ -18,6 +18,21 @@ import { renderWithAppContext } from "../../../helpers/renderWithAppContext";
 const mockOpenURL = jest.fn();
 const mockUseLocalSearchParams = jest.fn();
 
+function createProjectDetailsAppData(
+  project: (typeof testAppData.projects)[number],
+) {
+  return {
+    ...testAppData,
+    projects: [project],
+  };
+}
+
+function getIconActions(
+  tree: Awaited<ReturnType<typeof renderWithAppContext>>,
+) {
+  return tree.root.findAllByType("WnaButtonIcon");
+}
+
 jest.mock("react-i18next", () => ({
   initReactI18next: {
     type: "3rdParty",
@@ -193,7 +208,7 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
     jest.restoreAllMocks();
   });
 
-  it("renders icon actions in portrait mode and opens public links directly", async () => {
+  it("shows icon actions in portrait mode and opens public links directly", async () => {
     const project = {
       ...testAppData.projects[0],
       repoVisibility: "public" as const,
@@ -206,13 +221,10 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
     });
 
     const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: {
-        ...testAppData,
-        projects: [project],
-      },
+      appData: createProjectDetailsAppData(project),
     });
 
-    const iconActions = tree.root.findAllByType("WnaButtonIcon");
+    const iconActions = getIconActions(tree);
 
     expect(iconActions).toHaveLength(3);
 
@@ -239,13 +251,10 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
     });
 
     const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: {
-        ...testAppData,
-        projects: [project],
-      },
+      appData: createProjectDetailsAppData(project),
     });
 
-    const iconActions = tree.root.findAllByType("WnaButtonIcon");
+    const iconActions = getIconActions(tree);
 
     await act(async () => {
       await iconActions[0].props.onPress();
