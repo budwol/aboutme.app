@@ -1,5 +1,5 @@
 import { WnaImageElementProps } from "@components/images/WnaImageElement/WnaImageElementTypes";
-import { animationSpeed } from "@constants/animationSpeed";
+import { appMotionConstants } from "@constants/motionConstants";
 import { Image } from "expo-image";
 import { memo } from "react";
 import { ImageStyle as ReactNativeImageStyle } from "react-native";
@@ -17,7 +17,10 @@ function WnaImageElement(props: WnaImageElementProps) {
       accessibilityLabel={props.altText}
       cachePolicy="memory-disk"
       source={source}
-      transition={props.overwriteAnimationSpeed ?? animationSpeed}
+      transition={
+        props.overwriteAnimationSpeed ??
+        appMotionConstants.defaultAnimationDuration
+      }
       contentFit={props.contentFit ?? "cover"}
       priority={props.priority}
       responsivePolicy={props.responsivePolicy}

@@ -3,7 +3,7 @@ import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
 import { ImageStyle } from "expo-image";
 import React, { ReactNode, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { WnaBlurView } from "../misc/WnaBlurView";
+import { WnaBlurView } from "../effects/WnaBlurView";
 
 export type WnaImageBackgroundProps = {
   imageUri?: string;

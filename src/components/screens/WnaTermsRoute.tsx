@@ -1,4 +1,4 @@
-import { i18nKeys } from "@services/i18n/i18nKeys";
+import { i18nKeys } from "@/i18n/i18nKeys";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getTermsHtmlContent } from "./legalContent";

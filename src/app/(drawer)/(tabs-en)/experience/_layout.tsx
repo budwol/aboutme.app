@@ -1,1 +1,1 @@
-export { default } from "@components/navigation/WnaStackLayout";
+export { default } from "@/navigation/components/WnaStackLayout";
