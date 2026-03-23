@@ -1,6 +1,17 @@
-import { defineConfig, devices } from "@playwright/test";
+import {
+  defineConfig,
+  devices,
+  type ReporterDescription,
+} from "@playwright/test";
 
 const port = 3000;
+const reporter: "list" | ReporterDescription[] = process.env.CI
+  ? ([
+      ["github"],
+      ["list"],
+      ["html", { open: "never" }],
+    ] satisfies ReporterDescription[])
+  : "list";
 
 export default defineConfig({
   testDir: "./tests/e2e/specs",
@@ -9,7 +20,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: "list",
+  reporter,
   expect: {
     timeout: 15000,
   },
