@@ -2,7 +2,7 @@ import { convertHexToRgba } from "@/utils/colorConverter";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { actionButtonRightConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
-import AppStyle from "@services/wnaStyleService";
+import AppStyle from "@/theme/appStyle";
 import { FC, memo } from "react";
 import { View, ViewStyle } from "react-native";
 import WnaIcon from "../icon/WnaIcon/WnaIcon";

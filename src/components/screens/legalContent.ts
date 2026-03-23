@@ -1,5 +1,5 @@
 import { AppData } from "@/app-data";
-import { getLangCode } from "@services/i18n/i18n";
+import { getLangCode } from "@/i18n/i18n";
 import { escapeHtml } from "@utils/htmlSanitizer";
 
 type SupportedLang = "de" | "en";

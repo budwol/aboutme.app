@@ -1,7 +1,7 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
-import AppStyle from "@services/wnaStyleService";
-import { i18nKeys } from "@services/i18n/i18nKeys";
+import AppStyle from "@/theme/appStyle";
+import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { LinearGradient } from "expo-linear-gradient";
 import { TFunction } from "i18next";

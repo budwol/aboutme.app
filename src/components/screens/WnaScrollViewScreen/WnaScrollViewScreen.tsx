@@ -1,0 +1,113 @@
+import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
+import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
+import { getNavigationBaseUrl } from "@/navigation/routes/wnaNavigationRouteProvider";
+import WnaBaseScreen from "@components/screens/WnaBaseScreen";
+import WnaContactFooter from "@components/screens/WnaContactFooter";
+import { useWnaScrollY } from "@components/screens/useWnaScrollY";
+import WnaShareActions from "@components/sections/WnaShareActions";
+import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
+import { Href } from "expo-router";
+import { i18nKeys } from "@/i18n/i18nKeys";
+import Animated from "react-native-reanimated";
+import { FC, memo, ReactNode, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
+
+export type WnaScrollViewScreenProps = {
+  children?: ReactNode;
+  isBusy?: boolean;
+  isBusyText?: string | null;
+  backgroundImageUrl?: string;
+  onCancel?: () => void;
+  backHref?: Href;
+  titleHref?: Href;
+  preventBack?: boolean;
+  askBeforeBack?: boolean;
+  headerTitle?: string;
+  iconName?: keyof typeof iconMap;
+  headerButton0?: ReactNode;
+  headerButton1?: ReactNode;
+  headerButton2?: ReactNode;
+  isRootPage?: boolean;
+  showFooter?: boolean;
+  showContactFooter?: boolean;
+  showHeaderShadow?: boolean;
+  showAppStoreButtons?: boolean;
+};
+
+type WnaScrollViewFooterProps = {
+  title: string;
+  url: string;
+};
+
+const WnaScrollViewFooter = memo(({ title, url }: WnaScrollViewFooterProps) => {
+  return (
+    <>
+      <WnaSeparatorHorizontal transparent space={16} />
+      <WnaShareActions url={url} title={title} />
+    </>
+  );
+});
+
+WnaScrollViewFooter.displayName = "WnaScrollViewFooter";
+
+const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
+  children,
+  headerTitle,
+  iconName,
+  backHref,
+  titleHref,
+  headerButton0,
+  headerButton1,
+  headerButton2,
+  isRootPage,
+  showFooter,
+  showContactFooter = true,
+  showAppStoreButtons,
+}) => {
+  const { appStyle } = useWnaTheme();
+  const { appLayout } = useWnaLayout();
+  const { t } = useTranslation(["common"]);
+  const { scrollY, onScroll } = useWnaScrollY();
+  const footerTitle = t(i18nKeys.appBrand);
+  const shareUrl = getNavigationBaseUrl();
+
+  const contentContainerStyle = useMemo(
+    () => ({
+      paddingTop: appLayout.contentListPaddingTop,
+      paddingBottom: appLayout.contentPaddingBottom,
+    }),
+    [appLayout.contentListPaddingTop, appLayout.contentPaddingBottom],
+  );
+
+  return (
+    <WnaBaseScreen
+      isRootPage={isRootPage}
+      headerTitle={headerTitle}
+      icon={iconName}
+      backHref={backHref}
+      titleHref={titleHref}
+      scrollY={scrollY}
+      headerButton0={headerButton0}
+      headerButton1={headerButton1}
+      headerButton2={headerButton2}
+      showAppStoreButtons={showAppStoreButtons}
+    >
+      <Animated.ScrollView
+        contentContainerStyle={contentContainerStyle}
+        scrollEventThrottle={appLayout.scrollEventThrottle}
+        onScroll={onScroll}
+      >
+        <View style={appStyle.containerCenterMaxWidth}>
+          {children}
+          {showFooter && (
+            <WnaScrollViewFooter title={footerTitle} url={shareUrl} />
+          )}
+          {showContactFooter && <WnaContactFooter />}
+        </View>
+      </Animated.ScrollView>
+    </WnaBaseScreen>
+  );
+};
+
+export default WnaScrollViewScreen;

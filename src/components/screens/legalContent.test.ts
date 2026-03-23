@@ -5,7 +5,7 @@ import {
   getLicensesHtmlContent,
   getTermsHtmlContent,
 } from "@components/screens/legalContent";
-import { testAppData } from "@/test/testAppData";
+import { testAppData } from "@/app-data/testAppData";
 
 describe("legalContent", () => {
   it("injects app data into disclaimer and privacy html", () => {

@@ -1,8 +1,5 @@
 import { WnaResponsiveImageSource } from "@components/images/WnaImage";
-
-const avatarResponsiveSize = 300;
-const avatarResponsiveViewportWidth = 1200;
-const avatarOriginalSize = 1024;
+import { imageConstants } from "@constants/imageConstants";
 
 function trimLeadingSlashes(value: string): string {
   return value.replace(/^\/+/, "");
@@ -23,18 +20,18 @@ export function getAvatarImageSources(
     return [];
   }
 
-  const avatarVariantFileName = `${withoutExtension(normalizedFileName)}_${avatarResponsiveSize}.webp`;
+  const avatarVariantFileName = `${withoutExtension(normalizedFileName)}_${imageConstants.avatarResponsiveSize}.webp`;
 
   return [
     {
       imageUrl: `images/${avatarVariantFileName}`,
-      width: avatarResponsiveSize,
-      webMaxViewportWidth: avatarResponsiveViewportWidth,
+      width: imageConstants.avatarResponsiveSize,
+      webMaxViewportWidth: imageConstants.avatarResponsiveViewportWidth,
     },
     {
       imageUrl: `images/${normalizedFileName}`,
-      width: avatarOriginalSize,
-      webMaxViewportWidth: avatarOriginalSize * 2,
+      width: imageConstants.avatarOriginalSize,
+      webMaxViewportWidth: imageConstants.avatarOriginalSize * 2,
     },
   ];
 }

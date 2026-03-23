@@ -1,10 +1,10 @@
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
-import { Theme } from "@services/wnaAsyncStorageProvider";
+import { Theme } from "@/storage/themeStorage";
 import Colors from "@constants/theme/colors";
 import {
   getThemeFromStorageAsync,
   setThemeToStorageAsync,
-} from "@services/wnaAsyncStorageProvider";
+} from "@/storage/themeStorage";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 import { ColorSchemeName } from "react-native";
 import Toast from "react-native-toast-message";

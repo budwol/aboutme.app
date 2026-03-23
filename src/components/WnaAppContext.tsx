@@ -1,9 +1,10 @@
 import { AppData, defaultAppData } from "@/app-data";
 import { AppLayout, getAppLayout } from "@constants/layoutConstants";
-import { CurrentColors } from "@constants/currentColors";
+import { appMotionConstants } from "@constants/motionConstants";
+import { themePalettes } from "@constants/themePalettes";
 import Colors from "@constants/theme/colors";
-import AppStyle, { setAppStyle } from "@services/wnaStyleService";
-import { Theme } from "@services/wnaAsyncStorageProvider";
+import AppStyle, { setAppStyle } from "@/theme/appStyle";
+import { Theme } from "@/storage/themeStorage";
 import React, {
   createContext,
   PropsWithChildren,
@@ -15,8 +16,6 @@ import React, {
   useState,
 } from "react";
 import { Dimensions } from "react-native";
-
-const navigationTransitionDelay = 420;
 
 type WnaLifecycleState = {
   isAppInitialized: boolean;
@@ -99,7 +98,7 @@ export function useWnaAppData() {
 }
 
 export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
-  const initialColors = CurrentColors.light;
+  const initialColors = themePalettes.light;
   const dimensions = getInitialDimensions();
 
   const [isAppInitialized, setIsAppInitialized] = useState(false);
@@ -154,7 +153,7 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
       navigationTransitionTimerRef.current = setTimeout(() => {
         navigationTransitionTimerRef.current = null;
         action();
-      }, navigationTransitionDelay);
+      }, appMotionConstants.navigationTransitionDelay);
     },
     [isNavigationTransitionActive],
   );

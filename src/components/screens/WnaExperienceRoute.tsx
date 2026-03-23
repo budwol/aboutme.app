@@ -1,13 +1,13 @@
 import { useWnaAppData, useWnaTheme } from "@components/WnaAppContext";
-import WnaListCardWhiteDecent from "@/components/cards/WnaListCardWhiteDecent";
-import WnaMenuHeaderRight from "@components/navigation/WnaMenuHeaderRight";
-import WnaNavigationHeaderButtonRight from "@components/navigation/WnaNavigationHeaderButtonRight";
-import WnaExperienceCard from "@components/welcome/WnaExperienceCard";
+import WnaSurfaceCard from "@/components/cards/WnaSurfaceCard";
+import WnaMenuHeaderRight from "@/navigation/components/WnaMenuHeaderRight";
+import WnaNavigationHeaderButtonRight from "@/navigation/components/WnaNavigationHeaderButtonRight";
+import WnaExperienceCard from "@components/sections/WnaExperienceCard";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import WnaScrollViewScreen from "./WnaScrollViewScreen";
-import { i18nKeys } from "@services/i18n/i18nKeys";
+import { i18nKeys } from "@/i18n/i18nKeys";
 
 export default function WnaExperienceRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
@@ -39,14 +39,14 @@ export default function WnaExperienceRoute(): ReactNode {
         />
       }
     >
-      <WnaListCardWhiteDecent appColors={appColors}>
+      <WnaSurfaceCard appColors={appColors}>
         <WnaExperienceCard
           appColors={appColors}
           appData={appData}
           appStyle={appStyle}
           t={t}
         />
-      </WnaListCardWhiteDecent>
+      </WnaSurfaceCard>
     </WnaScrollViewScreen>
   );
 }

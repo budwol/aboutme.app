@@ -1,17 +1,15 @@
 import { ProjectEntry } from "@/app-data";
-
-const projectImageBreakpointSmall = 480;
-const projectImageBreakpointMedium = 960;
+import { imageConstants } from "@constants/imageConstants";
 
 export function getProjectImageForWidth(
   project: Pick<ProjectEntry, "imageL" | "imageM" | "imageS">,
   width: number,
 ) {
-  if (width <= projectImageBreakpointSmall) {
+  if (width <= imageConstants.projectImageBreakpointSmall) {
     return project.imageS;
   }
 
-  if (width <= projectImageBreakpointMedium) {
+  if (width <= imageConstants.projectImageBreakpointMedium) {
     return project.imageM;
   }
 

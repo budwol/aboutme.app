@@ -1,5 +1,5 @@
 import Colors from "@constants/theme/colors";
-import AppStyle from "@services/wnaStyleService";
+import AppStyle from "@/theme/appStyle";
 import { TFunction } from "i18next";
 import { ViewStyle } from "react-native";
 

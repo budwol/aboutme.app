@@ -1,0 +1,109 @@
+import { Text, View } from "react-native";
+import WnaBadge from "@components/display/WnaBadge";
+import { convertHexToRgba } from "@utils/colorConverter";
+import { WnaSectionProps } from "@components/sections/WnaSectionProps";
+import { i18nKeys } from "@/i18n/i18nKeys";
+import { appLayoutConstants } from "@constants/layoutConstants";
+
+type WnaTechStackGroup = {
+  key: string;
+  title: string;
+  stack: string[];
+};
+
+type WnaTechStackCardProps = Pick<
+  WnaSectionProps,
+  "appColors" | "appData" | "appStyle" | "t"
+> & {
+  groups?: WnaTechStackGroup[];
+};
+
+export default function WnaTechStackCard({
+  appColors,
+  appData,
+  appStyle,
+  t,
+  groups,
+}: WnaTechStackCardProps) {
+  const groupGap = appLayoutConstants.globalListGap / 2;
+  const resolvedGroups = groups ?? [
+    {
+      key: "primary",
+      title: t(i18nKeys.titleTechstackPrimary),
+      stack: appData?.techStack?.primary ?? [],
+    },
+    {
+      key: "secondary",
+      title: t(i18nKeys.titleTechStackSecondary),
+      stack: appData?.techStack?.secondary ?? [],
+    },
+  ];
+
+  const renderBadges = (stack: string[], groupKey: string) => (
+    <View
+      style={{
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+      }}
+    >
+      {stack.map((tech) => (
+        <WnaBadge
+          key={`${groupKey}-${tech}`}
+          text={tech}
+          appColors={appColors}
+          appStyle={appStyle}
+        />
+      ))}
+    </View>
+  );
+
+  const renderGroupCard = (
+    title: string,
+    stack: string[],
+    groupKey: string,
+  ) => (
+    <View
+      key={groupKey}
+      style={{
+        flex: 1,
+        minWidth: 280,
+        padding: 16,
+        borderRadius: appLayoutConstants.globalCornerRadius,
+        gap: 16,
+        backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
+        borderWidth: 1,
+        borderColor: appColors.coolgray2,
+      }}
+    >
+      <Text
+        style={[
+          appStyle.textNeutralTitleLarge,
+          {
+            textTransform: "uppercase",
+            color: appColors.coolgray8,
+            letterSpacing: 1,
+          },
+        ]}
+      >
+        {title}
+      </Text>
+
+      {renderBadges(stack, groupKey)}
+    </View>
+  );
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        gap: groupGap,
+        flexWrap: "wrap",
+      }}
+    >
+      {resolvedGroups
+        .filter((group) => group.stack.length > 0)
+        .map((group) => renderGroupCard(group.title, group.stack, group.key))}
+    </View>
+  );
+}
