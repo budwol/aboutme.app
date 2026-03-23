@@ -41,6 +41,16 @@ jest.mock("@components/buttons/WnaPressable", () => {
   };
 });
 
+jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
+  const { createElement } = jest.requireActual(
+    "react",
+  ) as typeof import("react");
+
+  return function MockWnaIcon(props: unknown) {
+    return createElement("WnaIcon", props as Record<string, unknown>);
+  };
+});
+
 describe("WnaProjectsCard", () => {
   it("renders one project card per project entry", () => {
     const appData = {
@@ -52,6 +62,7 @@ describe("WnaProjectsCard", () => {
         {
           ...testAppData.projects[0],
           title: "Project 2",
+          imageM: "project-2-medium.png",
           imageS: "project-2.png",
         },
       ],
@@ -85,9 +96,20 @@ describe("WnaProjectsCard", () => {
 
     expect(title.props.subtitle).toBe("PRIVATE WORK");
     expect(textValues).toContain("English project note");
+    expect(textValues).toContain(testAppData.projectsHighlights[0].text);
+    expect(textValues).toContain(testAppData.projectsHighlights[1].text);
     expect(cards).toHaveLength(2);
+    expect(cards[0].props.contentMinHeight).toBe(78);
+    expect(cards[0].props.height).toBe(128);
+    expect(cards[0].props.width).toBe(528);
+    expect(cards[1].props.contentMinHeight).toBe(78);
+    expect(cards[1].props.height).toBe(128);
+    expect(cards[1].props.width).toBe(256);
     expect(cards[0].props.imageUrl).toBe(
-      `images/${appData.projects[0].imageS}`,
+      `images/${appData.projects[0].imageM}`,
+    );
+    expect(cards[1].props.imageUrl).toBe(
+      `images/${appData.projects[1].imageS}`,
     );
     expect(cards[1].props.text1).toBe("Project 2");
   });
@@ -172,5 +194,41 @@ describe("WnaProjectsCard", () => {
     });
 
     expect(onShowMorePress).toHaveBeenCalledTimes(1);
+  });
+
+  it("omits optional intro blocks when context and highlights are missing", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProjectsCard
+          appColors={
+            {
+              isDark: true,
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              accent5: "#0aa",
+            } as never
+          }
+          appData={{
+            ...testAppData,
+            projectsContext: "",
+            projectsHighlights: [],
+          }}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const texts = tree!.root.findAllByType("Text");
+    const textValues = texts.map(
+      (node: { props: { children?: React.ReactNode } }) => node.props.children,
+    );
+    const pressables = tree!.root.findAllByType("WnaPressable");
+
+    expect(textValues).not.toContain(testAppData.projectsContext);
+    expect(textValues).not.toContain(testAppData.projectsHighlights[0].text);
+    expect(pressables[0].props.ripple).toBe("light");
   });
 });

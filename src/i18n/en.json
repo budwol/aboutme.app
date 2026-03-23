@@ -1,6 +1,7 @@
 {
   "common": {
     "actionDownload": "Download",
+    "actionClose": "Close",
     "actionEmail": "E-Mail",
     "actionGithub": "GitHub",
     "actionGoBack": "Back",
@@ -18,6 +19,7 @@
     "actionWebApp": "Web App",
     "actionXing": "Xing",
     "actionPlayStore": "Play Store",
+    "actionContinueToPage": "Continue to page",
     "answerNo": "No",
     "answerYes": "Yes",
     "appBrand": "Portfolio",
@@ -32,6 +34,8 @@
     "errorUnknown": "An error has occurred",
     "imageTitleAvatar": "Avatar",
     "infoNotAvailable": "Unfortunately not yet available",
+    "infoPrivateRepoHint": "The repository is private.",
+    "infoPrivateRepoBody": "Feel free to contact me. If useful, we can arrange an appointment for a review.",
     "infoPleaseWait": "Please wait",
     "infoWorkInProgress": "... in  progress ...",
     "screenErrorLog": "Logs",
@@ -54,6 +58,7 @@
     "success": "Successfully executed",
     "successDownload": "Download completed",
     "titleProjectRepo": "Repository",
+    "titlePrivateRepo": "Private repository",
     "titleProjectTechstack": "Technologies",
     "titleTechstackPrimary": "Primary Techstack",
     "titleTechStackSecondary": "Secondary Techstack",

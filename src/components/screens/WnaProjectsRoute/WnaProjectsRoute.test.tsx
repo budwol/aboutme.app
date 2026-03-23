@@ -103,6 +103,18 @@ jest.mock("@components/images/WnaHeroImage", () => {
   };
 });
 
+jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ReactModule = require("react");
+
+  return function MockWnaIcon(props: unknown) {
+    return ReactModule.createElement(
+      "WnaIcon",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
 jest.mock("@components/text/WnaSectionTitle", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
@@ -173,8 +185,10 @@ describe("WnaProjectsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         isDark: false,
+        black: "#000",
         warmgray6: "#666",
         coolgray2: "#ccc",
+        coolgray8: "#111",
         staticAccent5: "#0aa",
         staticBlack: "#000",
         staticCoolgray2: "#ccc",
@@ -211,10 +225,24 @@ describe("WnaProjectsRoute", () => {
 
     const baseScreen = tree!.root.findByType("WnaBaseScreen");
     const flatList = tree!.root.findByType("AnimatedFlatList");
+    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      headerTree = TestRenderer.create(header);
+    });
+    const headerTextValues = headerTree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
 
     expect(baseScreen.props.headerTitle).toBe("screenTitleProjects");
     expect(baseScreen.props.titleHref).toBe("/(drawer)/(tabs-de)");
-    expect(flatList.props.ListHeaderComponent).toBeUndefined();
+    expect(headerTextValues).toContain(testAppData.projectsContext);
+    expect(headerTextValues).toContain(testAppData.projectsHighlights[0].text);
+    expect(headerTextValues).toContain(testAppData.projectsHighlights[1].text);
     expect(flatList.props.ListFooterComponent.type.name).toBe(
       "MockContactFooter",
     );
@@ -257,6 +285,8 @@ describe("WnaProjectsRoute", () => {
     expect(textValues).toContain("screenTitleProjects");
     expect(textValues).toContain(testAppData.projectsSubtitle?.toUpperCase());
     expect(textValues).toContain(testAppData.projectsContext);
+    expect(textValues).toContain(testAppData.projectsHighlights[0].text);
+    expect(textValues).toContain(testAppData.projectsHighlights[1].text);
     expect(pressables).toHaveLength(testAppData.projects.length);
   });
 
@@ -291,5 +321,64 @@ describe("WnaProjectsRoute", () => {
 
     expect(textValues).toContain("Android / Web App");
     expect(textValues).toContain("Part of a cohesive fullstack system");
+  });
+
+  it("allows longer landscape overlay titles and context to wrap across multiple lines", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projects: [
+          {
+            ...testAppData.projects[0],
+            title:
+              "Event-Driven Backend for Tour Workflows with Extended Title",
+            context:
+              "Architecture, offline support, synchronization, and export workflows in one cohesive system.",
+          },
+          ...testAppData.projects.slice(1),
+        ],
+      },
+    });
+    appContext.useWnaLayout.mockReturnValue({
+      appLayout: {
+        contentListPaddingTop: 24,
+        contentPaddingBottom: 24,
+        scrollEventThrottle: 16,
+      },
+      currentWindowWidth: 1440,
+      isLandscape: true,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const featuredTitle = tree!.root
+      .findAllByType("Text")
+      .find(
+        (node: {
+          props: { children?: React.ReactNode; numberOfLines?: number };
+        }) =>
+          node.props.children ===
+          "Event-Driven Backend for Tour Workflows with Extended Title",
+      );
+    const featuredContext = tree!.root
+      .findAllByType("Text")
+      .find(
+        (node: {
+          props: { children?: React.ReactNode; numberOfLines?: number };
+        }) =>
+          node.props.children ===
+          "Architecture, offline support, synchronization, and export workflows in one cohesive system.",
+      );
+
+    expect(featuredTitle?.props.numberOfLines).toBe(3);
+    expect(featuredContext?.props.numberOfLines).toBe(4);
   });
 });
