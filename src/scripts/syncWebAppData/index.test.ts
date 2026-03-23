@@ -3,7 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
- 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { syncWebAppData } =
   require("../../../scripts/sync-web-app-data.cjs") as {
     syncWebAppData: (
@@ -18,6 +18,7 @@ const { syncWebAppData } =
       envLocalFile: string;
     };
   };
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 const createdFixtures: string[] = [];
 const silentLogger = () => undefined;
