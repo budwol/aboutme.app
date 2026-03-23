@@ -7,6 +7,7 @@ import {
 import WnaPressable from "@components/buttons/WnaPressable";
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import { getProjectImageForWidth } from "@components/images/wnaImageAssetResolver";
+import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import WnaMenuHeaderRight from "@/navigation/components/WnaMenuHeaderRight";
 import WnaNavigationHeaderButtonRight from "@/navigation/components/WnaNavigationHeaderButtonRight";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
@@ -80,8 +81,77 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 12,
   },
+  landscapeFeatureBox: {
+    paddingHorizontal: 22,
+    paddingVertical: 20,
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 14,
+  },
+  landscapeFeatureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  landscapeFeatureIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    flexShrink: 0,
+  },
+  landscapeFeatureText: {
+    flex: 1,
+    lineHeight: 20,
+  },
   landscapeContext: {
     lineHeight: 24,
+  },
+  portraitIntro: {
+    width: "100%",
+    gap: 16,
+    marginBottom: 20,
+  },
+  portraitContextBox: {
+    width: "100%",
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 10,
+  },
+  portraitFeatureBox: {
+    width: "100%",
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 10,
+  },
+  portraitFeatureItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  portraitFeatureIconWrap: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  portraitFeatureText: {
+    lineHeight: 18,
   },
   landscapeProjects: {
     flex: 1,
@@ -158,6 +228,7 @@ const styles = StyleSheet.create({
   projectTitle: {
     lineHeight: 31,
     letterSpacing: 0.2,
+    flexShrink: 1,
   },
   projectTitleFeatured: {
     fontSize: 34,
@@ -230,6 +301,97 @@ export default function WnaProjectsRoute(): ReactNode {
     [appLayout.contentListPaddingTop, appLayout.contentPaddingBottom],
   );
 
+  const renderPortraitIntro = useMemo(() => {
+    if (!appData.projectsContext && appData.projectsHighlights.length === 0) {
+      return null;
+    }
+
+    return (
+      <View style={styles.portraitIntro}>
+        {appData.projectsContext ? (
+          <View
+            style={[
+              styles.portraitContextBox,
+              {
+                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.16),
+                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+              },
+            ]}
+          >
+            <Text
+              style={[
+                appStyle.textSmall,
+                {
+                  lineHeight: (appStyle.textSmall?.lineHeight ?? 16) + 4,
+                  opacity: 0.82,
+                },
+              ]}
+            >
+              {appData.projectsContext}
+            </Text>
+          </View>
+        ) : null}
+
+        {appData.projectsHighlights.length > 0 ? (
+          <View
+            style={[
+              styles.portraitFeatureBox,
+              {
+                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.18),
+                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+              },
+            ]}
+          >
+            {appData.projectsHighlights.map((item, index) => (
+              <View
+                key={`portrait-project-highlight-${item.icon}-${item.text}-${index}`}
+                style={[
+                  styles.portraitFeatureItem,
+                  {
+                    backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
+                    borderColor: convertHexToRgba(appColors.coolgray2, 0.42),
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.portraitFeatureIconWrap,
+                    {
+                      backgroundColor: convertHexToRgba(
+                        appColors.coolgray8,
+                        0.08,
+                      ),
+                    },
+                  ]}
+                >
+                  <WnaIcon
+                    iconName={item.icon as never}
+                    size={18}
+                    color={appColors.black}
+                  />
+                </View>
+                <Text
+                  style={[
+                    appStyle.textSmall,
+                    styles.portraitFeatureText,
+                    { color: appColors.black },
+                  ]}
+                >
+                  {item.text}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </View>
+    );
+  }, [
+    appColors,
+    appData.projectsContext,
+    appData.projectsHighlights,
+    appStyle,
+  ]);
+
   const renderProjectCard = useCallback(
     (
       item: ProjectEntry,
@@ -260,16 +422,8 @@ export default function WnaProjectsRoute(): ReactNode {
               landscapeVariant && styles.projectCardLandscape,
               featured && styles.projectCardFeatured,
               {
-                backgroundColor: convertHexToRgba(
-                  landscapeVariant
-                    ? appColors.staticWhite
-                    : appColors.warmgray6,
-                  landscapeVariant ? 0.78 : 0.14,
-                ),
-                borderColor: convertHexToRgba(
-                  appColors.coolgray2,
-                  landscapeVariant ? 0.44 : 0.54,
-                ),
+                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
+                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
               },
             ]}
           >
@@ -312,7 +466,7 @@ export default function WnaProjectsRoute(): ReactNode {
                       styles.projectSubtitle,
                       { color: appColors.staticWhite },
                     ]}
-                    numberOfLines={1}
+                    numberOfLines={2}
                   >
                     {item.subtitle}
                   </Text>
@@ -325,7 +479,7 @@ export default function WnaProjectsRoute(): ReactNode {
                     featured && styles.projectTitleFeatured,
                     { color: appColors.staticWhite },
                   ]}
-                  numberOfLines={featured ? 2 : 1}
+                  numberOfLines={featured ? 3 : 2}
                 >
                   {item.title}
                 </Text>
@@ -342,7 +496,7 @@ export default function WnaProjectsRoute(): ReactNode {
                           landscapeVariant && !featured ? "italic" : "normal",
                       },
                     ]}
-                    numberOfLines={featured ? 3 : 2}
+                    numberOfLines={featured ? 4 : 3}
                   >
                     {item.context}
                   </Text>
@@ -429,6 +583,62 @@ export default function WnaProjectsRoute(): ReactNode {
                     </Text>
                   </View>
                 ) : null}
+
+                {appData.projectsHighlights.length > 0 ? (
+                  <View
+                    style={[
+                      styles.landscapeFeatureBox,
+                      {
+                        backgroundColor: convertHexToRgba(
+                          appColors.staticWhite,
+                          0.14,
+                        ),
+                        borderColor: convertHexToRgba(
+                          appColors.staticCoolgray8,
+                          0.56,
+                        ),
+                      },
+                    ]}
+                  >
+                    {appData.projectsHighlights.map((item, index) => (
+                      <View
+                        key={`${item.icon}-${item.text}-${index}`}
+                        style={styles.landscapeFeatureItem}
+                      >
+                        <View
+                          style={[
+                            styles.landscapeFeatureIconWrap,
+                            {
+                              backgroundColor: convertHexToRgba(
+                                appColors.staticCoolgray8,
+                                0.42,
+                              ),
+                              borderColor: convertHexToRgba(
+                                appColors.staticWhite,
+                                0.16,
+                              ),
+                            },
+                          ]}
+                        >
+                          <WnaIcon
+                            iconName={item.icon as never}
+                            size={18}
+                            color={appColors.staticWhite}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            appStyle.textSmall,
+                            styles.landscapeFeatureText,
+                            { color: appColors.staticWhite, opacity: 0.9 },
+                          ]}
+                        >
+                          {item.text}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
               </View>
 
               <View style={styles.landscapeProjects}>
@@ -478,6 +688,7 @@ export default function WnaProjectsRoute(): ReactNode {
     );
   }, [
     appColors,
+    appData.projectsHighlights,
     appData.projectsContext,
     appData.projectsSubtitle,
     appLayout.scrollEventThrottle,
@@ -526,6 +737,7 @@ export default function WnaProjectsRoute(): ReactNode {
           ItemSeparatorComponent={itemSeparator}
           data={projects}
           contentContainerStyle={contentContainerStyle}
+          ListHeaderComponent={renderPortraitIntro}
           ListFooterComponent={<WnaContactFooter />}
           renderItem={({ item, index }) => renderProjectCard(item, index)}
         />

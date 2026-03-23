@@ -2,6 +2,11 @@ import { i18n } from "@/i18n/i18n";
 import { normalizeSiteUrl } from "@utils/appConfig";
 
 type SupportedLang = "de" | "en";
+export type RepoVisibility = "private" | "public";
+export type ProjectHighlightEntry = {
+  icon: string;
+  text: string;
+};
 
 export type ExperienceEntry = {
   period: string;
@@ -20,6 +25,7 @@ export type ProjectEntry = {
   context?: string;
   description?: string;
   repoUrl?: string;
+  repoVisibility?: RepoVisibility;
   webUrl?: string;
   playStoreUrl?: string;
   techstack: string[];
@@ -43,6 +49,7 @@ export type AppData = {
     primary: string[];
     secondary: string[];
   };
+  projectsHighlights: ProjectHighlightEntry[];
   projects: ProjectEntry[];
   projectsSubtitle?: string;
   projectsContext?: string;
@@ -76,6 +83,7 @@ export const defaultAppData: AppData = {
     primary: ["Primary 1", "Primary 2", "Primary 3"],
     secondary: ["Secondary 1", "Secondary 2", "Secondary 3"],
   },
+  projectsHighlights: [],
   projectsSubtitle: "Some private side projects",
   projectsContext:
     "Private end-to-end projects from concept and architecture to deployment and operation.",
@@ -87,6 +95,7 @@ export const defaultAppData: AppData = {
       subtitle: "Container App",
       description: "Short project summary.",
       repoUrl: "https://github.com/example/project-1",
+      repoVisibility: "public",
       techstack: ["Code"],
       opacity: 1,
       imageL: "default_project.webp",
@@ -149,6 +158,11 @@ type ExperienceEntryInput = Partial<ExperienceEntry> & {
   detailsEn?: string[];
 };
 
+type ProjectHighlightEntryInput = Partial<ProjectHighlightEntry> & {
+  textDe?: string;
+  textEn?: string;
+};
+
 type AppDataInput = Partial<AppData> & {
   profile?: ProfileInput;
   techStack?: Partial<AppData["techStack"]>;
@@ -159,6 +173,7 @@ type AppDataInput = Partial<AppData> & {
   projectsContextEn?: string;
   projectDetailsContextDe?: string;
   projectDetailsContextEn?: string;
+  projectsHighlights?: ProjectHighlightEntryInput[];
   projects?: ProjectEntryInput[];
   experienceSubtitleDe?: string;
   experienceSubtitleEn?: string;
@@ -187,6 +202,13 @@ function asStringArray(value: unknown, fallback: string[]) {
 
 function asNumberOrUndefined(value: unknown, fallback?: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function asRepoVisibility(
+  value: unknown,
+  fallback?: RepoVisibility,
+): RepoVisibility | undefined {
+  return value === "private" || value === "public" ? value : fallback;
 }
 
 function getSupportedLang(
@@ -364,6 +386,10 @@ function normalizeProjectEntry(
       ),
     ),
     repoUrl: firstNonEmptyString(entry.repoUrl),
+    repoVisibility: asRepoVisibility(
+      entry.repoVisibility,
+      defaultProjectEntry.repoVisibility,
+    ),
     webUrl: firstNonEmptyString(entry.webUrl),
     playStoreUrl: firstNonEmptyString(entry.playStoreUrl),
     techstack: asStringArray(entry.techstack, defaultProjectEntry.techstack),
@@ -372,6 +398,22 @@ function normalizeProjectEntry(
     imageM: asString(entry.imageM, defaultProjectEntry.imageM),
     imageS: asString(entry.imageS, defaultProjectEntry.imageS),
   };
+}
+
+function normalizeProjectHighlightEntry(
+  entry: ProjectHighlightEntryInput,
+  lang: SupportedLang,
+): ProjectHighlightEntry | undefined {
+  const icon = firstNonEmptyString(entry.icon);
+  const text = firstNonEmptyString(
+    getLocalizedString(lang, "", entry.text, entry.textDe, entry.textEn),
+  );
+
+  if (!icon || !text) {
+    return undefined;
+  }
+
+  return { icon, text };
 }
 
 function normalizeExperienceEntry(
@@ -478,6 +520,11 @@ export function normalizeAppData(
       data.projectsContextDe,
       data.projectsContextEn,
     ),
+    projectsHighlights:
+      data.projectsHighlights
+        ?.map((entry) => normalizeProjectHighlightEntry(entry, lang))
+        .filter((entry): entry is ProjectHighlightEntry => Boolean(entry)) ??
+      defaultAppData.projectsHighlights,
     projectDetailsContext: getLocalizedString(
       lang,
       defaultAppData.projectDetailsContext ?? "",

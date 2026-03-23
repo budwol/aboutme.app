@@ -56,5 +56,67 @@ describe("WnaCardVerticalWithImage", () => {
     expect(image.props.style).toMatchObject({ width: 300, height: 150 });
     expect(content.props.title).toBe("Project One");
     expect(content.props.subtitle).toBe("Subtitle");
+    expect(content.props.subtitleAlign).toBe("center");
+    expect(content.props.titleAlign).toBe("center");
+    expect(content.props.titleMinHeight).toBe(40);
+    expect(content.props.titleNumberOfLines).toBe(2);
+    expect(content.props.titlePaddingHorizontal).toBe(12);
+    expect(content.props.subtitleNumberOfLines).toBe(2);
+    expect(content.props.subtitlePaddingHorizontal).toBe(12);
+  });
+
+  it("keeps a custom image height when provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardVerticalWithImage
+          appColors={
+            {
+              warmgray6: "#666666",
+              coolgray2: "#222222",
+              black: "#000000",
+            } as never
+          }
+          appStyle={{} as never}
+          imageUrl="images/project.png"
+          text1="Project One"
+          text2="Subtitle"
+          width={300}
+          height={128}
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("WnaImage");
+
+    expect(image.props.style).toMatchObject({ width: 300, height: 128 });
+  });
+
+  it("keeps a custom text area height when provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardVerticalWithImage
+          appColors={
+            {
+              warmgray6: "#666666",
+              coolgray2: "#222222",
+              black: "#000000",
+            } as never
+          }
+          appStyle={{} as never}
+          imageUrl="images/project.png"
+          text1="Project One"
+          text2="Subtitle"
+          contentMinHeight={78}
+        />,
+      );
+    });
+
+    const textWrap = tree!.root.findAllByType("View")[1];
+
+    expect(textWrap.props.style).toMatchObject({ minHeight: 78 });
   });
 });

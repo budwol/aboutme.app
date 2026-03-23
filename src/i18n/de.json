@@ -1,6 +1,7 @@
 {
   "common": {
     "actionDownload": "Herunterladen",
+    "actionClose": "Schließen",
     "actionEmail": "E-Mail",
     "actionGithub": "GitHub",
     "actionGoBack": "Zurück",
@@ -18,6 +19,7 @@
     "actionWebApp": "Web-App",
     "actionXing": "Xing",
     "actionPlayStore": "Play Store",
+    "actionContinueToPage": "Trotzdem zur Seite",
     "answerNo": "Nein",
     "answerYes": "Ja",
     "appBrand": "Portfolio",
@@ -32,6 +34,8 @@
     "errorUnknown": "Das hätte nicht passieren sollen",
     "imageTitleAvatar": "Avatar",
     "infoNotAvailable": "Leider noch nicht verfügbar",
+    "infoPrivateRepoHint": "Das Repository ist privat.",
+    "infoPrivateRepoBody": "Gerne können Sie mich kontaktieren. Dann können wir bei Interesse einen Termin für ein Review vereinbaren.",
     "screenTitleContact": "Kontakt",
     "screenTitleExperience": "Berufliche Tätigkeiten",
     "screenTitleProjects": "Einige Projekte",
@@ -49,6 +53,7 @@
     "success": "Das hat geklappt",
     "successDownload": "Download abgeschlossen",
     "titleProjectRepo": "Repository",
+    "titlePrivateRepo": "Privates Repository",
     "titleProjectTechstack": "Technologien",
     "titleTechstackPrimary": "Aktueller Techstack",
     "titleTechStackSecondary": "Weiterer Techstack",
