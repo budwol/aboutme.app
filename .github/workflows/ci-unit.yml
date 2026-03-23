@@ -1,0 +1,27 @@
+name: ci-unit
+
+on:
+  workflow_call:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check out repo
+        uses: actions/checkout@v4
+
+      - name: set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.4
+          cache: npm
+
+      - name: install deps
+        run: npm ci
+
+      - name: unit
+        run: npm run test:unit

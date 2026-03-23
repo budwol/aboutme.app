@@ -233,8 +233,13 @@ The runtime path is meant to stay plain and inspectable, not clever.
 If you want the short answer to "is this thing still standing right?", this is the little checklist:
 
 - `npm run test:security`
-- `npm run test:all`
+- `npm run test:prettier`
+- `npm run lint`
+- `npm run test:types`
+- `npm run test:unit`
+- `npm run test:integration`
 - `npm run test:smoke`
+- `npm run test:e2e`
 - CI passing on the current branch
 - generated `nginx/site.conf` still listening on `8080`
 - container healthcheck still hitting `127.0.0.1:8080`
@@ -280,6 +285,14 @@ Short version: the app path is meant to stay calm and safe, the deploy scripts a
 
 Local Git hooks stop at unit level. Smoke and E2E stay out of the hooks and are meant to run in CI or manually when needed.
 
+The quality gates are meant to run in this order:
+
+1. `lint + prettier + types`
+2. `unit`
+3. `integration`
+4. `smoke`
+5. `e2e`
+
 - `npm run lint`
 - `npm run test:deps`
 - `npm run test:dry-run`
@@ -293,6 +306,8 @@ Local Git hooks stop at unit level. Smoke and E2E stay out of the hooks and are 
 - `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
+`npm run test:all` is the broad local test stack for `prettier + types + unit + integration + e2e`. `smoke` stays separate on purpose.
+
 The Git hook path is intentionally smaller:
 
 - `npx lint-staged`
@@ -300,7 +315,23 @@ The Git hook path is intentionally smaller:
 - `npm run test:types`
 - `npm run test:unit`
 
-There is also a tiny GitHub Actions CI now. It runs the broader quality gate, including `test:smoke` and `test:e2e`, on pushes and pull requests, just to make sure the little cabin is still standing before someone walks in with muddy boots.
+There is also a small GitHub Actions CI now. It runs the same gate sequence as separate jobs, so the whole little parade is easier to read when something falls over.
+
+```mermaid
+flowchart LR
+  A["lint + prettier + types"] --> B["unit"]
+  B --> C["integration"]
+  C --> D["smoke"]
+  D --> E["e2e"]
+```
+
+The orchestration lives in [`.github/workflows/ci.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci.yml). Each gate sits in its own reusable workflow file:
+
+- [`.github/workflows/ci-lint-prettier.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-lint-prettier.yml)
+- [`.github/workflows/ci-unit.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-unit.yml)
+- [`.github/workflows/ci-integration.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-integration.yml)
+- [`.github/workflows/ci-smoke.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-smoke.yml)
+- [`.github/workflows/ci-e2e.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-e2e.yml)
 
 If you want the full local CI pass:
 
@@ -308,7 +339,7 @@ If you want the full local CI pass:
 npm run ci:local
 ```
 
-`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, TypeScript, ESLint fixes, security checks, unit tests, and E2Es. It is a local full-gate, not a tiny cleanup helper.
+`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, TypeScript, ESLint fixes, security checks, unit tests, integration tests, and E2Es. It is the broad local verification path, not a tiny cleanup helper. The `smoke` gate still stays separate.
 
 The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 
