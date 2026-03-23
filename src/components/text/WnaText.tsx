@@ -1,7 +1,7 @@
 import { isHtml, stripHtml } from "@/utils/htmlSanitizer";
-import WnaHtmlRenderer from "@components/misc/WnaHtmlRenderer";
+import WnaHtmlRenderer from "@components/content/WnaHtmlRenderer";
 import Colors from "@constants/theme/colors";
-import AppStyle from "@services/wnaStyleService";
+import AppStyle from "@/theme/appStyle";
 import { FC, memo } from "react";
 import { Text, TextStyle } from "react-native";
 
