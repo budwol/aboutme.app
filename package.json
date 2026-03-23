@@ -22,7 +22,7 @@
     "test:dry-run": "./init.sh --dry-run",
     "test:prettier": "prettier --check .",
     "test:smoke": "./scripts/smoke-export.sh",
-    "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcessSecurity.test.ts src/scripts/initScript.test.ts src/utils/appConfig.test.ts src/utils/htmlSanitizer.test.ts src/scripts/envParser.test.ts && npm run test:dry-run",
+    "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcessSecurity/index.test.ts src/scripts/initScript/index.test.ts src/utils/appConfig/index.test.ts src/utils/htmlSanitizer/index.test.ts src/scripts/envParser/index.test.ts && npm run test:dry-run",
     "test:types": "tsc --skipLibCheck",
     "test:unit": "jest --runInBand --watchAll=false",
     "web": "node ./scripts/sync-web-app-data.cjs && expo start --web"
@@ -70,6 +70,7 @@
     "sanitize-html": "^2.17.2"
   },
   "devDependencies": {
+    "@types/react-test-renderer": "^19.1.0",
     "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.1.0",
     "@types/sanitize-html": "^2.16.1",

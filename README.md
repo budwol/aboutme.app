@@ -98,10 +98,11 @@ If you want this to stop looking like my little template and start looking like 
   this is the heart of the content: profile, projects, links, experience, legal pages
 - `.aboutme/images/`
   drop in your avatar, project images, logo, and background here
-- `src/locales/`
+- `src/i18n/`
   adjust copy and translations if the default wording is not your voice
 - `src/components/`
   shape the UI if you want to push the layout further than content swapping
+  notable groups are `sections/`, `screens/`, `buttons/`, `cards/`, and `images/`
 
 In practice the usual flow is:
 
@@ -151,6 +152,8 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
 - experience page
 - dedicated contact page
 - menu/legal pages (imprint, privacy, terms, licenses)
+
+Navigation is built with Expo Router under `src/app/`, while reusable navigation UI and route helpers live under `src/navigation/`.
 
 ### Recommended Image Ratios
 
