@@ -3,7 +3,9 @@ import {
   useWnaLayout,
   useWnaTheme,
 } from "@components/WnaAppContext";
+import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
 import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
+import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import WnaSurfaceCard from "@components/cards/WnaSurfaceCard";
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import { getProjectImageForWidth } from "@components/images/wnaImageAssetResolver";
@@ -41,7 +43,7 @@ import { useTranslation } from "react-i18next";
 const styles = StyleSheet.create({
   cardContent: {
     width: "100%",
-    gap: 24,
+    gap: appLayoutConstants.contentSectionGap,
   },
   heroSection: {
     width: "100%",
@@ -52,6 +54,12 @@ const styles = StyleSheet.create({
     left: 16,
     zIndex: 1,
   },
+  heroActionContainer: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    zIndex: 1,
+  },
   heroBadge: {
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -60,16 +68,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   contentBody: {
-    gap: 24,
-  },
-  metaSection: {
-    gap: 20,
-    padding: 20,
-    borderRadius: appLayoutConstants.globalCornerRadius,
-    borderWidth: 1,
+    gap: appLayoutConstants.contentSectionGap,
   },
   contentSection: {
-    gap: 20,
+    gap: appLayoutConstants.contentSectionGap - 4,
   },
   stackGroup: {
     gap: 12,
@@ -95,28 +97,56 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.52)",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: appLayoutConstants.contentPaddingBottom + 4,
+    cursor: "auto",
   },
   modalDialog: {
     width: "100%",
     maxWidth: 560,
-    padding: 24,
+    padding: appLayoutConstants.contentSectionGap,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
-    gap: 20,
+    gap: appLayoutConstants.contentSectionGap - 4,
+    cursor: "auto",
   },
   modalHeader: {
     gap: 8,
+  },
+  modalHeaderTop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  modalHeaderCopy: {
+    flex: 1,
+    gap: 8,
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
   modalBody: {
     gap: 10,
   },
   modalActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
     gap: 12,
+  },
+  modalActionButton: {
+    flexGrow: 1,
+    flexBasis: 208,
+    minWidth: 208,
   },
   descriptionSection: {
     gap: 16,
-    padding: 20,
+    padding: appLayoutConstants.contentSectionPaddingVertical + 4,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
   },
@@ -227,7 +257,7 @@ function renderProjectDescription(
 export default function WnaProjectDetailsRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
-  const { currentWindowWidth } = useWnaLayout();
+  const { currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const navigation = useNavigation();
   const router = useRouter();
@@ -340,6 +370,72 @@ export default function WnaProjectDetailsRoute(): ReactNode {
               </View>
             ) : null}
 
+            {projectLinks.length > 0 ? (
+              <View style={styles.heroActionContainer}>
+                <View style={styles.actionSection}>
+                  <View style={styles.actionLinks}>
+                    {projectLinks.map((link) =>
+                      isLandscape ? (
+                        <WnaButtonIconText
+                          key={link.label}
+                          appColors={appColors}
+                          appStyle={appStyle}
+                          iconName={link.icon}
+                          text={link.label}
+                          textColor={appColors.staticWhite}
+                          backgroundColor={convertHexToRgba(
+                            appColors.staticCoolgray8,
+                            0.96,
+                          )}
+                          borderWidth={1}
+                          style={{
+                            ...styles.actionButton,
+                            borderColor: convertHexToRgba(
+                              appColors.staticCoolgray2,
+                              0.72,
+                            ),
+                          }}
+                          onPress={() => {
+                            if (
+                              link.icon === "github" &&
+                              project.repoVisibility === "private"
+                            ) {
+                              setIsPrivateRepoModalVisible(true);
+                              return;
+                            }
+
+                            Linking.openURL(link.url);
+                          }}
+                        />
+                      ) : (
+                        <WnaButtonIcon
+                          key={link.label}
+                          appColors={appColors}
+                          appStyle={appStyle}
+                          iconName={link.icon}
+                          toolTip={link.label}
+                          toolTipPosition="top"
+                          t={t}
+                          checkInternetConnection={false}
+                          onPress={() => {
+                            if (
+                              link.icon === "github" &&
+                              project.repoVisibility === "private"
+                            ) {
+                              setIsPrivateRepoModalVisible(true);
+                              return;
+                            }
+
+                            Linking.openURL(link.url);
+                          }}
+                        />
+                      ),
+                    )}
+                  </View>
+                </View>
+              </View>
+            ) : null}
+
             <WnaHeroImage
               appColors={appColors}
               imageUrl={`images/${getProjectImageForWidth(project, currentWindowWidth)}`}
@@ -355,72 +451,22 @@ export default function WnaProjectDetailsRoute(): ReactNode {
           />
 
           <View style={styles.contentBody}>
-            <View
-              style={[
-                styles.metaSection,
-                {
-                  backgroundColor: convertHexToRgba(appColors.warmgray6, 0.12),
-                  borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
-                },
-              ]}
-            >
-              {projectLinks.length > 0 ? (
-                <View style={styles.actionSection}>
-                  <View style={styles.actionLinks}>
-                    {projectLinks.map((link) => (
-                      <WnaButtonIconText
-                        key={link.label}
-                        appColors={appColors}
-                        appStyle={appStyle}
-                        iconName={link.icon}
-                        text={link.label}
-                        textColor={appColors.white}
-                        backgroundColor={convertHexToRgba(
-                          appColors.coolgray8,
-                          0.96,
-                        )}
-                        borderWidth={1}
-                        style={{
-                          ...styles.actionButton,
-                          borderColor: convertHexToRgba(
-                            appColors.coolgray2,
-                            0.72,
-                          ),
-                        }}
-                        onPress={() => {
-                          if (
-                            link.icon === "github" &&
-                            project.repoVisibility === "private"
-                          ) {
-                            setIsPrivateRepoModalVisible(true);
-                            return;
-                          }
-
-                          Linking.openURL(link.url);
-                        }}
-                      />
-                    ))}
-                  </View>
-                </View>
+            <View style={styles.stackGroup}>
+              {project.techstack.length > 0 ? (
+                <WnaTechStackCard
+                  appColors={appColors}
+                  appData={appData}
+                  appStyle={appStyle}
+                  t={t}
+                  groups={[
+                    {
+                      key: "project-techstack",
+                      title: t(i18nKeys.titleProjectTechstack),
+                      stack: project.techstack,
+                    },
+                  ]}
+                />
               ) : null}
-
-              <View style={styles.stackGroup}>
-                {project.techstack.length > 0 ? (
-                  <WnaTechStackCard
-                    appColors={appColors}
-                    appData={appData}
-                    appStyle={appStyle}
-                    t={t}
-                    groups={[
-                      {
-                        key: "project-techstack",
-                        title: t(i18nKeys.titleProjectTechstack),
-                        stack: project.techstack,
-                      },
-                    ]}
-                  />
-                ) : null}
-              </View>
             </View>
 
             <View style={styles.contentSection}>
@@ -483,8 +529,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
             style={styles.modalBackdrop}
             onPress={() => setIsPrivateRepoModalVisible(false)}
           >
-            <Pressable
-              onPress={() => undefined}
+            <View
               style={[
                 styles.modalDialog,
                 {
@@ -494,22 +539,42 @@ export default function WnaProjectDetailsRoute(): ReactNode {
               ]}
             >
               <View style={styles.modalHeader}>
-                <Text
-                  style={[
-                    appStyle.textNeutralMedium,
-                    { color: appColors.white, fontWeight: "700" },
-                  ]}
-                >
-                  {t(i18nKeys.titlePrivateRepo)}
-                </Text>
-                <Text
-                  style={[
-                    appStyle.textNeutralMedium,
-                    { color: appColors.white, opacity: 0.92 },
-                  ]}
-                >
-                  {t(i18nKeys.infoPrivateRepoHint)}
-                </Text>
+                <View style={styles.modalHeaderTop}>
+                  <View style={styles.modalHeaderCopy}>
+                    <Text
+                      style={[
+                        appStyle.textNeutralMedium,
+                        { color: appColors.white, fontWeight: "700" },
+                      ]}
+                    >
+                      {t(i18nKeys.titlePrivateRepo)}
+                    </Text>
+                  </View>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t(i18nKeys.actionClose)}
+                    onPress={() => setIsPrivateRepoModalVisible(false)}
+                    style={[
+                      styles.modalCloseButton,
+                      {
+                        backgroundColor: convertHexToRgba(
+                          appColors.coolgray8,
+                          0.98,
+                        ),
+                        borderColor: convertHexToRgba(
+                          appColors.coolgray2,
+                          0.72,
+                        ),
+                      },
+                    ]}
+                  >
+                    <WnaIcon
+                      iconName="close"
+                      size={18}
+                      color={appColors.white}
+                    />
+                  </Pressable>
+                </View>
               </View>
 
               <View style={styles.modalBody}>
@@ -519,6 +584,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                     { color: appColors.white, opacity: 0.86 },
                   ]}
                 >
+                  {t(i18nKeys.infoPrivateRepoHint)}{" "}
                   {t(i18nKeys.infoPrivateRepoBody)}
                 </Text>
               </View>
@@ -534,6 +600,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   borderWidth={1}
                   style={{
                     ...styles.actionButton,
+                    ...styles.modalActionButton,
                     borderColor: convertHexToRgba(appColors.coolgray2, 0.4),
                     marginHorizontal: 0,
                   }}
@@ -552,6 +619,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   borderWidth={1}
                   style={{
                     ...styles.actionButton,
+                    ...styles.modalActionButton,
                     borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
                     marginHorizontal: 0,
                   }}
@@ -560,23 +628,8 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                     Linking.openURL(project.repoUrl ?? "");
                   }}
                 />
-                <WnaButtonIconText
-                  appColors={appColors}
-                  appStyle={appStyle}
-                  iconName="close"
-                  text={t(i18nKeys.actionClose)}
-                  textColor={appColors.white}
-                  backgroundColor={convertHexToRgba(appColors.coolgray8, 0.98)}
-                  borderWidth={1}
-                  style={{
-                    ...styles.actionButton,
-                    borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
-                    marginHorizontal: 0,
-                  }}
-                  onPress={() => setIsPrivateRepoModalVisible(false)}
-                />
               </View>
-            </Pressable>
+            </View>
           </Pressable>
         </Modal>
       </WnaSurfaceCard>

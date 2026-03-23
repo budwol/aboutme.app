@@ -1,3 +1,4 @@
+import { useWnaLayout } from "@components/WnaAppContext";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaPressable from "@components/buttons/WnaPressable";
 import WnaSectionFooterAction from "@components/sections/WnaSectionFooterAction";
@@ -50,9 +51,13 @@ export default function WnaProjectsCard({
   onProjectPress,
   onShowMorePress,
 }: WnaProjectsCardProps) {
+  const { isLandscape } = useWnaLayout();
   const cardWidth = sectionConstants.projectsCardWidth;
   const cardHeight = cardWidth * 0.5;
   const cardContentMinHeight = 78;
+  const featuredCardWidth =
+    cardWidth * 2 + sectionConstants.projectsCardGridGap;
+  const useFeaturedFirstCard = isLandscape;
   return (
     <View
       style={{
@@ -133,7 +138,11 @@ export default function WnaProjectsCard({
         {appData.projects.map((project, index) => (
           <View
             key={`${project.title}-${index}`}
-            style={index === 0 ? styles.projectItemFeatured : undefined}
+            style={
+              index === 0 && useFeaturedFirstCard
+                ? styles.projectItemFeatured
+                : undefined
+            }
           >
             <WnaPressable
               ripple={appColors.isDark ? "light" : "dark"}
@@ -145,16 +154,16 @@ export default function WnaProjectsCard({
                 contentMinHeight={cardContentMinHeight}
                 height={cardHeight}
                 width={
-                  index === 0
-                    ? cardWidth * 2 + sectionConstants.projectsCardGridGap
+                  index === 0 && useFeaturedFirstCard
+                    ? featuredCardWidth
                     : cardWidth
                 }
                 appColors={appColors}
                 appStyle={appStyle}
                 imageUrl={`images/${getProjectImageForWidth(
                   project,
-                  index === 0
-                    ? cardWidth * 2 + sectionConstants.projectsCardGridGap
+                  index === 0 && useFeaturedFirstCard
+                    ? featuredCardWidth
                     : cardWidth,
                 )}`}
                 text1={project.title}

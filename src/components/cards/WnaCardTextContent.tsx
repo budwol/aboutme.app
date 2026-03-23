@@ -10,6 +10,7 @@ export type WnaCardTextContentProps = {
   subtitle?: string;
   description?: string;
   subtitleAlign?: TextStyle["textAlign"];
+  subtitleMinHeight?: number;
   titleAlign?: TextStyle["textAlign"];
   titleMinHeight?: number;
   titlePaddingHorizontal?: number;
@@ -27,6 +28,7 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
   subtitle,
   description,
   subtitleAlign,
+  subtitleMinHeight,
   titleAlign,
   titleMinHeight,
   titlePaddingHorizontal,
@@ -79,6 +81,7 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
                 {
                   padding: bodyPadding ?? 0,
                   lineHeight: (appStyle.textNeutralSmall?.lineHeight ?? 16) + 2,
+                  minHeight: subtitleMinHeight,
                   paddingHorizontal:
                     subtitlePaddingHorizontal ?? bodyPadding ?? 0,
                   textAlign: subtitleAlign ?? "left",
@@ -88,6 +91,7 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
                 color: appColors.black,
                 fontSize: 13,
                 lineHeight: 16,
+                minHeight: subtitleMinHeight,
                 paddingHorizontal: subtitlePaddingHorizontal ?? 0,
                 textAlign: subtitleAlign ?? "left",
               }
