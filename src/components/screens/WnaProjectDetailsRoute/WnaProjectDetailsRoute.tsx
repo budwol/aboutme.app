@@ -27,8 +27,15 @@ import {
   useNavigation,
   useRouter,
 } from "expo-router";
-import { ReactNode, useMemo } from "react";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { ReactNode, useMemo, useState } from "react";
+import {
+  Linking,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useTranslation } from "react-i18next";
 
 const styles = StyleSheet.create({
@@ -82,6 +89,30 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     height: appLayoutConstants.textInputHeight,
     borderRadius: appLayoutConstants.globalCornerRadius,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.52)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  modalDialog: {
+    width: "100%",
+    maxWidth: 560,
+    padding: 24,
+    borderRadius: appLayoutConstants.globalCornerRadius,
+    borderWidth: 1,
+    gap: 20,
+  },
+  modalHeader: {
+    gap: 8,
+  },
+  modalBody: {
+    gap: 10,
+  },
+  modalActions: {
+    gap: 12,
   },
   descriptionSection: {
     gap: 16,
@@ -201,6 +232,8 @@ export default function WnaProjectDetailsRoute(): ReactNode {
   const navigation = useNavigation();
   const router = useRouter();
   const params = useLocalSearchParams<{ slug?: string | string[] }>();
+  const [isPrivateRepoModalVisible, setIsPrivateRepoModalVisible] =
+    useState(false);
   const rawSlug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const projectMatch = useMemo(
     () => findProjectBySlug(appData.projects, rawSlug),
@@ -220,6 +253,11 @@ export default function WnaProjectDetailsRoute(): ReactNode {
 
   const { project } = projectMatch;
   const lang = getNavigationLang(getLangCode());
+  const privateRepoMailToUrl = `mailto:${appData.contact.email}?subject=${encodeURIComponent(
+    `Repository review: ${project.title}`,
+  )}&body=${encodeURIComponent(
+    `Hello,\n\nI would be interested in a review of the project "${project.title}".\n\nBest regards`,
+  )}`;
   const projectLinks = [
     {
       url: project.repoUrl,
@@ -350,6 +388,14 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                           ),
                         }}
                         onPress={() => {
+                          if (
+                            link.icon === "github" &&
+                            project.repoVisibility === "private"
+                          ) {
+                            setIsPrivateRepoModalVisible(true);
+                            return;
+                          }
+
                           Linking.openURL(link.url);
                         }}
                       />
@@ -378,25 +424,6 @@ export default function WnaProjectDetailsRoute(): ReactNode {
             </View>
 
             <View style={styles.contentSection}>
-              {project.description ? (
-                <View
-                  style={[
-                    styles.descriptionSection,
-                    {
-                      backgroundColor: convertHexToRgba(
-                        appColors.warmgray6,
-                        0.2,
-                      ),
-                      borderColor: convertHexToRgba(appColors.coolgray2, 0.9),
-                    },
-                  ]}
-                >
-                  <View style={styles.descriptionGroup}>
-                    {renderProjectDescription(project.description, appStyle)}
-                  </View>
-                </View>
-              ) : null}
-
               {appData.projectDetailsContext ? (
                 <View
                   style={[
@@ -424,9 +451,134 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   </Text>
                 </View>
               ) : null}
+
+              {project.description ? (
+                <View
+                  style={[
+                    styles.descriptionSection,
+                    {
+                      backgroundColor: convertHexToRgba(
+                        appColors.warmgray6,
+                        0.2,
+                      ),
+                      borderColor: convertHexToRgba(appColors.coolgray2, 0.9),
+                    },
+                  ]}
+                >
+                  <View style={styles.descriptionGroup}>
+                    {renderProjectDescription(project.description, appStyle)}
+                  </View>
+                </View>
+              ) : null}
             </View>
           </View>
         </View>
+        <Modal
+          visible={isPrivateRepoModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setIsPrivateRepoModalVisible(false)}
+        >
+          <Pressable
+            style={styles.modalBackdrop}
+            onPress={() => setIsPrivateRepoModalVisible(false)}
+          >
+            <Pressable
+              onPress={() => undefined}
+              style={[
+                styles.modalDialog,
+                {
+                  backgroundColor: convertHexToRgba(appColors.coolgray8, 0.96),
+                  borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+                },
+              ]}
+            >
+              <View style={styles.modalHeader}>
+                <Text
+                  style={[
+                    appStyle.textNeutralMedium,
+                    { color: appColors.white, fontWeight: "700" },
+                  ]}
+                >
+                  {t(i18nKeys.titlePrivateRepo)}
+                </Text>
+                <Text
+                  style={[
+                    appStyle.textNeutralMedium,
+                    { color: appColors.white, opacity: 0.92 },
+                  ]}
+                >
+                  {t(i18nKeys.infoPrivateRepoHint)}
+                </Text>
+              </View>
+
+              <View style={styles.modalBody}>
+                <Text
+                  style={[
+                    appStyle.textNeutralMedium,
+                    { color: appColors.white, opacity: 0.86 },
+                  ]}
+                >
+                  {t(i18nKeys.infoPrivateRepoBody)}
+                </Text>
+              </View>
+
+              <View style={styles.modalActions}>
+                <WnaButtonIconText
+                  appColors={appColors}
+                  appStyle={appStyle}
+                  iconName="email"
+                  text={t(i18nKeys.actionEmail)}
+                  textColor={appColors.white}
+                  backgroundColor={convertHexToRgba(appColors.accent5, 0.92)}
+                  borderWidth={1}
+                  style={{
+                    ...styles.actionButton,
+                    borderColor: convertHexToRgba(appColors.coolgray2, 0.4),
+                    marginHorizontal: 0,
+                  }}
+                  onPress={() => {
+                    setIsPrivateRepoModalVisible(false);
+                    Linking.openURL(privateRepoMailToUrl);
+                  }}
+                />
+                <WnaButtonIconText
+                  appColors={appColors}
+                  appStyle={appStyle}
+                  iconName="github"
+                  text={t(i18nKeys.actionContinueToPage)}
+                  textColor={appColors.white}
+                  backgroundColor={convertHexToRgba(appColors.coolgray8, 0.98)}
+                  borderWidth={1}
+                  style={{
+                    ...styles.actionButton,
+                    borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+                    marginHorizontal: 0,
+                  }}
+                  onPress={() => {
+                    setIsPrivateRepoModalVisible(false);
+                    Linking.openURL(project.repoUrl ?? "");
+                  }}
+                />
+                <WnaButtonIconText
+                  appColors={appColors}
+                  appStyle={appStyle}
+                  iconName="close"
+                  text={t(i18nKeys.actionClose)}
+                  textColor={appColors.white}
+                  backgroundColor={convertHexToRgba(appColors.coolgray8, 0.98)}
+                  borderWidth={1}
+                  style={{
+                    ...styles.actionButton,
+                    borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+                    marginHorizontal: 0,
+                  }}
+                  onPress={() => setIsPrivateRepoModalVisible(false)}
+                />
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
       </WnaSurfaceCard>
     </WnaScrollViewScreen>
   );

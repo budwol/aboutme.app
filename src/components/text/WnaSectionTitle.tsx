@@ -80,9 +80,11 @@ const WnaSectionTitle = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    width: "100%",
   },
   title: {
     letterSpacing: 2,
+    textAlign: "center",
   },
 });
 

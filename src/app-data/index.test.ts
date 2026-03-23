@@ -55,6 +55,13 @@ describe("normalizeAppData", () => {
         projectsSubtitleEn: "Private work",
         projectsContextDe: "Deutscher Projekthinweis",
         projectsContextEn: "English project note",
+        projectsHighlights: [
+          {
+            icon: "phone",
+            textDe: "Mobile First",
+            textEn: "Mobile First",
+          },
+        ],
         projectDetailsContextDe: "Deutscher Detailhinweis",
         projectDetailsContextEn: "English detail note",
         projects: [
@@ -66,6 +73,7 @@ describe("normalizeAppData", () => {
             descriptionDe: "Deutsche Beschreibung",
             descriptionEn: "English description",
             repoUrl: "https://github.com/example/custom-project",
+            repoVisibility: "private",
             webUrl: "https://app.example.com/custom-project",
             playStoreUrl:
               "https://play.google.com/store/apps/details?id=com.example.customproject",
@@ -95,12 +103,16 @@ describe("normalizeAppData", () => {
     expect(data.siteUrl).toBe("https://portfolio.example.com");
     expect(data.projectsSubtitle).toBe("Private work");
     expect(data.projectsContext).toBe("English project note");
+    expect(data.projectsHighlights).toEqual([
+      { icon: "phone", text: "Mobile First" },
+    ]);
     expect(data.projectDetailsContext).toBe("English detail note");
     expect(data.projects[0]).toMatchObject({
       title: "Custom Project",
       context: "English project context",
       description: "English description",
       repoUrl: "https://github.com/example/custom-project",
+      repoVisibility: "private",
       webUrl: "https://app.example.com/custom-project",
       playStoreUrl:
         "https://play.google.com/store/apps/details?id=com.example.customproject",

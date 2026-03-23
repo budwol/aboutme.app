@@ -22,6 +22,18 @@ const exampleAppDataInput = {
     primary: ["PHP", "Basic"],
     secondary: ["Perl", "Java"],
   },
+  projectsHighlights: [
+    {
+      icon: "phone",
+      textDe: "Mobile First",
+      textEn: "Mobile First",
+    },
+    {
+      icon: "map-outline",
+      textDe: "Geodaten",
+      textEn: "Geospatial Data",
+    },
+  ],
   projectsSubtitleDe: "Einige private Nebenprojekte",
   projectsSubtitleEn: "Some private side projects",
   projects: [
@@ -35,6 +47,7 @@ const exampleAppDataInput = {
       descriptionEn:
         "Mobile and web app for ordering pizza with a shared codebase.",
       repoUrl: "https://github.com/JohnDoe/pizza-app",
+      repoVisibility: "private",
       techstack: ["Flutter", "Dart", "Firebase"],
       imageL: "default_project.webp",
       imageM: "default_project.webp",
@@ -50,6 +63,7 @@ const exampleAppDataInput = {
       descriptionEn:
         "REST API for authentication, product data, and order workflows.",
       repoUrl: "https://github.com/JohnDoe/backend-api",
+      repoVisibility: "private",
       techstack: ["C#", "ASP.NET Core", ".NET 9", "Docker"],
       imageL: "default_project.webp",
       imageM: "default_project.webp",
@@ -65,6 +79,7 @@ const exampleAppDataInput = {
       descriptionEn:
         "Concept for a platform to buy, sell, and review code snippets.",
       repoUrl: "https://github.com/JohnDoe/code-snippet-store",
+      repoVisibility: "private",
       techstack: ["Python", "React", "PostgreSQL"],
       imageL: "default_project.webp",
       imageM: "default_project.webp",

@@ -147,6 +147,7 @@ jest.mock("expo-router", () => {
 
 describe("WnaProjectDetailsRoute", () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
 
     const appContext = jest.requireMock("@components/WnaAppContext") as {
@@ -210,6 +211,7 @@ describe("WnaProjectDetailsRoute", () => {
       projects: [
         {
           ...testAppData.projects[0],
+          repoVisibility: "public",
           context: "Part of a cohesive fullstack system",
           webUrl: "https://app.example.com",
           playStoreUrl: "https://play.example.com",
@@ -278,6 +280,98 @@ describe("WnaProjectDetailsRoute", () => {
         stack: appData.projects[0].techstack,
       },
     ]);
+  });
+
+  it("opens a modal for private repositories and offers continue and contact actions", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      contact: {
+        ...testAppData.contact,
+        email: "contact@example.com",
+      },
+      projects: [
+        {
+          ...testAppData.projects[0],
+          repoVisibility: "private",
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const repoLink = tree!.root
+      .findAllByType("WnaButtonIconText")
+      .find(
+        (node: { props: { text?: string; iconName?: string } }) =>
+          node.props.text === i18nKeys.actionGithub &&
+          node.props.iconName === "github",
+      );
+
+    await act(async () => {
+      await repoLink?.props.onPress();
+    });
+
+    expect(Linking.openURL).not.toHaveBeenCalled();
+
+    const modal = tree!.root.findByType("Modal");
+    const texts = tree!.root.findAllByType("Text");
+    const textValues = texts.map(
+      (node: { props: { children?: React.ReactNode } }) => node.props.children,
+    );
+    const modalActions = tree!.root
+      .findAllByType("WnaButtonIconText")
+      .slice(-3);
+
+    expect(modal.props.visible).toBe(true);
+    expect(textValues).toContain(i18nKeys.titlePrivateRepo);
+    expect(textValues).toContain(i18nKeys.infoPrivateRepoHint);
+    expect(textValues).toContain(i18nKeys.infoPrivateRepoBody);
+
+    await act(async () => {
+      await modalActions[0].props.onPress();
+    });
+
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      expect.stringContaining("mailto:contact@example.com"),
+    );
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const linksAfterRerender = tree!.root.findAllByType("WnaButtonIconText");
+
+    await act(async () => {
+      await linksAfterRerender[0].props.onPress();
+    });
+
+    const continueAction = tree!.root
+      .findAllByType("WnaButtonIconText")
+      .find(
+        (node: { props: { text?: string } }) =>
+          node.props.text === i18nKeys.actionContinueToPage,
+      );
+
+    await act(async () => {
+      await continueAction.props.onPress();
+    });
+
+    expect(Linking.openURL).toHaveBeenCalledWith(appData.projects[0].repoUrl);
   });
 
   it("renders bullet lines in project descriptions as separate bullet rows", async () => {
