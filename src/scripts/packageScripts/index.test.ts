@@ -15,17 +15,32 @@ describe("package scripts", () => {
   it("re-syncs the real app-data after the local CI path", () => {
     const packageJson = readPackageJson();
     const ciLocal = packageJson.scripts?.["ci:local"];
+    const orderedGates = [
+      "npm run test:prettier",
+      "npm run lint",
+      "npm run test:types",
+      "npm run test:unit",
+      "npm run test:integration",
+      "npm run test:dry-run",
+      "npm run test:smoke",
+      "npm run test:e2e",
+    ];
 
     expect(ciLocal).toBeDefined();
-    expect(ciLocal).toContain("npm run test:all");
     expect(ciLocal).toContain("node ./scripts/sync-web-app-data.cjs");
 
-    const testAllIndex = ciLocal!.indexOf("npm run test:all");
+    let previousGateIndex = -1;
+    for (const gate of orderedGates) {
+      const gateIndex = ciLocal!.indexOf(gate);
+      expect(gateIndex).toBeGreaterThan(previousGateIndex);
+      previousGateIndex = gateIndex;
+    }
+
     const resyncIndex = ciLocal!.lastIndexOf(
       "node ./scripts/sync-web-app-data.cjs",
     );
 
-    expect(resyncIndex).toBeGreaterThan(testAllIndex);
+    expect(resyncIndex).toBeGreaterThan(previousGateIndex);
   });
 
   it("re-syncs the real app-data again right before web export", () => {
