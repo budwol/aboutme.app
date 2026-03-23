@@ -55,6 +55,7 @@ const WnaCardVerticalWithImageComponent: FC<IWnaCardVerticalWithImageProps> = ({
           title={text1}
           subtitle={text2}
           subtitleAlign={"center"}
+          subtitleMinHeight={52}
           titleAlign={"center"}
           titleMinHeight={40}
           titleNumberOfLines={2}
