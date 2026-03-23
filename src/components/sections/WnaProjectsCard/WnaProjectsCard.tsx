@@ -147,6 +147,7 @@ export default function WnaProjectsCard({
             <WnaPressable
               ripple={appColors.isDark ? "light" : "dark"}
               checkInternetConnection={false}
+              accessibilityLabel={`Open project ${project.title}`}
               t={t}
               onPress={() => onProjectPress?.(index)}
             >
