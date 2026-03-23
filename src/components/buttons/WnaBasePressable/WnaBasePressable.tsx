@@ -21,6 +21,8 @@ const WnaBasePressable: FC<WnaPressableProps> = (props) => {
   const isEnabled = props.isEnabled ?? true;
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={props.accessibilityLabel}
       disabled={!isEnabled}
       onPress={props.onPress}
       onHoverIn={props.onHoverIn}

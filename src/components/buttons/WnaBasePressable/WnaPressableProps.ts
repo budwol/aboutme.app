@@ -5,6 +5,7 @@ import { ViewStyle } from "react-native";
 export type WnaPressableProps = {
   children?: ReactNode;
   onPress: () => void;
+  accessibilityLabel?: string;
   onHoverIn?: () => void;
   onHoverOut?: () => void;
   checkInternetConnection?: boolean;
