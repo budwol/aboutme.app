@@ -54,6 +54,14 @@ const styles = StyleSheet.create({
     left: 16,
     zIndex: 1,
   },
+  heroBottomLeftStack: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    zIndex: 1,
+    gap: 12,
+    alignItems: "flex-start",
+  },
   heroActionContainer: {
     position: "absolute",
     bottom: 16,
@@ -341,7 +349,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
       <WnaSurfaceCard appColors={appColors}>
         <View style={styles.cardContent}>
           <View style={styles.heroSection}>
-            {project.subtitle ? (
+            {project.subtitle && isLandscape ? (
               <View style={styles.heroBadgeContainer}>
                 <View
                   style={[
@@ -370,8 +378,72 @@ export default function WnaProjectDetailsRoute(): ReactNode {
               </View>
             ) : null}
 
-            {projectLinks.length > 0 ? (
-              <View style={styles.heroActionContainer}>
+            {!isLandscape && (project.subtitle || projectLinks.length > 0) ? (
+              <View style={styles.heroBottomLeftStack}>
+                {projectLinks.length > 0 ? (
+                  <View style={styles.actionSection}>
+                    <View style={styles.actionLinks}>
+                      {projectLinks.map((link) => (
+                        <WnaButtonIcon
+                          key={link.label}
+                          appColors={appColors}
+                          appStyle={appStyle}
+                          iconName={link.icon}
+                          toolTip={link.label}
+                          toolTipPosition="top"
+                          t={t}
+                          checkInternetConnection={false}
+                          onPress={() => {
+                            if (
+                              link.icon === "github" &&
+                              project.repoVisibility === "private"
+                            ) {
+                              setIsPrivateRepoModalVisible(true);
+                              return;
+                            }
+
+                            Linking.openURL(link.url);
+                          }}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ) : null}
+
+                {project.subtitle ? (
+                  <View
+                    style={[
+                      styles.heroBadge,
+                      {
+                        backgroundColor: convertHexToRgba(
+                          appColors.staticCoolgray8,
+                          0.8,
+                        ),
+                        borderColor: convertHexToRgba(
+                          appColors.coolgray2,
+                          0.72,
+                        ),
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        appStyle.textSmall,
+                        {
+                          color: appColors.staticWhite,
+                          lineHeight: 16,
+                        },
+                      ]}
+                    >
+                      {project.subtitle}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
+            {projectLinks.length > 0 && isLandscape ? (
+              <View style={[styles.heroActionContainer]}>
                 <View style={styles.actionSection}>
                   <View style={styles.actionLinks}>
                     {projectLinks.map((link) =>
@@ -407,29 +479,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                             Linking.openURL(link.url);
                           }}
                         />
-                      ) : (
-                        <WnaButtonIcon
-                          key={link.label}
-                          appColors={appColors}
-                          appStyle={appStyle}
-                          iconName={link.icon}
-                          toolTip={link.label}
-                          toolTipPosition="top"
-                          t={t}
-                          checkInternetConnection={false}
-                          onPress={() => {
-                            if (
-                              link.icon === "github" &&
-                              project.repoVisibility === "private"
-                            ) {
-                              setIsPrivateRepoModalVisible(true);
-                              return;
-                            }
-
-                            Linking.openURL(link.url);
-                          }}
-                        />
-                      ),
+                      ) : null,
                     )}
                   </View>
                 </View>
