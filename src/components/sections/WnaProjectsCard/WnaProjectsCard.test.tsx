@@ -4,6 +4,10 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 
+jest.mock("@components/WnaAppContext", () => ({
+  useWnaLayout: jest.fn(() => ({ isLandscape: true })),
+}));
+
 jest.mock("@components/text/WnaSectionTitle", () => {
   const { createElement } = jest.requireActual(
     "react",
@@ -230,5 +234,39 @@ describe("WnaProjectsCard", () => {
     expect(textValues).not.toContain(testAppData.projectsContext);
     expect(textValues).not.toContain(testAppData.projectsHighlights[0].text);
     expect(pressables[0].props.ripple).toBe("light");
+  });
+
+  it("keeps the first project card at normal width in portrait mode", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaLayout.mockReturnValue({ isLandscape: false });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProjectsCard
+          appColors={
+            {
+              isDark: false,
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              accent5: "#0aa",
+            } as never
+          }
+          appData={testAppData}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const cards = tree!.root.findAllByType("WnaCardVerticalWithImage");
+
+    expect(cards[0].props.width).toBe(256);
+    expect(cards[0].props.imageUrl).toBe(
+      `images/${testAppData.projects[0].imageS}`,
+    );
   });
 });

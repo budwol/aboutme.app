@@ -57,6 +57,7 @@ describe("WnaCardVerticalWithImage", () => {
     expect(content.props.title).toBe("Project One");
     expect(content.props.subtitle).toBe("Subtitle");
     expect(content.props.subtitleAlign).toBe("center");
+    expect(content.props.subtitleMinHeight).toBe(52);
     expect(content.props.titleAlign).toBe("center");
     expect(content.props.titleMinHeight).toBe(40);
     expect(content.props.titleNumberOfLines).toBe(2);
