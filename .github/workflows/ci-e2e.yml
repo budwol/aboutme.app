@@ -27,10 +27,23 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: e2e
+        id: e2e
+        continue-on-error: true
         run: npm run test:e2e
 
+      - name: print playwright failure context
+        if: steps.e2e.outcome == 'failure'
+        run: |
+          if [ -d test-results ]; then
+            find test-results -name error-context.md | while read -r file; do
+              echo "::group::$file"
+              sed -n '1,200p' "$file"
+              echo "::endgroup::"
+            done
+          fi
+
       - name: upload playwright artifacts
-        if: failure()
+        if: steps.e2e.outcome == 'failure'
         uses: actions/upload-artifact@v6
         with:
           name: playwright-artifacts
@@ -38,3 +51,7 @@ jobs:
             playwright-report
             test-results
           if-no-files-found: ignore
+
+      - name: fail job if e2e failed
+        if: steps.e2e.outcome == 'failure'
+        run: exit 1
