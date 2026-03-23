@@ -4,13 +4,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { I18nextProvider } from "react-i18next";
 
 import WnaApp from "@components/WnaApp";
-import { setNavigationBaseUrl } from "@components/navigation/wnaNavigationRouteProvider";
-import { i18n } from "@services/i18n/i18n";
+import { setNavigationBaseUrl } from "@/navigation/routes/wnaNavigationRouteProvider";
+import { i18n } from "@/i18n/i18n";
 import { AppData, loadAppData } from "@/app-data";
-import {
-  getThemeFromStorageAsync,
-  Theme,
-} from "@services/wnaAsyncStorageProvider";
+import { getThemeFromStorageAsync, Theme } from "@/storage/themeStorage";
 import { WnaAppContextProvider } from "@/components/WnaAppContext";
 
 global.__expo_disable_font_preloading__ = true;

@@ -1,0 +1,17 @@
+export const sectionConstants = {
+  sectionFooterActionPaddingHorizontal: 16,
+  sectionFooterActionPaddingVertical: 8,
+  sectionFooterActionMarginTop: 8,
+  projectsCardWidth: 256,
+  projectsCardGridGap: 16,
+  projectsContextPaddingHorizontal: 16,
+  projectsContextPaddingVertical: 14,
+  projectsContextOpacity: 0.78,
+  heroAvatarSize: 200,
+  heroAvatarCompactSize: 132,
+  heroAvatarMarginTop: 8,
+  heroAccentBarWidth: 112,
+  heroAccentBarPulseWidth: 24,
+  heroAccentBarPulseDuration: 30000,
+  heroFieldMotionDuration: 13000,
+} as const;
