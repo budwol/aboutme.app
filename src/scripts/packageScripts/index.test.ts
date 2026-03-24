@@ -76,6 +76,7 @@ describe("package scripts", () => {
     jest.resetModules();
     process.env.APP_NAME = "AboutMe";
     process.env.APP_DESCRIPTION = "Portfolio";
+    process.env.SCHEME = "aboutme";
 
     // `app.config.ts` is evaluated in Node, so the test mirrors that path.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
