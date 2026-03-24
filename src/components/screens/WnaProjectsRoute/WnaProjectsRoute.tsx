@@ -313,8 +313,8 @@ export default function WnaProjectsRoute(): ReactNode {
             style={[
               styles.portraitContextBox,
               {
-                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.16),
-                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+                backgroundColor: convertHexToRgba(appColors.staticWhite, 0.2),
+                borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.64),
               },
             ]}
           >
@@ -322,6 +322,7 @@ export default function WnaProjectsRoute(): ReactNode {
               style={[
                 appStyle.textSmall,
                 {
+                  color: appColors.staticWhite,
                   lineHeight: (appStyle.textSmall?.lineHeight ?? 16) + 4,
                   opacity: 0.82,
                 },
@@ -337,8 +338,8 @@ export default function WnaProjectsRoute(): ReactNode {
             style={[
               styles.portraitFeatureBox,
               {
-                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.18),
-                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+                backgroundColor: convertHexToRgba(appColors.staticWhite, 0.14),
+                borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.56),
               },
             ]}
           >
@@ -348,8 +349,11 @@ export default function WnaProjectsRoute(): ReactNode {
                 style={[
                   styles.portraitFeatureItem,
                   {
-                    backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
-                    borderColor: convertHexToRgba(appColors.coolgray2, 0.42),
+                    backgroundColor: convertHexToRgba(
+                      appColors.staticCoolgray8,
+                      0.42,
+                    ),
+                    borderColor: convertHexToRgba(appColors.staticWhite, 0.16),
                   },
                 ]}
               >
@@ -358,7 +362,7 @@ export default function WnaProjectsRoute(): ReactNode {
                     styles.portraitFeatureIconWrap,
                     {
                       backgroundColor: convertHexToRgba(
-                        appColors.coolgray8,
+                        appColors.staticWhite,
                         0.08,
                       ),
                     },
@@ -367,14 +371,14 @@ export default function WnaProjectsRoute(): ReactNode {
                   <WnaIcon
                     iconName={item.icon as never}
                     size={18}
-                    color={appColors.black}
+                    color={appColors.staticWhite}
                   />
                 </View>
                 <Text
                   style={[
                     appStyle.textSmall,
                     styles.portraitFeatureText,
-                    { color: appColors.black },
+                    { color: appColors.staticWhite, opacity: 0.9 },
                   ]}
                 >
                   {item.text}
@@ -423,8 +427,8 @@ export default function WnaProjectsRoute(): ReactNode {
               landscapeVariant && styles.projectCardLandscape,
               featured && styles.projectCardFeatured,
               {
-                backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
-                borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+                backgroundColor: convertHexToRgba(appColors.staticWhite, 0.14),
+                borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.56),
               },
             ]}
           >
