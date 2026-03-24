@@ -170,11 +170,13 @@ describe("WnaProjectDetailsRoute", () => {
 
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
+        background: "#fcfcfc",
+        black: "#111111",
         staticWhite: "#ffffff",
         staticCoolgray2: "#cccccc",
         staticCoolgray8: "#222222",
-        coolgray2: "#cccccc",
-        coolgray8: "#222222",
+        coolgray2: "#d6d6d6",
+        coolgray8: "#181818",
         accent5: "#2a7fff",
         white: "#ffffff",
         warmgray6: "#999999",
@@ -352,6 +354,12 @@ describe("WnaProjectDetailsRoute", () => {
     const modalActions = tree!.root
       .findAllByType("WnaButtonIconText")
       .slice(-2);
+    const modalDialog = tree!.root.findByProps({
+      testID: "private-repo-modal-dialog",
+    });
+    const modalCloseButton = tree!.root.findByProps({
+      testID: "private-repo-modal-close",
+    });
 
     expect(modal.props.visible).toBe(true);
     expect(textValues).toContain(i18nKeys.titlePrivateRepo);
@@ -363,6 +371,26 @@ describe("WnaProjectDetailsRoute", () => {
     expect(modalActions).toHaveLength(2);
     expect(modalActions[0].props.style).toMatchObject({ flexBasis: 208 });
     expect(modalActions[1].props.style).toMatchObject({ flexBasis: 208 });
+    expect(modalDialog.props.style[1]).toMatchObject({
+      backgroundColor: "rgba(252,252,252,0.96)",
+      borderColor: "rgba(214,214,214,0.72)",
+    });
+    expect(modalCloseButton.props.style[1]).toMatchObject({
+      backgroundColor: "rgba(252,252,252,0.98)",
+      borderColor: "rgba(214,214,214,0.72)",
+    });
+    expect(modalActions[0].props.textColor).toBe("#ffffff");
+    expect(modalActions[0].props.backgroundColor).toBe("rgba(42,127,255,0.92)");
+    expect(modalActions[0].props.style).toMatchObject({
+      borderColor: "rgba(214,214,214,0.4)",
+    });
+    expect(modalActions[1].props.textColor).toBe("#111111");
+    expect(modalActions[1].props.backgroundColor).toBe(
+      "rgba(252,252,252,0.98)",
+    );
+    expect(modalActions[1].props.style).toMatchObject({
+      borderColor: "rgba(214,214,214,0.72)",
+    });
 
     await act(async () => {
       await modalActions[0].props.onPress();
@@ -506,5 +534,90 @@ describe("WnaProjectDetailsRoute", () => {
       ),
     ).toEqual(["top", "top", "top"]);
     expect(textButtons).toHaveLength(0);
+  });
+
+  it("uses dark dialog colors when the active theme is dark", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaTheme: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          repoVisibility: "private",
+        },
+      ],
+    };
+
+    appContext.useWnaTheme.mockReturnValue({
+      appColors: {
+        background: "#181818",
+        black: "#ffffff",
+        staticWhite: "#ffffff",
+        staticCoolgray2: "#cccccc",
+        staticCoolgray8: "#222222",
+        coolgray2: "#282D37",
+        coolgray8: "#fcfcfc",
+        accent5: "#2a7fff",
+        white: "#181818",
+        warmgray6: "#999999",
+      },
+      appStyle: {
+        textSmall: {},
+        textNeutralMedium: {},
+      },
+    });
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const repoLink = tree!.root
+      .findAllByType("WnaButtonIconText")
+      .find(
+        (node: { props: { text?: string; iconName?: string } }) =>
+          node.props.text === i18nKeys.actionGithub &&
+          node.props.iconName === "github",
+      );
+
+    await act(async () => {
+      await repoLink?.props.onPress();
+    });
+
+    const modalDialog = tree!.root.findByProps({
+      testID: "private-repo-modal-dialog",
+    });
+    const modalCloseButton = tree!.root.findByProps({
+      testID: "private-repo-modal-close",
+    });
+    const modalActions = tree!.root
+      .findAllByType("WnaButtonIconText")
+      .slice(-2);
+
+    expect(modalDialog.props.style[1]).toMatchObject({
+      backgroundColor: "rgba(24,24,24,0.96)",
+      borderColor: "rgba(40,45,55,0.72)",
+    });
+    expect(modalCloseButton.props.style[1]).toMatchObject({
+      backgroundColor: "rgba(24,24,24,0.98)",
+      borderColor: "rgba(40,45,55,0.72)",
+    });
+    expect(modalActions[0].props.textColor).toBe("#ffffff");
+    expect(modalActions[1].props.textColor).toBe("#ffffff");
+    expect(modalActions[1].props.backgroundColor).toBe("rgba(24,24,24,0.98)");
+    expect(modalActions[1].props.style).toMatchObject({
+      borderColor: "rgba(40,45,55,0.72)",
+    });
   });
 });

@@ -580,10 +580,11 @@ export default function WnaProjectDetailsRoute(): ReactNode {
             onPress={() => setIsPrivateRepoModalVisible(false)}
           >
             <View
+              testID="private-repo-modal-dialog"
               style={[
                 styles.modalDialog,
                 {
-                  backgroundColor: convertHexToRgba(appColors.coolgray8, 0.96),
+                  backgroundColor: convertHexToRgba(appColors.background, 0.96),
                   borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
                 },
               ]}
@@ -594,13 +595,14 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                     <Text
                       style={[
                         appStyle.textNeutralMedium,
-                        { color: appColors.white, fontWeight: "700" },
+                        { color: appColors.black, fontWeight: "700" },
                       ]}
                     >
                       {t(i18nKeys.titlePrivateRepo)}
                     </Text>
                   </View>
                   <Pressable
+                    testID="private-repo-modal-close"
                     accessibilityRole="button"
                     accessibilityLabel={t(i18nKeys.actionClose)}
                     onPress={() => setIsPrivateRepoModalVisible(false)}
@@ -608,7 +610,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                       styles.modalCloseButton,
                       {
                         backgroundColor: convertHexToRgba(
-                          appColors.coolgray8,
+                          appColors.background,
                           0.98,
                         ),
                         borderColor: convertHexToRgba(
@@ -621,7 +623,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                     <WnaIcon
                       iconName="close"
                       size={18}
-                      color={appColors.white}
+                      color={appColors.black}
                     />
                   </Pressable>
                 </View>
@@ -631,7 +633,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                 <Text
                   style={[
                     appStyle.textNeutralMedium,
-                    { color: appColors.white, opacity: 0.86 },
+                    { color: appColors.black, opacity: 0.86 },
                   ]}
                 >
                   {t(i18nKeys.infoPrivateRepoHint)}{" "}
@@ -645,7 +647,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   appStyle={appStyle}
                   iconName="email"
                   text={t(i18nKeys.actionEmail)}
-                  textColor={appColors.white}
+                  textColor={appColors.staticWhite}
                   backgroundColor={convertHexToRgba(appColors.accent5, 0.92)}
                   borderWidth={1}
                   style={{
@@ -664,8 +666,8 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   appStyle={appStyle}
                   iconName="github"
                   text={t(i18nKeys.actionContinueToPage)}
-                  textColor={appColors.white}
-                  backgroundColor={convertHexToRgba(appColors.coolgray8, 0.98)}
+                  textColor={appColors.black}
+                  backgroundColor={convertHexToRgba(appColors.background, 0.98)}
                   borderWidth={1}
                   style={{
                     ...styles.actionButton,
