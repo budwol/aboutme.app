@@ -50,7 +50,7 @@ function getOptionalOwner(): string | undefined {
 
 const appName = getRequiredEnv("APP_NAME");
 const appDescription = getRequiredEnv("APP_DESCRIPTION");
-const appVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? "1.0.0";
+const appVersion = process.env.EXPO_PUBLIC_APP_VERSION ?? "1.1.0";
 const publicLogo1024 = "./public/logo_1024.png";
 const publicLogo192 = "./public/logo_192.png";
 const appSlug = getOptionalEnv(
