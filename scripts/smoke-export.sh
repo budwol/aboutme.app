@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TEMP_BIN_DIR=""
+APP_VERSION="$(node -p "require('./package.json').version")"
 
 cleanup() {
   if [ -n "$TEMP_BIN_DIR" ] && [ -d "$TEMP_BIN_DIR" ]; then
@@ -70,6 +71,11 @@ fi
 
 npm run init
 . "$ROOT_DIR/scripts/load-env.sh" "$ROOT_DIR/.env"
+EXPO_CONFIG_JSON="$(npx expo config --json)"
+
+echo "$EXPO_CONFIG_JSON" | grep -q "\"version\":\"$APP_VERSION\""
+echo "$EXPO_CONFIG_JSON" | grep -q "\"appVersion\":\"$APP_VERSION\""
+
 npx expo export -p web
 
 test -f dist/index.html
