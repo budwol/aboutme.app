@@ -177,14 +177,14 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
 
     add_header 'X-Content-Type-Options' 'nosniff' always;
     add_header 'X-Frame-Options' 'DENY' always;
-    add_header 'Cross-Origin-Opener-Policy' 'unsafe-none' always;
+    add_header 'Cross-Origin-Opener-Policy' 'same-origin' always;
     add_header 'Cross-Origin-Embedder-Policy' 'same-origin' always;
     add_header 'Cross-Origin-Resource-Policy' 'same-origin' always;
     add_header 'Strict-Transport-Security' 'max-age=31536000; includeSubDomains; preload' always;
     add_header 'Referrer-Policy' 'same-origin' always;
-    add_header 'Permissions-Policy' 'geolocation=(self),midi=(),sync-xhr=(),microphone=(),camera=(self),magnetometer=(self),gyroscope=(),fullscreen=(self),payment=()' always;
+    add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;
     add_header 'X-Robots-Tag' 'noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate' always;
-    add_header Content-Security-Policy "default-src 'self'; connect-src 'self' ${allowDomain} https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' ${allowDomain}; script-src-elem 'self' 'unsafe-inline' ${allowDomain}; style-src 'self' 'unsafe-inline' ${allowDomain} https://cdnjs.cloudflare.com; font-src 'self' data: ${allowDomain} https://cdnjs.cloudflare.com; img-src 'self' data: ${allowDomain}; frame-src 'self' ${allowDomain}; frame-ancestors 'self'; object-src 'none';" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self' ${allowDomain}; font-src 'self' data: ${allowDomain}; form-action 'self'; frame-ancestors 'self'; frame-src 'self' ${allowDomain}; img-src 'self' data: ${allowDomain}; manifest-src 'self'; object-src 'none'; script-src 'self' ${allowDomain}; script-src-attr 'none'; script-src-elem 'self' ${allowDomain}; style-src 'self' 'unsafe-inline' ${allowDomain}; worker-src 'self' blob:;" always;
 
     server_tokens off;
 
