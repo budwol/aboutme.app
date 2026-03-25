@@ -51,7 +51,22 @@ describe("init process security", () => {
     expect(generated.nginxConfig).toContain("listen 8080 default_server;");
     expect(generated.nginxConfig).toContain("error_log /dev/stderr warn;");
     expect(generated.nginxConfig).toContain(
+      "add_header 'Cross-Origin-Opener-Policy' 'same-origin' always;",
+    );
+    expect(generated.nginxConfig).toContain(
+      "add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;",
+    );
+    expect(generated.nginxConfig).toContain(
       "add_header 'Cross-Origin-Resource-Policy' 'same-origin' always;",
+    );
+    expect(generated.nginxConfig).toContain("base-uri 'self';");
+    expect(generated.nginxConfig).toContain("form-action 'self';");
+    expect(generated.nginxConfig).toContain("manifest-src 'self';");
+    expect(generated.nginxConfig).toContain("script-src-attr 'none';");
+    expect(generated.nginxConfig).toContain("worker-src 'self' blob:;");
+    expect(generated.nginxConfig).not.toContain("https://cdnjs.cloudflare.com");
+    expect(generated.nginxConfig).not.toContain(
+      "script-src 'self' 'unsafe-inline'",
     );
     expect(generated.manifest).toContain('"scope": "/"');
     expect(generated.manifest).toContain('"start_url": "/"');

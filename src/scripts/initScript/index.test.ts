@@ -217,6 +217,23 @@ describe("init.sh", () => {
     expect(fs.existsSync(path.join(fixtureRoot, "public", "favicon.svg"))).toBe(
       true,
     );
+    const nginxConfig = fs.readFileSync(
+      path.join(fixtureRoot, "nginx", "site.conf"),
+      "utf8",
+    );
+    expect(nginxConfig).toContain(
+      "add_header 'Cross-Origin-Opener-Policy' 'same-origin' always;",
+    );
+    expect(nginxConfig).toContain(
+      "add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;",
+    );
+    expect(nginxConfig).toContain("base-uri 'self';");
+    expect(nginxConfig).toContain("form-action 'self';");
+    expect(nginxConfig).toContain("manifest-src 'self';");
+    expect(nginxConfig).toContain("script-src-attr 'none';");
+    expect(nginxConfig).toContain("worker-src 'self' blob:;");
+    expect(nginxConfig).not.toContain("https://cdnjs.cloudflare.com");
+    expect(nginxConfig).not.toContain("script-src 'self' 'unsafe-inline'");
   });
 
   it("stays idempotent across repeated runs", () => {
