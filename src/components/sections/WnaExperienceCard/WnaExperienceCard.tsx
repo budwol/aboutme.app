@@ -2,6 +2,8 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   DimensionValue,
   LayoutChangeEvent,
+  Linking,
+  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -10,6 +12,7 @@ import {
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaBadge from "@components/display/WnaBadge";
 import WnaCardSmallVertical from "@components/cards/WnaCardSmallVertical";
+import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import WnaSectionFooterAction from "@components/sections/WnaSectionFooterAction";
 import { WnaSectionProps } from "@components/sections/WnaSectionProps";
 import { i18nKeys } from "@/i18n/i18nKeys";
@@ -43,6 +46,14 @@ type ExperienceDetailsBoxProps = {
   backgroundColor: string;
   borderColor: string;
   children: ReactNode;
+};
+
+type ExperienceCompanyLinkProps = {
+  appColors: WnaExperienceCardProps["appColors"];
+  appStyle: WnaExperienceCardProps["appStyle"];
+  company: string;
+  companyUrl: string;
+  index: number;
 };
 
 function ExperienceDetailsBox({
@@ -90,6 +101,60 @@ function ExperienceDetailsBox({
         {children}
       </View>
     </Animated.View>
+  );
+}
+
+function ExperienceCompanyLink({
+  appColors,
+  appStyle,
+  company,
+  companyUrl,
+  index,
+}: ExperienceCompanyLinkProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Pressable
+      accessibilityRole="link"
+      onHoverIn={() => setIsHovered(true)}
+      onHoverOut={() => setIsHovered(false)}
+      onPress={(event) => {
+        event.stopPropagation();
+        void Linking.openURL(companyUrl);
+      }}
+      style={[
+        styles.companyLinkPressable,
+        isHovered && {
+          backgroundColor: convertHexToRgba(appColors.accent5, 0.08),
+        },
+      ]}
+      testID={`experience-company-link-${index}`}
+    >
+      <View style={styles.companyLinkRow}>
+        <Text
+          style={[
+            appStyle.textNeutralSmall,
+            styles.companyLinkText,
+            isHovered && { color: appColors.accent5 },
+            {
+              textDecorationColor: convertHexToRgba(appColors.accent5, 0.45),
+            },
+          ]}
+        >
+          {company}
+        </Text>
+        <WnaIcon
+          iconName="open-in-new"
+          size={12}
+          color={
+            isHovered
+              ? appColors.accent5
+              : convertHexToRgba(appColors.accent5, 0.72)
+          }
+          style={styles.companyLinkIcon}
+        />
+      </View>
+    </Pressable>
   );
 }
 
@@ -163,6 +228,26 @@ export default function WnaExperienceCard({
       current.includes(index)
         ? current.filter((entry) => entry !== index)
         : [...current, index],
+    );
+  }
+
+  function renderCompanySubtitle(
+    company: string,
+    companyUrl: string | undefined,
+    index: number,
+  ): ReactNode | undefined {
+    if (!companyUrl) {
+      return undefined;
+    }
+
+    return (
+      <ExperienceCompanyLink
+        appColors={appColors}
+        appStyle={appStyle}
+        company={company}
+        companyUrl={companyUrl}
+        index={index}
+      />
     );
   }
 
@@ -338,6 +423,11 @@ export default function WnaExperienceCard({
                     appColors={appColors}
                     title={item.role}
                     subtitle={item.company}
+                    subtitleContent={renderCompanySubtitle(
+                      item.company,
+                      item.companyUrl,
+                      index,
+                    )}
                     description={item.description}
                     badgeText={item.duration || "..."}
                     opacity={item.opacity ?? 1}
@@ -470,6 +560,27 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     width: undefined,
+  },
+  companyLinkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  companyLinkPressable: {
+    alignSelf: "flex-start",
+    position: "relative",
+    zIndex: 2,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginHorizontal: -4,
+    marginVertical: -2,
+  },
+  companyLinkText: {
+    textDecorationLine: "underline",
+  },
+  companyLinkIcon: {
+    opacity: 0.9,
   },
   actionRow: {
     width: "100%",
