@@ -89,6 +89,7 @@ describe("normalizeAppData", () => {
             roleEn: "Engineer",
             periodDe: "seit 05/2024",
             periodEn: "since 05/2024",
+            companyUrl: "https://company.example.com",
             descriptionDe: "Deutsch",
             descriptionEn: "English",
             detailsDe: ["Fokus Deutsch"],
@@ -126,6 +127,7 @@ describe("normalizeAppData", () => {
       period: "since 05/2024",
       description: "English",
       company: defaultAppData.experience[0].company,
+      companyUrl: "https://company.example.com",
       details: ["Focus English"],
       techstack: ["C#", ".NET"],
     });

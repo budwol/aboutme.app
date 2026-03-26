@@ -119,5 +119,33 @@ describe("WnaExperienceRoute integration", () => {
     expect(experienceCard.props.appData.experience[0].company).toBe(
       testAppData.experience[0].company,
     );
+    expect(experienceCard.props.appData.experience[0].companyUrl).toBe(
+      testAppData.experience[0].companyUrl,
+    );
+  });
+
+  it("preserves experiences without a company URL", async () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          company: "Employer Without Link",
+          companyUrl: undefined,
+        },
+      ],
+    };
+
+    const tree = await renderWithAppContext(<WnaExperienceRoute />, {
+      appData,
+    });
+    const experienceCard = tree.root.findByType("WnaExperienceCard");
+
+    expect(experienceCard.props.appData.experience[0].company).toBe(
+      "Employer Without Link",
+    );
+    expect(
+      experienceCard.props.appData.experience[0].companyUrl,
+    ).toBeUndefined();
   });
 });

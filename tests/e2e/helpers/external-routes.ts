@@ -52,6 +52,49 @@ export async function stubXingRoute(target: BrowserContext | Page) {
   );
 }
 
+export async function stubEmployerRoutes(target: BrowserContext | Page) {
+  await stubExternalRoute(
+    target,
+    "https://cool-company.example.com/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://rocket-science.example.com/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://code-fabric.example.com/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://www.vita34.de/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://www.sinc.de/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://kbs-leipzig.de/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://vitricon.com/de/**",
+    "<html><body>stub employer page</body></html>",
+  );
+  await stubExternalRoute(
+    target,
+    "https://www.arbeitsagentur.de/vor-ort/it-systemhaus/startseite",
+    "<html><body>stub employer page</body></html>",
+  );
+}
+
 export async function installExternalUrlCapture(page: Page) {
   await page.evaluate(() => {
     // Some actions end up on window.open, others on a plain anchor click.
