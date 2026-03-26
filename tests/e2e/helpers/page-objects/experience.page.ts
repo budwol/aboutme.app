@@ -3,6 +3,7 @@ import {
   exampleAppData,
   exampleAppDataDe,
 } from "../../fixtures/example-app-data";
+import { installExternalUrlCapture } from "../external-routes";
 
 export class ExperiencePage {
   readonly page: Page;
@@ -53,5 +54,35 @@ export class ExperiencePage {
       await expect(this.body()).toContainText(item.role);
       await expect(this.body()).toContainText(item.description);
     }
+  }
+
+  async prepareExternalUrlCapture() {
+    await installExternalUrlCapture(this.page);
+  }
+
+  async openFirstCompanyLink() {
+    await this.page.getByTestId("experience-company-link-0").last().click();
+  }
+
+  async assertFirstCompanyUrlOpened() {
+    const expectedUrl = exampleAppData.experience.firstCompanyUrl.replace(
+      /\/$/,
+      "",
+    );
+
+    await expect
+      .poll(async () =>
+        this.page
+          .evaluate(
+            () =>
+              (
+                window as Window & {
+                  __wnaLastOpenedUrl?: string | null;
+                }
+              ).__wnaLastOpenedUrl ?? "",
+          )
+          .then((url) => url.replace(/\/$/, "")),
+      )
+      .toBe(expectedUrl);
   }
 }

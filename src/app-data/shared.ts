@@ -13,6 +13,7 @@ export type ExperienceEntry = {
   duration: string;
   role: string;
   company: string;
+  companyUrl?: string;
   description: string;
   details: string[];
   techstack: string[];
@@ -152,6 +153,7 @@ type ExperienceEntryInput = Partial<ExperienceEntry> & {
   periodEn?: string;
   roleDe?: string;
   roleEn?: string;
+  companyUrl?: string;
   descriptionDe?: string;
   descriptionEn?: string;
   detailsDe?: string[];
@@ -444,6 +446,7 @@ function normalizeExperienceEntry(
       entry.roleEn,
     ),
     company: asString(entry.company, defaultExperienceEntry.company),
+    companyUrl: firstNonEmptyString(entry.companyUrl),
     description: getLocalizedString(
       lang,
       defaultExperienceEntry.description,

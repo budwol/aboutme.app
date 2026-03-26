@@ -11,12 +11,6 @@ type RenderedTextNode = {
   };
 };
 
-type PressableNode = {
-  props: {
-    onPress?: () => void;
-  };
-};
-
 type BadgeNode = {
   props: {
     text?: string;
@@ -27,6 +21,7 @@ type CardNode = {
   props: {
     title?: string;
     subtitle?: string;
+    subtitleContent?: React.ReactNode;
     description?: string;
     badgeText?: string;
     onPress?: () => void;
@@ -60,6 +55,7 @@ jest.mock("@components/cards/WnaCardSmallVertical", () => {
     return createElement(
       "WnaCardSmallVertical",
       props as Record<string, unknown>,
+      (props as { subtitleContent?: React.ReactNode }).subtitleContent,
       (props as { footerContent?: React.ReactNode }).footerContent,
     );
   };
@@ -96,8 +92,11 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaExperienceCard", () => {
+  const openURL = jest.spyOn(ReactNative.Linking, "openURL");
+
   beforeEach(() => {
     jest.restoreAllMocks();
+    openURL.mockResolvedValue(undefined);
   });
 
   it("renders one timeline card per experience entry", () => {
@@ -229,6 +228,112 @@ describe("WnaExperienceCard", () => {
       );
 
     expect(toggle).toBeDefined();
+  });
+
+  it("renders the company as a subtle link and opens the employer URL", async () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          company: "Linked Employer",
+          companyUrl: "https://linked-employer.example.com",
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textNeutralMicro: {},
+              textMicro: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const companyLink = tree!.root.findByProps({
+      testID: "experience-company-link-0",
+    });
+    const linkText = companyLink.findByType("Text");
+
+    expect(companyLink.props.accessibilityRole).toBe("link");
+    expect(typeof companyLink.props.onHoverIn).toBe("function");
+    expect(typeof companyLink.props.onHoverOut).toBe("function");
+    expect(flattenText(linkText.props.children)).toBe("Linked Employer");
+
+    await act(async () => {
+      await companyLink.props.onPress({
+        stopPropagation: jest.fn(),
+      });
+    });
+
+    expect(openURL).toHaveBeenCalledWith("https://linked-employer.example.com");
+  });
+
+  it("renders a plain company subtitle when no employer URL is provided", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          company: "Plain Employer",
+          companyUrl: undefined,
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textNeutralMicro: {},
+              textMicro: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const card = tree!.root.findByType("WnaCardSmallVertical");
+
+    expect(card.props.subtitle).toBe("Plain Employer");
+    expect(card.props.subtitleContent).toBeUndefined();
+    expect(
+      tree!.root.findAllByProps({
+        testID: "experience-company-link-0",
+      }),
+    ).toHaveLength(0);
   });
 
   it("renders a details toggle when an experience only has a description", () => {
@@ -805,12 +910,19 @@ describe("WnaExperienceCard", () => {
     const textValues = tree!.root
       .findAllByType("Text")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
-    const pressable = tree!.root.find(
-      (node: PressableNode) => typeof node.props.onPress === "function",
+    const footerAction = tree!.root.find(
+      (node: {
+        props: {
+          label?: string;
+          onPress?: () => void;
+        };
+      }) =>
+        node.props.label === "actionShowMore" &&
+        typeof node.props.onPress === "function",
     );
 
     act(() => {
-      pressable.props.onPress?.();
+      footerAction.props.onPress?.();
     });
 
     expect(cards).toHaveLength(4);
@@ -825,7 +937,7 @@ describe("WnaExperienceCard", () => {
     expect(onFooterActionPress).toHaveBeenCalledTimes(1);
   });
 
-  it("updates the footer action hover state without affecting the action flow", () => {
+  it("keeps the footer action flow intact when hoverable company links exist", () => {
     const onFooterActionPress = jest.fn();
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -860,23 +972,19 @@ describe("WnaExperienceCard", () => {
       );
     });
 
-    const footerPressable = tree!.root.find(
+    const footerAction = tree!.root.find(
       (node: {
         props: {
-          onHoverIn?: () => void;
-          onHoverOut?: () => void;
+          label?: string;
           onPress?: () => void;
         };
       }) =>
-        typeof node.props.onHoverIn === "function" &&
-        typeof node.props.onHoverOut === "function" &&
+        node.props.label === "actionShowMore" &&
         typeof node.props.onPress === "function",
     );
 
     act(() => {
-      footerPressable.props.onHoverIn?.();
-      footerPressable.props.onHoverOut?.();
-      footerPressable.props.onPress?.();
+      footerAction.props.onPress?.();
     });
 
     expect(onFooterActionPress).toHaveBeenCalledTimes(1);

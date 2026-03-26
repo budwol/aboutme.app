@@ -1,13 +1,14 @@
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
-import { FC, memo } from "react";
-import { Text, TextStyle } from "react-native";
+import { FC, memo, ReactNode } from "react";
+import { Text, TextStyle, View } from "react-native";
 
 export type WnaCardTextContentProps = {
   appColors: Colors;
   appStyle?: AppStyle;
   title?: string;
   subtitle?: string;
+  subtitleContent?: ReactNode;
   description?: string;
   subtitleAlign?: TextStyle["textAlign"];
   subtitleMinHeight?: number;
@@ -26,6 +27,7 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
   appStyle,
   title,
   subtitle,
+  subtitleContent,
   description,
   subtitleAlign,
   subtitleMinHeight,
@@ -71,7 +73,23 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
       </Text>
     ) : null}
 
-    {subtitle !== undefined ? (
+    {subtitleContent !== undefined ? (
+      <View
+        style={{
+          minHeight: subtitleMinHeight,
+          padding: bodyPadding ?? 0,
+          paddingHorizontal: subtitlePaddingHorizontal ?? bodyPadding ?? 0,
+          alignItems:
+            subtitleAlign === "center"
+              ? "center"
+              : subtitleAlign === "right"
+                ? "flex-end"
+                : "flex-start",
+        }}
+      >
+        {subtitleContent}
+      </View>
+    ) : subtitle !== undefined ? (
       <Text
         numberOfLines={subtitleNumberOfLines}
         style={

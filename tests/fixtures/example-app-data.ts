@@ -41,6 +41,7 @@ const appDataExample = JSON.parse(
   experienceSubtitleEn?: string;
   experience: {
     company: string;
+    companyUrl?: string;
     roleDe: string;
     roleEn: string;
     descriptionDe: string;
@@ -83,10 +84,12 @@ function buildExampleAppData(lang: "de" | "en") {
       ).toUpperCase(),
       items: appDataExample.experience.map((entry) => ({
         company: entry.company,
+        companyUrl: entry.companyUrl ?? "",
         role: isGerman ? entry.roleDe : entry.roleEn,
         description: isGerman ? entry.descriptionDe : entry.descriptionEn,
       })),
       firstCompany: appDataExample.experience[0].company,
+      firstCompanyUrl: appDataExample.experience[0].companyUrl ?? "",
       firstRole: isGerman
         ? appDataExample.experience[0].roleDe
         : appDataExample.experience[0].roleEn,

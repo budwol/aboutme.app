@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import { stubEmployerRoutes } from "../../helpers/external-routes";
 import { ExperiencePage } from "../../helpers/page-objects/experience.page";
 import { HomePage } from "../../helpers/page-objects/home.page";
 
@@ -33,5 +34,12 @@ test("user reviews experience items, toggles details, and navigates to the exper
 
   await test.step("verify the full experience page content", async () => {
     await experiencePage.assertContent();
+  });
+
+  await test.step("open the first employer link", async () => {
+    await stubEmployerRoutes(page);
+    await experiencePage.prepareExternalUrlCapture();
+    await experiencePage.openFirstCompanyLink();
+    await experiencePage.assertFirstCompanyUrlOpened();
   });
 });
