@@ -116,6 +116,7 @@ const exampleAppDataInput = {
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Cool Company Ltd.",
+      companyUrl: "https://cool-company.example.com",
       descriptionDe: "Entwicklung und Weiterentwicklung digitaler Produkte.",
       descriptionEn: "Built and improved digital products.",
       detailsDe: ["Verantwortung für Frontend, Backend und Deployment."],
@@ -129,6 +130,7 @@ const exampleAppDataInput = {
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Rocket Science Ltd.",
+      companyUrl: "https://rocket-science.example.com",
       descriptionDe: "Entwicklung von Anwendungen und Backend-Systemen.",
       descriptionEn: "Developed applications and backend systems.",
       detailsDe: [
@@ -144,6 +146,7 @@ const exampleAppDataInput = {
       roleDe: "Softwareentwickler",
       roleEn: "Software Developer",
       company: "Code Fabric Ltd.",
+      companyUrl: "https://code-fabric.example.com",
       descriptionDe: "Umsetzung von Features und Pflege bestehender Systeme.",
       descriptionEn: "Implemented features and maintained existing systems.",
       detailsDe: ["Arbeit an internen Tools und webbasierten Fachanwendungen."],

@@ -11,6 +11,7 @@ import { Text, View } from "react-native";
 export interface IWnaCardSmallVerticalProps
   extends WnaBaseCardProps, WnaVerticalTextCardContent {
   description: string;
+  subtitleContent?: ReactNode;
   badgeText?: string;
   width?: number;
   opacity?: number;
@@ -24,6 +25,7 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
   title,
   subtitle,
   description,
+  subtitleContent,
   badgeText,
   opacity,
   footerContent,
@@ -51,6 +53,7 @@ const WnaCardSmallVerticalComponent: FC<IWnaCardSmallVerticalProps> = ({
             appStyle={appStyle}
             title={title}
             subtitle={subtitle}
+            subtitleContent={subtitleContent}
           />
         </View>
 
@@ -98,6 +101,7 @@ const WnaCardSmallVertical = memo(
     prevProps.appColors === nextProps.appColors &&
     prevProps.title === nextProps.title &&
     prevProps.subtitle === nextProps.subtitle &&
+    prevProps.subtitleContent === nextProps.subtitleContent &&
     prevProps.description === nextProps.description &&
     prevProps.badgeText === nextProps.badgeText &&
     prevProps.footerContent === nextProps.footerContent &&
