@@ -13,10 +13,18 @@ export {
 } from "@/app-data/shared";
 
 async function readAppDataModule(): Promise<unknown> {
-  return Promise.resolve().then(() => {
-    // app-data.json is generated locally and intentionally ignored by git
-    return require("../app-data.json") as unknown;
+  const response = await fetch("/app-data.json", {
+    headers: {
+      Accept: "application/json",
+    },
+    cache: "no-store",
   });
+
+  if (!response.ok) {
+    throw new Error(`app-data fetch failed: ${response.status}`);
+  }
+
+  return response.json();
 }
 
 export const loadAppData = async (

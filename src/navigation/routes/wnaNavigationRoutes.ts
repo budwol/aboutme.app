@@ -1,6 +1,6 @@
 import { getConfiguredSiteUrl, normalizeSiteUrl } from "@utils/appConfig";
 import { getProjectPathSegment } from "@utils/projectRoutes";
-import { Href, Router } from "expo-router";
+import { Href } from "expo-router";
 import { getLangCode } from "@/i18n/i18n";
 
 export type WnaRouteLang = "de" | "en";
@@ -63,19 +63,6 @@ export function getDrawerNavigationPath(
   return `/(drawer)/(tabs-${lang})${path}`;
 }
 
-export function getNavigationPageName(
-  key: WnaRouteKey,
-  lang = getNavigationLang(),
-) {
-  const path = routeDefinitions[key][lang];
-  if (path === "/") {
-    return "/";
-  }
-
-  const parts = path.split("/").filter(Boolean);
-  return parts.at(-1) ?? "/";
-}
-
 export function getAbsoluteNavigationPath(
   key: WnaRouteKey,
   lang = getNavigationLang(),
@@ -95,16 +82,4 @@ export function getDrawerProjectNavigationPath(
   lang = getNavigationLang(),
 ): string {
   return `/(drawer)/(tabs-${lang})/${getProjectPathSegment(lang)}/${slug}`;
-}
-
-export function getAbsoluteProjectNavigationPath(
-  slug: string,
-  lang = getNavigationLang(),
-): Href {
-  return `${currentBaseUrl}${getProjectNavigationPath(slug, lang)}` as Href;
-}
-
-export function navigateToRoot(router: Router) {
-  router.dismissAll();
-  router.replace(getNavigationPath("root"));
 }

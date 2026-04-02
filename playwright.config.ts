@@ -14,7 +14,7 @@ const reporter: "list" | ReporterDescription[] = process.env.CI
   : "list";
 
 export default defineConfig({
-  testDir: "./tests/e2e/specs",
+  testDir: "./tests/e2e",
   timeout: 60000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

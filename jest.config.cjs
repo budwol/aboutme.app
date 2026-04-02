@@ -3,6 +3,7 @@ module.exports = {
   setupFiles: ["<rootDir>/jest.setup.cjs"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^@tests/(.*)$": "<rootDir>/tests/$1",
     "^@app/(.*)$": "<rootDir>/src/app/$1",
     "^@assets/(.*)$": "<rootDir>/assets/$1",
     "^@components/(.*)$": "<rootDir>/src/components/$1",
