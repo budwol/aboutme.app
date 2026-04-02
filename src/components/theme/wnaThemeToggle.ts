@@ -9,7 +9,7 @@ import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 import { ColorSchemeName } from "react-native";
 import Toast from "react-native-toast-message";
 
-export function getThemeLabel(theme: Theme) {
+function getThemeLabel(theme: Theme) {
   switch (theme) {
     case "light":
       return "Light mode";
