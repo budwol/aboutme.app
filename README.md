@@ -158,8 +158,23 @@ Navigation is built with Expo Router under `src/app/`, while reusable navigation
 
 ### Recommended Image Ratios
 
-- **S** – 4:3 (e.g. 256x192)
-- **L** – whatever ratio makes sense for your work
+**Project images** use a 2:1 ratio. The app picks between three sizes depending on viewport width:
+
+| Field in `app-data.json` | Size     | Viewport   |
+| ------------------------ | -------- | ---------- |
+| `imageL`                 | 1024×512 | > 960 px   |
+| `imageM`                 | 512×256  | 480–960 px |
+| `imageS`                 | 300×150  | < 480 px   |
+
+Start with a source image of at least ~2000×1000 px at 2:1, then generate the three variants:
+
+```bash
+convert source.png -resize 1024x512! images/myproject_1024_512.webp
+convert source.png -resize 512x256!  images/myproject_512_256.webp
+convert source.png -resize 300x150!  images/myproject_300_150.webp
+```
+
+Drop the results into `.aboutme/images/` and point the three fields in `app-data.json` at them. If you do not have an image yet, `default_project.webp` works fine as a placeholder for all three.
 
 ## Deployment
 
