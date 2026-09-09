@@ -1,8 +1,10 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import { Platform } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaHtmlRenderer from "@components/content/WnaHtmlRenderer";
+
+const originalPlatformOS = Platform.OS;
 
 jest.mock("react-native-render-html", () => {
   const { createElement } = jest.requireActual(
@@ -62,8 +64,14 @@ const appStyle = {
 } as never;
 
 describe("WnaHtmlRenderer", () => {
+  afterEach(() => {
+    Object.defineProperty(Platform, "OS", {
+      configurable: true,
+      value: originalPlatformOS,
+    });
+  });
+
   it("renders sanitized html as a web div", () => {
-    const originalPlatform = Platform.OS;
     Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -94,15 +102,9 @@ describe("WnaHtmlRenderer", () => {
     );
     expect(div.props.dangerouslySetInnerHTML.__html).toContain("<p>Hello</p>");
     expect(div.props.dangerouslySetInnerHTML.__html).not.toContain("script");
-
-    Object.defineProperty(Platform, "OS", {
-      configurable: true,
-      value: originalPlatform,
-    });
   });
 
   it("renders native html and max-height gradient fallback for empty html", () => {
-    const originalPlatform = Platform.OS;
     Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -128,10 +130,5 @@ describe("WnaHtmlRenderer", () => {
     );
     expect(gradient.props.colors).toEqual(["#ffffff", "transparent"]);
     expect(gradient.props.style.height).toBe(60);
-
-    Object.defineProperty(Platform, "OS", {
-      configurable: true,
-      value: originalPlatform,
-    });
   });
 });
