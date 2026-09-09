@@ -5,13 +5,16 @@ import { WnaSectionProps } from "@components/sections/WnaSectionProps";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { useTranslation } from "react-i18next";
 import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
+import { getResumePdfUrl } from "@utils/resumePdfUrl";
 
 export default function WnaContactCard({
   appColors,
   appData,
   appStyle,
 }: WnaSectionProps) {
-  const { t } = useTranslation(["common"]);
+  const { t, i18n } = useTranslation(["common"]);
+  const resumeLang =
+    (i18n.resolvedLanguage ?? i18n.language) === "de" ? "de" : "en";
 
   const handleOpenUrl = useCallback(async (url: string, type: string) => {
     try {
@@ -100,6 +103,17 @@ export default function WnaContactCard({
           t={t}
         />
       )}
+      <WnaButtonIcon
+        key={"resume"}
+        appColors={appColors}
+        appStyle={appStyle}
+        iconName={"file-pdf-box"}
+        onPress={() => handleOpenUrl(getResumePdfUrl(resumeLang), "resume")}
+        checkInternetConnection={false}
+        toolTipPosition="top"
+        toolTip={t(i18nKeys.actionDownloadResume)}
+        t={t}
+      />
     </View>
   );
 }

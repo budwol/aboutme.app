@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Linking, Text, View, StyleSheet } from "react-native";
 import { useDrawerStatus } from "@react-navigation/drawer";
 import { Href, router, useNavigation, useSegments } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -23,6 +23,7 @@ import { appLayoutConstants } from "@constants/layoutConstants";
 import { navigationLayoutConstants } from "@constants/navigationLayoutConstants";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
+import { getResumePdfUrl } from "@utils/resumePdfUrl";
 import WnaImage from "@components/images/WnaImage";
 import { getNavigationLang } from "@/navigation/routes/wnaNavigationRoutes";
 import { useColorScheme } from "react-native";
@@ -138,14 +139,7 @@ export default function WnaDrawerMenu() {
           text={item.text}
           isSecondary={item.type === "secondary"}
           isActive={isActive}
-          onPress={() => {
-            if (item.onPress) {
-              void item.onPress();
-              return;
-            }
-
-            handleNavigate(item.route, isActive);
-          }}
+          onPress={() => handleNavigate(item.route, isActive)}
         />
       );
     },
@@ -215,6 +209,26 @@ export default function WnaDrawerMenu() {
       </View>
 
       <View style={styles.footer}>
+        <WnaButtonIconText
+          appColors={appColors}
+          appStyle={appStyle}
+          text={t(i18nKeys.actionDownloadResume)}
+          iconName={"file-pdf-box"}
+          backgroundColor={
+            appColors.isDark ? appColors.coolgray2 : appColors.white
+          }
+          textColor={appColors.black}
+          borderWidth={1}
+          onPress={() => Linking.openURL(getResumePdfUrl(langCode))}
+          style={{
+            ...styles.themeButton,
+            height: compactButtonHeight,
+            borderRadius:
+              appLayout.globalCornerRadius ??
+              appLayoutConstants.globalCornerRadius,
+          }}
+        />
+
         <WnaButtonIconText
           appColors={appColors}
           appStyle={appStyle}
