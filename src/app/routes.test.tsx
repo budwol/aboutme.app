@@ -91,6 +91,17 @@ jest.mock(
     },
 );
 
+jest.mock(
+  "@/navigation/components/WnaTabLayout",
+  () =>
+    function WnaTabLayout(props: unknown) {
+      return require("react").createElement(
+        "WnaTabLayout",
+        props as Record<string, unknown>,
+      );
+    },
+);
+
 jest.mock("@components/WnaAppContext", () => ({
   WnaAppContextProvider: ({ children }: { children?: React.ReactNode }) =>
     require("react").createElement("WnaAppContextProvider", null, children),
@@ -215,6 +226,11 @@ const stackLayoutCases = [
   "./(drawer)/(tabs-de)/menu/_layout",
 ] satisfies string[];
 
+const tabLayoutCases = [
+  ["./(drawer)/(tabs-en)/_layout", "home"],
+  ["./(drawer)/(tabs-de)/_layout", "home"],
+] satisfies [string, string][];
+
 describe("app routes", () => {
   it.each(routeCases)("re-exports %s as %s", (modulePath, typeName) => {
     const Route = require(modulePath).default;
@@ -236,6 +252,19 @@ describe("app routes", () => {
     });
 
     expect(tree!.root.findByType("WnaStackLayout")).toBeTruthy();
+  });
+
+  it.each(tabLayoutCases)("renders %s as tab layout", (modulePath) => {
+    const Layout = require(modulePath).default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<Layout />);
+    });
+
+    expect(tree!.root.findByType("WnaTabLayout").props.screens).toEqual(
+      expect.arrayContaining([expect.objectContaining({ icon: "home" })]),
+    );
   });
 
   it("redirects unknown routes to the localized root path", () => {

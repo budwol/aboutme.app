@@ -1,7 +1,9 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaCardVerticalWithImage from "@components/cards/WnaCardVerticalWithImage";
+
+const mockWnaImage = jest.fn();
 
 jest.mock("@components/images/WnaImage", () => {
   const { createElement } = jest.requireActual(
@@ -9,6 +11,8 @@ jest.mock("@components/images/WnaImage", () => {
   ) as typeof import("react");
 
   return function MockWnaImage(props: unknown) {
+    mockWnaImage(props);
+
     return createElement("WnaImage", props as Record<string, unknown>);
   };
 });
@@ -27,19 +31,23 @@ jest.mock("@components/cards/WnaCardTextContent", () => {
 });
 
 describe("WnaCardVerticalWithImage", () => {
+  const appColors = {
+    warmgray6: "#666666",
+    coolgray2: "#222222",
+    black: "#000000",
+  } as never;
+
+  beforeEach(() => {
+    mockWnaImage.mockClear();
+  });
+
   it("renders the image and forwards text props to the shared content component", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
       tree = TestRenderer.create(
         <WnaCardVerticalWithImage
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              black: "#000000",
-            } as never
-          }
+          appColors={appColors}
           appStyle={{} as never}
           imageUrl="images/project.png"
           text1="Project One"
@@ -72,13 +80,7 @@ describe("WnaCardVerticalWithImage", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaCardVerticalWithImage
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              black: "#000000",
-            } as never
-          }
+          appColors={appColors}
           appStyle={{} as never}
           imageUrl="images/project.png"
           text1="Project One"
@@ -100,13 +102,7 @@ describe("WnaCardVerticalWithImage", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaCardVerticalWithImage
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              black: "#000000",
-            } as never
-          }
+          appColors={appColors}
           appStyle={{} as never}
           imageUrl="images/project.png"
           text1="Project One"
@@ -119,5 +115,35 @@ describe("WnaCardVerticalWithImage", () => {
     const textWrap = tree!.root.findAllByType("View")[1];
 
     expect(textWrap.props.style).toMatchObject({ minHeight: 78 });
+  });
+
+  it("skips re-rendering while memoized image props stay stable", () => {
+    const props = {
+      appColors,
+      appStyle: {} as never,
+      imageUrl: "images/project.png",
+      text1: "Project One",
+      text2: "Subtitle",
+      width: 300,
+    };
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaCardVerticalWithImage {...props} />);
+    });
+
+    expect(mockWnaImage).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(<WnaCardVerticalWithImage {...props} />);
+    });
+
+    expect(mockWnaImage).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(<WnaCardVerticalWithImage {...props} width={320} />);
+    });
+
+    expect(mockWnaImage).toHaveBeenCalledTimes(2);
   });
 });
