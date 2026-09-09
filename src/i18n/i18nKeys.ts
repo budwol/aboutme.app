@@ -19,6 +19,7 @@ const i18nKeys = {
   actionXing: "actionXing",
   actionPlayStore: "actionPlayStore",
   actionContinueToPage: "actionContinueToPage",
+  actionDownloadResume: "actionDownloadResume",
   answerNo: "answerNo",
   answerYes: "answerYes",
   appBrand: "appBrand",
@@ -62,6 +63,7 @@ const i18nKeys = {
   wordEnd: "wordEnd",
   wordLegal: "wordLegal",
   wordNo: "wordNo",
+  wordResume: "wordResume",
   wordWelcome: "wordWelcome",
   wordYes: "wordYes",
 };

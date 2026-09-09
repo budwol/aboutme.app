@@ -186,6 +186,8 @@ If you are just using this as a portfolio template, you can ignore Docker for a 
 
 Both `npm run web` and `npm run export:web` sync `.aboutme/app-data.json` into `public/app-data.json`, mirror `.aboutme/images/*` into `public/images/*`, and bump the web asset version first, so the web app always starts from the latest source content and image files.
 
+They also generate a condensed portfolio PDF from the same `.aboutme/app-data.json` — `public/Portfolio-DE.pdf` (German) and `public/Portfolio-EN.pdf` (English) — covering profile, contact, tech stack, and work experience, deliberately leaving out the private side projects. Alongside those, `public/Portfolio-DE-ATS.pdf`/`public/Portfolio-EN-ATS.pdf` are a deliberately plain, single-column companion: no sidebar, no photo, skill levels spelled out as text instead of bars — meant to survive an Applicant Tracking System's automated parsing, which the two-column designed version is not well-suited for. The designed PDF links to its own ATS counterpart from its page footer. All four ship in `dist` alongside the rest of the export, and the app links to the designed PDF from the contact footer and from a standalone download button in the navigation drawer's footer. Run `npm run generate:resume-pdf` on its own if you just want to regenerate the PDFs without a full export.
+
 Docker is there for people who actually want that delivery path, not as a rite of passage before the app is allowed to exist.
 
 1. Create a `.env` file if your deploy setup needs one.

@@ -20,6 +20,7 @@
     "actionXing": "Xing",
     "actionPlayStore": "Play Store",
     "actionContinueToPage": "Trotzdem zur Seite",
+    "actionDownloadResume": "Portfolio herunterladen",
     "answerNo": "Nein",
     "answerYes": "Ja",
     "appBrand": "Portfolio",
@@ -63,6 +64,7 @@
     "wordEnd": "Ende",
     "wordLegal": "Rechtliches",
     "wordNo": "Nein",
+    "wordResume": "Lebenslauf",
     "wordWelcome": "Willkommen",
     "wordYes": "Ja"
   }
