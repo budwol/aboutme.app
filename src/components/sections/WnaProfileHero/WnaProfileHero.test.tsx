@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaProfileHero from "@components/sections/WnaProfileHero";
@@ -68,6 +68,10 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaProfileHero", () => {
+  afterEach(() => {
+    mockReduceMotion = true;
+  });
+
   const appColors = {
     white: "#ffffff",
     black: "#000000",
@@ -174,7 +178,5 @@ describe("WnaProfileHero", () => {
         ]),
       }),
     );
-
-    mockReduceMotion = true;
   });
 });

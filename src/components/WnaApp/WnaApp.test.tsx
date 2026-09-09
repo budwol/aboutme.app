@@ -1,11 +1,19 @@
 import WnaApp, { ErrorBoundary } from "@components/WnaApp";
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 import React from "react";
 import { Dimensions, Text } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 
 const mockLoggerError = jest.fn();
+const originalRequestAnimationFrame = global.requestAnimationFrame;
 let mockPathname = "/start";
 
 jest.mock("wna-logger", () => ({
@@ -176,6 +184,12 @@ describe("WnaApp", () => {
       coolgray8: "#111111",
     };
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    global.requestAnimationFrame = originalRequestAnimationFrame;
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
   it("renders only the neutral boot shell before initialization", () => {
@@ -382,7 +396,6 @@ describe("WnaApp", () => {
   });
 
   it("shows the navigation transition overlay after the intro completed", () => {
-    const originalRequestAnimationFrame = global.requestAnimationFrame;
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
 
@@ -416,11 +429,9 @@ describe("WnaApp", () => {
 
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
     expect(mockFinishNavigationTransition).not.toHaveBeenCalled();
-    global.requestAnimationFrame = originalRequestAnimationFrame;
   });
 
   it("finishes the navigation transition after the pathname changes", () => {
-    const originalRequestAnimationFrame = global.requestAnimationFrame;
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
 
@@ -463,12 +474,10 @@ describe("WnaApp", () => {
     });
 
     expect(mockFinishNavigationTransition).toHaveBeenCalledTimes(1);
-    global.requestAnimationFrame = originalRequestAnimationFrame;
   });
 
   it("keeps the navigation transition inactive during the intro", () => {
     mockIsNavigationTransitionActive = true;
-    const originalRequestAnimationFrame = global.requestAnimationFrame;
     global.requestAnimationFrame = jest.fn(() => 1) as never;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -487,7 +496,6 @@ describe("WnaApp", () => {
     });
 
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
-    global.requestAnimationFrame = originalRequestAnimationFrame;
   });
 });
 
