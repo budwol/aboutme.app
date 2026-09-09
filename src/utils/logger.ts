@@ -1,7 +1,4 @@
 type LoggerBaseType = {
-  shareLogfileAsync: () => Promise<void>;
-  deleteLogFileAsync: () => Promise<void>;
-  readLogFileAsync: () => Promise<string>;
   info: (msg: unknown) => void;
   warn: (methodName: string, msg: unknown) => void;
   error: (methodName: string, msg: unknown) => void;
@@ -17,21 +14,6 @@ function ensureLogger() {
 }
 
 export default class Logger {
-  public static async shareLogfileAsync() {
-    ensureLogger();
-    await LoggerBase?.shareLogfileAsync();
-  }
-
-  public static async deleteLogFileAsync() {
-    ensureLogger();
-    await LoggerBase?.deleteLogFileAsync();
-  }
-
-  public static async readLogFileAsync(): Promise<string> {
-    ensureLogger();
-    return LoggerBase?.readLogFileAsync() ?? "";
-  }
-
   public static info(msg: unknown) {
     ensureLogger();
     LoggerBase?.info(msg);
