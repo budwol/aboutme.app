@@ -1,4 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
+import { DrawerActions } from "@react-navigation/native";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaMenuHeaderRight from "@/navigation/components/WnaMenuHeaderRight";
@@ -43,5 +44,32 @@ describe("WnaMenuHeaderRight", () => {
     const buttonHeader = tree!.root.findByType("WnaButtonHeader");
 
     expect(buttonHeader.props.text).toBe("Menue");
+  });
+
+  it("dispatches the drawer open action when pressed", () => {
+    const navigation = { dispatch: jest.fn() };
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaMenuHeaderRight
+          appColors={{ isDark: false } as never}
+          appStyle={{} as never}
+          navigation={navigation}
+          t={(() => "Menu") as never}
+        />,
+      );
+    });
+
+    const buttonHeader = tree!.root.findByType("WnaButtonHeader");
+
+    act(() => {
+      (buttonHeader.props as { onPress: () => void }).onPress();
+    });
+
+    expect(navigation.dispatch).toHaveBeenCalledTimes(1);
+    expect(navigation.dispatch).toHaveBeenCalledWith(
+      DrawerActions.openDrawer(),
+    );
   });
 });
