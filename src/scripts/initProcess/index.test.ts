@@ -3,7 +3,18 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { runInitProcess } = require("../../../scripts/init-process.cjs") as {
+const initProcessModule = require("../../../scripts/init-process.cjs") as {
+  buildGeneratedFiles: (input: {
+    siteUrl: string;
+    profileName: string;
+    appName: string;
+  }) => {
+    nginxConfig: string;
+    robotsTxt: string;
+    sitemapXml: string;
+    manifest: string;
+  };
+  normalizeSiteUrl: (siteUrl?: string) => string;
   runInitProcess: (
     rootDir: string,
     options?: {
@@ -15,6 +26,63 @@ const { runInitProcess } = require("../../../scripts/init-process.cjs") as {
     },
   ) => { generated: boolean; migrated: boolean };
 };
+const { buildGeneratedFiles, normalizeSiteUrl, runInitProcess } =
+  initProcessModule;
+
+describe("init process security", () => {
+  it("accepts https urls and local http urls", () => {
+    expect(normalizeSiteUrl("https://portfolio.example.com/")).toBe(
+      "https://portfolio.example.com",
+    );
+    expect(normalizeSiteUrl("http://localhost:8081/")).toBe(
+      "http://localhost:8081",
+    );
+  });
+
+  it("rejects unsafe site urls", () => {
+    expect(() => normalizeSiteUrl("http://example.com")).toThrow(
+      /invalid siteUrl/,
+    );
+    expect(() => normalizeSiteUrl("https://example.com?x=1")).toThrow(
+      /invalid siteUrl/,
+    );
+    expect(() => normalizeSiteUrl("javascript:alert(1)")).toThrow(
+      /invalid siteUrl/,
+    );
+  });
+
+  it("uses the normalized host in generated output", () => {
+    const generated = buildGeneratedFiles({
+      siteUrl: "https://portfolio.example.com/",
+      profileName: "Jane Example",
+      appName: "AboutMe",
+    });
+
+    expect(generated.nginxConfig).toContain("https://portfolio.example.com");
+    expect(generated.nginxConfig).toContain("listen 8080 default_server;");
+    expect(generated.nginxConfig).toContain("error_log /dev/stderr warn;");
+    expect(generated.nginxConfig).toContain(
+      "add_header 'Cross-Origin-Opener-Policy' 'same-origin' always;",
+    );
+    expect(generated.nginxConfig).toContain(
+      "add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;",
+    );
+    expect(generated.nginxConfig).toContain(
+      "add_header 'Cross-Origin-Resource-Policy' 'same-origin' always;",
+    );
+    expect(generated.nginxConfig).toContain("base-uri 'self';");
+    expect(generated.nginxConfig).toContain("form-action 'self';");
+    expect(generated.nginxConfig).toContain("manifest-src 'self';");
+    expect(generated.nginxConfig).toContain("script-src-attr 'none';");
+    expect(generated.nginxConfig).toContain("worker-src 'self' blob:;");
+    expect(generated.nginxConfig).not.toContain("https://cdnjs.cloudflare.com");
+    expect(generated.nginxConfig).not.toContain(
+      "script-src 'self' 'unsafe-inline'",
+    );
+    expect(generated.manifest).toContain('"scope": "/"');
+    expect(generated.manifest).toContain('"start_url": "/"');
+  });
+});
 
 function writeFile(filePath: string, content: string) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });

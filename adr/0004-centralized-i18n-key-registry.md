@@ -4,7 +4,7 @@ Date: 2026-09-09
 
 ## Status
 
-Accepted (reconstructed from existing implementation), one known deviation noted below
+Accepted (reconstructed from existing implementation)
 
 ## Context
 
@@ -12,10 +12,9 @@ UI copy (button labels, screen titles, error messages) is translated via `i18nex
 
 ## Decision
 
-Every translation key is declared once as a `key: "key"` entry in `src/i18n/i18nKeys.ts` (a flat object, alphabetically ordered by key name), then defined in both `src/i18n/de.json` and `src/i18n/en.json` under the `common` namespace with the exact same key. Components call `t(i18nKeys.someKey)` rather than `t("someKey")`, giving autocomplete and a single place to see every string the app can render, and `useTranslation(["common"])` is the standard hook usage.
+Every translation key is declared once as a `key: "key"` entry in `src/i18n/i18nKeys.ts` (a flat object, alphabetically ordered by key name), then defined in both `src/i18n/de.json` and `src/i18n/en.json` under the `common` namespace with the exact same key. Components call `t(i18nKeys.someKey)` rather than `t("someKey")`, giving autocomplete and a single place to see every string the app can render, and `useTranslation(["common"])` is the standard hook usage. No component passes a literal string as a label — even single-use, seemingly-static labels go through the registry, since that's what makes it trustworthy as "every string the app can render."
 
 ## Consequences
 
 - Adding UI copy means touching three files (`i18nKeys.ts`, `de.json`, `en.json`) in lockstep.
-- Nothing currently enforces that `de.json` and `en.json` stay in sync — as of this writing `en.json` has five keys (`infoPleaseWait`, `infoWorkInProgress`, `screenErrorLog`, `settingsAdvancedLogging`, `settingsDiarySwitchToDefaultTab`) that `de.json` is missing, so German users hitting those code paths get i18next's fallback/missing-key behavior instead of German text. A lint rule or test asserting key-set parity between the two files would catch this class of drift going forward.
-- Known deviation: `src/components/screens/WnaHeader/WnaHeader.tsx:214` passes a hardcoded `text="Back"` instead of `t(i18nKeys.actionGoBack)`, bypassing the registry for that one label.
+- `src/i18n/i18nKeys.test.ts` enforces key-set parity across `i18nKeys.ts`, `de.json`, and `en.json` — a missing or orphaned key in any one of the three now fails the test suite instead of silently falling back to i18next's missing-key behavior at runtime.

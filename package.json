@@ -27,7 +27,7 @@
     "test:integration": "jest --runInBand --watchAll=false tests/integration",
     "test:prettier": "prettier --check .",
     "test:smoke": "./scripts/smoke-export.sh",
-    "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcessSecurity/index.test.ts src/scripts/initScript/index.test.ts src/utils/appConfig/index.test.ts src/utils/htmlSanitizer/index.test.ts src/scripts/envParser/index.test.ts && npm run test:dry-run",
+    "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcess/index.test.ts src/utils/appConfig/index.test.ts src/utils/htmlSanitizer/index.test.ts src/scripts/envParser/index.test.ts && npm run test:dry-run",
     "test:types": "tsc --skipLibCheck",
     "test:unit": "jest --runInBand --watchAll=false src",
     "web": "node ./scripts/sync-web-app-data.cjs && node ./scripts/generate-resume-pdf.cjs && expo start --web"

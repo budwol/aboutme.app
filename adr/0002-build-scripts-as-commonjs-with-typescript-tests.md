@@ -4,7 +4,7 @@ Date: 2026-09-09
 
 ## Status
 
-Accepted (reconstructed from existing implementation), one known deviation noted below
+Accepted (reconstructed from existing implementation)
 
 ## Context
 
@@ -12,10 +12,10 @@ The app source is TypeScript compiled/bundled by Metro through Expo. Build-time 
 
 ## Decision
 
-Tooling scripts live in `scripts/*.cjs` as plain, dependency-light CommonJS (`sync-web-app-data.cjs`, `env-parser.cjs`, `init-process.cjs`). Each exports its core function(s) via `module.exports` and additionally runs as a CLI when invoked directly (`if (require.main === module)`). Each script gets a matching TypeScript test file under `src/scripts/<camelCaseName>/index.test.ts`, which does `require("../../../scripts/x.cjs")` (with `/* eslint-disable @typescript-eslint/no-require-imports */`) so the tests can still run through the project's Jest/TypeScript setup rather than a separate Node-only test runner.
+Tooling scripts live in `scripts/*.cjs` as plain, dependency-light CommonJS (`sync-web-app-data.cjs`, `env-parser.cjs`, `init-process.cjs`). Each exports its core function(s) via `module.exports` and additionally runs as a CLI when invoked directly (`if (require.main === module)`). Each script gets exactly one matching TypeScript test file under `src/scripts/<camelCaseName>/index.test.ts`, which does `require("../../../scripts/x.cjs")` (with `/* eslint-disable @typescript-eslint/no-require-imports */`) so the tests can still run through the project's Jest/TypeScript setup rather than a separate Node-only test runner. Multiple concerns within one script (e.g. `init-process.cjs`'s URL/CSP validation vs. its end-to-end init workflow) stay in that single test file as separate `describe` blocks rather than splitting across directories — the 1:1 script-to-directory mapping is not negotiable, only the internal grouping of `it`s within it is.
 
 ## Consequences
 
 - Adding a new build script means also adding `src/scripts/<name>/index.test.ts` — there's no test co-located with the `.cjs` file itself.
 - Scripts occasionally need a Jest environment override (`@jest-environment node` docblock) plus restoring native `TextDecoder`/`TextEncoder` when a script pulls in a Node-only third-party dependency (see `src/scripts/generateResumePdf/index.test.ts`), because the default RN test environment's export conditions and global polyfills target the app runtime, not plain Node.
-- Known deviation: `scripts/init-process.cjs` doesn't have a single 1:1 test directory. Its logic is exercised indirectly across `src/scripts/initProcessSecurity/index.test.ts` and `src/scripts/initScript/index.test.ts`, split by concern rather than by source file. `src/scripts/packageScripts/index.test.ts` also doesn't test a `scripts/*.cjs` file at all — it tests `app.config.ts`. Any cleanup of this convention should either fold these into one `src/scripts/initProcess/` directory or explicitly document the split-by-concern exception.
+- `src/scripts/packageScripts/index.test.ts` is not part of this convention at all — it doesn't test a `scripts/*.cjs` file, it asserts invariants between `package.json`'s scripts and `app.config.ts` (e.g. that the app version has one source of truth). It's named after what it tests, same as every other directory here, it just happens not to be a build script.
