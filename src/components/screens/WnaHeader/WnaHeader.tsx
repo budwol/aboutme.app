@@ -6,6 +6,7 @@ import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { appMotionConstants } from "@constants/motionConstants";
 import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Platform, useColorScheme, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
@@ -17,6 +18,7 @@ import Animated, {
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
 import WnaMultilineHeader from "@components/screens/WnaMultilineHeader";
+import { i18nKeys } from "@/i18n/i18nKeys";
 
 export type WnaHeaderProps = {
   headerTitle?: string;
@@ -55,6 +57,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       useWnaTheme();
     const { appLayout, isLandscape } = useWnaLayout();
     const colorScheme = useColorScheme();
+    const { t } = useTranslation(["common"]);
 
     const themeIcon = getThemeIcon(theme);
     const canUseBrowserBack =
@@ -211,7 +214,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               {backButtonVisible ? (
                 <View style={{ paddingLeft: isLandscape ? 8 : 0 }}>
                   <WnaButtonHeader
-                    text="Back"
+                    text={t(i18nKeys.actionGoBack)}
                     appStyle={appStyle}
                     appColors={appColors}
                     iconName="arrow-left"
