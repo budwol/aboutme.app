@@ -10,6 +10,9 @@ import { AppData, loadAppData } from "@/app-data";
 import { getThemeFromStorageAsync, Theme } from "@/storage/themeStorage";
 import { WnaAppContextProvider } from "@/components/WnaAppContext";
 
+// re-exported so expo-router picks it up as this layout's crash fallback UI
+export { ErrorBoundary } from "@components/WnaApp";
+
 global.__expo_disable_font_preloading__ = true;
 
 function RootLayoutContent() {
