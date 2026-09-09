@@ -84,4 +84,40 @@ describe("WnaSurfaceCard", () => {
     expect(views[0].props.style.backgroundColor).toBe("#000000");
     expect(views[1].props.style.backgroundColor).toBe("#ff0000");
   });
+
+  it("supports explicit light and transparent dark themes", () => {
+    let lightTree: ReturnType<typeof TestRenderer.create> | undefined;
+    let transparentDarkTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      lightTree = TestRenderer.create(
+        <WnaSurfaceCard appColors={lightColors} theme="light" type="first">
+          child
+        </WnaSurfaceCard>,
+      );
+      transparentDarkTree = TestRenderer.create(
+        <WnaSurfaceCard
+          appColors={darkColors}
+          theme="transparentDark"
+          type="last"
+        >
+          child
+        </WnaSurfaceCard>,
+      );
+    });
+
+    expect(lightTree!.root.findByType("WnaBlurView").props.blurTint).toBe(
+      "extraLight",
+    );
+    expect(
+      lightTree!.root.findAllByType("View")[0].props.style.backgroundColor,
+    ).toBe("#ffffff");
+    expect(
+      transparentDarkTree!.root.findByType("WnaBlurView").props.blurTint,
+    ).toBe("dark");
+    expect(
+      transparentDarkTree!.root.findAllByType("View")[0].props.style
+        .backgroundColor,
+    ).toBe("rgba(0,0,0,0.1)");
+  });
 });
