@@ -1,5 +1,4 @@
 import {
-  getConfiguredProfileNameFromSources,
   getConfiguredSiteUrlFromSources,
   isAllowedSiteUrl,
   normalizeSiteUrl,
@@ -18,14 +17,5 @@ export function getConfiguredSiteUrl(): string {
   return getConfiguredSiteUrlFromSources({
     publicSiteUrl,
     baseUrl,
-  });
-}
-
-export function getConfiguredProfileName(): string {
-  const envAppName =
-    typeof process.env.APP_NAME === "string" ? process.env.APP_NAME.trim() : "";
-
-  return getConfiguredProfileNameFromSources({
-    envAppName,
   });
 }
