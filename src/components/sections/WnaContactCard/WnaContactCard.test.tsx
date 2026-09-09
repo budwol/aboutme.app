@@ -12,6 +12,7 @@ jest.mock("react-i18next", () => ({
   },
   useTranslation: () => ({
     t: (value: string) => value,
+    i18n: { resolvedLanguage: "de", language: "de" },
   }),
 }));
 
@@ -71,7 +72,7 @@ describe("WnaContactCard", () => {
 
     const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
 
-    expect(buttons).toHaveLength(5);
+    expect(buttons).toHaveLength(6);
 
     await act(async () => {
       for (const button of buttons) {
@@ -90,6 +91,7 @@ describe("WnaContactCard", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
+    expect(canOpenURL).toHaveBeenNthCalledWith(6, "/Portfolio-DE.pdf");
 
     expect(openURL).toHaveBeenNthCalledWith(1, appData.contact.github);
     expect(openURL).toHaveBeenNthCalledWith(2, appData.contact.linkedin);
@@ -99,5 +101,6 @@ describe("WnaContactCard", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
+    expect(openURL).toHaveBeenNthCalledWith(6, "/Portfolio-DE.pdf");
   });
 });

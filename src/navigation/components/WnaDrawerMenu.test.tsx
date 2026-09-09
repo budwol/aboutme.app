@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
+import { Linking } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@app/(drawer)/WnaDrawerMenu";
 import { appLayoutConstants } from "@constants/layoutConstants";
@@ -358,5 +359,37 @@ describe("WnaDrawerMenu", () => {
       text2: "Light mode",
       props: { appColors: { id: 2, isDark: false } },
     });
+  });
+
+  it("renders a standalone portfolio download button in the drawer footer, separate from the nav list", async () => {
+    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const navItems = tree!.root.findAllByType("WnaDrawerNavigationItem");
+    expect(
+      navItems.some(
+        (item: DrawerItemNode) => item.props.text === "actionDownloadResume",
+      ),
+    ).toBe(false);
+
+    const buttons = tree!.root.findAllByType("WnaButtonIconText");
+    const downloadButton = buttons.find(
+      (item: ButtonNode) => item.props.text === "actionDownloadResume",
+    );
+
+    expect(downloadButton).toBeDefined();
+
+    await act(async () => {
+      await downloadButton!.props.onPress();
+    });
+
+    expect(openURL).toHaveBeenCalledWith("/Portfolio-DE.pdf");
+
+    openURL.mockRestore();
   });
 });
