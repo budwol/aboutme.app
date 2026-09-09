@@ -10,6 +10,7 @@ describe("projectRoutes", () => {
   it("creates stable project slugs with an index suffix", () => {
     expect(createProjectSlug("Hello World", 0)).toBe("hello-world-1");
     expect(createProjectSlug("Ä Ö Ü", 1)).toBe("a-o-u-2");
+    expect(createProjectSlug("!!!", 2)).toBe("project-3");
   });
 
   it("finds projects by their derived slug", () => {
@@ -17,6 +18,10 @@ describe("projectRoutes", () => {
 
     expect(match?.project.title).toBe(testAppData.projects[0].title);
     expect(match?.index).toBe(0);
+    expect(findProjectBySlug(testAppData.projects)).toBeUndefined();
+    expect(
+      findProjectBySlug(testAppData.projects, "missing-1"),
+    ).toBeUndefined();
   });
 
   it("returns localized project path segments", () => {

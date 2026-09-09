@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import {
+  getConfiguredSiteUrl,
   getConfiguredSiteUrlFromSources,
   isAllowedSiteUrl,
   normalizeSiteUrl,
@@ -28,6 +29,12 @@ describe("app config", () => {
     expect(isAllowedSiteUrl("https://example.com?x=1")).toBe(false);
     expect(isAllowedSiteUrl("https://user:pass@example.com")).toBe(false);
     expect(isAllowedSiteUrl("/relative/path")).toBe(false);
+    expect(isAllowedSiteUrl("")).toBe(false);
+    expect(isAllowedSiteUrl(undefined)).toBe(false);
+    expect(normalizeSiteUrl("http://example.com")).toBe(
+      "http://localhost:8081",
+    );
+    expect(normalizeSiteUrl(undefined)).toBe("http://localhost:8081");
   });
 
   it("uses the first valid configured site url", () => {
@@ -37,6 +44,11 @@ describe("app config", () => {
         baseUrl: "https://base.example.com",
       }),
     ).toBe("https://public.example.com");
+    expect(
+      getConfiguredSiteUrlFromSources({
+        baseUrl: "https://base.example.com",
+      }),
+    ).toBe("https://base.example.com");
   });
 
   it("throws on missing or invalid configured site urls", () => {
@@ -48,5 +60,21 @@ describe("app config", () => {
         publicSiteUrl: "http://example.com",
       }),
     ).toThrow(/Invalid site URL configuration/);
+  });
+
+  it("reads configured site urls from environment variables", () => {
+    const originalPublicSiteUrl = process.env.EXPO_PUBLIC_SITE_URL;
+    const originalBaseUrl = process.env.BASE_URL;
+
+    process.env.EXPO_PUBLIC_SITE_URL = " https://public.example.com/ ";
+    process.env.BASE_URL = "https://base.example.com/";
+    expect(getConfiguredSiteUrl()).toBe("https://public.example.com");
+
+    process.env.EXPO_PUBLIC_SITE_URL = "";
+    process.env.BASE_URL = " https://base.example.com/ ";
+    expect(getConfiguredSiteUrl()).toBe("https://base.example.com");
+
+    process.env.EXPO_PUBLIC_SITE_URL = originalPublicSiteUrl;
+    process.env.BASE_URL = originalBaseUrl;
   });
 });
