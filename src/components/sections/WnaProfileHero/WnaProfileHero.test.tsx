@@ -4,6 +4,8 @@ import TestRenderer, { act } from "react-test-renderer";
 import WnaProfileHero from "@components/sections/WnaProfileHero";
 import { testAppData } from "@/app-data/testAppData";
 
+let mockReduceMotion = true;
+
 jest.mock("@components/images/WnaImage", () => {
   const { createElement } = jest.requireActual(
     "react",
@@ -56,7 +58,7 @@ jest.mock("react-native-reanimated", () => {
 
       return outputStart + ratio * (outputEnd - outputStart);
     },
-    useReducedMotion: () => true,
+    useReducedMotion: () => mockReduceMotion,
     useAnimatedStyle: (callback: () => Record<string, unknown>) => callback(),
     useSharedValue: (initialValue: number) => ({ value: initialValue }),
     withRepeat: (value: unknown) => value,
@@ -66,23 +68,23 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaProfileHero", () => {
+  const appColors = {
+    white: "#ffffff",
+    black: "#000000",
+    accent5: "#22aa66",
+    coolgray2: "#cccccc",
+    coolgray8: "#222222",
+    coolgray6: "#666666",
+    warmgray6: "#999999",
+  } as never;
+
   it("renders the accent bar between name and title in the regular hero", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
       tree = TestRenderer.create(
         <WnaProfileHero
-          appColors={
-            {
-              white: "#ffffff",
-              black: "#000000",
-              accent5: "#22aa66",
-              coolgray2: "#cccccc",
-              coolgray8: "#222222",
-              coolgray6: "#666666",
-              warmgray6: "#999999",
-            } as never
-          }
+          appColors={appColors}
           appData={testAppData}
           appStyle={
             {
@@ -116,17 +118,7 @@ describe("WnaProfileHero", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaProfileHero
-          appColors={
-            {
-              white: "#ffffff",
-              black: "#000000",
-              accent5: "#22aa66",
-              coolgray2: "#cccccc",
-              coolgray8: "#222222",
-              coolgray6: "#666666",
-              warmgray6: "#999999",
-            } as never
-          }
+          appColors={appColors}
           appData={testAppData}
           appStyle={
             {
@@ -145,5 +137,44 @@ describe("WnaProfileHero", () => {
     expect(accentBars[0].props.width).toBe(112);
     expect(accentBars[0].props.pulseToWidth).toBe(24);
     expect(accentBars[0].props.pulseDuration).toBe(30000);
+  });
+
+  it("animates hero shapes when reduced motion is disabled", () => {
+    mockReduceMotion = false;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProfileHero
+          appColors={appColors}
+          appData={testAppData}
+          appStyle={
+            {
+              textExtraLarge: {},
+              textNeutralSubtitle: {},
+            } as never
+          }
+        />,
+      );
+    });
+
+    const animatedShape = tree!.root
+      .findAllByType("AnimatedView")
+      .find(
+        (node: { props: { style?: unknown[] } }) =>
+          Array.isArray(node.props.style) &&
+          (node.props.style[1] as { opacity?: number })?.opacity !== 1,
+      );
+
+    expect(animatedShape?.props.style[1]).toEqual(
+      expect.objectContaining({
+        opacity: expect.any(Number),
+        transform: expect.arrayContaining([
+          expect.objectContaining({ scale: expect.any(Number) }),
+        ]),
+      }),
+    );
+
+    mockReduceMotion = true;
   });
 });
