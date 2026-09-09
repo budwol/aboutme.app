@@ -66,7 +66,7 @@ reactLogger.info = filterIgnoredMessages(reactLogger.info);
 reactLogger.warn = filterIgnoredMessages(reactLogger.warn);
 reactLogger.error = filterIgnoredMessages(reactLogger.error);
 
-export enum LogPrefix {
+enum LogPrefix {
   log,
   info,
   warn,

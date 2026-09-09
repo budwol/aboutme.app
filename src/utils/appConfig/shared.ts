@@ -1,12 +1,4 @@
 const DEFAULT_SITE_URL = "http://localhost:8081";
-const DEFAULT_PROFILE_NAME = "Your Name";
-
-export type AppDataJson = {
-  siteUrl?: string;
-  profile?: {
-    name?: string;
-  };
-};
 
 function isLocalHttpHost(hostname: string): boolean {
   return (
@@ -77,13 +69,4 @@ export function getConfiguredSiteUrlFromSources(sources: {
   }
 
   return normalizeSiteUrl(configuredSiteUrl);
-}
-
-export function getConfiguredProfileNameFromSources(sources: {
-  appDataProfileName?: string;
-  envAppName?: string;
-}): string {
-  return (
-    sources.appDataProfileName || sources.envAppName || DEFAULT_PROFILE_NAME
-  );
 }

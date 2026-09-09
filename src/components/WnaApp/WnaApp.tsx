@@ -1,4 +1,5 @@
 import Toast, { ToastConfig } from "react-native-toast-message";
+import Logger from "@/utils/logger";
 import { AppData } from "@/app-data";
 import {
   Dimensions,
@@ -69,6 +70,10 @@ function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
 }
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    Logger.error(ErrorBoundary.name, error);
+  }, [error]);
+
   return (
     <View
       style={{

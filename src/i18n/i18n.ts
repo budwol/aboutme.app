@@ -18,9 +18,6 @@ const getLangCode = () => {
 
   return langCode;
 };
-const isLangGerman = () => getLangCode() === "de";
-const isLangEnglish = () => getLangCode() !== "de";
-
 i18n.use(initReactI18next).init({
   compatibilityJSON: "v4",
   lng: getLangCode(),
@@ -35,4 +32,4 @@ i18n.use(initReactI18next).init({
   },
 });
 
-export { getLangCode, i18n, isLangEnglish, isLangGerman };
+export { getLangCode, i18n };
