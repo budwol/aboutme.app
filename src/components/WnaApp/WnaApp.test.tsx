@@ -1,8 +1,19 @@
-import WnaApp from "@components/WnaApp";
+import WnaApp, { ErrorBoundary } from "@components/WnaApp";
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+
+const mockLoggerError = jest.fn();
+
+jest.mock("wna-logger", () => ({
+  __esModule: true,
+  default: {
+    error: (...args: unknown[]) => mockLoggerError(...args),
+    info: () => {},
+    warn: () => {},
+  },
+}));
 
 type RenderedTextNode = {
   props: {
@@ -149,5 +160,36 @@ describe("WnaApp", () => {
     expect(heroField.props.compact).toBe(true);
     expect(textValues).toContain(appData.profile.name);
     expect(textValues).toContain(appData.profile.title.toUpperCase());
+  });
+});
+
+describe("ErrorBoundary", () => {
+  it("logs the error and renders a retry action", () => {
+    mockLoggerError.mockClear();
+    const error = new Error("boom");
+    const retry = jest.fn<() => Promise<void>>();
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<ErrorBoundary error={error} retry={retry} />);
+    });
+
+    expect(mockLoggerError).toHaveBeenCalledWith("ErrorBoundary", error);
+
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => node.props.children);
+    expect(textValues).toContain("boom");
+    expect(textValues).toContain("retry");
+
+    const retryText = tree!.root
+      .findAllByType("Text")
+      .find((node: RenderedTextNode) => node.props.children === "retry");
+    act(() => {
+      (retryText!.props as { onPress: () => void }).onPress();
+    });
+
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 });
