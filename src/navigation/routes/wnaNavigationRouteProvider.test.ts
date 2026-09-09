@@ -83,4 +83,27 @@ describe("wnaNavigationRouteProvider", () => {
       "/(drawer)/(tabs-de)/menu/impressum",
     );
   });
+
+  it("falls back to english paths for non-german locales", () => {
+    jest.doMock("expo-localization", () => ({
+      getLocales: () => [{ languageCode: "fr" }],
+    }));
+
+    let routes!: typeof import("@/navigation/routes/wnaNavigationRouteProvider");
+
+    jest.isolateModules(() => {
+      routes = jest.requireActual(
+        "@/navigation/routes/wnaNavigationRouteProvider",
+      ) as typeof import("@/navigation/routes/wnaNavigationRouteProvider");
+    });
+
+    routes.setNavigationBaseUrl("https://portfolio.example.com");
+
+    expect(routes.getNavigationBaseUrl()).toBe("https://portfolio.example.com");
+    expect(routes.getNavigationLang()).toBe("en");
+    expect(routes.getNavigationPath("privacy")).toBe("/menu/privacy");
+    expect(routes.getProjectNavigationPath("custom-project")).toBe(
+      "/projects/custom-project",
+    );
+  });
 });

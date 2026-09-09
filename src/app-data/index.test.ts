@@ -281,4 +281,48 @@ describe("normalizeAppData", () => {
     expect(data.siteUrl).toBe("https://portfolio.example.com");
     expect(data.profile.name).toBe("budwol");
   });
+
+  it("fetches app-data from the public json endpoint by default", async () => {
+    const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        siteUrl: "https://portfolio.example.com/",
+        profile: {
+          name: "Loaded Person",
+        },
+      }),
+    } as Response);
+
+    const data = await loadAppData();
+
+    expect(fetchSpy).toHaveBeenCalledWith("/app-data.json", {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+    expect(data.siteUrl).toBe("https://portfolio.example.com");
+    expect(data.profile.name).toBe("Loaded Person");
+
+    fetchSpy.mockRestore();
+  });
+
+  it("falls back to defaults when the public json endpoint fails", async () => {
+    const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    } as Response);
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    const data = await loadAppData();
+
+    expect(data).toEqual(normalizeAppData(defaultAppData));
+    expect(warnSpy).toHaveBeenCalledWith(
+      "app-data.json not found -> using defaults",
+    );
+
+    fetchSpy.mockRestore();
+    warnSpy.mockRestore();
+  });
 });
