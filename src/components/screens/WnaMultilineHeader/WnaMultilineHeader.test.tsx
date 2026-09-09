@@ -78,6 +78,25 @@ describe("WnaMultilineHeader", () => {
     return tree!;
   }
 
+  function renderSplitHeader() {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        WnaMultilineHeader(
+          appColors,
+          appStyle,
+          appLayout,
+          false,
+          false,
+          "Main | Sub",
+        ),
+      );
+    });
+
+    return tree!;
+  }
+
   function findSingleLineTitleWrapper(
     tree: ReturnType<typeof TestRenderer.create>,
   ) {
@@ -109,5 +128,14 @@ describe("WnaMultilineHeader", () => {
 
     expect(titleWrapper.props.style.paddingLeft).toBe(8);
     expect(tree.root.findAllByType("WnaImage")).toHaveLength(0);
+  });
+
+  it("splits pipe-separated titles into main and subtitle", () => {
+    const tree = renderSplitHeader();
+    const textValues = tree.root
+      .findAllByType("Text")
+      .map((node: HeaderTextNode) => node.props.children);
+
+    expect(textValues).toEqual(["Main", "Sub"]);
   });
 });

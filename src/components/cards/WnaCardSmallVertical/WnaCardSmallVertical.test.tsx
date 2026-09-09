@@ -1,7 +1,9 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaCardSmallVertical from "@components/cards/WnaCardSmallVertical";
+
+const mockWnaCardTextContent = jest.fn();
 
 jest.mock("@components/cards/WnaCardTextContent", () => {
   const { createElement } = jest.requireActual(
@@ -9,6 +11,8 @@ jest.mock("@components/cards/WnaCardTextContent", () => {
   ) as typeof import("react");
 
   return function MockWnaVerticalCardTextContent(props: unknown) {
+    mockWnaCardTextContent(props);
+
     return createElement(
       "WnaCardTextContent",
       props as Record<string, unknown>,
@@ -41,25 +45,30 @@ jest.mock("@components/buttons/WnaPressable", () => {
 });
 
 describe("WnaCardSmallVertical", () => {
+  const appColors = {
+    warmgray6: "#666666",
+    coolgray2: "#222222",
+    coolgray1: "#dddddd",
+    coolgray8: "#111111",
+    black: "#000000",
+  } as never;
+  const appStyle = {
+    textMicro: { lineHeight: 16 },
+    textNeutralMicro: {},
+  } as never;
+
+  beforeEach(() => {
+    mockWnaCardTextContent.mockClear();
+  });
+
   it("forwards title, subtitle and description to the shared content component", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
       tree = TestRenderer.create(
         <WnaCardSmallVertical
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              black: "#000000",
-            } as never
-          }
-          appStyle={
-            {
-              textMicro: { lineHeight: 16 },
-              textNeutralMicro: {},
-            } as never
-          }
+          appColors={appColors}
+          appStyle={appStyle}
           title="Engineer"
           subtitle="Example Inc."
           description="Built features."
@@ -91,21 +100,8 @@ describe("WnaCardSmallVertical", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaCardSmallVertical
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              coolgray1: "#dddddd",
-              coolgray8: "#111111",
-              black: "#000000",
-            } as never
-          }
-          appStyle={
-            {
-              textMicro: { lineHeight: 16 },
-              textNeutralMicro: {},
-            } as never
-          }
+          appColors={appColors}
+          appStyle={appStyle}
           title="Engineer"
           subtitle="Example Inc."
           description="Built features."
@@ -131,21 +127,8 @@ describe("WnaCardSmallVertical", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaCardSmallVertical
-          appColors={
-            {
-              warmgray6: "#666666",
-              coolgray2: "#222222",
-              coolgray1: "#dddddd",
-              coolgray8: "#111111",
-              black: "#000000",
-            } as never
-          }
-          appStyle={
-            {
-              textMicro: { lineHeight: 16 },
-              textNeutralMicro: {},
-            } as never
-          }
+          appColors={appColors}
+          appStyle={appStyle}
           title="Engineer"
           subtitle="Example Inc."
           description="Built features."
@@ -154,5 +137,36 @@ describe("WnaCardSmallVertical", () => {
     });
 
     expect(tree!.root.findAllByType("WnaPressable")).toHaveLength(0);
+  });
+
+  it("skips re-rendering while memoized props stay stable", () => {
+    const props = {
+      appColors,
+      appStyle,
+      title: "Engineer",
+      subtitle: "Example Inc.",
+      description: "Built features.",
+    };
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaCardSmallVertical {...props} />);
+    });
+
+    expect(mockWnaCardTextContent).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(<WnaCardSmallVertical {...props} />);
+    });
+
+    expect(mockWnaCardTextContent).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(
+        <WnaCardSmallVertical {...props} description="Changed features." />,
+      );
+    });
+
+    expect(mockWnaCardTextContent).toHaveBeenCalledTimes(2);
   });
 });
