@@ -76,4 +76,30 @@ describe("WnaNavigationHeaderButtonRight", () => {
 
     expect(buttonHeader.props.text).toBe("tx:screenTitleStartPage");
   });
+
+  it("pushes the resolved route when the header button is pressed", () => {
+    const router = { push: jest.fn() };
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaNavigationHeaderButtonRight
+          appColors={{ isDark: false } as never}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+          router={router as never}
+          route="projects"
+        />,
+      );
+    });
+
+    const buttonHeader = tree!.root.findByType("WnaButtonHeader");
+
+    act(() => {
+      (buttonHeader.props as { onPress: () => void }).onPress();
+    });
+
+    expect(router.push).toHaveBeenCalledTimes(1);
+    expect(router.push).toHaveBeenCalledWith("/projects");
+  });
 });

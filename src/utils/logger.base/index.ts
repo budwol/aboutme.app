@@ -1,11 +1,5 @@
-import * as FileSystem from "expo-file-system/legacy";
-import { shareAsync } from "expo-sharing";
-import { LogBox, Platform } from "react-native";
-import {
-  consoleTransport,
-  fileAsyncTransport,
-  logger,
-} from "react-native-logs";
+import { LogBox } from "react-native";
+import { logger, mapConsoleTransport } from "react-native-logs";
 
 type LoggerMethod = (message: string) => void;
 
@@ -31,7 +25,18 @@ const filterIgnoredMessages = <T extends LoggerMethod>(fn: T): T =>
     fn(message);
   }) as T;
 
-const config = {
+// app.config.ts pins `platforms: ["web"]` — this app never ships to native,
+// so logging only ever needs a console transport. No on-device log file, no
+// expo-file-system/expo-sharing dependency, no native-only branch.
+//
+// mapConsoleTransport (not consoleTransport): consoleTransport always calls
+// console.log and wraps the message in ANSI color codes, which is meant for
+// a terminal — a browser console renders those codes as literal garbage
+// text instead of color, and every log call bypasses DevTools' per-level
+// filtering (Errors/Warnings) since nothing ever reaches console.error or
+// console.warn. mapConsoleTransport routes each level to the matching
+// console method via `mapLevels` instead.
+const reactLogger = logger.createLogger({
   levels: {
     debug: 0,
     log: 1,
@@ -39,38 +44,21 @@ const config = {
     warn: 5,
     error: 6,
   },
-  transport: [consoleTransport],
+  transport: [mapConsoleTransport],
   transportOptions: {
     mapLevels: {
       debug: "log",
       log: "log",
       info: "info",
       warn: "warn",
-      err: "error",
+      error: "error",
     },
-    colors: {
-      debug: "white",
-      log: "white",
-      info: "blueBright",
-      warn: "yellowBright",
-      error: "redBright",
-    },
-    FS: FileSystem,
-    fileName: "app.log",
   },
   dateFormat: "iso",
-  printDate: Platform.OS !== "web",
+  printDate: false,
   printLevel: true,
   enabled: true,
-} as const;
-
-if (Platform.OS !== "web") {
-  // @ts-expect-error react-native-logs supports mixed transports, but its generics are narrower than runtime behavior.
-  config.transport.push(fileAsyncTransport);
-}
-
-// @ts-expect-error createLogger transport generics do not model the mixed transport setup used here.
-const reactLogger = logger.createLogger(config);
+});
 
 // filter ignored messages before they reach the transports
 reactLogger.log = filterIgnoredMessages(reactLogger.log);
@@ -85,35 +73,8 @@ export enum LogPrefix {
   error,
 }
 
-const logFilePath = FileSystem.documentDirectory + "app.log";
-
 export default class LoggerBase {
-  public static isEnabled = Platform.OS === "web";
-
-  public static async shareLogfileAsync() {
-    await shareAsync(logFilePath, {
-      dialogTitle: "logfile",
-      mimeType: "text/plain",
-    });
-  }
-
-  public static async deleteLogFileAsync() {
-    const info = await FileSystem.getInfoAsync(logFilePath);
-    if (info.exists) await FileSystem.deleteAsync(logFilePath);
-  }
-
-  public static async readLogFileAsync(): Promise<string> {
-    try {
-      return await FileSystem.readAsStringAsync(logFilePath, {
-        encoding: "utf8",
-      });
-    } catch {
-      return "";
-    }
-  }
-
   public static info(msg: unknown): void {
-    if (!this.isEnabled) return;
     this.log(LogPrefix.info, msg);
   }
 
