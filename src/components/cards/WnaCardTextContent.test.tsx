@@ -76,6 +76,65 @@ describe("WnaCardTextContent", () => {
     expect(tree!.root.findByType("TextMarker")).toBeTruthy();
   });
 
+  it("uses app style text rules and right-aligned custom content", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent
+          appColors={appColors}
+          appStyle={
+            {
+              textNeutralMedium: { lineHeight: undefined },
+              textNeutralSmall: { lineHeight: undefined },
+              textNeutralMicro: { color: "#555555" },
+            } as never
+          }
+          title="Styled title"
+          subtitle="Styled subtitle"
+          description="Styled description"
+          subtitleAlign="right"
+          titleNumberOfLines={1}
+          subtitleNumberOfLines={2}
+          bodyPadding={3}
+        />,
+      );
+    });
+
+    const texts = tree!.root.findAllByType("Text");
+
+    expect(texts[0].props.numberOfLines).toBe(1);
+    expect(texts[0].props.style[1]).toEqual(
+      expect.objectContaining({ lineHeight: 20 }),
+    );
+    expect(texts[1].props.numberOfLines).toBe(2);
+    expect(texts[1].props.style[1]).toEqual(
+      expect.objectContaining({
+        lineHeight: 18,
+        paddingHorizontal: 3,
+        textAlign: "right",
+      }),
+    );
+    expect(texts[2].props.style).toEqual({ color: "#555555" });
+  });
+
+  it("left-aligns custom subtitle content by default", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent
+          appColors={appColors}
+          subtitleContent={<TextMarker />}
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("View").props.style).toEqual(
+      expect.objectContaining({ alignItems: "flex-start" }),
+    );
+  });
+
   it("renders nothing for omitted optional content", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
