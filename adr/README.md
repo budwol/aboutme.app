@@ -13,7 +13,8 @@ Format: lightweight ADR (Context / Decision / Consequences). New ADRs get the ne
 | [0005](0005-wna-component-module-convention.md)                 | Components follow a `WnaXxx` directory-with-barrel convention                          |
 | [0006](0006-cache-busted-static-assets.md)                      | Static local assets are cache-busted via a deploy version query param                  |
 | [0007](0007-deploy-scripts-guard-destructive-actions.md)        | Deploy scripts guard destructive actions behind confirmation, dry-run, and path checks |
-| [0008](0008-dev-only-file-logging.md)                           | File logging is dev-only; production logging is a no-op facade                         |
+| [0008](0008-dev-only-console-logging.md)                        | Console logging is dev-only; production logging is a no-op facade                      |
 | [0009](0009-ci-as-chained-reusable-workflows.md)                | CI is split into single-concern reusable workflows chained by `needs`                  |
 | [0010](0010-build-time-resume-pdf-generation.md)                | A condensed resume PDF is generated at build time from the same source data            |
 | [0011](0011-ats-safe-resume-variant.md)                         | A separate, single-column resume variant is generated for ATS pipelines                |
+| [0012](0012-react-test-renderer-for-component-tests.md)         | Component tests use `react-test-renderer`, not `@testing-library/react-native`         |
