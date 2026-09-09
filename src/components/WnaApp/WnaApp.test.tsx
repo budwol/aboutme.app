@@ -300,6 +300,47 @@ describe("WnaApp", () => {
     );
   });
 
+  it("renders theme-change and info toast variants", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    const toast = tree!.root.findByType("Toast");
+    let themeChangeCard: ReturnType<typeof TestRenderer.create> | undefined;
+    let infoCard: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      themeChangeCard = TestRenderer.create(
+        toast.props.config.themeChange({
+          text1: "Theme",
+          props: {},
+        }),
+      );
+      infoCard = TestRenderer.create(
+        toast.props.config.info({
+          text1: "Info",
+          text2: "More",
+          props: {},
+        }),
+      );
+    });
+
+    expect(themeChangeCard!.root.findByType("Text").props.children).toBe(
+      "Theme",
+    );
+    expect(
+      infoCard!.root
+        .findAllByType("Text")
+        .map((node: RenderedTextNode) => node.props.children),
+    ).toEqual(["Info", "More"]);
+  });
+
   it("wires resize events through the debounced layout updater", () => {
     jest.useFakeTimers();
     const remove = jest.fn();
@@ -375,6 +416,53 @@ describe("WnaApp", () => {
 
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
     expect(mockFinishNavigationTransition).not.toHaveBeenCalled();
+    global.requestAnimationFrame = originalRequestAnimationFrame;
+  });
+
+  it("finishes the navigation transition after the pathname changes", () => {
+    const originalRequestAnimationFrame = global.requestAnimationFrame;
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      callback(0);
+
+      return 1;
+    }) as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    mockIsNavigationTransitionActive = true;
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    mockPathname = "/next";
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    expect(mockFinishNavigationTransition).toHaveBeenCalledTimes(1);
     global.requestAnimationFrame = originalRequestAnimationFrame;
   });
 
