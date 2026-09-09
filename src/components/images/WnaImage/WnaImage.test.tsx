@@ -1,13 +1,24 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaImage from "@components/images/WnaImage";
+
+const mockLoggerWarn = jest.fn();
+const mockLoggerError = jest.fn();
+const mockWnaImageElement = jest.fn();
+
+jest.mock("@/utils/logger", () => ({
+  warn: (...args: unknown[]) => mockLoggerWarn(...args),
+  error: (...args: unknown[]) => mockLoggerError(...args),
+}));
 
 jest.mock("@components/images/WnaImageElement/WnaImageElement", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
 
   return function MockWnaImageElement(props: unknown) {
+    mockWnaImageElement(props);
+
     return ReactModule.createElement(
       "WnaImageElement",
       props as Record<string, unknown>,
@@ -16,13 +27,21 @@ jest.mock("@components/images/WnaImageElement/WnaImageElement", () => {
 });
 
 describe("WnaImage", () => {
+  const appColors = {} as never;
+
+  beforeEach(() => {
+    mockLoggerWarn.mockClear();
+    mockLoggerError.mockClear();
+    mockWnaImageElement.mockClear();
+  });
+
   it("normalizes local image asset paths to absolute web paths", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
       tree = TestRenderer.create(
         <WnaImage
-          appColors={{} as never}
+          appColors={appColors}
           imageUrl="images/ava.webp"
           imageTitle="Avatar"
         />,
@@ -40,7 +59,7 @@ describe("WnaImage", () => {
     act(() => {
       tree = TestRenderer.create(
         <WnaImage
-          appColors={{} as never}
+          appColors={appColors}
           imageUrl="images/ava.webp"
           imageTitle="Avatar"
           sources={[
@@ -79,5 +98,127 @@ describe("WnaImage", () => {
     ]);
     expect(image.props.priority).toBe("high");
     expect(image.props.responsivePolicy).toBe("static");
+  });
+
+  it("falls back from an empty image URL to thumbnail and placeholder URLs", () => {
+    let thumbnailTree: ReturnType<typeof TestRenderer.create> | undefined;
+    let placeholderTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      thumbnailTree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl=""
+          imageTitle="Thumbnail"
+          thumbnailUrl="thumb.webp"
+          placeholderUrl="placeholder.webp"
+        />,
+      );
+      placeholderTree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl=""
+          imageTitle="Placeholder"
+          placeholderUrl="placeholder.webp"
+        />,
+      );
+    });
+
+    expect(thumbnailTree!.root.findAllByType("WnaImageElement")).toHaveLength(
+      0,
+    );
+    expect(placeholderTree!.root.findAllByType("WnaImageElement")).toHaveLength(
+      0,
+    );
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it("shows only the activity indicator for an empty image without fallbacks", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl=""
+          imageTitle="Missing"
+          showActivityIndicator
+        />,
+      );
+    });
+
+    expect(mockLoggerWarn).toHaveBeenCalledWith(
+      "WnaImage",
+      "imageUrl is empty",
+    );
+    expect(tree!.root.findAllByType("WnaImageElement")).toHaveLength(0);
+    expect(tree!.root.findByType("ActivityIndicator")).toBeTruthy();
+  });
+
+  it("keeps remote sources loading against a local placeholder", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="https://cdn.example.com/full.webp"
+          imageTitle="Remote"
+          placeholderUrl="placeholder.webp"
+          hideBackground
+        />,
+      );
+    });
+
+    const wrapper = tree!.root.findByType("View");
+
+    expect(tree!.root.findByType("WnaImageElement").props.source).toBe(
+      "https://cdn.example.com/full.webp",
+    );
+    expect(wrapper.props.style[1].backgroundColor).toBe("transparent");
+  });
+
+  it("does not re-render while memoized visual props stay unchanged", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+    const stableStyle = { width: 100 };
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="images/ava.webp"
+          imageTitle="Avatar"
+          style={stableStyle}
+        />,
+      );
+    });
+
+    expect(mockWnaImageElement).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="images/ava.webp"
+          imageTitle="Avatar"
+          style={stableStyle}
+        />,
+      );
+    });
+
+    expect(mockWnaImageElement).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.update(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="images/ava.webp"
+          imageTitle="Avatar updated"
+          style={stableStyle}
+        />,
+      );
+    });
+
+    expect(mockWnaImageElement).toHaveBeenCalledTimes(2);
   });
 });
