@@ -20,4 +20,15 @@ module.exports = {
     "/playwright-report/",
     "/test-results/",
   ],
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/*.d.ts",
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 100,
+      lines: 100,
+    },
+  },
 };

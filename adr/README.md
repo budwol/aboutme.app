@@ -18,3 +18,4 @@ Format: lightweight ADR (Context / Decision / Consequences). New ADRs get the ne
 | [0010](0010-build-time-resume-pdf-generation.md)                | A condensed resume PDF is generated at build time from the same source data            |
 | [0011](0011-ats-safe-resume-variant.md)                         | A separate, single-column resume variant is generated for ATS pipelines                |
 | [0012](0012-react-test-renderer-for-component-tests.md)         | Component tests use `react-test-renderer`, not `@testing-library/react-native`         |
+| [0013](0013-100-percent-line-and-branch-coverage-target.md)     | 100% line and branch coverage is the target, enforced via `coverageThreshold`          |
