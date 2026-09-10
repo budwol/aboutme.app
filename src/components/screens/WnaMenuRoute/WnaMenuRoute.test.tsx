@@ -137,6 +137,7 @@ describe("WnaMenuRoute", () => {
     const scrollViewScreen = tree!.root.findByType("WnaScrollViewScreen");
 
     expect(scrollViewScreen.props.showContactFooter).toBe(false);
+    expect(scrollViewScreen.props.titleHref).toBe("/");
 
     act(() => items[1].props.onPress());
     act(() => items[2].props.onPress());
