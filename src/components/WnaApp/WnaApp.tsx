@@ -255,6 +255,14 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   );
 
   useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.getElementById("wna-static-shell")?.remove();
+  }, []);
+
+  useEffect(() => {
     const handleChange = () => {
       if (dimensionTimerRef.current) {
         clearTimeout(dimensionTimerRef.current);

@@ -381,6 +381,69 @@ describe("normalizeAppData", () => {
     fetchSpy.mockRestore();
   });
 
+  it("prefers embedded export app-data over the public json endpoint", async () => {
+    const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        profile: {
+          name: "Fetched Person",
+        },
+      }),
+    } as Response);
+    const originalDocument = global.document;
+    (global as typeof globalThis & { document: Document }).document = {
+      getElementById: (id: string) =>
+        id === "wna-app-data"
+          ? ({
+              textContent: JSON.stringify({
+                siteUrl: "https://embedded.example.com/",
+                profile: {
+                  name: "Embedded Person",
+                },
+              }),
+            } as HTMLElement)
+          : null,
+    } as Document;
+
+    const data = await loadAppData();
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(data.siteUrl).toBe("https://embedded.example.com");
+    expect(data.profile.name).toBe("Embedded Person");
+
+    global.document = originalDocument;
+    fetchSpy.mockRestore();
+  });
+
+  it("falls back to the public json endpoint when embedded app-data is empty", async () => {
+    const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        profile: {
+          name: "Fetched Person",
+        },
+      }),
+    } as Response);
+    const originalDocument = global.document;
+    (global as typeof globalThis & { document: Document }).document = {
+      getElementById: (id: string) =>
+        id === "wna-app-data" ? ({ textContent: " " } as HTMLElement) : null,
+    } as Document;
+
+    const data = await loadAppData();
+
+    expect(fetchSpy).toHaveBeenCalledWith("/app-data.json", {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+    expect(data.profile.name).toBe("Fetched Person");
+
+    global.document = originalDocument;
+    fetchSpy.mockRestore();
+  });
+
   it("falls back to defaults when the public json endpoint fails", async () => {
     const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
       ok: false,

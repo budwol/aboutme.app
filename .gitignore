@@ -11,6 +11,7 @@ coverage/
 playwright-report/
 tests/playwright/results
 test-results/
+*-20??????T??????.json
 
 # Expo
 .expo/

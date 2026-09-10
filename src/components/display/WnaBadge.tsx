@@ -1,7 +1,6 @@
 import React, { memo } from "react";
-import { View, StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { Text, View, StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
-import WnaText from "@components/text/WnaText";
 import WnaIcon from "../icon/WnaIcon/WnaIcon";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
@@ -40,17 +39,25 @@ const WnaBadge = ({
       )}
 
       {text && (
-        <WnaText
-          appColors={appColors}
-          appStyle={appStyle}
-          fontColor={fontColor ?? appColors.white}
+        <Text
           style={
             Array.isArray(textStyle)
-              ? [appStyle.textMicro, styles.text, ...textStyle]
-              : [appStyle.textMicro, styles.text, textStyle ?? {}]
+              ? [
+                  appStyle.textMicro,
+                  styles.text,
+                  { color: fontColor ?? appColors.white },
+                  ...textStyle,
+                ]
+              : [
+                  appStyle.textMicro,
+                  styles.text,
+                  { color: fontColor ?? appColors.white },
+                  textStyle ?? {},
+                ]
           }
-          text={text}
-        />
+        >
+          {text}
+        </Text>
       )}
     </View>
   );
