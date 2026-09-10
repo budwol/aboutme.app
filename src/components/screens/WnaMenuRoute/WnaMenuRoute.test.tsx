@@ -6,13 +6,6 @@ import TestRenderer, { act } from "react-test-renderer";
 const mockNavigate = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
-const mockToastShow = jest.fn();
-
-function MockToast(_props: unknown) {
-  return null;
-}
-
-MockToast.show = mockToastShow;
 
 jest.mock("@components/WnaAppContext", () => ({
   useWnaAppLifecycle: jest.fn(() => ({ isAppInitialized: true })),
@@ -45,10 +38,13 @@ jest.mock("@utils/themeColors", () => ({
   resolveAppColors: () => ({ id: 2, isDark: false }),
 }));
 
-jest.mock("react-native-toast-message", () => ({
-  __esModule: true,
-  default: MockToast,
-}));
+jest.mock("@components/feedback/wnaToast");
+
+const mockShowWnaToast = (
+  jest.requireMock("@components/feedback/wnaToast") as {
+    showWnaToast: jest.Mock;
+  }
+).showWnaToast;
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({ navigate: mockNavigate }),
@@ -168,7 +164,7 @@ describe("WnaMenuRoute", () => {
   it("renders a theme entry and toggles the theme from the drawer", async () => {
     mockSetTheme.mockClear();
     mockSetAppColors.mockClear();
-    mockToastShow.mockClear();
+    mockShowWnaToast.mockClear();
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -187,7 +183,7 @@ describe("WnaMenuRoute", () => {
 
     expect(mockSetAppColors).toHaveBeenCalledWith({ id: 2, isDark: false });
     expect(mockSetTheme).toHaveBeenCalledWith("light");
-    expect(mockToastShow).toHaveBeenCalledWith({
+    expect(mockShowWnaToast).toHaveBeenCalledWith({
       type: "themeChange",
       text1: "Appearance",
       text2: "Light mode",

@@ -10,15 +10,8 @@ const mockReplace = jest.fn();
 const mockBack = jest.fn();
 const mockNavigate = jest.fn();
 const mockCanGoBack = jest.fn(() => false);
-const mockToastShow = jest.fn();
 const mockHistoryBack = jest.fn();
 const mockStartNavigationTransition = jest.fn((action: () => void) => action());
-
-function MockToast(_props: unknown) {
-  return null;
-}
-
-MockToast.show = mockToastShow;
 
 type HeaderButtonNode = {
   props: {
@@ -121,11 +114,13 @@ jest.mock("@utils/themeColors", () => ({
   resolveAppColors: () => ({ id: 2, isDark: false }),
 }));
 
-jest.mock("react-native-toast-message", () => ({
-  __esModule: true,
-  default: MockToast,
-  show: mockToastShow,
-}));
+jest.mock("@components/feedback/wnaToast");
+
+const mockShowWnaToast = (
+  jest.requireMock("@components/feedback/wnaToast") as {
+    showWnaToast: jest.Mock;
+  }
+).showWnaToast;
 
 jest.mock("react-native-reanimated", () => {
   const ReactModule = require("react") as typeof import("react");
@@ -154,7 +149,7 @@ describe("WnaHeader", () => {
     mockBack.mockClear();
     mockNavigate.mockClear();
     mockCanGoBack.mockReturnValue(false);
-    mockToastShow.mockClear();
+    mockShowWnaToast.mockClear();
     mockHistoryBack.mockClear();
     mockStartNavigationTransition.mockClear();
     (useWnaLayout as jest.Mock).mockReturnValue({
@@ -239,7 +234,7 @@ describe("WnaHeader", () => {
       await themeButton?.props.onPress();
     });
 
-    expect(mockToastShow).toHaveBeenCalledWith({
+    expect(mockShowWnaToast).toHaveBeenCalledWith({
       type: "themeChange",
       text1: "Appearance",
       text2: "Light mode",
