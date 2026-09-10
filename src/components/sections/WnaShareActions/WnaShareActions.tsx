@@ -1,11 +1,36 @@
 import { useCallback, useMemo } from "react";
-import { Linking, View } from "react-native";
+import { Linking, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useWnaTheme } from "@components/WnaAppContext";
+import { useWnaLayout, useWnaTheme } from "@components/WnaAppContext";
 import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
+
+const shareButtonSize = 52;
+const shareButtonGap = 12;
+const narrowShareActionsWidth = shareButtonSize * 2 + shareButtonGap;
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+  },
+  actions: {
+    alignSelf: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: 16,
+    maxWidth: 320,
+    rowGap: shareButtonGap,
+    columnGap: 16,
+    width: "100%",
+  },
+  actionsNarrow: {
+    columnGap: shareButtonGap,
+    maxWidth: narrowShareActionsWidth,
+  },
+});
 
 export interface WnaShareActionsProps {
   url: string;
@@ -14,7 +39,9 @@ export interface WnaShareActionsProps {
 
 export default function WnaShareActions({ url, title }: WnaShareActionsProps) {
   const { appColors, appStyle } = useWnaTheme();
+  const { currentWindowWidth } = useWnaLayout();
   const { t } = useTranslation(["common"]);
+  const isNarrow = currentWindowWidth < 420;
 
   const encodedUrl = useMemo(() => encodeURIComponent(url), [url]);
   const encodedTitle = useMemo(() => encodeURIComponent(title), [title]);
@@ -50,7 +77,7 @@ export default function WnaShareActions({ url, title }: WnaShareActionsProps) {
   );
 
   return (
-    <View>
+    <View style={styles.container}>
       <WnaSectionTitle
         appColors={appColors}
         appStyle={appStyle}
@@ -58,15 +85,7 @@ export default function WnaShareActions({ url, title }: WnaShareActionsProps) {
         title={t(i18nKeys.actionShare)}
       />
 
-      <View
-        style={{
-          margin: 16,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 16,
-        }}
-      >
+      <View style={[styles.actions, isNarrow && styles.actionsNarrow]}>
         {shareActions.map(({ icon, link, tooltip }) => (
           <WnaButtonIcon
             key={icon}
