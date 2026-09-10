@@ -10,6 +10,20 @@ config.transformer = {
 
 config.resolver.platforms = ["web", "ios", "android"];
 
+// Expo Router treats every file under src/app as a potential route, which
+// would otherwise sweep Jest test files (e.g. src/app/routes.test.tsx, with
+// its dynamic require() calls for route re-export checks) into the
+// production bundle and break Metro's static analysis.
+config.resolver.blockList = [
+  ...(Array.isArray(config.resolver.blockList)
+    ? config.resolver.blockList
+    : config.resolver.blockList
+      ? [config.resolver.blockList]
+      : []),
+  /\.test\.(ts|tsx|js|jsx)$/,
+  /\.spec\.(ts|tsx|js|jsx)$/,
+];
+
 config.resolver.extraNodeModules = {
   "@": srcRoot,
   "@assets": path.resolve(__dirname, "assets"),

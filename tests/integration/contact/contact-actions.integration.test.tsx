@@ -43,6 +43,7 @@ jest.mock("react-i18next", () => ({
   },
   useTranslation: () => ({
     t: (value: string) => value,
+    i18n: { resolvedLanguage: "en", language: "en" },
   }),
 }));
 
@@ -128,7 +129,7 @@ describe("WnaContactCard action integration", () => {
     const tree = await renderWithAppContext(<ContactCardHost />, { appData });
     const buttons = getActionButtons(tree);
 
-    expect(buttons).toHaveLength(5);
+    expect(buttons).toHaveLength(6);
 
     await act(async () => {
       await buttons[0].props.onPress();
