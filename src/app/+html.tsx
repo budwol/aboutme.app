@@ -3,7 +3,6 @@ import { PropsWithChildren, useEffect } from "react";
 import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
 
 const appDescription =
-  process.env.APP_DESCRIPTION?.trim() ||
   "Persönliche Website mit Projekten, Erfahrungen und Kontaktmöglichkeiten.";
 const backgroundImageUrl = getVersionedLocalAssetUrl("/bg.webp");
 
