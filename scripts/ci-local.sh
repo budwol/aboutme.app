@@ -15,6 +15,7 @@ npm run test:prettier
 npm run lint
 npm run test:types
 npm run test:unit
+npm run test:coverage
 npm run test:integration
 npm run test:dry-run
 npm run test:smoke

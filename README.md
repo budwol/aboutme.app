@@ -308,15 +308,17 @@ The quality gates are meant to run in this order:
 
 1. `lint + prettier + types`
 2. `unit`
-3. `integration`
-4. `dry-run`
-5. `smoke`
-6. `e2e`
+3. `coverage`
+4. `integration`
+5. `dry-run`
+6. `smoke`
+7. `e2e`
 
 - `npm run lint`
 - `npm run test:deps`
 - `npm run test:dry-run`
 - `npm run test:unit`
+- `npm run test:coverage`
 - `npm run test:security`
 - `npm run test:smoke`
 - `npm run test:types`
@@ -326,7 +328,7 @@ The quality gates are meant to run in this order:
 - `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
-`npm run test:all` is the broad local test stack for `prettier + types + unit + integration + e2e`. `smoke` stays separate on purpose.
+`npm run test:all` is the broad local test stack for `prettier + types + unit + coverage + integration + e2e`. `smoke` stays separate on purpose.
 
 The Git hook path is intentionally smaller:
 
@@ -340,16 +342,18 @@ There is also a small GitHub Actions CI now. It runs the same gate sequence as s
 ```mermaid
 flowchart LR
   A["lint + prettier + types"] --> B["unit"]
-  B --> C["integration"]
-  C --> D["dry-run"]
-  D --> E["smoke"]
-  E --> F["e2e"]
+  B --> C["coverage"]
+  C --> D["integration"]
+  D --> E["dry-run"]
+  E --> F["smoke"]
+  F --> G["e2e"]
 ```
 
 The orchestration lives in [`.github/workflows/ci.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci.yml). Each gate sits in its own reusable workflow file:
 
 - [`.github/workflows/ci-lint-prettier.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-lint-prettier.yml)
 - [`.github/workflows/ci-unit.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-unit.yml)
+- [`.github/workflows/ci-coverage.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-coverage.yml)
 - [`.github/workflows/ci-integration.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-integration.yml)
 - [`.github/workflows/ci-dry-run.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-dry-run.yml)
 - [`.github/workflows/ci-smoke.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-smoke.yml)
@@ -361,7 +365,7 @@ If you want the full local CI pass:
 npm run ci:local
 ```
 
-`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
+`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, coverage, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
 
 The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 
