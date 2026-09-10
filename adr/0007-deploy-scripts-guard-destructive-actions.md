@@ -12,7 +12,7 @@ Accepted (reconstructed from existing implementation)
 
 ## Decision
 
-Both scripts share the same shape: they source `.env` via `scripts/load-env.sh`, validate required config is present and well-formed before doing anything (`deploy-container.sh` rejects whitespace/invalid characters in `CONTAINER_REGISTRY`/`IMAGE`; `deploy-local.sh` resolves the target path and refuses anything outside `/var/www/*` or equal to `/var/www` itself), support a `--dry-run` flag that prints what would happen and exits before the destructive step, and otherwise prompt for an interactive `y/N` confirmation unless `--yes` is passed and stdin is a TTY (`[ -t 0 ]`).
+Both scripts share the same shape: they source `.env` via `scripts/load-env.sh`, validate required config is present and well-formed before doing anything (`deploy-container.sh` rejects whitespace/invalid characters in `CONTAINER_REGISTRY`/`IMAGE`; `deploy-local.sh` resolves the target path and refuses anything outside `/var/www/*` or equal to `/var/www` itself), support a `--dry-run` flag that prints what would happen and exits before build/push or filesystem changes, and otherwise prompt for an interactive `y/N` confirmation unless `--yes` is passed and stdin is a TTY (`[ -t 0 ]`).
 
 ## Consequences
 
