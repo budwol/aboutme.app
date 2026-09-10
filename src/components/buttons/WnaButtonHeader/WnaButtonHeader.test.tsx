@@ -55,6 +55,7 @@ describe("WnaButtonHeader", () => {
     const icon = tree!.root.findByType("WnaIcon");
 
     expect(pressable.props.toolTip).toBe("Home");
+    expect(pressable.props.accessibilityLabel).toBe("Home");
     expect(icon.props.iconName).toBe("home");
   });
 
@@ -75,6 +76,7 @@ describe("WnaButtonHeader", () => {
     const pressable = tree!.root.findByType("WnaPressable");
 
     expect(pressable.props.toolTip).toBe("");
+    expect(pressable.props.accessibilityLabel).toBe("menu");
     expect(
       tree!.root.findAll(
         (node: { props: { style?: unknown } }) =>

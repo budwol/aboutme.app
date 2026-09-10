@@ -58,6 +58,7 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
             outlineColor,
           },
         ]}
+        accessibilityLabel={text || iconName}
         onPress={onPress}
         checkInternetConnection={checkInternetConnection}
         t={t}

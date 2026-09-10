@@ -97,9 +97,9 @@ export const styles = StyleSheet.create({
     zIndex: 2,
     borderRadius: 8,
     paddingHorizontal: 4,
-    paddingVertical: 2,
+    paddingVertical: 4,
     marginHorizontal: -4,
-    marginVertical: -2,
+    marginVertical: 0,
   },
   companyLinkText: {
     textDecorationLine: "underline",
