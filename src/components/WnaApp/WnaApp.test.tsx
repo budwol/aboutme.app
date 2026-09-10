@@ -16,6 +16,12 @@ const mockLoggerError = jest.fn();
 const originalRequestAnimationFrame = global.requestAnimationFrame;
 let mockPathname = "/start";
 
+type RenderedTextNode = {
+  props: {
+    children?: unknown;
+  };
+};
+
 jest.mock("wna-logger", () => ({
   __esModule: true,
   default: {
@@ -24,12 +30,6 @@ jest.mock("wna-logger", () => ({
     warn: () => {},
   },
 }));
-
-type RenderedTextNode = {
-  props: {
-    children?: unknown;
-  };
-};
 
 const mockSetIsAppInitialized = jest.fn();
 const mockSetAppData = jest.fn();
@@ -51,14 +51,6 @@ let mockAppColors = {
   coolgray6: "#666666",
   coolgray8: "#111111",
 };
-
-function MockToast(props: unknown) {
-  // keep the test renderer simple, we only care about the config prop here
-  // and the static api shape matching the runtime component.
-  return React.createElement("Toast", props as Record<string, unknown>);
-}
-
-MockToast.show = jest.fn();
 
 jest.mock("@components/WnaAppContext", () => ({
   useWnaAppLifecycle: () => ({
@@ -112,10 +104,18 @@ jest.mock("react-native-safe-area-context", () => ({
   },
 }));
 
-jest.mock("react-native-toast-message", () => {
-  return {
-    __esModule: true,
-    default: MockToast,
+jest.mock("@components/feedback/WnaToastHost", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+  const ReactModule = jestModule.requireActual(
+    "react",
+  ) as typeof import("react");
+
+  return function MockWnaToastHost(props: unknown) {
+    return ReactModule.createElement(
+      "WnaToastHost",
+      props as Record<string, unknown>,
+    );
   };
 });
 
@@ -302,164 +302,6 @@ describe("WnaApp", () => {
     expect(heroField.props.compact).toBe(true);
     expect(textValues).toContain(appData.profile.name);
     expect(textValues).toContain(appData.profile.title.toUpperCase());
-  });
-
-  it("renders toast cards with configured text and fallback app colors", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(
-        <WnaApp appData={testAppData} theme="system">
-          <></>
-        </WnaApp>,
-      );
-    });
-
-    const toast = tree!.root.findByType("Toast");
-    let card: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      card = TestRenderer.create(
-        toast.props.config.success({
-          text1: "Saved",
-          text2: "Done",
-          props: {},
-        }),
-      );
-    });
-
-    const textValues = card!.root
-      .findAllByType("Text")
-      .map((node: RenderedTextNode) => node.props.children);
-
-    expect(textValues).toEqual(["Saved", "Done"]);
-    expect(card.root.findAllByType("View")[0].props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(255,255,255,0.98)",
-      }),
-    );
-  });
-
-  it("renders dark toast cards with provided override colors", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(
-        <WnaApp appData={testAppData} theme="dark">
-          <></>
-        </WnaApp>,
-      );
-    });
-
-    const toast = tree!.root.findByType("Toast");
-    let card: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      card = TestRenderer.create(
-        toast.props.config.error({
-          text2: "Failed",
-          props: {
-            appColors: {
-              ...mockAppColors,
-              isDark: true,
-              background: "#101010",
-            },
-          },
-        }),
-      );
-    });
-
-    expect(card!.root.findByType("Text").props.children).toBe("Failed");
-    expect(card!.root.findAllByType("View")[0].props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(16,16,16,0.98)",
-      }),
-    );
-
-    let darkTitleCard: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      darkTitleCard = TestRenderer.create(
-        toast.props.config.error({
-          text1: "Alert",
-          text2: "Failed",
-          props: {
-            appColors: {
-              ...mockAppColors,
-              isDark: true,
-              background: "#101010",
-            },
-          },
-        }),
-      );
-    });
-
-    const darkTitleTexts = darkTitleCard!.root
-      .findAllByType("Text")
-      .map((node: RenderedTextNode) => node.props.children);
-
-    expect(darkTitleTexts).toEqual(["Alert", "Failed"]);
-
-    let fallbackColorsCard: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      fallbackColorsCard = TestRenderer.create(
-        toast.props.config.error({
-          text1: "Oops",
-          text2: "Failed",
-          props: {},
-        }),
-      );
-    });
-
-    expect(
-      fallbackColorsCard!.root.findAllByType("View")[0].props.style,
-    ).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(255,255,255,0.98)",
-      }),
-    );
-  });
-
-  it("renders theme-change and info toast variants", () => {
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      tree = TestRenderer.create(
-        <WnaApp appData={testAppData} theme="system">
-          <></>
-        </WnaApp>,
-      );
-    });
-
-    const toast = tree!.root.findByType("Toast");
-    let themeChangeCard: ReturnType<typeof TestRenderer.create> | undefined;
-    let infoCard: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      themeChangeCard = TestRenderer.create(
-        toast.props.config.themeChange({
-          text1: "Theme",
-          props: {},
-        }),
-      );
-      infoCard = TestRenderer.create(
-        toast.props.config.info({
-          text1: "Info",
-          text2: "More",
-          props: {},
-        }),
-      );
-    });
-
-    expect(themeChangeCard!.root.findByType("Text").props.children).toBe(
-      "Theme",
-    );
-    expect(
-      infoCard!.root
-        .findAllByType("Text")
-        .map((node: RenderedTextNode) => node.props.children),
-    ).toEqual(["Info", "More"]);
   });
 
   it("wires resize events through the debounced layout updater", () => {
