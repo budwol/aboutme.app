@@ -69,4 +69,42 @@ describe("WnaBlurView", () => {
       ]),
     );
   });
+
+  it("defaults the tint to dark when none is given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBlurView blurTint={undefined as unknown as "dark"}>
+          child
+        </WnaBlurView>,
+      );
+    });
+
+    const view = tree!.root.findByType("View");
+
+    expect(view.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "rgba(17,17,17,0.5)" }),
+      ]),
+    );
+  });
+
+  it("uses a light background and lower opacity for non-dark, non-default tints", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBlurView blurTint="light">child</WnaBlurView>,
+      );
+    });
+
+    const view = tree!.root.findByType("View");
+
+    expect(view.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "rgba(255,255,255,0.8)" }),
+      ]),
+    );
+  });
 });

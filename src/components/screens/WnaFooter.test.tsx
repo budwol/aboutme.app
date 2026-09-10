@@ -76,4 +76,24 @@ describe("WnaFooter", () => {
     expect(gradient.props.style.alignItems).toBe("flex-end");
     expect(text.props.children).toBe("ERRORNOINTERNET");
   });
+
+  it("centers the offline banner in portrait layout", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaFooter
+          appColors={appColors}
+          appStyle={appStyle}
+          isLandscape={false}
+          isInternetReachable={false}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const gradient = tree!.root.findByType("LinearGradient");
+
+    expect(gradient.props.style.alignItems).toBe("center");
+  });
 });

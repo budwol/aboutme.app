@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import WnaProfileHero from "@components/sections/WnaProfileHero";
+import WnaProfileHero, {
+  WnaHeroField,
+} from "@components/sections/WnaProfileHero";
 import { testAppData } from "@/app-data/testAppData";
 
 let mockReduceMotion = true;
@@ -178,5 +180,17 @@ describe("WnaProfileHero", () => {
         ]),
       }),
     );
+  });
+
+  it("defaults WnaHeroField to non-compact when compact is omitted", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaHeroField appColors={appColors} />);
+    });
+
+    const shapeField = tree!.root.findByType("View" as never);
+
+    expect(shapeField.props.style[1]).toBe(false);
   });
 });

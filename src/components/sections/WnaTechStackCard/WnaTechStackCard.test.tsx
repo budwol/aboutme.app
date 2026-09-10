@@ -44,4 +44,38 @@ describe("WnaTechStackCard", () => {
 
     expect(wrapper.props.style.gap).toBe(appLayoutConstants.globalListGap / 2);
   });
+
+  it("falls back to empty stacks and renders nothing when techStack data is missing", () => {
+    const appData = {
+      ...testAppData,
+      techStack: {
+        primary: undefined,
+        secondary: undefined,
+      },
+    } as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaTechStackCard
+          appColors={
+            {
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              coolgray8: "#222222",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralTitleLarge: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("WnaBadge")).toHaveLength(0);
+  });
 });

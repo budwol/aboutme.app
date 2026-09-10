@@ -105,6 +105,50 @@ describe("WnaPressable", () => {
     expect(popable.props.position).toBe("right");
   });
 
+  it("renders bottom-positioned tooltip after the pressable", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaPressable
+          onPress={() => undefined}
+          ripple="light"
+          toolTip="Done"
+          toolTipPosition="bottom"
+        >
+          child
+        </WnaPressable>,
+      );
+    });
+
+    const popable = tree!.root.findByType("Popable");
+
+    expect(popable.props.content).toBe("Done");
+    expect(popable.props.position).toBe("bottom");
+  });
+
+  it("renders a left-positioned tooltip before the pressable", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaPressable
+          onPress={() => undefined}
+          ripple="light"
+          toolTip="Back"
+          toolTipPosition="left"
+        >
+          child
+        </WnaPressable>,
+      );
+    });
+
+    const popable = tree!.root.findByType("Popable");
+
+    expect(popable.props.content).toBe("Back");
+    expect(popable.props.position).toBe("left");
+  });
+
   it("omits tooltip wrappers when tooltip text is missing", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

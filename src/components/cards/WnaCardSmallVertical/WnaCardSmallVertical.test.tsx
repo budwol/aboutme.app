@@ -139,6 +139,26 @@ describe("WnaCardSmallVertical", () => {
     expect(tree!.root.findAllByType("WnaPressable")).toHaveLength(0);
   });
 
+  it("omits the description text and renders footer content when provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardSmallVertical
+          appColors={appColors}
+          appStyle={appStyle}
+          title="Engineer"
+          subtitle="Example Inc."
+          description=""
+          footerContent={<TextMarker />}
+        />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("Text")).toHaveLength(0);
+    expect(tree!.root.findByType("TextMarker")).toBeTruthy();
+  });
+
   it("skips re-rendering while memoized props stay stable", () => {
     const props = {
       appColors,
@@ -170,3 +190,7 @@ describe("WnaCardSmallVertical", () => {
     expect(mockWnaCardTextContent).toHaveBeenCalledTimes(2);
   });
 });
+
+function TextMarker() {
+  return React.createElement("TextMarker");
+}

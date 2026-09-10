@@ -119,4 +119,110 @@ describe("WnaAppContext", () => {
     expect(lifecycle!.isNavigationTransitionActive).toBe(false);
     jest.useRealTimers();
   });
+
+  it("restarts the pending timer when triggered twice within the same tick", () => {
+    jest.useFakeTimers();
+    const action = jest.fn();
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaAppContextProvider>
+          <LifecycleProbe onValue={(value) => (lifecycle = value)} />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    act(() => {
+      lifecycle!.startNavigationTransition(action);
+      lifecycle!.startNavigationTransition(action);
+    });
+
+    expect(jest.getTimerCount()).toBe(1);
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(action).toHaveBeenCalledTimes(1);
+    jest.useRealTimers();
+  });
+
+  it("clears the pending timer when finishing before it fires", () => {
+    jest.useFakeTimers();
+    const action = jest.fn();
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaAppContextProvider>
+          <LifecycleProbe onValue={(value) => (lifecycle = value)} />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    act(() => {
+      lifecycle!.startNavigationTransition(action);
+    });
+
+    act(() => {
+      lifecycle!.finishNavigationTransition();
+    });
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(action).not.toHaveBeenCalled();
+    expect(lifecycle!.isNavigationTransitionActive).toBe(false);
+    jest.useRealTimers();
+  });
+
+  it("clears the pending navigation timer on unmount", () => {
+    jest.useFakeTimers();
+    const action = jest.fn();
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaAppContextProvider>
+          <LifecycleProbe onValue={(value) => (lifecycle = value)} />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    act(() => {
+      lifecycle!.startNavigationTransition(action);
+    });
+
+    act(() => {
+      tree!.unmount();
+    });
+
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(action).not.toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
+  it("unmounts cleanly when no navigation timer is pending", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaAppContextProvider>
+          <LifecycleProbe onValue={() => {}} />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    expect(() => {
+      act(() => {
+        tree!.unmount();
+      });
+    }).not.toThrow();
+  });
 });

@@ -22,6 +22,8 @@ export default function WnaMultilineHeader(
   const maxLength = 4096;
   let mainTitle = "";
   let subTitle = "";
+  // istanbul ignore else -- title is guaranteed truthy here because the
+  // `!headerTitle` guard above already returned for any falsy value.
   if (title) {
     const titleSegments = title.split("|");
     if (titleSegments.length > 1) {
