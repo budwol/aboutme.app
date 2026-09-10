@@ -135,7 +135,12 @@ describe("WnaDrawerMenu integration", () => {
     const tree = await renderWithAppContext(<WnaDrawerMenu />);
     const pressables = tree.root.findAllByType("WnaPressable");
     const { renderedItems: drawerItems } = getRenderedDrawerItems(tree);
-    const themeButton = tree.root.findByType("WnaButtonIconText");
+    const themeButton = tree.root
+      .findAllByType("WnaButtonIconText")
+      .find(
+        (node: { props: { iconName?: string } }) =>
+          node.props.iconName === "moon-waning-crescent",
+      )!;
     const footerLink = tree.root.find(
       (node: {
         type: unknown;
