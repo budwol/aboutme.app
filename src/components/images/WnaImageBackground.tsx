@@ -42,7 +42,8 @@ const WnaImageBackground = React.memo(
           alt=""
           aria-hidden="true"
           decoding="async"
-          fetchPriority="low"
+          fetchPriority="high"
+          loading="eager"
           style={styles.webImage}
         />
 
