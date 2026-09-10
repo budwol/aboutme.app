@@ -14,21 +14,30 @@ const narrowShareActionsWidth = shareButtonSize * 2 + shareButtonGap;
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    padding: 12,
+    marginTop: 16,
+    backgroundColor: "transparent",
   },
   actions: {
     alignSelf: "center",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    marginTop: 16,
     maxWidth: 320,
     rowGap: shareButtonGap,
     columnGap: 16,
     width: "100%",
+    minWidth: 0,
   },
   actionsNarrow: {
     columnGap: shareButtonGap,
     maxWidth: narrowShareActionsWidth,
+  },
+  actionItem: {
+    width: shareButtonSize,
+    flexBasis: shareButtonSize,
+    flexGrow: 0,
+    flexShrink: 0,
   },
 });
 
@@ -87,17 +96,18 @@ export default function WnaShareActions({ url, title }: WnaShareActionsProps) {
 
       <View style={[styles.actions, isNarrow && styles.actionsNarrow]}>
         {shareActions.map(({ icon, link, tooltip }) => (
-          <WnaButtonIcon
-            key={icon}
-            appColors={appColors}
-            appStyle={appStyle}
-            iconName={icon}
-            onPress={() => open(link)}
-            checkInternetConnection={false}
-            toolTipPosition="top"
-            toolTip={tooltip}
-            t={t}
-          />
+          <View key={icon} style={styles.actionItem}>
+            <WnaButtonIcon
+              appColors={appColors}
+              appStyle={appStyle}
+              iconName={icon}
+              onPress={() => open(link)}
+              checkInternetConnection={false}
+              toolTipPosition="top"
+              toolTip={tooltip}
+              t={t}
+            />
+          </View>
         ))}
       </View>
     </View>
