@@ -21,7 +21,13 @@ describe("package scripts", () => {
   it("re-syncs the real app-data after the local CI path", () => {
     const packageJson = readPackageJson();
     const ciLocal = packageJson.scripts?.["ci:local"];
-    const orderedGates = [
+    const ciLocalScript = readRootFile("scripts/ci-local.sh");
+    const orderedCommands = [
+      "[ ! -e ./package-lock.json ] || rm ./package-lock.json",
+      "rm -rf dist web-build .expo .expo/web .cache",
+      "npm prune",
+      "HUSKY=0 npm i --package-lock-only",
+      "./node_modules/.bin/expo-doctor",
       "npm run test:prettier",
       "npm run lint",
       "npm run test:types",
@@ -33,20 +39,22 @@ describe("package scripts", () => {
     ];
 
     expect(ciLocal).toBeDefined();
-    expect(ciLocal).toContain("node ./scripts/sync-web-app-data.cjs");
+    expect(ciLocal).toBe("./scripts/ci-local.sh");
+    expect(ciLocalScript).toContain("node ./scripts/sync-web-app-data.cjs");
 
-    let previousGateIndex = -1;
-    for (const gate of orderedGates) {
-      const gateIndex = ciLocal!.indexOf(gate);
-      expect(gateIndex).toBeGreaterThan(previousGateIndex);
-      previousGateIndex = gateIndex;
+    let previousCommandIndex = -1;
+    for (const command of orderedCommands) {
+      const commandIndex = ciLocalScript.indexOf(command);
+      expect(commandIndex).toBeGreaterThan(previousCommandIndex);
+      previousCommandIndex = commandIndex;
     }
 
-    const resyncIndex = ciLocal!.lastIndexOf(
+    const resyncIndex = ciLocalScript.lastIndexOf(
       "node ./scripts/sync-web-app-data.cjs",
     );
 
-    expect(resyncIndex).toBeGreaterThan(previousGateIndex);
+    expect(resyncIndex).toBeGreaterThan(previousCommandIndex);
+    expect(ciLocalScript).toContain("echo ci:local done.");
   });
 
   it("re-syncs the real app-data again right before web export", () => {
