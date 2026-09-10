@@ -1,10 +1,21 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { Linking } from "react-native";
+import { Linking, View } from "react-native";
 import WnaShareActions from "@components/sections/WnaShareActions";
 
+let mockCurrentWindowWidth = 390;
+
+type TestNode = {
+  props: {
+    style?: unknown;
+  };
+};
+
 jest.mock("@components/WnaAppContext", () => ({
+  useWnaLayout: () => ({
+    currentWindowWidth: mockCurrentWindowWidth,
+  }),
   useWnaTheme: () => ({
     appColors: {
       staticWhite: "#ffffff",
@@ -40,10 +51,9 @@ jest.mock("@components/buttons/WnaButtonIcon", () => {
 });
 
 describe("WnaShareActions", () => {
-  it("renders share actions and opens encoded share links", () => {
-    const openUrlSpy = jest
-      .spyOn(Linking, "openURL")
-      .mockImplementation(() => Promise.resolve());
+  function renderShareActions(width = 390) {
+    mockCurrentWindowWidth = width;
+
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -55,8 +65,17 @@ describe("WnaShareActions", () => {
       );
     });
 
-    const title = tree!.root.findByType("WnaSectionTitle");
-    const buttons = tree!.root.findAllByType("WnaButtonIcon");
+    return tree!;
+  }
+
+  it("renders share actions and opens encoded share links", () => {
+    const openUrlSpy = jest
+      .spyOn(Linking, "openURL")
+      .mockImplementation(() => Promise.resolve());
+    const tree = renderShareActions();
+
+    const title = tree.root.findByType("WnaSectionTitle");
+    const buttons = tree.root.findAllByType("WnaButtonIcon");
 
     expect(title.props.title).toBe("actionShare");
     expect(buttons).toHaveLength(4);
@@ -76,5 +95,58 @@ describe("WnaShareActions", () => {
     );
 
     openUrlSpy.mockRestore();
+  });
+
+  it("keeps share buttons constrained to two columns on narrow screens", () => {
+    const tree = renderShareActions(360);
+    const actionContainer = tree.root
+      .findAllByType(View)
+      .find((node: TestNode) => {
+        const style = Array.isArray(node.props.style) ? node.props.style : [];
+
+        return style.some(
+          (entry: { maxWidth?: number } | false | undefined) =>
+            entry && entry.maxWidth === 116,
+        );
+      });
+
+    expect(actionContainer).toBeDefined();
+    expect(actionContainer!.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flexDirection: "row",
+          flexWrap: "wrap",
+          width: "100%",
+        }),
+        expect.objectContaining({
+          maxWidth: 116,
+        }),
+      ]),
+    );
+  });
+
+  it("uses the wider share row on larger screens", () => {
+    const tree = renderShareActions(720);
+    const actionContainer = tree.root
+      .findAllByType(View)
+      .find((node: TestNode) => {
+        const style = Array.isArray(node.props.style) ? node.props.style : [];
+
+        return style.some(
+          (entry: { maxWidth?: number } | false | undefined) =>
+            entry && entry.maxWidth === 320,
+        );
+      });
+
+    expect(actionContainer).toBeDefined();
+    expect(actionContainer!.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flexWrap: "wrap",
+          maxWidth: 320,
+        }),
+        false,
+      ]),
+    );
   });
 });
