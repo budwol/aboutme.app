@@ -117,6 +117,24 @@ describe("WnaCardVerticalWithImage", () => {
     expect(textWrap.props.style).toMatchObject({ minHeight: 78 });
   });
 
+  it("falls back to empty image title and url when omitted", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardVerticalWithImage
+          appColors={appColors}
+          appStyle={{} as never}
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("WnaImage");
+
+    expect(image.props.imageTitle).toBe("");
+    expect(image.props.imageUrl).toBe("");
+  });
+
   it("skips re-rendering while memoized image props stay stable", () => {
     const props = {
       appColors,

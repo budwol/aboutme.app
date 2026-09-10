@@ -62,4 +62,24 @@ describe("WnaImageBackground", () => {
     expect(blur.props.blurTint).toBe("dark");
     expect(blur.props.blurIntensity).toBe(40);
   });
+
+  it("renders the blur overlay in dark mode", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageBackground
+          appColors={{ white: "#fff" } as never}
+          imageUri="images/bg.webp"
+          isDarkMode
+        >
+          child
+        </WnaImageBackground>,
+      );
+    });
+
+    const blur = tree!.root.findByType("WnaBlurView");
+
+    expect(blur.props.blurTint).toBe("dark");
+  });
 });

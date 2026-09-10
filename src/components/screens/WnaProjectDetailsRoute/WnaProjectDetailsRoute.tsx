@@ -447,6 +447,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                 <View style={styles.actionSection}>
                   <View style={styles.actionLinks}>
                     {projectLinks.map((link) =>
+                      /* istanbul ignore next -- isLandscape can't flip mid-map; the outer condition already guards this block to isLandscape === true */
                       isLandscape ? (
                         <WnaButtonIconText
                           key={link.label}
@@ -677,6 +678,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                   }}
                   onPress={() => {
                     setIsPrivateRepoModalVisible(false);
+                    /* istanbul ignore next -- this modal only opens via the github projectLinks entry, which is filtered out whenever repoUrl is falsy, so repoUrl is always truthy here */
                     Linking.openURL(project.repoUrl ?? "");
                   }}
                 />

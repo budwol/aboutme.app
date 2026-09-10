@@ -20,4 +20,8 @@ describe("getAvatarImageSources", () => {
   it("returns an empty list for an empty avatar file name", () => {
     expect(getAvatarImageSources("")).toEqual([]);
   });
+
+  it("returns an empty list for a nullish avatar file name", () => {
+    expect(getAvatarImageSources(undefined as unknown as string)).toEqual([]);
+  });
 });

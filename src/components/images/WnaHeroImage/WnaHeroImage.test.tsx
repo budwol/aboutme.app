@@ -56,4 +56,21 @@ describe("WnaHeroImage", () => {
       ]),
     );
   });
+
+  it("renders a gradient overlay when showGradient is set", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeroImage
+          appColors={{ staticBlack: "#000" } as never}
+          imageUrl="images/project.webp"
+          imageTitle="Project"
+          showGradient
+        />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("LinearGradient")).toHaveLength(1);
+  });
 });

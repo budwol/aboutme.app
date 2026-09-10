@@ -66,6 +66,18 @@ describe("WnaAccentBar", () => {
     expect(bar.props.style[2].width).toBe(180);
   });
 
+  it("defaults to the standard width when none is given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaAccentBar appColors={appColors} />);
+    });
+
+    const row = tree!.root.findByType("View");
+
+    expect(row.props.style[1].width).toBe(220);
+  });
+
   it("animates towards a collapsed width when enabled", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

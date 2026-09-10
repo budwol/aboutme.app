@@ -53,4 +53,16 @@ describe("shouldIgnoreLogMessage", () => {
       ),
     ).not.toThrow();
   });
+
+  it("falls back to the plain log transport for unrecognized prefixes", () => {
+    const privateLog = (
+      LoggerBase as unknown as {
+        log: (prefix: number, msg: unknown, methodName?: string) => void;
+      }
+    ).log;
+
+    expect(() =>
+      privateLog.call(LoggerBase, -1, "debug message"),
+    ).not.toThrow();
+  });
 });

@@ -194,4 +194,19 @@ describe("WnaMenuRoute", () => {
       props: { appColors: { id: 2, isDark: false } },
     });
   });
+
+  it("renders nothing until the app is initialized", () => {
+    const { useWnaAppLifecycle } = jest.requireMock(
+      "@components/WnaAppContext",
+    ) as { useWnaAppLifecycle: jest.Mock<() => { isAppInitialized: boolean }> };
+    useWnaAppLifecycle.mockReturnValueOnce({ isAppInitialized: false });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaMenuRoute />);
+    });
+
+    expect(tree!.toJSON()).toBeNull();
+  });
 });

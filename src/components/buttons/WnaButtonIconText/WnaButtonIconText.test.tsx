@@ -135,4 +135,39 @@ describe("WnaButtonIconText", () => {
       "rocket-launch-outline",
     );
   });
+
+  it("falls back to the dark background color and a custom border width", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonIconText
+          appColors={
+            {
+              isDark: true,
+              staticWhite: "#fff",
+              staticWarmgray8: "#ccc",
+              staticWarmgray7: "#333",
+              background: "#111",
+            } as never
+          }
+          text="Open profile"
+          iconName="account"
+          onPress={() => {}}
+          borderWidth={3}
+        />,
+      );
+    });
+
+    const pressable = tree!.root.findByType("WnaPressable");
+
+    expect(pressable.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          backgroundColor: "#333",
+          borderWidth: 3,
+        }),
+      ]),
+    );
+  });
 });

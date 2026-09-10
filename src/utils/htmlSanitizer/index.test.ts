@@ -44,4 +44,15 @@ describe("html sanitizer", () => {
     expect(isHtml("<p>hello</p>")).toBe(true);
     expect(stripHtml("<p>hello</p>")).toBe("hello");
   });
+
+  it("handles undefined input by defaulting to an empty value", () => {
+    expect(escapeHtml()).toBe("");
+    expect(sanitizeHtml()).toBe("");
+    expect(isHtml()).toBe(false);
+    expect(stripHtml()).toBe("");
+  });
+
+  it("drops the href and target attributes when they are absent or disallowed", () => {
+    expect(sanitizeHtml('<a target="_top">no href</a>')).toBe("<a>no href</a>");
+  });
 });

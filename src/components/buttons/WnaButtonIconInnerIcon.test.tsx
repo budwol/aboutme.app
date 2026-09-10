@@ -2,16 +2,22 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonIconInnerIcon from "@components/buttons/WnaButtonIconInnerIcon";
+import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaIcon(props: unknown) {
-    return createElement("WnaIcon", props as Record<string, unknown>);
+  return {
+    __esModule: true,
+    default: jest.fn((props: unknown) =>
+      createElement("WnaIcon", props as Record<string, unknown>),
+    ),
   };
 });
+
+const mockWnaIcon = WnaIcon as unknown as jest.Mock;
 
 describe("WnaButtonIconInnerIcon", () => {
   it("renders default icon and size", () => {
@@ -80,5 +86,82 @@ describe("WnaButtonIconInnerIcon", () => {
     );
     expect(icon.props.iconName).toBe("account");
     expect(icon.props.color).toBe("#123456");
+  });
+
+  it("re-renders only when isDark, color or iconName change", () => {
+    mockWnaIcon.mockClear();
+
+    const baseColors = {
+      staticBlack: "#000000",
+      staticWhite: "#ffffff",
+      isDark: false,
+    };
+    const appStyle = { containerCenterCenter: {} } as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonIconInnerIcon
+          appColors={baseColors as never}
+          appStyle={appStyle}
+          iconName="account"
+          color="#111111"
+        />,
+      );
+    });
+    expect(mockWnaIcon).toHaveBeenCalledTimes(1);
+
+    // Same values via new object/prop references: comparator should treat as
+    // equal (isDark ===, color ===, iconName ===) so memo skips re-render.
+    act(() => {
+      tree!.update(
+        <WnaButtonIconInnerIcon
+          appColors={{ ...baseColors } as never}
+          appStyle={appStyle}
+          iconName="account"
+          color="#111111"
+        />,
+      );
+    });
+    expect(mockWnaIcon).toHaveBeenCalledTimes(1);
+
+    // isDark differs -> first comparator condition is false -> re-renders.
+    act(() => {
+      tree!.update(
+        <WnaButtonIconInnerIcon
+          appColors={{ ...baseColors, isDark: true } as never}
+          appStyle={appStyle}
+          iconName="account"
+          color="#111111"
+        />,
+      );
+    });
+    expect(mockWnaIcon).toHaveBeenCalledTimes(2);
+
+    // isDark unchanged, color differs -> second condition is false.
+    act(() => {
+      tree!.update(
+        <WnaButtonIconInnerIcon
+          appColors={{ ...baseColors, isDark: true } as never}
+          appStyle={appStyle}
+          iconName="account"
+          color="#222222"
+        />,
+      );
+    });
+    expect(mockWnaIcon).toHaveBeenCalledTimes(3);
+
+    // isDark and color unchanged, iconName differs -> third condition false.
+    act(() => {
+      tree!.update(
+        <WnaButtonIconInnerIcon
+          appColors={{ ...baseColors, isDark: true } as never}
+          appStyle={appStyle}
+          iconName="cube"
+          color="#222222"
+        />,
+      );
+    });
+    expect(mockWnaIcon).toHaveBeenCalledTimes(4);
   });
 });

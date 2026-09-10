@@ -215,6 +215,7 @@ export default function WnaExperienceCard({
         appLayoutConstants.globalListGap +
         dotColumnWidth +
         appLayoutConstants.globalListGap +
+        /* istanbul ignore next -- effectiveCardWidth is only undefined when isCompactLayout is true, but this branch only runs when it's false, so the fallback is unreachable within a single render */
         (effectiveCardWidth ?? minCardWidth);
       nextLineLeft =
         periodWidth + appLayoutConstants.globalListGap + dotColumnWidth / 2;
