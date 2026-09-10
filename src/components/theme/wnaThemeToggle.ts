@@ -7,7 +7,7 @@ import {
 } from "@/storage/themeStorage";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 import { ColorSchemeName } from "react-native";
-import Toast from "react-native-toast-message";
+import { showWnaToast } from "@components/feedback/wnaToast";
 
 function getThemeLabel(theme: Theme) {
   switch (theme) {
@@ -51,7 +51,7 @@ export async function toggleWnaTheme({
   setAppColors(nextColors);
   setTheme(nextTheme);
 
-  Toast.show({
+  showWnaToast({
     type: "themeChange",
     text1: "Appearance",
     text2: getThemeLabel(nextTheme),

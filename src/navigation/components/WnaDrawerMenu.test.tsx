@@ -12,7 +12,6 @@ const mockSetOptions = jest.fn();
 const mockPush = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
-const mockToastShow = jest.fn();
 let mockDrawerStatus = "closed";
 let mockSegments: string[] = ["(drawer)", "(tabs-de)"];
 
@@ -36,12 +35,6 @@ type FooterLinkNode = {
     children?: string[];
   };
 };
-
-function MockToast(_props: unknown) {
-  return null;
-}
-
-MockToast.show = mockToastShow;
 
 jest.mock("@components/WnaAppContext", () => ({
   useWnaAppData: () => ({
@@ -110,10 +103,13 @@ jest.mock("@utils/themeColors", () => ({
   resolveAppColors: () => ({ id: 2, isDark: false }),
 }));
 
-jest.mock("react-native-toast-message", () => ({
-  __esModule: true,
-  default: MockToast,
-}));
+jest.mock("@components/feedback/wnaToast");
+
+const mockShowWnaToast = (
+  jest.requireMock("@components/feedback/wnaToast") as {
+    showWnaToast: jest.Mock;
+  }
+).showWnaToast;
 
 jest.mock("@react-navigation/drawer", () => ({
   useDrawerStatus: () => mockDrawerStatus,
@@ -210,7 +206,7 @@ describe("WnaDrawerMenu", () => {
     mockSetOptions.mockClear();
     mockSetTheme.mockClear();
     mockSetAppColors.mockClear();
-    mockToastShow.mockClear();
+    mockShowWnaToast.mockClear();
     mockDrawerStatus = "closed";
     mockSegments = ["(drawer)", "(tabs-de)"];
   });
@@ -354,7 +350,7 @@ describe("WnaDrawerMenu", () => {
 
     expect(mockSetAppColors).toHaveBeenCalledWith({ id: 2, isDark: false });
     expect(mockSetTheme).toHaveBeenCalledWith("light");
-    expect(mockToastShow).toHaveBeenCalledWith({
+    expect(mockShowWnaToast).toHaveBeenCalledWith({
       type: "themeChange",
       text1: "Appearance",
       text2: "Light mode",

@@ -4,16 +4,19 @@ import {
   getThemeFromStorageAsync,
   setThemeToStorageAsync,
 } from "@/storage/themeStorage";
-import Toast from "react-native-toast-message";
 
 jest.mock("@/storage/themeStorage", () => ({
   getThemeFromStorageAsync: jest.fn(),
   setThemeToStorageAsync: jest.fn(),
 }));
 
-jest.mock("react-native-toast-message", () => ({
-  show: jest.fn(),
-}));
+jest.mock("@components/feedback/wnaToast");
+
+const mockShowWnaToast = (
+  jest.requireMock("@components/feedback/wnaToast") as {
+    showWnaToast: jest.Mock;
+  }
+).showWnaToast;
 
 describe("wnaThemeToggle", () => {
   beforeEach(() => {
@@ -46,7 +49,7 @@ describe("wnaThemeToggle", () => {
     expect(setAppColors).toHaveBeenCalledWith(
       expect.objectContaining({ isDark: true }),
     );
-    expect(Toast.show).toHaveBeenCalledWith(
+    expect(mockShowWnaToast).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "themeChange",
         text1: "Appearance",
@@ -73,7 +76,7 @@ describe("wnaThemeToggle", () => {
     });
 
     expect(setTheme).toHaveBeenCalledWith("system");
-    expect(Toast.show).toHaveBeenCalledWith(
+    expect(mockShowWnaToast).toHaveBeenCalledWith(
       expect.objectContaining({ text2: "System mode" }),
     );
   });
