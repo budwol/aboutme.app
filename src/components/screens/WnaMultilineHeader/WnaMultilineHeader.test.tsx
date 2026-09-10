@@ -152,6 +152,13 @@ describe("WnaMultilineHeader", () => {
     expect(result).toBeNull();
   });
 
+  it("supports pressing the header without an onPress callback", () => {
+    const tree = renderHeader(false);
+    const pressable = tree.root.findByType("WnaPressable");
+
+    expect(() => pressable.props.onPress()).not.toThrow();
+  });
+
   it("uses the larger landscape font size for the main title", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
