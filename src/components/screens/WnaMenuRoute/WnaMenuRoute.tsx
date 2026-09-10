@@ -41,6 +41,7 @@ export default function WnaMenuRoute(): ReactNode {
     <WnaScrollViewScreen
       isRootPage
       headerTitle={t(i18nKeys.screenTitleMenuWithoutDots)}
+      titleHref="/"
       showContactFooter={false}
       showAppStoreButtons={false}
       headerButton0={
