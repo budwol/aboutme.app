@@ -40,7 +40,6 @@ if [[ ! "$IMAGE" =~ ^[a-z0-9._/-]+$ ]]; then
   exit 1
 fi
 
-npm run export:web
 IMAGE_REF="$CONTAINER_REGISTRY/$IMAGE:latest"
 echo "image ref: $IMAGE_REF"
 
@@ -48,6 +47,8 @@ if [ "$dry_run" = true ]; then
   echo "dry run: no build, no push, just a quiet little rehearsal"
   exit 0
 fi
+
+npm run export:web
 
 if [ -t 0 ] && [ "$assume_yes" != true ]; then
   printf "build and push %s ? [y/N] " "$IMAGE_REF"

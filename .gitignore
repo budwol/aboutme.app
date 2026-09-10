@@ -14,6 +14,8 @@ test-results/
 
 # Expo
 .expo/
+.expo-shared/
+.cache/
 dist/
 web-build/
 
