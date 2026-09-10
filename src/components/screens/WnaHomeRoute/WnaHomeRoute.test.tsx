@@ -350,4 +350,46 @@ describe("WnaHomeRoute", () => {
 
     expect(mockPush).not.toHaveBeenCalled();
   });
+
+  it("cancels the pending animation frame on unmount before it fires", () => {
+    const tree = renderHomeRoute();
+
+    act(() => {
+      tree.unmount();
+    });
+
+    expect(mockCancelAnimationFrame).toHaveBeenCalled();
+  });
+
+  it("does not cancel a missing animation frame on unmount", () => {
+    mockRequestAnimationFrame.mockImplementationOnce(
+      () => null as unknown as number,
+    );
+
+    const tree = renderHomeRoute();
+
+    act(() => {
+      tree.unmount();
+    });
+
+    expect(mockCancelAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  it("clears the deferred section timeout on unmount before it fires", () => {
+    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+    const tree = renderHomeRoute();
+
+    act(() => {
+      jest.advanceTimersByTime(0);
+    });
+
+    clearTimeoutSpy.mockClear();
+
+    act(() => {
+      tree.unmount();
+    });
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    clearTimeoutSpy.mockRestore();
+  });
 });

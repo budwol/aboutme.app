@@ -305,6 +305,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     });
 
     return () => {
+      /* istanbul ignore else -- revealFrameRef.current is assigned synchronously by the requestAnimationFrame call above in the same effect run that registers this cleanup, so it can never be null when the cleanup runs */
       if (revealFrameRef.current !== null) {
         cancelAnimationFrame(revealFrameRef.current);
       }
@@ -364,6 +365,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     });
 
     return () => {
+      /* istanbul ignore else -- navigationRevealFrameRef.current is assigned synchronously by the requestAnimationFrame call above in the same effect run that registers this cleanup, so it can never be null when the cleanup runs */
       if (navigationRevealFrameRef.current !== null) {
         cancelAnimationFrame(navigationRevealFrameRef.current);
       }

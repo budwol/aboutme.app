@@ -138,4 +138,45 @@ describe("WnaMultilineHeader", () => {
 
     expect(textValues).toEqual(["Main", "Sub"]);
   });
+
+  it("returns null when no header title is given", () => {
+    const result = WnaMultilineHeader(
+      appColors,
+      appStyle,
+      appLayout,
+      false,
+      false,
+      undefined,
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it("uses the larger landscape font size for the main title", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        WnaMultilineHeader(
+          appColors,
+          appStyle,
+          appLayout,
+          true,
+          true,
+          "Projekt App",
+        ),
+      );
+    });
+
+    const titleWrapper = findSingleLineTitleWrapper(tree!);
+    const titleText = titleWrapper
+      .findAllByType("Text")
+      .find(
+        (node: HeaderTextNode) => node.props.children === "Projekt App",
+      ) as unknown as { props: { style: unknown[] } };
+
+    expect(titleText.props.style).toEqual(
+      expect.arrayContaining([{ fontSize: 20 }]),
+    );
+  });
 });

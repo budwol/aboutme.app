@@ -77,6 +77,31 @@ describe("WnaBasePressable", () => {
     );
   });
 
+  it("uses dark ripple colors when hovered and pressed", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBasePressable ripple="dark" onPress={() => undefined}>
+          child
+        </WnaBasePressable>,
+      );
+    });
+
+    const pressable = tree!.root.find(
+      (node: TestNode) =>
+        node.props.accessibilityRole === "button" &&
+        typeof node.props.style === "function",
+    );
+
+    expect(pressable.props.style({ hovered: true, pressed: true })).toEqual(
+      expect.arrayContaining([
+        { backgroundColor: "rgba(0,0,0,0.06)", opacity: 0.9 },
+        { backgroundColor: "rgba(0,0,0,0.08)", opacity: 0.8 },
+      ]),
+    );
+  });
+
   it("uses transparent ripple colors when no ripple is configured", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

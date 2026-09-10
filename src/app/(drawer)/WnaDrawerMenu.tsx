@@ -126,7 +126,8 @@ export default function WnaDrawerMenu() {
 
       const isActive = isRootItem
         ? isStartActive || routeLast === lastSegment
-        : routeLast === undefined
+        : // istanbul ignore next -- every non-root menu item defines a real route today, so routeLast is never undefined; kept as a defensive fallback
+          routeLast === undefined
           ? isStartActive
           : routeLast === lastSegment;
 

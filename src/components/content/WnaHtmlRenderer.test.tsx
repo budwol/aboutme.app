@@ -19,6 +19,17 @@ jest.mock("react-native-render-html", () => {
   };
 });
 
+jest.mock("@utils/htmlSanitizer", () => {
+  const actual = jest.requireActual(
+    "@utils/htmlSanitizer",
+  ) as typeof import("@utils/htmlSanitizer");
+
+  return {
+    ...actual,
+    sanitizeHtml: jest.fn(actual.sanitizeHtml),
+  };
+});
+
 jest.mock("expo-linear-gradient", () => {
   const { createElement } = jest.requireActual(
     "react",
@@ -30,11 +41,13 @@ jest.mock("expo-linear-gradient", () => {
   };
 });
 
-const appColors = {
+const baseAppColors = {
   isDark: false,
   white: "#ffffff",
   coolgray6: "#666666",
-} as never;
+};
+
+const appColors = baseAppColors as never;
 
 const appStyle = {
   textSmall: {
@@ -130,5 +143,118 @@ describe("WnaHtmlRenderer", () => {
     );
     expect(gradient.props.colors).toEqual(["#ffffff", "transparent"]);
     expect(gradient.props.style.height).toBe(60);
+  });
+
+  it("re-renders only when html or the dark mode flag actually changes", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHtmlRenderer
+          appColors={{ ...baseAppColors, coolgray6: "#666666" } as never}
+          appStyle={appStyle}
+          width={320}
+          html="<p>A</p>"
+        />,
+      );
+    });
+
+    act(() => {
+      tree!.update(
+        <WnaHtmlRenderer
+          appColors={{ ...baseAppColors, coolgray6: "#666666" } as never}
+          appStyle={appStyle}
+          width={320}
+          html="<p>A</p>"
+        />,
+      );
+    });
+
+    expect(
+      tree!.root.findByType("div").props.dangerouslySetInnerHTML.__html,
+    ).toContain("A");
+
+    act(() => {
+      tree!.update(
+        <WnaHtmlRenderer
+          appColors={{ ...baseAppColors, coolgray6: "#666666" } as never}
+          appStyle={appStyle}
+          width={320}
+          html="<p>B</p>"
+        />,
+      );
+    });
+
+    expect(
+      tree!.root.findByType("div").props.dangerouslySetInnerHTML.__html,
+    ).toContain("B");
+
+    act(() => {
+      tree!.update(
+        <WnaHtmlRenderer
+          appColors={
+            { ...baseAppColors, isDark: true, coolgray6: "#999999" } as never
+          }
+          appStyle={appStyle}
+          width={320}
+          html="<p>B</p>"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("div").props.style).toEqual(
+      expect.objectContaining({ color: "#999999" }),
+    );
+  });
+
+  it("falls back to an empty string when sanitization yields no value", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+
+    const { sanitizeHtml } = jest.requireMock("@utils/htmlSanitizer") as {
+      sanitizeHtml: jest.Mock<(value?: string) => string | undefined>;
+    };
+    sanitizeHtml.mockReturnValueOnce(undefined);
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHtmlRenderer
+          appColors={appColors}
+          appStyle={appStyle}
+          width={320}
+          html="<p>irrelevant</p>"
+        />,
+      );
+    });
+
+    expect(
+      tree!.root.findByType("div").props.dangerouslySetInnerHTML.__html,
+    ).toBe("");
+  });
+
+  it("falls back to an empty string for native rendering when sanitization yields no value", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
+
+    const { sanitizeHtml } = jest.requireMock("@utils/htmlSanitizer") as {
+      sanitizeHtml: jest.Mock<(value?: string) => string | undefined>;
+    };
+    sanitizeHtml.mockReturnValueOnce(undefined);
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHtmlRenderer
+          appColors={appColors}
+          appStyle={appStyle}
+          width={320}
+          html="<p>irrelevant</p>"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("RenderHtml").props.source.html).toBe("");
   });
 });

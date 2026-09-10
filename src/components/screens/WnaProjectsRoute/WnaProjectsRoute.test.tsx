@@ -367,4 +367,199 @@ describe("WnaProjectsRoute", () => {
       );
     expect(featuredTitle?.props.numberOfLines).toBe(3);
   });
+
+  it("omits the portrait intro entirely when there is no context or highlights", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projectsContext: undefined,
+        projectsHighlights: [],
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const flatList = tree!.root.findByType("AnimatedFlatList");
+
+    expect(flatList.props.ListHeaderComponent).toBeNull();
+  });
+
+  it("renders only the highlights in the portrait intro when there is no context", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projectsContext: undefined,
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      headerTree = TestRenderer.create(header);
+    });
+
+    const textValues = headerTree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(textValues).toContain(testAppData.projectsHighlights[0].text);
+  });
+
+  it("renders only the context in the portrait intro when there are no highlights", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projectsHighlights: [],
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      headerTree = TestRenderer.create(header);
+    });
+
+    const textValues = headerTree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(textValues).toContain(testAppData.projectsContext);
+  });
+
+  it("uses a light ripple color and navigates on press in dark mode", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaTheme: jest.Mock;
+    };
+    appContext.useWnaTheme.mockReturnValue({
+      appColors: {
+        isDark: true,
+        black: "#000",
+        warmgray6: "#666",
+        coolgray2: "#ccc",
+        coolgray8: "#111",
+        staticAccent5: "#0aa",
+        staticBlack: "#000",
+        staticCoolgray2: "#ccc",
+        staticCoolgray6: "#666",
+        staticCoolgray8: "#111",
+        staticWhite: "#fff",
+      },
+      appStyle: {
+        containerCenterMaxWidth: {},
+        textTitleLarge: {},
+        textSmall: {},
+        textNeutralMedium: {},
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const renderItemOutput = flatList.props.renderItem({
+      item: { ...testAppData.projects[0], subtitle: undefined },
+      index: 0,
+    }) as React.ReactElement;
+    let itemTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      itemTree = TestRenderer.create(renderItemOutput);
+    });
+
+    const pressable = itemTree!.root.findByType("WnaPressable");
+
+    expect(pressable.props.ripple).toBe("light");
+
+    expect(() => {
+      act(() => {
+        (pressable.props as { onPress: () => void }).onPress();
+      });
+    }).not.toThrow();
+
+    expect(flatList.props.keyExtractor(testAppData.projects[0])).toBe(
+      testAppData.projects[0].title,
+    );
+    expect(flatList.props.ItemSeparatorComponent).toBeDefined();
+    expect(() => flatList.props.ItemSeparatorComponent()).not.toThrow();
+  });
+
+  it("collapses the landscape layout when there is no context data or projects", () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projectsContext: undefined,
+        projectsHighlights: [],
+        projectsSubtitle: undefined,
+        projects: [],
+      },
+    });
+    appContext.useWnaLayout.mockReturnValue({
+      appLayout: {
+        contentPaddingBottom: 16,
+        contentPaddingBottomWhenActionButton: 16,
+        contentListPaddingTop: 16,
+        scrollEventThrottle: 16,
+      },
+      currentWindowWidth: 1400,
+      isLandscape: true,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(tree!.root.findAllByType("WnaPressable")).toHaveLength(0);
+    expect(textValues).toContain("");
+  });
 });

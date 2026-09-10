@@ -13,10 +13,12 @@ jest.mock("@components/content/WnaHtmlRenderer", () => {
   };
 });
 
-const appColors = {
+const baseAppColors = {
   black: "#111111",
   isDark: false,
-} as never;
+};
+
+const appColors = baseAppColors as never;
 
 const appStyle = {
   textNeutralSmall: { fontSize: 13, lineHeight: 18 },
@@ -101,5 +103,39 @@ describe("WnaText", () => {
     expect(renderer.props.fontSize).toBe(16);
     expect(renderer.props.fontColor).toBe("#123456");
     expect(renderer.props.maxHeight).toBe(120);
+  });
+
+  it("skips re-rendering when text and dark mode stay stable", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaText appColors={appColors} appStyle={appStyle} text="Stable" />,
+      );
+    });
+
+    act(() => {
+      tree!.update(
+        <WnaText
+          appColors={{ ...baseAppColors } as never}
+          appStyle={appStyle}
+          text="Stable"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("Text").props.children).toBe("Stable");
+
+    act(() => {
+      tree!.update(
+        <WnaText
+          appColors={{ ...baseAppColors, isDark: true } as never}
+          appStyle={appStyle}
+          text="Changed"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("Text").props.children).toBe("Changed");
   });
 });

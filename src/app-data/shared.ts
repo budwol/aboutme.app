@@ -286,7 +286,8 @@ function parsePeriodStart(period: string): Date | null {
 
   return Number.isFinite(month) && Number.isFinite(year)
     ? new Date(year, month, 1)
-    : null;
+    : // istanbul ignore next -- regex digit groups are always finite; defensive fallback only
+      null;
 }
 
 function parsePeriodEnd(period: string): Date | null {
@@ -302,7 +303,8 @@ function parsePeriodEnd(period: string): Date | null {
 
   return Number.isFinite(month) && Number.isFinite(year)
     ? new Date(year, month, 1)
-    : null;
+    : // istanbul ignore next -- regex digit groups are always finite; defensive fallback only
+      null;
 }
 
 function calculateExperienceDuration(period: string, lang: SupportedLang) {
@@ -320,6 +322,8 @@ function calculateExperienceDuration(period: string, lang: SupportedLang) {
     (end.getMonth() - start.getMonth()) +
     1;
 
+  // istanbul ignore if -- given the end >= start guard above, totalMonths is
+  // always a finite integer >= 1; kept as a defensive guard only
   if (!Number.isFinite(totalMonths) || totalMonths <= 0) {
     return null;
   }
@@ -335,7 +339,11 @@ function calculateExperienceDuration(period: string, lang: SupportedLang) {
     if (months > 0) {
       parts.push(`${months} Mon.`);
     }
-    return parts.join(" ") || "1 Mon.";
+    return (
+      parts.join(" ") ||
+      // istanbul ignore next -- totalMonths >= 1 always yields a non-empty years/months part
+      "1 Mon."
+    );
   }
 
   const parts = [];
@@ -345,7 +353,11 @@ function calculateExperienceDuration(period: string, lang: SupportedLang) {
   if (months > 0) {
     parts.push(`${months} ${months === 1 ? "mo" : "mos"}`);
   }
-  return parts.join(" ") || "1 mo";
+  return (
+    parts.join(" ") ||
+    // istanbul ignore next -- totalMonths >= 1 always yields a non-empty years/months part
+    "1 mo"
+  );
 }
 
 function normalizeProjectEntry(
@@ -436,7 +448,10 @@ function normalizeExperienceEntry(
     period,
     duration: asString(
       entry.duration,
-      calculatedDuration ?? period ?? defaultExperienceEntry.duration,
+      calculatedDuration ??
+        period ??
+        // istanbul ignore next -- period always resolves to a non-empty string via defaultExperienceEntry.period
+        defaultExperienceEntry.duration,
     ),
     role: getLocalizedString(
       lang,
@@ -511,6 +526,7 @@ export function normalizeAppData(
     },
     projectsSubtitle: getLocalizedString(
       lang,
+      // istanbul ignore next -- defaultAppData always provides this field
       defaultAppData.projectsSubtitle ?? "",
       data.projectsSubtitle,
       data.projectsSubtitleDe,
@@ -518,6 +534,7 @@ export function normalizeAppData(
     ),
     projectsContext: getLocalizedString(
       lang,
+      // istanbul ignore next -- defaultAppData always provides this field
       defaultAppData.projectsContext ?? "",
       data.projectsContext,
       data.projectsContextDe,
@@ -530,6 +547,7 @@ export function normalizeAppData(
       defaultAppData.projectsHighlights,
     projectDetailsContext: getLocalizedString(
       lang,
+      // istanbul ignore next -- defaultAppData always provides this field
       defaultAppData.projectDetailsContext ?? "",
       data.projectDetailsContext,
       data.projectDetailsContextDe,
@@ -540,6 +558,7 @@ export function normalizeAppData(
       defaultAppData.projects,
     experienceSubtitle: getLocalizedString(
       lang,
+      // istanbul ignore next -- defaultAppData always provides this field
       defaultAppData.experienceSubtitle ?? "",
       data.experienceSubtitle,
       data.experienceSubtitleDe,

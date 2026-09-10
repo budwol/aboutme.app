@@ -58,4 +58,38 @@ describe("WnaNavigationList", () => {
     ]);
     expect(list.props.renderItem({ item: undefined })).toBeNull();
   });
+
+  it("falls back to layout defaults when no overrides or style are given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaNavigationList
+          appStyle={{ containerCenterMaxWidth: {} } as never}
+          appLayout={
+            {
+              contentListPaddingTop: 12,
+              contentPaddingBottom: 24,
+              globalListGap: 8,
+              scrollEventThrottle: 16,
+            } as never
+          }
+          items={[]}
+          renderItem={() => null}
+        />,
+      );
+    });
+
+    const list = tree!.root.findByType(FlatList);
+    const separator = list.props.ItemSeparatorComponent();
+
+    expect(list.props.style).toEqual([
+      { paddingTop: 12, paddingBottom: 24 },
+      null,
+    ]);
+    expect(separator.props.style).toEqual([
+      expect.objectContaining({ width: "100%" }),
+      { height: 8 },
+    ]);
+  });
 });

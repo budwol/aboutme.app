@@ -21,6 +21,10 @@ export const shouldIgnoreLogMessage = (message: string) =>
 
 const filterIgnoredMessages = <T extends LoggerMethod>(fn: T): T =>
   ((message: string) => {
+    // defense-in-depth: LoggerBase.log() already filters before dispatching,
+    // so this guard is unreachable through the public API today, but keeps
+    // the transport itself safe if it's ever called directly.
+    /* istanbul ignore if */
     if (shouldIgnoreLogMessage(message)) return;
     fn(message);
   }) as T;

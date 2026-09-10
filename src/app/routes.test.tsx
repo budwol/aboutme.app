@@ -105,19 +105,24 @@ jest.mock(
 jest.mock("@components/WnaAppContext", () => ({
   WnaAppContextProvider: ({ children }: { children?: React.ReactNode }) =>
     require("react").createElement("WnaAppContextProvider", null, children),
-  useWnaTheme: () => ({
+  useWnaTheme: jest.fn(() => ({
     appColors: {
       isDark: false,
       staticCoolgray8: "#222222",
       white: "#ffffff",
     },
-  }),
+  })),
 }));
 
 jest.mock("@components/WnaApp", () => ({
   __esModule: true,
-  default: ({ children }: { children?: React.ReactNode }) =>
-    require("react").createElement("WnaApp", null, children),
+  default: ({
+    children,
+    ...props
+  }: {
+    children?: React.ReactNode;
+  } & Record<string, unknown>) =>
+    require("react").createElement("WnaApp", props, children),
   ErrorBoundary: function ErrorBoundary() {
     return require("react").createElement("ErrorBoundary");
   },
@@ -309,6 +314,32 @@ describe("app routes", () => {
     });
   });
 
+  it("skips removing the font node when it is absent", () => {
+    const originalDocument = global.document;
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: {
+        getElementById: jest.fn(() => null),
+      },
+    });
+    const RootHtml = require("./+html").default;
+
+    expect(() => {
+      act(() => {
+        TestRenderer.create(
+          <RootHtml>
+            <main />
+          </RootHtml>,
+        );
+      });
+    }).not.toThrow();
+
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: originalDocument,
+    });
+  });
+
   it("renders the drawer layout with the shared drawer menu", () => {
     const DrawerLayout = require("./(drawer)/_layout").default;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -325,6 +356,28 @@ describe("app routes", () => {
     );
     expect(drawer.props.drawerContent().type.name).toBe("WnaDrawerMenu");
     expect(tree!.root.findAllByType("DrawerScreen")).toHaveLength(2);
+  });
+
+  it("uses the dark drawer background in dark mode", () => {
+    const { useWnaTheme } = require("@components/WnaAppContext");
+    useWnaTheme.mockReturnValueOnce({
+      appColors: {
+        isDark: true,
+        staticCoolgray8: "#222222",
+        white: "#ffffff",
+      },
+    });
+    const DrawerLayout = require("./(drawer)/_layout").default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<DrawerLayout />);
+    });
+
+    expect(
+      tree!.root.findByType("Drawer").props.screenOptions.drawerStyle
+        .backgroundColor,
+    ).toBe("#222222");
   });
 
   it("initializes app data and theme before rendering the root layout content", async () => {
@@ -346,6 +399,23 @@ describe("app routes", () => {
       { flex: 1 },
     );
     expect(tree!.root.findByType("WnaApp")).toBeTruthy();
+    expect(tree!.root.findByType("WnaApp").props.theme).toBe("dark");
     expect(tree!.root.findByType("Slot")).toBeTruthy();
+  });
+
+  it("falls back to the system theme when none is stored", async () => {
+    const { getThemeFromStorageAsync } = require("@/storage/themeStorage") as {
+      getThemeFromStorageAsync: jest.Mock<() => Promise<string | null>>;
+    };
+    getThemeFromStorageAsync.mockResolvedValueOnce(null);
+    const RootLayout = require("./_layout").default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<RootLayout />);
+    });
+    await act(async () => undefined);
+
+    expect(tree!.root.findByType("WnaApp").props.theme).toBe("system");
   });
 });
