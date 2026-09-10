@@ -6,6 +6,10 @@ import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 import { useTranslation } from "react-i18next";
 
+jest.mock("@components/WnaAppContext", () => ({
+  useWnaLayout: () => ({ currentWindowWidth: 390 }),
+}));
+
 jest.mock("react-i18next", () => ({
   initReactI18next: {
     type: "3rdParty",
@@ -34,6 +38,12 @@ jest.mock("@components/buttons/WnaButtonIcon", () => {
     return ReactModule.createElement("WnaButtonIcon", props);
   };
 });
+
+type ViewNode = {
+  props: {
+    style?: unknown;
+  };
+};
 
 describe("WnaContactCard", () => {
   const canOpenURL = jest.spyOn(Linking, "canOpenURL");
@@ -74,6 +84,28 @@ describe("WnaContactCard", () => {
     const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
 
     expect(buttons).toHaveLength(6);
+    const actionContainer = testRenderer!.root
+      .findAllByType("View")
+      .find((node: ViewNode) => {
+        const style = Array.isArray(node.props.style) ? node.props.style : [];
+
+        return style.some(
+          (entry: { maxWidth?: number } | false | undefined) =>
+            entry && entry.maxWidth === 188,
+        );
+      });
+
+    expect(actionContainer).toBeDefined();
+    expect(actionContainer!.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flexDirection: "row",
+          flexWrap: "wrap",
+          width: "100%",
+        }),
+        expect.objectContaining({ maxWidth: 188 }),
+      ]),
+    );
 
     await act(async () => {
       for (const button of buttons) {
