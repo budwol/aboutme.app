@@ -18,7 +18,7 @@
     "prepare": "husky",
     "start": "expo start",
     "test": "jest --watchAll",
-    "test:all": "npm run test:prettier && npm run test:types && npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:all": "npm run test:prettier && npm run test:types && npm run test:unit && npm run test:coverage && npm run test:integration && npm run test:e2e",
     "test:deps": "npm ls --depth=0",
     "test:dry-run": "./init.sh --dry-run",
     "test:e2e": "playwright test",

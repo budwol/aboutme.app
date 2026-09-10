@@ -32,6 +32,7 @@ describe("package scripts", () => {
       "npm run lint",
       "npm run test:types",
       "npm run test:unit",
+      "npm run test:coverage",
       "npm run test:integration",
       "npm run test:dry-run",
       "npm run test:smoke",
@@ -73,6 +74,51 @@ describe("package scripts", () => {
     expect(ciLocalIndex).toBeGreaterThan(firstSyncIndex);
     expect(secondSyncIndex).toBeGreaterThan(ciLocalIndex);
     expect(exportIndex).toBeGreaterThan(secondSyncIndex);
+  });
+
+  it("keeps the broad local test stack aligned with coverage enforcement", () => {
+    const packageJson = readPackageJson();
+    const testAll = packageJson.scripts?.["test:all"];
+
+    expect(testAll).toBeDefined();
+
+    const orderedCommands = [
+      "npm run test:prettier",
+      "npm run test:types",
+      "npm run test:unit",
+      "npm run test:coverage",
+      "npm run test:integration",
+      "npm run test:e2e",
+    ];
+
+    let previousCommandIndex = -1;
+    for (const command of orderedCommands) {
+      const commandIndex = testAll!.indexOf(command);
+      expect(commandIndex).toBeGreaterThan(previousCommandIndex);
+      previousCommandIndex = commandIndex;
+    }
+  });
+
+  it("keeps the GitHub Actions workflow chain aligned with the local gate order", () => {
+    const ciWorkflow = readRootFile(".github/workflows/ci.yml");
+    const expectedEdges = [
+      ["unit:", "needs: lint_prettier"],
+      ["coverage:", "needs: unit"],
+      ["integration:", "needs: coverage"],
+      ["dry_run:", "needs: integration"],
+      ["smoke:", "needs: dry_run"],
+      ["e2e:", "needs: smoke"],
+    ];
+
+    for (const [job, needs] of expectedEdges) {
+      const jobIndex = ciWorkflow.indexOf(job);
+      const needsIndex = ciWorkflow.indexOf(needs, jobIndex);
+
+      expect(jobIndex).toBeGreaterThanOrEqual(0);
+      expect(needsIndex).toBeGreaterThan(jobIndex);
+    }
+
+    expect(ciWorkflow).toContain("uses: ./.github/workflows/ci-coverage.yml");
   });
 
   it("keeps the app version in package.json as the single maintained source", () => {
