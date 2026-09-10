@@ -1,17 +1,8 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
+import { Text } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaBadge from "@components/display/WnaBadge";
-
-jest.mock("@components/text/WnaText", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return function MockWnaText(props: unknown) {
-    return createElement("WnaText", props as Record<string, unknown>);
-  };
-});
 
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const { createElement } = jest.requireActual(
@@ -61,12 +52,14 @@ describe("WnaBadge", () => {
     });
 
     const icon = tree!.root.findByType("WnaIcon");
-    const text = tree!.root.findByType("WnaText");
+    const text = tree!.root.findByType(Text);
 
     expect(icon.props.iconName).toBe("account");
     expect(icon.props.color).toBe("#222222");
-    expect(text.props.fontColor).toBe("#ffffff");
-    expect(text.props.text).toBe("Profile");
+    expect(text.props.children).toBe("Profile");
+    expect(text.props.style).toEqual(
+      expect.arrayContaining([{ color: "#ffffff" }]),
+    );
   });
 
   it("keeps array text styles when provided", () => {
@@ -84,11 +77,35 @@ describe("WnaBadge", () => {
       );
     });
 
-    const text = tree!.root.findByType("WnaText");
+    const text = tree!.root.findByType(Text);
 
-    expect(text.props.fontColor).toBe("#123456");
     expect(text.props.style).toEqual(
-      expect.arrayContaining([{ marginTop: 1 }, { marginBottom: 2 }]),
+      expect.arrayContaining([
+        { color: "#123456" },
+        { marginTop: 1 },
+        { marginBottom: 2 },
+      ]),
+    );
+  });
+
+  it("uses the default text color with array text styles", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBadge
+          appColors={appColors}
+          appStyle={appStyle}
+          text="Profile"
+          textStyle={[{ marginTop: 1 }]}
+        />,
+      );
+    });
+
+    const text = tree!.root.findByType(Text);
+
+    expect(text.props.style).toEqual(
+      expect.arrayContaining([{ color: "#ffffff" }, { marginTop: 1 }]),
     );
   });
 });
