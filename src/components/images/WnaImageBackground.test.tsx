@@ -58,6 +58,8 @@ describe("WnaImageBackground", () => {
 
     expect(image.props.src).toBe("images/bg.webp");
     expect(image.props["aria-hidden"]).toBe("true");
+    expect(image.props.fetchPriority).toBe("high");
+    expect(image.props.loading).toBe("eager");
     expect(blur.props.forceExperimentalBlur).toBe(true);
     expect(blur.props.blurTint).toBe("dark");
     expect(blur.props.blurIntensity).toBe(40);
