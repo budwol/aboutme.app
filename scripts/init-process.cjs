@@ -324,7 +324,7 @@ function buildAvatarVariantFileName(fileName, size) {
 function defaultCreateResponsiveAvatar(sourcePath, targetPath) {
   execFileSync(
     "convert",
-    [sourcePath, "-resize", "300x300", "-quality", "90", targetPath],
+    [sourcePath, "-resize", "300x300", "-quality", "80", targetPath],
     { stdio: "inherit" },
   );
 }
