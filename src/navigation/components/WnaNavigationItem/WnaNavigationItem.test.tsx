@@ -99,4 +99,39 @@ describe("WnaNavigationItem", () => {
     expect(onPressA).not.toHaveBeenCalled();
     expect(onPressB).toHaveBeenCalledWith("Legal");
   });
+
+  it("squares off all corners for a middle-of-list item with a custom right icon", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaNavigationItem
+          appColors={
+            {
+              isDark: false,
+              black: "#000",
+              accent5: "#0af",
+              coolgray4: "#999",
+            } as never
+          }
+          appStyle={{ textNeutralMedium: {} } as never}
+          text="Middle"
+          iconName="scale-balance"
+          iconRightName="chevron-right"
+          type="middle"
+          onPress={jest.fn()}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const pressable = tree!.root.findByType("WnaPressable");
+
+    expect(pressable.props.style).toEqual({
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    });
+  });
 });

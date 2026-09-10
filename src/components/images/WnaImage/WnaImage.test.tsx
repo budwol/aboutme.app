@@ -178,6 +178,42 @@ describe("WnaImage", () => {
     expect(wrapper.props.style[1].backgroundColor).toBe("transparent");
   });
 
+  it("falls back to empty state and logs when resolving the image throws", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl=""
+          imageTitle="Broken"
+          thumbnailUrl={999 as unknown as string}
+        />,
+      );
+    });
+
+    expect(mockLoggerError).toHaveBeenCalledWith("WnaImage", expect.any(Error));
+    expect(tree!.root.findAllByType("WnaImageElement")).toHaveLength(0);
+  });
+
+  it("falls back to the image URL for alt text when no title is given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="images/ava.webp"
+          imageTitle={undefined as unknown as string}
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("WnaImageElement");
+
+    expect(image.props.altText).toContain("images/ava.webp");
+  });
+
   it("does not re-render while memoized visual props stay unchanged", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
     const stableStyle = { width: 100 };

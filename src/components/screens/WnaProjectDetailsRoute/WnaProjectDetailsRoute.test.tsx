@@ -620,4 +620,191 @@ describe("WnaProjectDetailsRoute", () => {
       borderColor: "rgba(40,45,55,0.72)",
     });
   });
+
+  it("redirects when the slug param is passed as an array", async () => {
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: [createProjectSlug(testAppData.projects[0].title, 0)],
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    expect(tree!.root.findByType("WnaScrollViewScreen").props.headerTitle).toBe(
+      testAppData.projects[0].title,
+    );
+  });
+
+  it("opens the private repo modal from the compact portrait actions and dismisses it via backdrop and close button", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaLayout: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          subtitle: undefined,
+          repoVisibility: "private",
+          webUrl: "https://app.example.com",
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    appContext.useWnaLayout.mockReturnValue({
+      currentWindowWidth: 420,
+      isLandscape: false,
+    });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    const iconButtons = tree!.root.findAllByType("WnaButtonIcon");
+    const githubButton = iconButtons.find(
+      (button: { props: { iconName?: string } }) =>
+        button.props.iconName === "github",
+    );
+    const webButton = iconButtons.find(
+      (button: { props: { iconName?: string } }) =>
+        button.props.iconName === "web",
+    );
+
+    act(() => {
+      githubButton?.props.onPress();
+    });
+
+    expect(Linking.openURL).not.toHaveBeenCalled();
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(1);
+
+    const findPressables = () =>
+      tree!.root.findAll(
+        (node: { type: unknown }) =>
+          (node.type as { name?: string })?.name === "Pressable",
+      );
+
+    act(() => {
+      (findPressables()[0].props as { onPress: () => void }).onPress();
+    });
+
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+
+    act(() => {
+      githubButton?.props.onPress();
+    });
+
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(1);
+
+    const modalCloseButton = tree!.root.findByProps({
+      testID: "private-repo-modal-close",
+    });
+
+    act(() => {
+      modalCloseButton.props.onPress();
+    });
+
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+
+    act(() => {
+      webButton?.props.onPress();
+    });
+
+    expect(Linking.openURL).toHaveBeenCalledWith("https://app.example.com");
+    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+  });
+
+  it("hides the compact portrait action row when the project has no links", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+      useWnaLayout: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          subtitle: "Solo side project",
+          repoUrl: undefined,
+          webUrl: undefined,
+          playStoreUrl: undefined,
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    appContext.useWnaLayout.mockReturnValue({
+      currentWindowWidth: 420,
+      isLandscape: false,
+    });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    expect(tree!.root.findAllByType("WnaButtonIcon")).toHaveLength(0);
+    const textValues = tree!.root
+      .findAllByType("Text")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(textValues).toContain("Solo side project");
+  });
+
+  it("omits the optional sections when techstack, context, and description are absent", async () => {
+    const appContext = jest.requireMock("@components/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    const expoRouter = jest.requireMock("expo-router") as {
+      useLocalSearchParams: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projectDetailsContext: undefined,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          techstack: [],
+          description: undefined,
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    expoRouter.useLocalSearchParams.mockReturnValue({
+      slug: createProjectSlug(appData.projects[0].title, 0),
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+    });
+
+    expect(tree!.root.findAllByType("WnaTechStackCard")).toHaveLength(0);
+  });
 });

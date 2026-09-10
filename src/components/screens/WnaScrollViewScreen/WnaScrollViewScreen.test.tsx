@@ -131,4 +131,20 @@ describe("WnaScrollViewScreen", () => {
 
     expect(tree!.root.findAllByType("WnaContactFooter")).toHaveLength(0);
   });
+
+  it("renders the share footer when showFooter is enabled", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaScrollViewScreen headerTitle="Page" showFooter>
+          <></>
+        </WnaScrollViewScreen>,
+      );
+    });
+
+    expect(tree!.root.findByType("WnaShareActions").props.url).toBe(
+      "https://portfolio.example.com",
+    );
+  });
 });

@@ -278,6 +278,31 @@ describe("WnaExperienceCard", () => {
     expect(typeof companyLink.props.onHoverOut).toBe("function");
     expect(flattenText(linkText.props.children)).toBe("Linked Employer");
 
+    act(() => {
+      companyLink.props.onHoverIn();
+    });
+
+    const hoveredLink = tree!.root.findByProps({
+      testID: "experience-company-link-0",
+    });
+    const hoveredStyle = hoveredLink.props.style as unknown[];
+
+    expect(hoveredStyle).toContainEqual(
+      expect.objectContaining({
+        backgroundColor: expect.any(String),
+      }),
+    );
+
+    act(() => {
+      companyLink.props.onHoverOut();
+    });
+
+    const unhoveredLink = tree!.root.findByProps({
+      testID: "experience-company-link-0",
+    });
+
+    expect((unhoveredLink.props.style as unknown[])[1]).toBe(false);
+
     await act(async () => {
       await companyLink.props.onPress({
         stopPropagation: jest.fn(),
@@ -626,8 +651,10 @@ describe("WnaExperienceCard", () => {
   });
 
   it("uses the compact timeline layout on narrow screens", () => {
-    jest
-      .spyOn(ReactNative, "useWindowDimensions")
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const RN = require("react-native") as typeof import("react-native");
+    const useWindowDimensionsSpy = jest
+      .spyOn(RN, "useWindowDimensions")
       .mockReturnValue({ width: 480, height: 900, scale: 1, fontScale: 1 });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -668,9 +695,23 @@ describe("WnaExperienceCard", () => {
     const textValues = tree!.root
       .findAllByType("Text")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
+    const periodColumns = tree!.root.findAll(
+      (node: { props: { style?: unknown } }) =>
+        Array.isArray(node.props.style) &&
+        node.props.style.some(
+          (entry) =>
+            entry &&
+            typeof entry === "object" &&
+            "lineHeight" in (entry as Record<string, unknown>) &&
+            (entry as Record<string, unknown>).lineHeight === 18,
+        ),
+    );
 
     expect(timelineWrapper).toBeDefined();
     expect(textValues).toContain(testAppData.experience[0].period);
+    expect(periodColumns.length).toBeGreaterThan(0);
+
+    useWindowDimensionsSpy.mockRestore();
   });
 
   it("updates the detail box height when the content layout is measured", () => {
@@ -727,7 +768,80 @@ describe("WnaExperienceCard", () => {
       });
     });
 
+    act(() => {
+      measuredView.props.onLayout?.({
+        nativeEvent: { layout: { height: 48 } },
+      });
+    });
+
     expect(tree!.root.findAllByType("AnimatedView")).toHaveLength(1);
+  });
+
+  it("falls back to an empty subtitle when experienceSubtitle is missing", () => {
+    const appData = {
+      ...testAppData,
+      experienceSubtitle: undefined,
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={appData}
+          appStyle={{ textNeutralSmall: {} } as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const title = tree!.root.findByType("WnaSectionTitle");
+
+    expect(title.props.subtitle).toBe("");
+  });
+
+  it("defaults the card opacity to 1 when an experience entry has none", () => {
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          opacity: undefined,
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceCard
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+            } as never
+          }
+          appData={appData}
+          appStyle={{ textNeutralSmall: {} } as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const card = tree!.root.findByType("WnaCardSmallVertical");
+
+    expect(card.props.opacity).toBe(1);
   });
 
   it("expands the description when no dedicated detail list exists", () => {

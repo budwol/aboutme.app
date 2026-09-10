@@ -172,5 +172,23 @@ describe("WnaBaseScreen", () => {
       );
 
     expect(textValues).toContain("Loading data");
+
+    const animatedView = tree!.root.findByType("AnimatedView");
+    expect(animatedView.props.style[1].pointerEvents).toBe("auto");
+  });
+
+  it("disables pointer events on the busy overlay when not busy", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBaseScreen isBusy={false} isBusyText="Loading data">
+          <></>
+        </WnaBaseScreen>,
+      );
+    });
+
+    const animatedView = tree!.root.findByType("AnimatedView");
+    expect(animatedView.props.style[1].pointerEvents).toBe("none");
   });
 });

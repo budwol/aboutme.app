@@ -157,6 +157,14 @@ describe("WnaHeader", () => {
     mockToastShow.mockClear();
     mockHistoryBack.mockClear();
     mockStartNavigationTransition.mockClear();
+    (useWnaLayout as jest.Mock).mockReturnValue({
+      appLayout: {
+        headerHeight: 72,
+        headerButtonHeight: 56,
+        globalCornerRadius: 8,
+      },
+      isLandscape: true,
+    });
 
     Object.defineProperty(Platform, "OS", {
       configurable: true,
@@ -335,6 +343,115 @@ describe("WnaHeader", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/");
     expect(mockHistoryBack).not.toHaveBeenCalled();
     expect(mockBack).not.toHaveBeenCalled();
+  });
+
+  it("skips back navigation while busy", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" backHref="/projects" isBusy />,
+      );
+    });
+
+    const backButton = tree!.root.findAllByType("WnaButtonHeader")[0];
+
+    act(() => {
+      backButton.props.onPress();
+    });
+
+    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockHistoryBack).not.toHaveBeenCalled();
+    expect(mockBack).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it("skips title navigation while busy", () => {
+    const onTitlePress = jest.fn();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader
+          headerTitle="Project"
+          titleHref="/projects"
+          onTitlePress={onTitlePress}
+          isBusy
+        />,
+      );
+    });
+
+    const title = tree!.root.findByType("WnaMultilineHeader");
+
+    act(() => {
+      title.props.onPress();
+    });
+
+    expect(onTitlePress).not.toHaveBeenCalled();
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it("forces the header shadow and blur fully visible when showShadow is true", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" showShadow />,
+      );
+    });
+
+    const blurContainer = tree!.root.findAllByType("AnimatedView")[2];
+
+    expect(blurContainer.props.style[2].opacity).toBe(0.2);
+  });
+
+  it("forces the header shadow and blur fully hidden when showShadow is false", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" showShadow={false} />,
+      );
+    });
+
+    const blurContainer = tree!.root.findAllByType("AnimatedView")[2];
+
+    expect(blurContainer.props.style[2].opacity).toBe(0);
+  });
+
+  it("caps the shadow and blur opacity once scroll passes the threshold", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" scrollY={{ value: 1000 } as never} />,
+      );
+    });
+
+    const blurOverlay = tree!.root.findAllByType("AnimatedView")[3];
+
+    expect(blurOverlay.props.style[2].opacity).toBe(0.4);
+  });
+
+  it("hides the back placeholder spacer to match portrait spacing on the root page", () => {
+    (useWnaLayout as jest.Mock).mockReturnValue({
+      appLayout: {
+        headerHeight: 72,
+        headerButtonHeight: 56,
+        globalCornerRadius: 8,
+      },
+      isLandscape: false,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeader headerTitle="Project" isRootPage />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("WnaButtonHeader").length).toBe(0);
   });
 
   it("uses router back when browser history is not available but the router can go back", () => {

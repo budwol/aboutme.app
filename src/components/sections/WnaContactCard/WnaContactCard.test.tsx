@@ -4,16 +4,17 @@ import { Linking } from "react-native";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+import { useTranslation } from "react-i18next";
 
 jest.mock("react-i18next", () => ({
   initReactI18next: {
     type: "3rdParty",
     init: () => {},
   },
-  useTranslation: () => ({
+  useTranslation: jest.fn(() => ({
     t: (value: string) => value,
     i18n: { resolvedLanguage: "de", language: "de" },
-  }),
+  })),
 }));
 
 jest.mock("wna-logger", () => ({
@@ -102,5 +103,143 @@ describe("WnaContactCard", () => {
       `mailto:${appData.contact.email}`,
     );
     expect(openURL).toHaveBeenNthCalledWith(6, "/Portfolio-DE.pdf");
+  });
+
+  it("logs an error and skips opening when the URL is not supported", async () => {
+    canOpenURL.mockResolvedValueOnce(false);
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactCard
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const [githubButton] = testRenderer!.root.findAllByType("WnaButtonIcon");
+
+    await act(async () => {
+      await githubButton.props.onPress();
+    });
+
+    expect(canOpenURL).toHaveBeenCalledWith(testAppData.contact.github);
+    expect(openURL).not.toHaveBeenCalled();
+  });
+
+  it("logs an error when opening the URL throws", async () => {
+    const error = new Error("boom");
+    openURL.mockRejectedValueOnce(error);
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactCard
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const [githubButton] = testRenderer!.root.findAllByType("WnaButtonIcon");
+
+    await act(async () => {
+      await githubButton.props.onPress();
+    });
+
+    expect(openURL).toHaveBeenCalledWith(testAppData.contact.github);
+  });
+
+  it("omits the phone and email buttons when contact info is missing", async () => {
+    const appData = {
+      ...testAppData,
+      contact: {
+        ...testAppData.contact,
+        phone: undefined,
+        email: undefined,
+      },
+    } as never;
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactCard
+          appColors={undefined as never}
+          appData={appData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
+
+    expect(buttons).toHaveLength(4);
+  });
+
+  it("falls back to the English resume when the resolved language isn't German", async () => {
+    (useTranslation as jest.Mock).mockReturnValueOnce({
+      t: (value: string) => value,
+      i18n: { resolvedLanguage: "en", language: "en" },
+    });
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactCard
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
+    const resumeButton = buttons[buttons.length - 1];
+
+    await act(async () => {
+      await resumeButton.props.onPress();
+    });
+
+    expect(canOpenURL).toHaveBeenCalledWith("/Portfolio-EN.pdf");
+  });
+
+  it("falls back to the language when resolvedLanguage is unset", async () => {
+    (useTranslation as jest.Mock).mockReturnValueOnce({
+      t: (value: string) => value,
+      i18n: { resolvedLanguage: undefined, language: "de" },
+    });
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactCard
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
+    const resumeButton = buttons[buttons.length - 1];
+
+    await act(async () => {
+      await resumeButton.props.onPress();
+    });
+
+    expect(canOpenURL).toHaveBeenCalledWith("/Portfolio-DE.pdf");
   });
 });

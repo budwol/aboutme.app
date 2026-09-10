@@ -22,8 +22,8 @@ type WnaAccentBarProps = {
 function useWnaAccentBarAnimation(
   width: number,
   animated: boolean,
-  pulseToWidth?: number,
-  pulseDuration = 3600,
+  pulseToWidth: number | undefined,
+  pulseDuration: number,
 ) {
   const barWidth = useSharedValue(width);
   const barScale = useSharedValue(1);

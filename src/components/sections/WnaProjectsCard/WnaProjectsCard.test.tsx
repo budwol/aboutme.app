@@ -269,4 +269,29 @@ describe("WnaProjectsCard", () => {
       `images/${testAppData.projects[0].imageS}`,
     );
   });
+
+  it("falls back to an empty subtitle when projectsSubtitle is missing", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProjectsCard
+          appColors={
+            {
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              accent5: "#0aa",
+            } as never
+          }
+          appData={{ ...testAppData, projectsSubtitle: undefined }}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const title = tree!.root.findByType("WnaSectionTitle");
+
+    expect(title.props.subtitle).toBe("");
+  });
 });

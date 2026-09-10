@@ -211,6 +211,46 @@ describe("WnaApp", () => {
     );
   });
 
+  it("uses a dark neutral boot shell when the OS color scheme is dark", () => {
+    mockIsAppInitialized = false;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const RN = require("react-native") as typeof import("react-native");
+    const colorSchemeSpy = jest
+      .spyOn(RN, "useColorScheme")
+      .mockReturnValue("dark");
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    expect(tree!.root.findByType("View").props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#111" }),
+    );
+
+    colorSchemeSpy.mockRestore();
+  });
+
+  it("unmounts cleanly before any debounced resize or reveal timers fire", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    act(() => {
+      tree!.unmount();
+    });
+  });
+
   it("renders the opener bubble field with the provided app data", () => {
     const appData = {
       ...testAppData,
@@ -310,6 +350,50 @@ describe("WnaApp", () => {
     expect(card!.root.findAllByType("View")[0].props.style).toEqual(
       expect.objectContaining({
         backgroundColor: "rgba(16,16,16,0.98)",
+      }),
+    );
+
+    let darkTitleCard: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      darkTitleCard = TestRenderer.create(
+        toast.props.config.error({
+          text1: "Alert",
+          text2: "Failed",
+          props: {
+            appColors: {
+              ...mockAppColors,
+              isDark: true,
+              background: "#101010",
+            },
+          },
+        }),
+      );
+    });
+
+    const darkTitleTexts = darkTitleCard!.root
+      .findAllByType("Text")
+      .map((node: RenderedTextNode) => node.props.children);
+
+    expect(darkTitleTexts).toEqual(["Alert", "Failed"]);
+
+    let fallbackColorsCard: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      fallbackColorsCard = TestRenderer.create(
+        toast.props.config.error({
+          text1: "Oops",
+          text2: "Failed",
+          props: {},
+        }),
+      );
+    });
+
+    expect(
+      fallbackColorsCard!.root.findAllByType("View")[0].props.style,
+    ).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(255,255,255,0.98)",
       }),
     );
   });
@@ -496,6 +580,129 @@ describe("WnaApp", () => {
     });
 
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
+  });
+
+  it("renders dark intro and navigation transition overlays", () => {
+    mockAppColors = { ...mockAppColors, isDark: true };
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      callback(0);
+
+      return 1;
+    }) as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const introOverlay = tree!.root.findAllByType("AnimatedView")[1];
+
+    expect(introOverlay.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "#111111" }),
+      ]),
+    );
+
+    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    mockIsNavigationTransitionActive = true;
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const navigationOverlay = tree!.root.find(
+      (node: { type: { name?: string } }) =>
+        typeof node.type === "function" &&
+        node.type.name === "WnaNavigationTransitionOverlay",
+    ).parent;
+
+    expect(navigationOverlay?.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "#111111" }),
+      ]),
+    );
+  });
+
+  it("does not finish the navigation transition when the outgoing animation is interrupted", () => {
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      callback(0);
+
+      return 1;
+    }) as never;
+
+    const reanimated = jest.requireMock("react-native-reanimated") as {
+      withTiming: (
+        value: unknown,
+        config?: unknown,
+        callback?: (finished?: boolean) => void,
+      ) => unknown;
+    };
+    const originalWithTiming = reanimated.withTiming;
+
+    reanimated.withTiming = (value, config, callback) => {
+      callback?.(false);
+
+      return value;
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    mockIsNavigationTransitionActive = true;
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    mockPathname = "/next";
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <></>
+        </WnaApp>,
+      );
+    });
+
+    expect(mockFinishNavigationTransition).not.toHaveBeenCalled();
+
+    reanimated.withTiming = originalWithTiming;
   });
 });
 

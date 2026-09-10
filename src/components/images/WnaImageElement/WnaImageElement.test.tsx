@@ -94,4 +94,18 @@ describe("WnaImageElement", () => {
     expect(image.props.priority).toBe("high");
     expect(image.props.responsivePolicy).toBe("static");
   });
+
+  it("falls back to an empty source when neither source nor imageUrl is given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageElement appColors={{} as never} altText="Empty" />,
+      );
+    });
+
+    const image = tree!.root.findByType("ExpoImage");
+
+    expect(image.props.source).toBe("");
+  });
 });

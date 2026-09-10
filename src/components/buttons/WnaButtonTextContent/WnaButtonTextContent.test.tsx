@@ -25,4 +25,20 @@ describe("WnaButtonTextContent", () => {
     expect(tree!.root.findByType(Text).props.children).toBe("Open");
     expect(tree!.root.findByProps({ testID: "left-icon" })).toBeTruthy();
   });
+
+  it("falls back to the default text style when no app style is given", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonTextContent text="Open" textColor="#ffffff" />,
+      );
+    });
+
+    expect(tree!.root.findByType(Text).props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ fontSize: 16, fontWeight: "500" }),
+      ]),
+    );
+  });
 });

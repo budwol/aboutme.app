@@ -57,4 +57,63 @@ describe("WnaButtonHeader", () => {
     expect(pressable.props.toolTip).toBe("Home");
     expect(icon.props.iconName).toBe("home");
   });
+
+  it("defaults tooltip text and hides the badge when omitted", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonHeader
+          appColors={{ staticWhite: "#fff" } as never}
+          appStyle={{ containerCenterCenter: {} } as never}
+          iconName="menu"
+          onPress={() => {}}
+        />,
+      );
+    });
+
+    const pressable = tree!.root.findByType("WnaPressable");
+
+    expect(pressable.props.toolTip).toBe("");
+    expect(
+      tree!.root.findAll(
+        (node: { props: { style?: unknown } }) =>
+          Array.isArray(node.props.style) &&
+          node.props.style.some(
+            (s: { height?: number }) => s && s.height === 8,
+          ),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("shows the badge and uses an explicit color when provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonHeader
+          appColors={{ staticWhite: "#fff", red3: "#f00" } as never}
+          appStyle={{ containerCenterCenter: {} } as never}
+          iconName="menu"
+          color="#123456"
+          badgeVisible
+          onPress={() => {}}
+        />,
+      );
+    });
+
+    const icon = tree!.root.findByType("WnaIcon");
+
+    expect(icon.props.color).toBe("#123456");
+    expect(
+      tree!.root.findAll(
+        (node: { props: { style?: unknown } }) =>
+          Array.isArray(node.props.style) &&
+          node.props.style.some(
+            (s: { backgroundColor?: string }) =>
+              s && s.backgroundColor === "#f00",
+          ),
+      ).length,
+    ).toBeGreaterThan(0);
+  });
 });

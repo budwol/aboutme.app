@@ -135,6 +135,113 @@ describe("WnaCardTextContent", () => {
     );
   });
 
+  it("renders title without app style using default paddings and alignment", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent appColors={appColors} title="Plain title" />,
+      );
+    });
+
+    const text = tree!.root.findByType("Text");
+
+    expect(text.props.style).toEqual(
+      expect.objectContaining({
+        paddingHorizontal: 0,
+        paddingTop: 0,
+        textAlign: "left",
+      }),
+    );
+  });
+
+  it("aligns custom subtitle content to the right", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent
+          appColors={appColors}
+          subtitleContent={<TextMarker />}
+          subtitleAlign="right"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("View").props.style).toEqual(
+      expect.objectContaining({ alignItems: "flex-end" }),
+    );
+  });
+
+  it("uses default subtitle spacing and alignment without app style", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent appColors={appColors} subtitle="Plain subtitle" />,
+      );
+    });
+
+    const text = tree!.root.findByType("Text");
+
+    expect(text.props.style).toEqual(
+      expect.objectContaining({
+        paddingHorizontal: 0,
+        textAlign: "left",
+      }),
+    );
+  });
+
+  it("defaults subtitle body padding to 0 with app style when nothing provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent
+          appColors={appColors}
+          appStyle={
+            {
+              textNeutralSmall: { lineHeight: 16 },
+            } as never
+          }
+          subtitle="Styled subtitle"
+        />,
+      );
+    });
+
+    const text = tree!.root.findByType("Text");
+
+    expect(text.props.style[1]).toEqual(
+      expect.objectContaining({ padding: 0, paddingHorizontal: 0 }),
+    );
+  });
+
+  it("prefers subtitlePaddingHorizontal over bodyPadding with app style", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaCardTextContent
+          appColors={appColors}
+          appStyle={
+            {
+              textNeutralSmall: { lineHeight: 16 },
+            } as never
+          }
+          subtitle="Styled subtitle"
+          bodyPadding={5}
+          subtitlePaddingHorizontal={9}
+        />,
+      );
+    });
+
+    const text = tree!.root.findByType("Text");
+
+    expect(text.props.style[1]).toEqual(
+      expect.objectContaining({ paddingHorizontal: 9 }),
+    );
+  });
+
   it("renders nothing for omitted optional content", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

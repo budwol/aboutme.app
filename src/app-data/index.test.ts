@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { defaultAppData, loadAppData, normalizeAppData } from "@/app-data";
+import { i18n } from "@/i18n/i18n";
 
 describe("normalizeAppData", () => {
   it("deep-merges nested objects instead of dropping defaults", () => {
@@ -238,6 +239,79 @@ describe("normalizeAppData", () => {
     expect(data.projects[0].techstack).toEqual(
       defaultAppData.projects[0].techstack,
     );
+  });
+
+  it("resolves the language from i18n when no lang argument is passed", async () => {
+    await i18n.changeLanguage("de");
+
+    const dataDe = normalizeAppData({
+      profile: { titleDe: "Softwareentwickler", titleEn: "Software Engineer" },
+    });
+
+    expect(dataDe.profile.title).toBe("Softwareentwickler");
+
+    const originalResolvedLanguage = i18n.resolvedLanguage;
+    (i18n as { resolvedLanguage?: string }).resolvedLanguage = undefined;
+    i18n.language = "en";
+
+    const dataEn = normalizeAppData({
+      profile: { titleDe: "Softwareentwickler", titleEn: "Software Engineer" },
+    });
+
+    expect(dataEn.profile.title).toBe("Software Engineer");
+
+    (i18n as { resolvedLanguage?: string }).resolvedLanguage =
+      originalResolvedLanguage;
+    await i18n.changeLanguage("en");
+  });
+
+  it("falls back to an empty object for non-object app-data input", () => {
+    const data = normalizeAppData(null, "en");
+
+    expect(data).toEqual(normalizeAppData(defaultAppData, "en"));
+  });
+
+  it("filters out project highlights missing an icon or text", () => {
+    const data = normalizeAppData(
+      {
+        projectsHighlights: [
+          { icon: "phone", textEn: "Mobile First" },
+          { icon: "", textEn: "Missing Icon" },
+          { icon: "code", textEn: "" },
+        ],
+      },
+      "en",
+    );
+
+    expect(data.projectsHighlights).toEqual([
+      { icon: "phone", text: "Mobile First" },
+    ]);
+  });
+
+  it("formats experience durations across years/months boundaries", () => {
+    const dataDe = normalizeAppData(
+      {
+        experience: [{ periodDe: "01/2020 - 12/2021" }],
+      },
+      "de",
+    );
+
+    expect(dataDe.experience[0].duration).toBe("2 J.");
+
+    const dataEn = normalizeAppData(
+      {
+        experience: [
+          { periodEn: "01/2020 - 12/2021" },
+          { periodEn: "06/2020 - 08/2020" },
+          { periodEn: "05/2020 - 05/2020" },
+        ],
+      },
+      "en",
+    );
+
+    expect(dataEn.experience[0].duration).toBe("2 yrs");
+    expect(dataEn.experience[1].duration).toBe("3 mos");
+    expect(dataEn.experience[2].duration).toBe("1 mo");
   });
 
   it("normalizes the default fallback when app-data loading fails", async () => {

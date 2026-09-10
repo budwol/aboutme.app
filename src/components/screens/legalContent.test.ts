@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 import {
   buildDisclaimerHtml,
   buildPrivacyHtml,
@@ -6,6 +6,12 @@ import {
   getTermsHtmlContent,
 } from "@components/screens/legalContent";
 import { testAppData } from "@/app-data/testAppData";
+
+const mockGetLangCode = jest.fn<() => string>();
+
+jest.mock("@/i18n/i18n", () => ({
+  getLangCode: () => mockGetLangCode(),
+}));
 
 describe("legalContent", () => {
   it("injects app data into disclaimer and privacy html", () => {
@@ -53,5 +59,29 @@ describe("legalContent", () => {
     expect(getLicensesHtmlContent("en")).toContain("Core technologies used");
     expect(buildPrivacyHtml(testAppData, "en")).toContain("Privacy Policy");
     expect(buildDisclaimerHtml(testAppData, "en")).toContain("Imprint");
+  });
+
+  it("falls back to the detected language when none is provided (German)", () => {
+    mockGetLangCode.mockReturnValue("de");
+
+    expect(buildDisclaimerHtml(testAppData)).toContain("Impressum");
+    expect(buildPrivacyHtml(testAppData)).toContain("Datenschutzerklärung");
+    expect(getTermsHtmlContent()).toContain("Nutzungshinweis");
+    expect(getLicensesHtmlContent()).toContain("Verwendete Kerntechnologien");
+  });
+
+  it("falls back to the detected language when none is provided (English)", () => {
+    mockGetLangCode.mockReturnValue("en");
+
+    expect(buildDisclaimerHtml(testAppData)).toContain("Imprint");
+    expect(buildPrivacyHtml(testAppData)).toContain("Privacy Policy");
+    expect(getTermsHtmlContent()).toContain("Terms of Use");
+    expect(getLicensesHtmlContent()).toContain("Core technologies used");
+  });
+
+  it("treats an unsupported detected language as English", () => {
+    mockGetLangCode.mockReturnValue("fr");
+
+    expect(getTermsHtmlContent()).toContain("Terms of Use");
   });
 });

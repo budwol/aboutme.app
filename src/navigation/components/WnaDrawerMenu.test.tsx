@@ -52,7 +52,7 @@ jest.mock("@components/WnaAppContext", () => ({
       },
     },
   }),
-  useWnaLayout: () => ({
+  useWnaLayout: jest.fn(() => ({
     appLayout: {
       contentPaddingBottom: 0,
       contentListPaddingTop: 0,
@@ -61,8 +61,8 @@ jest.mock("@components/WnaAppContext", () => ({
       globalCornerRadius: mockGlobalCornerRadius,
       scrollEventThrottle: 16,
     },
-  }),
-  useWnaTheme: () => ({
+  })),
+  useWnaTheme: jest.fn(() => ({
     appStyle: {
       textTitleLarge: {},
       textSmall: {},
@@ -76,6 +76,7 @@ jest.mock("@components/WnaAppContext", () => ({
       white: "#fff",
       warmgray1: "#eee",
       accent5: "#4a4",
+      accent7: "#5b5",
       staticAccent5: "#4a4",
       black: "#000",
       coolgray1: "#ccc",
@@ -84,7 +85,7 @@ jest.mock("@components/WnaAppContext", () => ({
     theme: "dark",
     setTheme: mockSetTheme,
     setAppColors: mockSetAppColors,
-  }),
+  })),
 }));
 
 jest.mock("@components/currentAppVersion", () => () => "1.0.0");
@@ -391,5 +392,93 @@ describe("WnaDrawerMenu", () => {
     expect(openURL).toHaveBeenCalledWith("/Portfolio-DE.pdf");
 
     openURL.mockRestore();
+  });
+
+  it("does not navigate when pressing the already-active drawer item", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const items = tree!.root.findAllByType("WnaDrawerNavigationItem");
+    const profileItem = items.find(
+      (item: DrawerItemNode) => item.props.text === "screenTitleProfile",
+    );
+
+    act(() => {
+      profileItem!.props.onPress();
+    });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("uses dark-mode colors and falls back to default layout values", async () => {
+    const { useWnaTheme, useWnaLayout } = jest.requireMock(
+      "@components/WnaAppContext",
+    ) as {
+      useWnaTheme: jest.Mock<() => unknown>;
+      useWnaLayout: jest.Mock<() => unknown>;
+    };
+    useWnaTheme.mockReturnValueOnce({
+      appStyle: {
+        textTitleLarge: {},
+        textSmall: {},
+        textNeutralSmall: {},
+        textNeutralMedium: {},
+        containerCenterMaxWidth: {},
+      },
+      appColors: {
+        isDark: true,
+        staticCoolgray8: "#111",
+        white: "#fff",
+        warmgray1: "#eee",
+        accent5: "#4a4",
+        accent7: "#5b5",
+        staticAccent5: "#4a4",
+        black: "#000",
+        coolgray1: "#ccc",
+        coolgray2: "#bbb",
+      },
+      theme: "dark",
+      setTheme: mockSetTheme,
+      setAppColors: mockSetAppColors,
+    });
+    useWnaLayout.mockReturnValueOnce({
+      appLayout: {
+        contentPaddingBottom: 0,
+        contentListPaddingTop: 0,
+        globalListGap: 0,
+        headerButtonHeight: undefined,
+        globalCornerRadius: undefined,
+        scrollEventThrottle: 16,
+      },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const container = tree!.root.findAllByType("View")[0];
+    expect(container.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ backgroundColor: "#111" }),
+      ]),
+    );
+
+    const buttons = tree!.root.findAllByType("WnaButtonIconText");
+    const themeButton = buttons.find(
+      (item: ButtonNode) =>
+        item.props.text === "settingsTheme: common:catalogThemeDark",
+    );
+
+    expect(themeButton!.props.style).toEqual(
+      expect.objectContaining({
+        height: appLayoutConstants.textInputHeight,
+        borderRadius: appLayoutConstants.globalCornerRadius,
+      }),
+    );
   });
 });

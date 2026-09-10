@@ -118,6 +118,7 @@ describe("WnaTabLayout", () => {
           focused: boolean;
           color: string;
         }) => React.ReactNode;
+        tabBarLabel: () => null;
       };
     };
     let icon: ReturnType<typeof TestRenderer.create> | undefined;
@@ -137,5 +138,18 @@ describe("WnaTabLayout", () => {
         iconName: "home",
       }),
     );
+
+    let unfocusedIcon: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      unfocusedIcon = TestRenderer.create(
+        screen.options.tabBarIcon({ focused: false, color: "#abc" }),
+      );
+    });
+
+    expect(unfocusedIcon!.root.findByType("WnaIcon").props.size).not.toEqual(
+      icon!.root.findByType("WnaIcon").props.size,
+    );
+    expect(screen.options.tabBarLabel()).toBeNull();
   });
 });
