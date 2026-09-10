@@ -1,5 +1,11 @@
 import { ScrollViewStyleReset } from "expo-router/html";
 import { PropsWithChildren, useEffect } from "react";
+import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
+
+const appDescription =
+  process.env.APP_DESCRIPTION?.trim() ||
+  "Persönliche Website mit Projekten, Erfahrungen und Kontaktmöglichkeiten.";
+const backgroundImageUrl = getVersionedLocalAssetUrl("/bg.webp");
 
 export default function Root({ children }: PropsWithChildren) {
   useEffect(() => {
@@ -13,6 +19,7 @@ export default function Root({ children }: PropsWithChildren) {
       <head>
         <title>AboutMe</title>
         <meta charSet="utf-8" />
+        <meta name="description" content={appDescription} />
         <meta
           name="robots"
           content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"
@@ -24,6 +31,12 @@ export default function Root({ children }: PropsWithChildren) {
           type="font/woff2"
           href="/fonts/Manrope-VariableFont_wght.woff2"
           crossOrigin={"anonymous"}
+        />
+        <link
+          rel="preload"
+          as="image"
+          href={backgroundImageUrl}
+          fetchPriority="high"
         />
 
         <link rel="manifest" href="/site.webmanifest" />
