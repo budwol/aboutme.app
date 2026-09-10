@@ -18,8 +18,12 @@ jobs:
     needs: lint_prettier
     uses: ./.github/workflows/ci-unit.yml
 
-  integration:
+  coverage:
     needs: unit
+    uses: ./.github/workflows/ci-coverage.yml
+
+  integration:
+    needs: coverage
     uses: ./.github/workflows/ci-integration.yml
 
   dry_run:
