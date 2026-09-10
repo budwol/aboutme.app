@@ -156,6 +156,8 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
 
 Navigation is built with Expo Router under `src/app/`, while reusable navigation UI and route helpers live under `src/navigation/`.
 
+Metro blocks `*.test.*` and `*.spec.*` files from the app bundle. That keeps Expo Router focused on routes instead of wandering into test files under `src/app/`. The tests can keep their little easel right beside the route they cover, and the production canvas stays clean.
+
 ### Recommended Image Ratios
 
 **Project images** use a 2:1 ratio. The app picks between three sizes depending on viewport width:
@@ -242,7 +244,7 @@ The runtime path is meant to stay plain and inspectable, not clever.
 - The image healthcheck hits `http://127.0.0.1:8080/` with `wget`, so the check and the runtime speak the same language.
 - Runtime assets are only the exported `dist` output plus generated nginx config. Source content like `.aboutme/`, `.env`, tests, and other workshop clutter stays out of the image.
 - HTML content goes through `sanitize-html` with a small allowlist. That path is meant for trusted portfolio content, but it is no longer hanging off a homegrown regex filter.
-- The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Resource-Policy`, and `X-Robots-Tag`.
+- The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `Cross-Origin-Resource-Policy`, `Referrer-Policy`, `Permissions-Policy`, and `X-Robots-Tag`.
 - Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
 
 ## Production Checklist
@@ -359,7 +361,7 @@ If you want the full local CI pass:
 npm run ci:local
 ```
 
-`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, TypeScript, ESLint fixes, security checks, unit tests, integration tests, and E2Es. It is the broad local verification path, not a tiny cleanup helper. The `smoke` gate still stays separate.
+`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
 
 The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 
