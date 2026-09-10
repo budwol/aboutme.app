@@ -13,6 +13,12 @@ export {
 } from "@/app-data/shared";
 
 async function readAppDataModule(): Promise<unknown> {
+  const embeddedAppData = readEmbeddedAppData();
+
+  if (embeddedAppData) {
+    return embeddedAppData;
+  }
+
   const response = await fetch("/app-data.json", {
     headers: {
       Accept: "application/json",
@@ -25,6 +31,21 @@ async function readAppDataModule(): Promise<unknown> {
   }
 
   return response.json();
+}
+
+function readEmbeddedAppData(): unknown | null {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const appDataScript = document.getElementById("wna-app-data");
+  const appDataJson = appDataScript?.textContent?.trim();
+
+  if (!appDataJson) {
+    return null;
+  }
+
+  return JSON.parse(appDataJson);
 }
 
 export const loadAppData = async (

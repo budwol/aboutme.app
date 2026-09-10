@@ -69,11 +69,15 @@ describe("package scripts", () => {
     const ciLocalIndex = exportWeb!.indexOf("npm run ci:local");
     const secondSyncIndex = exportWeb!.lastIndexOf(syncCommand);
     const exportIndex = exportWeb!.indexOf("npx expo export -p web");
+    const injectWebShellIndex = exportWeb!.indexOf(
+      "node ./scripts/inject-web-shell.cjs",
+    );
 
     expect(firstSyncIndex).toBeGreaterThanOrEqual(0);
     expect(ciLocalIndex).toBeGreaterThan(firstSyncIndex);
     expect(secondSyncIndex).toBeGreaterThan(ciLocalIndex);
     expect(exportIndex).toBeGreaterThan(secondSyncIndex);
+    expect(injectWebShellIndex).toBeGreaterThan(exportIndex);
   });
 
   it("keeps the broad local test stack aligned with coverage enforcement", () => {

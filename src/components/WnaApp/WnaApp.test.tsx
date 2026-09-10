@@ -251,6 +251,29 @@ describe("WnaApp", () => {
     });
   });
 
+  it("removes the static export shell when the app mounts", () => {
+    const removeStaticShell = jest.fn();
+    const originalDocument = global.document;
+    (global as typeof globalThis & { document: Document }).document = {
+      getElementById: (id: string) =>
+        id === "wna-static-shell"
+          ? ({ remove: removeStaticShell } as unknown as HTMLElement)
+          : null,
+    } as Document;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    expect(removeStaticShell).toHaveBeenCalled();
+
+    global.document = originalDocument;
+  });
+
   it("renders the opener bubble field with the provided app data", () => {
     const appData = {
       ...testAppData,
