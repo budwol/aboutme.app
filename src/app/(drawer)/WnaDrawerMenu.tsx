@@ -220,7 +220,9 @@ export default function WnaDrawerMenu() {
           }
           textColor={appColors.black}
           borderWidth={1}
-          onPress={() => Linking.openURL(getResumePdfUrl(langCode))}
+          onPress={() =>
+            Linking.openURL(getResumePdfUrl(langCode, appData.profile.name))
+          }
           style={{
             ...styles.themeButton,
             height: compactButtonHeight,
