@@ -20,6 +20,10 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+jest.mock("@/i18n/i18n", () => ({
+  getLangCode: () => "de",
+}));
+
 jest.mock("expo-router", () => ({
   useNavigation: () => mockNavigation,
   useRouter: () => mockRouter,
@@ -107,6 +111,7 @@ describe("WnaExperienceRoute", () => {
 
     expect(screen.props.isRootPage).toBe(true);
     expect(screen.props.headerTitle).toBe("screenTitleExperience");
+    expect(screen.props.titleHref).toBe("/(drawer)/(tabs-de)");
     expect(homeButton.props.route).toBe("home");
     expect(homeButton.props.router).toBe(mockRouter);
     expect(menuButton.props.navigation).toBe(mockNavigation);

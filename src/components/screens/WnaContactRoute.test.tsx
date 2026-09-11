@@ -139,4 +139,16 @@ describe("WnaContactRoute", () => {
       tree!.root.findByType("WnaScrollViewScreen").props.showContactFooter,
     ).toBe(false);
   });
+
+  it("makes the header title navigate home", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaContactRoute />);
+    });
+
+    expect(tree!.root.findByType("WnaScrollViewScreen").props.titleHref).toBe(
+      "/(drawer)/(tabs-de)",
+    );
+  });
 });
