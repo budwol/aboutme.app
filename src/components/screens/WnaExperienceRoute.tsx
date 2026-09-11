@@ -2,6 +2,7 @@ import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
 import WnaSurfaceCard from "@/components/cards/WnaSurfaceCard";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
+import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaExperienceSection from "@components/sections/WnaExperienceSection";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode } from "react";
@@ -20,6 +21,7 @@ export default function WnaExperienceRoute(): ReactNode {
     <WnaScrollViewScreen
       isRootPage
       headerTitle={t(i18nKeys.screenTitleExperience)}
+      titleHref={getDrawerNavigationPath("root")}
       headerButton0={
         <WnaHeaderRouteButton
           appStyle={appStyle}
