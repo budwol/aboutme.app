@@ -1,4 +1,4 @@
-import { themePalettes } from "@constants/themePalettes";
+import { themePalettes } from "@constants/theme/themePalettes";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { View } from "react-native";
 

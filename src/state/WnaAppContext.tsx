@@ -1,7 +1,7 @@
 import { AppData, defaultAppData } from "@/app-data";
 import { AppLayout, getAppLayout } from "@constants/layoutConstants";
 import { appMotionConstants } from "@constants/motionConstants";
-import { themePalettes } from "@constants/themePalettes";
+import { themePalettes } from "@constants/theme/themePalettes";
 import Colors from "@constants/theme/colors";
 import AppStyle, { setAppStyle } from "@/theme/appStyle";
 import { Theme } from "@/storage/themeStorage";

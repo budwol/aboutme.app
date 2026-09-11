@@ -1,5 +1,5 @@
 import Colors from "@constants/theme/colors";
-import { themePalettes } from "@constants/themePalettes";
+import { themePalettes } from "@constants/theme/themePalettes";
 import { Theme } from "@/storage/themeStorage";
 import { ColorSchemeName } from "react-native";
 

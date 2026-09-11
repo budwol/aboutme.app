@@ -18,7 +18,7 @@ A senior-level architecture review (2026-09-11) traced import direction across t
 
 `WnaAppContext.tsx` (+ its test) moved to `src/state/WnaAppContext.tsx`, a new top-level module and peer to `app-data/`, `storage/`, `theme/`, `i18n/` — resolved via the generic `@/state/WnaAppContext` path (the `@/*` → `src/*` alias), the same pattern already used for those peers rather than a dedicated `@state` alias. `currentAppVersion.ts` (+ its test) moved to `src/utils/currentAppVersion.ts`.
 
-`src/components/` now holds only the UI component tree: role-categorized folders (`buttons/`, `cards/`, `chrome/`, `screens/`, `sections/`, ...) plus `WnaApp/` (the root shell component — legitimately uncategorized, there's only one). Nothing sits at its root anymore that isn't a real, renderable component.
+`src/components/` now holds only the UI component tree: role-categorized folders (`buttons/`, `cards/`, `chrome/`, `screens/`, `sections/`, ...) plus `WnaApp.tsx` (the root shell component — legitimately uncategorized, there's only one; flattened out of its own `WnaApp/` folder in the 2026-09-11 locality pass per [ADR 5](0005-wna-component-module-convention.md)'s directory rule, since it owns no side-file or subcomponent either). Nothing sits at its root anymore that isn't a real, renderable component.
 
 ## Consequences
 

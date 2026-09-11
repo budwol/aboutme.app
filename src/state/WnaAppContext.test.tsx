@@ -8,7 +8,7 @@ import {
   useWnaTheme,
   WnaAppContextProvider,
 } from "@/state/WnaAppContext";
-import { themePalettes } from "@constants/themePalettes";
+import { themePalettes } from "@constants/theme/themePalettes";
 
 function ContextProbe({ onValue }: { onValue: (value: unknown) => void }) {
   const lifecycle = useWnaAppLifecycle();
