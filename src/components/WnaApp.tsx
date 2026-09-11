@@ -28,6 +28,7 @@ import {
 import { appMotionConstants } from "@constants/motionConstants";
 import { Theme } from "@/storage/themeStorage";
 import Colors from "@constants/theme/colors";
+import { FontFamilies } from "@constants/theme/fontFamilies";
 import { resolveAppColors } from "@utils/themeColors";
 import { WnaHeroField } from "@components/sections/WnaProfileHero";
 import WnaAccentBar from "@components/display/WnaAccentBar";
@@ -422,18 +423,20 @@ const styles = StyleSheet.create({
   introCopy: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 12,
     paddingHorizontal: 24,
   },
   introBrand: {
+    fontFamily: FontFamilies.UI,
     fontSize: 34,
     fontWeight: "700",
-    letterSpacing: 0.8,
     textAlign: "center",
   },
   introName: {
+    fontFamily: FontFamilies.UI,
     fontSize: 13,
-    letterSpacing: 1.8,
+    fontWeight: "700",
+    letterSpacing: 1.75,
     textAlign: "center",
     textTransform: "uppercase",
   },
