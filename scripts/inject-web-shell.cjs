@@ -69,15 +69,16 @@ function removeInjectedFragments(html) {
 }
 
 function buildStaticShellStyle() {
-  return `<style id="${staticShellStyleId}">#${staticShellId}{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#f8f7f3;color:#151718;font-family:Manrope,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:24px;text-align:center}#${staticShellId} strong{display:block;font-size:clamp(2rem,8vw,3.5rem);line-height:1.02}#${staticShellId} span{display:block;margin-top:12px;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#646464}@media (prefers-color-scheme:dark){#${staticShellId}{background:#111;color:#f6f6f6}#${staticShellId} span{color:#d6d6d6}}</style>`;
+  return `<style id="${staticShellStyleId}">#${staticShellId}{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#f8f7f3;color:#151718;font-family:Manrope,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:24px;text-align:center}#${staticShellId} strong{display:block;font-size:34px;font-weight:700;line-height:1.02}#${staticShellId} i{display:block;width:48px;height:8px;margin:12px auto 0;border-radius:999px;background:#61afa7}#${staticShellId} span{display:block;margin-top:12px;font-size:13px;font-weight:700;letter-spacing:1.75px;text-transform:uppercase;color:#646464}@media (prefers-color-scheme:dark){#${staticShellId}{background:#111;color:#f6f6f6}#${staticShellId} span{color:#d6d6d6}}</style>`;
 }
 
 function buildStaticShell(appData) {
   const profile = appData?.profile ?? {};
   const name = escapeHtml(getLocalizedValue(profile, "name") || "AboutMe");
   const title = escapeHtml(getLocalizedValue(profile, "title"));
+  const titleMarkup = title ? `<i></i><span>${title}</span>` : "";
 
-  return `<div id="${staticShellId}" aria-hidden="true"><div><strong>${name}</strong>${title ? `<span>${title}</span>` : ""}</div></div>`;
+  return `<div id="${staticShellId}" aria-hidden="true"><div><strong>${name}</strong>${titleMarkup}</div></div>`;
 }
 
 function injectHtml(html, appData) {
