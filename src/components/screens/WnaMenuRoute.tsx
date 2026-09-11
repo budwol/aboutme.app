@@ -70,7 +70,7 @@ export default function WnaMenuRoute(): ReactNode {
           appColors={appColors}
           text={`${t(i18nKeys.settingsTheme)}: ${t(`common:catalogTheme${theme.charAt(0).toUpperCase()}${theme.slice(1)}`)}`}
           iconName={getThemeIcon(theme)}
-          iconRightName={"chevron-right"}
+          iconRightName={null}
           type={"standalone"}
           onPress={() =>
             void toggleWnaTheme({

@@ -134,4 +134,35 @@ describe("WnaNavigationItem", () => {
       borderBottomRightRadius: 0,
     });
   });
+
+  it("hides the trailing icon when iconRightName is explicitly null", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaNavigationItem
+          appColors={
+            {
+              isDark: false,
+              black: "#000",
+              accent5: "#0af",
+              coolgray4: "#999",
+            } as never
+          }
+          appStyle={{ textNeutralMedium: {} } as never}
+          text="Theme"
+          iconName="scale-balance"
+          iconRightName={null}
+          type="standalone"
+          onPress={jest.fn()}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const icons = tree!.root.findAllByType("WnaIcon");
+
+    expect(icons).toHaveLength(1);
+    expect(icons[0].props.iconName).toBe("scale-balance");
+  });
 });
