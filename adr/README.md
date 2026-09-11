@@ -24,3 +24,4 @@ Format: lightweight ADR (Context / Decision / Consequences). New ADRs get the ne
 | [0016](0016-layer-boundaries-enforced-by-lint-and-ci.md)        | Layer boundaries are enforced by ESLint and a CI circular-dependency gate                |
 | [0017](0017-naming-avoids-c-java-conventions.md)                | Naming avoids C#/Java conventions; overlapping type names are disambiguated by owner     |
 | [0018](0018-clear-metro-cache-on-export.md)                     | `export:web` always clears the Metro bundler cache                                       |
+| [0019](0019-splash-shell-and-intro-overlay-must-match.md)       | The static splash shell and the app's intro overlay must match                           |

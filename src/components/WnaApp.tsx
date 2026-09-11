@@ -39,6 +39,11 @@ type WnaLoadingCopyProps = {
   appData: AppData;
 };
 
+// Keep this in visual sync with the pre-hydration static shell in
+// scripts/inject-web-shell.cjs (buildStaticShellStyle/buildStaticShell) --
+// see adr/0019-splash-shell-and-intro-overlay-must-match.md. That script
+// can't import this component, so the font sizes/weights/spacing and the
+// accent-bar size/color are hand-duplicated there on purpose.
 function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
   return (
     <View style={styles.introCopy}>
