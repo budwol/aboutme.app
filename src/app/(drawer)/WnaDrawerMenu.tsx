@@ -187,10 +187,22 @@ export default function WnaDrawerMenu() {
           </View>
 
           <View style={styles.centered}>
-            <Text style={[appStyle.textTitleLarge, { color: appColors.black }]}>
+            <Text
+              style={[
+                appStyle.textTitleLarge,
+                styles.centeredText,
+                { color: appColors.black },
+              ]}
+            >
               {t(i18nKeys.appBrand)}
             </Text>
-            <Text style={[appStyle.textSmall, { opacity: 0.7 }]}>
+            <Text
+              style={[
+                appStyle.textSmall,
+                styles.centeredText,
+                { opacity: 0.7 },
+              ]}
+            >
               {appData.profile.title.toUpperCase()}
             </Text>
           </View>
@@ -302,6 +314,14 @@ const styles = StyleSheet.create({
   },
   centered: {
     alignItems: "center",
+    // Without an explicit width, this column shrinks to its content's
+    // natural (unwrapped) size — a long profile title then overflows the
+    // drawer's fixed width instead of wrapping onto a second line.
+    width: "100%",
+    paddingHorizontal: 24,
+  },
+  centeredText: {
+    textAlign: "center",
   },
   navWrapper: {
     flex: 1,
