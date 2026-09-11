@@ -209,10 +209,8 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   if (!isAppInitialized) return null;
 
   return (
-    // The browser tab title and the on-screen header text usually match
-    // (headerTitle), but the home page wants a more specific tab title for
-    // bookmarking (e.g. "Portfolio - Jane Doe") without changing what its
-    // header chrome actually displays — documentTitle overrides just that.
+    // documentTitle overrides the browser tab title without changing the
+    // on-screen header (headerTitle) — used for bookmarking-friendly titles.
     <WnaWebBaseScreen title={documentTitle ?? headerTitle}>
       <WnaImageBackground
         imageUri={backgroundImageUrl ?? appLayout.backgroundImageUrl}

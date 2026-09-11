@@ -145,7 +145,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 
     const subscription = Dimensions.addEventListener("change", handleChange);
 
-    // set the initial layout once on mount
     setDimensions();
 
     return () => {

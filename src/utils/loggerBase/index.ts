@@ -3,7 +3,6 @@ import { logger, mapConsoleTransport } from "react-native-logs";
 
 type LoggerMethod = (message: string) => void;
 
-// keep muted warnings in one place
 const ignoredLogs: RegExp[] = [
   /Support for defaultProps will be removed from function components/i,
   /"start" method does not exist in console/i,
@@ -13,7 +12,6 @@ const ignoredLogs: RegExp[] = [
   /Blocked aria-hidden on an element because its descendant retained focus/i,
 ];
 
-// mute repeated dev overlay warnings
 LogBox.ignoreLogs(ignoredLogs.map((r) => r.source));
 
 export const shouldIgnoreLogMessage = (message: string) =>
@@ -29,17 +27,11 @@ const filterIgnoredMessages = <T extends LoggerMethod>(fn: T): T =>
     fn(message);
   }) as T;
 
-// app.config.ts pins `platforms: ["web"]` — this app never ships to native,
-// so logging only ever needs a console transport. No on-device log file, no
-// expo-file-system/expo-sharing dependency, no native-only branch.
-//
-// mapConsoleTransport (not consoleTransport): consoleTransport always calls
-// console.log and wraps the message in ANSI color codes, which is meant for
-// a terminal — a browser console renders those codes as literal garbage
-// text instead of color, and every log call bypasses DevTools' per-level
-// filtering (Errors/Warnings) since nothing ever reaches console.error or
-// console.warn. mapConsoleTransport routes each level to the matching
-// console method via `mapLevels` instead.
+// This app is web-only (platforms: ["web"] in app.config.ts), so only a
+// console transport is needed. mapConsoleTransport (not consoleTransport)
+// is used because consoleTransport always calls console.log wrapped in
+// ANSI color codes — a browser console renders that as literal garbage and
+// every level bypasses DevTools' error/warning filtering either way.
 const reactLogger = logger.createLogger({
   levels: {
     debug: 0,
@@ -64,7 +56,6 @@ const reactLogger = logger.createLogger({
   enabled: true,
 });
 
-// filter ignored messages before they reach the transports
 reactLogger.log = filterIgnoredMessages(reactLogger.log);
 reactLogger.info = filterIgnoredMessages(reactLogger.info);
 reactLogger.warn = filterIgnoredMessages(reactLogger.warn);
