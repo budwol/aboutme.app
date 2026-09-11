@@ -4,11 +4,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { I18nextProvider } from "react-i18next";
 
 import WnaApp from "@components/WnaApp";
-import { setNavigationBaseUrl } from "@/navigation/routes/wnaNavigationRouteProvider";
 import { i18n } from "@/i18n/i18n";
 import { AppData, loadAppData } from "@/app-data";
 import { getThemeFromStorageAsync, Theme } from "@/storage/themeStorage";
-import { WnaAppContextProvider } from "@/components/WnaAppContext";
+import { WnaAppContextProvider } from "@/state/WnaAppContext";
 
 // re-exported so expo-router picks it up as this layout's crash fallback UI
 export { ErrorBoundary } from "@components/WnaApp";
@@ -22,7 +21,6 @@ function RootLayoutContent() {
   useEffect(() => {
     async function init() {
       const data = await loadAppData();
-      setNavigationBaseUrl(data.siteUrl);
       setAppData(data);
 
       const theme = (await getThemeFromStorageAsync()) ?? "system";

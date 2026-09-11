@@ -26,4 +26,52 @@ module.exports = [
       "react/react-in-jsx-scope": "off",
     },
   },
+  {
+    // Enforces the layering documented in ADR 15: foundational modules never
+    // depend upward on state/UI/routing, state never depends on UI/routing,
+    // and UI/routing never depends on the route files that mount them.
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: {
+      import: require("eslint-plugin-import"),
+    },
+    rules: {
+      "import/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            {
+              target: [
+                "./src/utils",
+                "./src/constants",
+                "./src/app-data",
+                "./src/storage",
+                "./src/theme",
+                "./src/i18n",
+              ],
+              from: [
+                "./src/state",
+                "./src/components",
+                "./src/navigation",
+                "./src/app",
+              ],
+              message:
+                "Foundational modules (utils/constants/app-data/storage/theme/i18n) must not depend on state/, components/, navigation/, or app/ — see ADR 15.",
+            },
+            {
+              target: "./src/state",
+              from: ["./src/components", "./src/navigation", "./src/app"],
+              message:
+                "src/state/ must not depend on components/, navigation/, or app/ — see ADR 15.",
+            },
+            {
+              target: ["./src/components", "./src/navigation"],
+              from: "./src/app",
+              message:
+                "components/ and navigation/ must not depend on app/ — Expo Router route files mount these, not the other way around.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

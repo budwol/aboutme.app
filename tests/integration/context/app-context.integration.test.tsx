@@ -6,7 +6,7 @@ import {
   useWnaAppLifecycle,
   useWnaLayout,
   useWnaTheme,
-} from "@components/WnaAppContext";
+} from "@/state/WnaAppContext";
 import {
   afterEach,
   beforeEach,

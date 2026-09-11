@@ -21,7 +21,7 @@ const allowedTags: string[] = [
 ];
 
 const allowedAttributes = {
-  a: ["href", "target"],
+  a: ["href", "target", "rel"],
 };
 
 const allowedSchemes = ["https", "mailto", "tel"];
@@ -65,6 +65,12 @@ export const sanitizeHtml = (value?: string): string =>
 
         if (["_blank", "_self"].includes(attribs.target)) {
           nextAttribs.target = attribs.target;
+        }
+
+        if (nextAttribs.target === "_blank") {
+          // prevent the opened page from reaching back into this tab via
+          // window.opener (reverse tabnabbing)
+          nextAttribs.rel = "noopener noreferrer";
         }
 
         return {

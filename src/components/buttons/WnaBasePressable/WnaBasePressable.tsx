@@ -1,9 +1,9 @@
 import { FC } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { WnaPressableProps } from "./WnaPressableProps";
-import { WnaPressableState } from "./WnaPressableState";
+import { WnaBasePressableProps } from "./wnaBasePressableProps";
+import { WnaBasePressableState } from "./wnaBasePressableState";
 
-const WnaBasePressable: FC<WnaPressableProps> = (props) => {
+const WnaBasePressable: FC<WnaBasePressableProps> = (props) => {
   const getHoverColor = (ripple: "light" | "dark" | undefined) =>
     ripple === "dark"
       ? "rgba(0,0,0,0.06)"
@@ -27,7 +27,7 @@ const WnaBasePressable: FC<WnaPressableProps> = (props) => {
       onPress={props.onPress}
       onHoverIn={props.onHoverIn}
       onHoverOut={props.onHoverOut}
-      style={({ pressed, hovered }: WnaPressableState) => [
+      style={({ pressed, hovered }: WnaBasePressableState) => [
         styles.base,
         !props.isEnabled && styles.disabled,
         hovered &&

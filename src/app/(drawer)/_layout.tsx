@@ -1,6 +1,6 @@
-import { useWnaTheme } from "@components/WnaAppContext";
+import { useWnaTheme } from "@/state/WnaAppContext";
 import { Drawer } from "expo-router/drawer";
-import WnaDrawerMenu from "./WnaDrawerMenu";
+import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 
 export default function DrawerLayout() {
   const { appColors } = useWnaTheme();

@@ -3,7 +3,7 @@ import { testAppData } from "@/app-data/testAppData";
 import {
   getDrawerNavigationPath,
   getDrawerProjectNavigationPath,
-} from "@/navigation/routes/wnaNavigationRouteProvider";
+} from "@/navigation/routes/wnaNavigationRoutes";
 import { createProjectSlug } from "@utils/projectRoutes";
 import {
   afterEach,
@@ -42,16 +42,16 @@ jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
   }),
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaMenuHeaderRight");
+  return createMockComponent("WnaMenuToggleButton");
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaNavigationHeaderButtonRight");
+  return createMockComponent("WnaHeaderRouteButton");
 });
 
 jest.mock("@components/screens/WnaBaseScreen", () => {
@@ -72,25 +72,25 @@ jest.mock("@components/display/WnaSeparatorHorizontal", () => {
   return createMockComponent("WnaSeparatorHorizontal");
 });
 
-jest.mock("@components/sections/WnaProfileCard", () => {
+jest.mock("@components/sections/WnaProfileSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaProfileCard");
+  return createMockComponent("WnaProfileSection");
 });
 
-jest.mock("@components/sections/WnaExperienceCard", () => {
+jest.mock("@components/sections/WnaExperienceSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaExperienceCard");
+  return createMockComponent("WnaExperienceSection");
 });
 
-jest.mock("@components/sections/WnaProjectsCard", () => {
+jest.mock("@components/sections/WnaProjectsSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaProjectsCard");
+  return createMockComponent("WnaProjectsSection");
 });
 
-jest.mock("@components/screens/WnaContactFooter", () => {
+jest.mock("@components/chrome/WnaContactFooter", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
   return createMockComponent("WnaContactFooter");
@@ -150,21 +150,22 @@ describe("WnaHomeRoute integration", () => {
     const tree = await renderWithAppContext(<WnaHomeRoute />);
 
     expect(
-      tree.root.findByType("WnaProfileCard").props.appData.profile.name,
+      tree.root.findByType("WnaProfileSection").props.appData.profile.name,
     ).toBe(testAppData.profile.name);
-    expect(tree.root.findAllByType("WnaExperienceCard")).toHaveLength(0);
-    expect(tree.root.findAllByType("WnaProjectsCard")).toHaveLength(0);
+    expect(tree.root.findAllByType("WnaExperienceSection")).toHaveLength(0);
+    expect(tree.root.findAllByType("WnaProjectsSection")).toHaveLength(0);
 
     await act(async () => {
       jest.runAllTimers();
     });
 
     expect(
-      tree.root.findByType("WnaExperienceCard").props.appData.experience[0]
+      tree.root.findByType("WnaExperienceSection").props.appData.experience[0]
         .company,
     ).toBe(testAppData.experience[0].company);
     expect(
-      tree.root.findByType("WnaProjectsCard").props.appData.projects[0].title,
+      tree.root.findByType("WnaProjectsSection").props.appData.projects[0]
+        .title,
     ).toBe(testAppData.projects[0].title);
     expect(tree.root.findByType("WnaContactFooter")).toBeTruthy();
   });
@@ -176,8 +177,8 @@ describe("WnaHomeRoute integration", () => {
       jest.runAllTimers();
     });
 
-    const experienceCard = tree.root.findByType("WnaExperienceCard");
-    const projectsCard = tree.root.findByType("WnaProjectsCard");
+    const experienceCard = tree.root.findByType("WnaExperienceSection");
+    const projectsCard = tree.root.findByType("WnaProjectsSection");
 
     experienceCard.props.onFooterActionPress();
     projectsCard.props.onShowMorePress();
@@ -207,7 +208,7 @@ describe("WnaHomeRoute integration", () => {
       jest.runAllTimers();
     });
 
-    const projectsCard = tree.root.findByType("WnaProjectsCard");
+    const projectsCard = tree.root.findByType("WnaProjectsSection");
 
     projectsCard.props.onProjectPress(1);
 
@@ -233,10 +234,10 @@ describe("WnaHomeRoute integration", () => {
     });
 
     expect(
-      tree.root.findByType("WnaExperienceCard").props.appData.experience,
+      tree.root.findByType("WnaExperienceSection").props.appData.experience,
     ).toEqual([]);
     expect(
-      tree.root.findByType("WnaProjectsCard").props.appData.projects,
+      tree.root.findByType("WnaProjectsSection").props.appData.projects,
     ).toEqual([]);
     expect(tree.root.findByType("WnaContactFooter")).toBeTruthy();
   });

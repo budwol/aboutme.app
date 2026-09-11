@@ -31,3 +31,6 @@ jobs:
 
       - name: types
         run: npm run test:types
+
+      - name: circular dependencies
+        run: npm run test:circular

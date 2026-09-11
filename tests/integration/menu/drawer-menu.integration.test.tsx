@@ -1,6 +1,6 @@
-import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRouteProvider";
+import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import { appMotionConstants } from "@constants/motionConstants";
-import WnaDrawerMenu from "@/app/(drawer)/WnaDrawerMenu";
+import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 import {
   afterEach,
   beforeEach,

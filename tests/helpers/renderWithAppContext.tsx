@@ -4,7 +4,7 @@ import {
   useWnaAppData,
   useWnaAppLifecycle,
   WnaAppContextProvider,
-} from "@components/WnaAppContext";
+} from "@/state/WnaAppContext";
 import React, { PropsWithChildren, useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 

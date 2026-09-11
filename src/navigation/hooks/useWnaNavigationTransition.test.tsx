@@ -6,7 +6,7 @@ import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationT
 
 const mockUseWnaAppLifecycle = jest.fn();
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppLifecycle: (...args: unknown[]) => mockUseWnaAppLifecycle(...args),
 }));
 

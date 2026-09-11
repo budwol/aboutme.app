@@ -12,9 +12,7 @@
       "@assets/*": ["assets/*"],
       "@components/*": ["src/components/*"],
       "@constants/*": ["src/constants/*"],
-      "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"],
-      "@secrets/*": ["secrets/*"],
       "wna-logger": ["src/utils/logger.ts"]
     }
   },

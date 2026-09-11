@@ -272,7 +272,7 @@ export function normalizeAppData(
   };
 }
 
-export function unwrapLoadedAppData(data: unknown): unknown {
+function unwrapLoadedAppData(data: unknown): unknown {
   return typeof data === "object" && data !== null && "default" in data
     ? (data as { default?: unknown }).default
     : data;

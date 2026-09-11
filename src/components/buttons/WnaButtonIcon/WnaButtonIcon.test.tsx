@@ -13,21 +13,21 @@ jest.mock("@components/buttons/WnaPressable", () => {
   };
 });
 
-jest.mock("@components/buttons/WnaButtonIconInnerIcon", () => {
+jest.mock("@components/buttons/WnaButtonIcon/WnaButtonIconBadge", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaButtonIconInnerIcon(props: unknown) {
+  return function MockWnaButtonIconBadge(props: unknown) {
     return createElement(
-      "WnaButtonIconInnerIcon",
+      "WnaButtonIconBadge",
       props as Record<string, unknown>,
     );
   };
 });
 
-jest.mock("@components/effects/WnaShadowStyle", () => ({
-  WnaShadowStyle: () => ({ boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)" }),
+jest.mock("@components/effects/wnaShadowStyle", () => ({
+  createShadowStyle: () => ({ boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)" }),
 }));
 
 describe("WnaButtonIcon", () => {
@@ -62,7 +62,7 @@ describe("WnaButtonIcon", () => {
 
     const view = tree!.root.findByType("View");
     const pressable = tree!.root.findByType("WnaPressable");
-    const icon = tree!.root.findByType("WnaButtonIconInnerIcon");
+    const icon = tree!.root.findByType("WnaButtonIconBadge");
 
     expect(view.props.style).toEqual(
       expect.arrayContaining([

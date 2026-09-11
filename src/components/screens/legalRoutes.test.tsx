@@ -7,7 +7,7 @@ import WnaTermsRoute from "@components/screens/WnaTermsRoute";
 
 const mockAppData = {};
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppData: () => ({ appData: mockAppData }),
 }));
 

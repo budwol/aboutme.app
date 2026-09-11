@@ -1,5 +1,5 @@
 import Colors from "@constants/theme/colors";
-import { WnaShadowStyle } from "@components/effects/WnaShadowStyle";
+import { createShadowStyle } from "@components/effects/wnaShadowStyle";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
@@ -94,7 +94,7 @@ export default function WnaAccentBar({
           styles.bar,
           {
             backgroundColor: appColors.accent5,
-            ...WnaShadowStyle(2.25, appColors.accent5),
+            ...createShadowStyle(2.25, appColors.accent5),
           },
           barAnimatedStyle,
         ]}

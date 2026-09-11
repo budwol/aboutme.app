@@ -1,8 +1,8 @@
-import { useWnaAppData, useWnaTheme } from "@components/WnaAppContext";
+import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
 import WnaSurfaceCard from "@/components/cards/WnaSurfaceCard";
-import WnaMenuHeaderRight from "@/navigation/components/WnaMenuHeaderRight";
-import WnaNavigationHeaderButtonRight from "@/navigation/components/WnaNavigationHeaderButtonRight";
-import WnaExperienceCard from "@components/sections/WnaExperienceCard";
+import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
+import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
+import WnaExperienceSection from "@components/sections/WnaExperienceSection";
 import { useNavigation, useRouter } from "expo-router";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,10 +19,9 @@ export default function WnaExperienceRoute(): ReactNode {
   return (
     <WnaScrollViewScreen
       isRootPage
-      showFooter={false}
       headerTitle={t(i18nKeys.screenTitleExperience)}
       headerButton0={
-        <WnaNavigationHeaderButtonRight
+        <WnaHeaderRouteButton
           appStyle={appStyle}
           appColors={appColors}
           router={router}
@@ -31,7 +30,7 @@ export default function WnaExperienceRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuHeaderRight
+        <WnaMenuToggleButton
           appStyle={appStyle}
           appColors={appColors}
           t={t}
@@ -40,7 +39,7 @@ export default function WnaExperienceRoute(): ReactNode {
       }
     >
       <WnaSurfaceCard appColors={appColors}>
-        <WnaExperienceCard
+        <WnaExperienceSection
           appColors={appColors}
           appData={appData}
           appStyle={appStyle}

@@ -306,7 +306,7 @@ Local Git hooks stop at unit level. Integration, dry-run, smoke, and E2E stay ou
 
 The quality gates are meant to run in this order:
 
-1. `lint + prettier + types`
+1. `lint + prettier + types + circular deps`
 2. `unit`
 3. `coverage`
 4. `integration`
@@ -315,6 +315,7 @@ The quality gates are meant to run in this order:
 7. `e2e`
 
 - `npm run lint`
+- `npm run test:circular`
 - `npm run test:deps`
 - `npm run test:dry-run`
 - `npm run test:unit`
@@ -328,7 +329,7 @@ The quality gates are meant to run in this order:
 - `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
-`npm run test:all` is the broad local test stack for `prettier + types + unit + coverage + integration + e2e`. `smoke` stays separate on purpose.
+`npm run test:all` is the broad local test stack for `prettier + types + circular deps + unit + coverage + integration + e2e`. `smoke` stays separate on purpose.
 
 The Git hook path is intentionally smaller:
 
@@ -341,7 +342,7 @@ There is also a small GitHub Actions CI now. It runs the same gate sequence as s
 
 ```mermaid
 flowchart LR
-  A["lint + prettier + types"] --> B["unit"]
+  A["lint + prettier + types + circular deps"] --> B["unit"]
   B --> C["coverage"]
   C --> D["integration"]
   D --> E["dry-run"]
@@ -349,15 +350,15 @@ flowchart LR
   F --> G["e2e"]
 ```
 
-The orchestration lives in [`.github/workflows/ci.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci.yml). Each gate sits in its own reusable workflow file:
+The orchestration lives in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml). Each gate sits in its own reusable workflow file:
 
-- [`.github/workflows/ci-lint-prettier.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-lint-prettier.yml)
-- [`.github/workflows/ci-unit.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-unit.yml)
-- [`.github/workflows/ci-coverage.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-coverage.yml)
-- [`.github/workflows/ci-integration.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-integration.yml)
-- [`.github/workflows/ci-dry-run.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-dry-run.yml)
-- [`.github/workflows/ci-smoke.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-smoke.yml)
-- [`.github/workflows/ci-e2e.yml`](/home/wna/code/AboutMe.App/.github/workflows/ci-e2e.yml)
+- [`.github/workflows/ci-lint-prettier.yml`](./.github/workflows/ci-lint-prettier.yml)
+- [`.github/workflows/ci-unit.yml`](./.github/workflows/ci-unit.yml)
+- [`.github/workflows/ci-coverage.yml`](./.github/workflows/ci-coverage.yml)
+- [`.github/workflows/ci-integration.yml`](./.github/workflows/ci-integration.yml)
+- [`.github/workflows/ci-dry-run.yml`](./.github/workflows/ci-dry-run.yml)
+- [`.github/workflows/ci-smoke.yml`](./.github/workflows/ci-smoke.yml)
+- [`.github/workflows/ci-e2e.yml`](./.github/workflows/ci-e2e.yml)
 
 If you want the full local CI pass:
 
@@ -371,7 +372,7 @@ The E2E path uses the example dataset on purpose, not your personalized portfoli
 
 ## License
 
-**ALL RIGHTS RESERVED**
+**Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**
 
 See `LICENSE.txt` for more information.
 

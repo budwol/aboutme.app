@@ -1,16 +1,12 @@
+import { defaultAppData } from "@/app-data/defaults";
 import {
-  defaultAppData,
   normalizeAppData,
   normalizeLoadedAppData,
-} from "@/app-data/shared";
+} from "@/app-data/normalization";
 
-export type { AppData, ExperienceEntry, ProjectEntry } from "@/app-data/shared";
-export {
-  defaultAppData,
-  normalizeAppData,
-  normalizeLoadedAppData,
-  unwrapLoadedAppData,
-} from "@/app-data/shared";
+export { defaultAppData } from "@/app-data/defaults";
+export { normalizeAppData } from "@/app-data/normalization";
+export type { AppData, ExperienceEntry, ProjectEntry } from "@/app-data/types";
 
 async function readAppDataModule(): Promise<unknown> {
   const embeddedAppData = readEmbeddedAppData();

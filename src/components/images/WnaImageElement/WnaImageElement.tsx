@@ -1,4 +1,4 @@
-import { WnaImageElementProps } from "@components/images/WnaImageElement/WnaImageElementTypes";
+import { WnaImageElementProps } from "@components/images/WnaImageElement/wnaImageElementTypes";
 import { appMotionConstants } from "@constants/motionConstants";
 import { Image } from "expo-image";
 import { memo } from "react";
