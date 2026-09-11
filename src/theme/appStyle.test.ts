@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { themePalettes } from "@constants/themePalettes";
+import { themePalettes } from "@constants/theme/themePalettes";
 import { setAppStyle } from "@/theme/appStyle";
 
 describe("appStyle", () => {
