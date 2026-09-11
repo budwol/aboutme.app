@@ -45,7 +45,7 @@ function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
       <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
         {appData.profile.name}
       </Text>
-      <WnaAccentBar appColors={appColors} animated />
+      <WnaAccentBar appColors={appColors} width={48} />
       <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
         {appData.profile.title.toUpperCase()}
       </Text>
