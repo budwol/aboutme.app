@@ -12,11 +12,9 @@ const GERMAN_DIACRITICS: Record<string, string> = {
   ß: "ss",
 };
 
-// A profile name can contain characters that are neither filesystem- nor
-// URL-safe (umlauts, accents, punctuation). Mirrors slugifyName in
-// scripts/generate-resume-pdf.cjs, which is what actually names the file
-// this URL points at — German umlauts/ß are spelled out since this is a
-// German name; anything else non-ASCII is dropped rather than guessed at.
+// Mirrors slugifyName in scripts/generate-resume-pdf.cjs, which is what
+// actually names the file this URL points at: German umlauts/ß are spelled
+// out, anything else non-ASCII is dropped rather than guessed at.
 function slugifyName(name: string): string {
   return name
     .replace(/[äöüÄÖÜß]/g, (char) => GERMAN_DIACRITICS[char])
@@ -25,9 +23,8 @@ function slugifyName(name: string): string {
     .replace(/[^A-Za-z0-9_-]/g, "");
 }
 
-// Matches the filename scripts/generate-resume-pdf.cjs actually writes to
-// public/ (buildPortfolioFileName there) — a name-based file a recipient
-// can save without renaming, rather than a generic "Portfolio-DE.pdf".
+// Matches the filename buildPortfolioFileName in
+// scripts/generate-resume-pdf.cjs writes to public/.
 export function getResumePdfUrl(lang: ResumePdfLang, name: string): string {
   return getVersionedLocalAssetUrl(
     `/${slugifyName(name)}_-_Portfolio_${lang.toUpperCase()}.pdf`,

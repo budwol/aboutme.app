@@ -81,7 +81,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const headerShadowStyle = useAnimatedStyle(() => {
       const scrollValue = scrollY?.value ?? 0;
       const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
-      // ease the shadow in nice and slow so the header does not slap you in the face
       const shadowStrength =
         showShadow === true
           ? 1
@@ -97,7 +96,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const blurContainerStyle = useAnimatedStyle(() => {
       const scrollValue = scrollY?.value ?? 0;
       const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
-      // same trick here, just a little fog rolling in as you scroll
       const calculatedBlur = Math.min(1, Math.max(0, baseOpacity * 2.4));
       const blurOpacity =
         showShadow === true && calculatedBlur < 0.2 ? 0.2 : calculatedBlur;
