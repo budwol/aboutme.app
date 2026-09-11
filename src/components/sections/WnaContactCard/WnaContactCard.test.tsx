@@ -124,7 +124,10 @@ describe("WnaContactCard", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
-    expect(canOpenURL).toHaveBeenNthCalledWith(6, "/Portfolio-DE.pdf");
+    expect(canOpenURL).toHaveBeenNthCalledWith(
+      6,
+      "/John_Doe_-_Portfolio_DE.pdf",
+    );
 
     expect(openURL).toHaveBeenNthCalledWith(1, appData.contact.github);
     expect(openURL).toHaveBeenNthCalledWith(2, appData.contact.linkedin);
@@ -134,7 +137,7 @@ describe("WnaContactCard", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
-    expect(openURL).toHaveBeenNthCalledWith(6, "/Portfolio-DE.pdf");
+    expect(openURL).toHaveBeenNthCalledWith(6, "/John_Doe_-_Portfolio_DE.pdf");
   });
 
   it("logs an error and skips opening when the URL is not supported", async () => {
@@ -243,7 +246,7 @@ describe("WnaContactCard", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/Portfolio-EN.pdf");
+    expect(canOpenURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_EN.pdf");
   });
 
   it("falls back to the language when resolvedLanguage is unset", async () => {
@@ -272,6 +275,6 @@ describe("WnaContactCard", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/Portfolio-DE.pdf");
+    expect(canOpenURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_DE.pdf");
   });
 });
