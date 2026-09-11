@@ -385,7 +385,7 @@ describe("WnaDrawerMenu", () => {
       await downloadButton!.props.onPress();
     });
 
-    expect(openURL).toHaveBeenCalledWith("/Portfolio-DE.pdf");
+    expect(openURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_DE.pdf");
 
     openURL.mockRestore();
   });
