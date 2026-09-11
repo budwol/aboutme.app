@@ -9,7 +9,6 @@ declare namespace NodeJS {
     DOCKER_USERNAME: string;
     EXPO_OWNER: string;
     EXPO_PUBLIC_ENABLE_SOURCE_MAPS: string;
-    EXPO_PUBLIC_GOOGLE_SITE_VERIFICATION: string;
     EXPO_PUBLIC_SITE_URL: string;
     EXPO_SLUG: string;
     NODE_ENV: string;

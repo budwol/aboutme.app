@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import { Linking } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
-import WnaDrawerMenu from "@app/(drawer)/WnaDrawerMenu";
+import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 import { appLayoutConstants } from "@constants/layoutConstants";
 
 const mockHeaderButtonHeight = appLayoutConstants.headerButtonHeight;
@@ -36,7 +36,7 @@ type FooterLinkNode = {
   };
 };
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppData: () => ({
     appData: {
       profile: {
@@ -81,7 +81,7 @@ jest.mock("@components/WnaAppContext", () => ({
   })),
 }));
 
-jest.mock("@components/currentAppVersion", () => () => "1.0.0");
+jest.mock("@utils/currentAppVersion", () => () => "1.0.0");
 
 jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
@@ -411,7 +411,7 @@ describe("WnaDrawerMenu", () => {
 
   it("uses dark-mode colors and falls back to default layout values", async () => {
     const { useWnaTheme, useWnaLayout } = jest.requireMock(
-      "@components/WnaAppContext",
+      "@/state/WnaAppContext",
     ) as {
       useWnaTheme: jest.Mock<() => unknown>;
       useWnaLayout: jest.Mock<() => unknown>;

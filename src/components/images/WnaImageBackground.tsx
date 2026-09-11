@@ -51,7 +51,7 @@ const WnaImageBackground = React.memo(
           forceExperimentalBlur
           isBackground
           style={styles.container}
-          blurTint={isDarkMode ? "dark" : "dark"}
+          blurTint={isDarkMode ? "dark" : "light"}
           blurIntensity={40}
         >
           {children}

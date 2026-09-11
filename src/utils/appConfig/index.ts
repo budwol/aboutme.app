@@ -2,7 +2,7 @@ import {
   getConfiguredSiteUrlFromSources,
   isAllowedSiteUrl,
   normalizeSiteUrl,
-} from "@utils/appConfig/shared";
+} from "@utils/appConfig/siteUrl";
 
 export { isAllowedSiteUrl, normalizeSiteUrl, getConfiguredSiteUrlFromSources };
 

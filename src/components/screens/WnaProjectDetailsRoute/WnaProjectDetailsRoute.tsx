@@ -2,17 +2,17 @@ import {
   useWnaAppData,
   useWnaLayout,
   useWnaTheme,
-} from "@components/WnaAppContext";
+} from "@/state/WnaAppContext";
 import WnaSurfaceCard from "@components/cards/WnaSurfaceCard";
-import WnaMenuHeaderRight from "@/navigation/components/WnaMenuHeaderRight";
-import WnaNavigationHeaderButtonRight from "@/navigation/components/WnaNavigationHeaderButtonRight";
+import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
+import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
 import {
   getDrawerNavigationPath,
   getNavigationLang,
-} from "@/navigation/routes/wnaNavigationRouteProvider";
+} from "@/navigation/routes/wnaNavigationRoutes";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
-import WnaTechStackCard from "@components/sections/WnaTechStackCard";
+import WnaTechStackSection from "@components/sections/WnaTechStackSection";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { findProjectBySlug } from "@utils/projectRoutes";
@@ -29,8 +29,8 @@ import WnaPrivateRepoModal from "./WnaPrivateRepoModal";
 import WnaProjectDescription from "./WnaProjectDescription";
 import WnaProjectDetailsContext from "./WnaProjectDetailsContext";
 import WnaProjectHero from "./WnaProjectHero";
-import { styles } from "./styles";
-import type { WnaProjectLink } from "./types";
+import { styles } from "./wnaProjectDetailsRouteStyles";
+import type { WnaProjectLink } from "./wnaProjectDetailsRouteTypes";
 
 export default function WnaProjectDetailsRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
@@ -97,9 +97,8 @@ export default function WnaProjectDetailsRoute(): ReactNode {
       headerTitle={project.title}
       iconName="rocket-launch-outline"
       titleHref={getDrawerNavigationPath("projects", lang)}
-      showFooter={false}
       headerButton0={
-        <WnaNavigationHeaderButtonRight
+        <WnaHeaderRouteButton
           appStyle={appStyle}
           appColors={appColors}
           router={router}
@@ -108,7 +107,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuHeaderRight
+        <WnaMenuToggleButton
           appStyle={appStyle}
           appColors={appColors}
           t={t}
@@ -139,7 +138,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
           <View style={styles.contentBody}>
             <View style={styles.stackGroup}>
               {project.techstack.length > 0 ? (
-                <WnaTechStackCard
+                <WnaTechStackSection
                   appColors={appColors}
                   appData={appData}
                   appStyle={appStyle}

@@ -1,4 +1,4 @@
-import * as WnaAppContext from "@components/WnaAppContext";
+import * as WnaAppContext from "@/state/WnaAppContext";
 import { Href, Router } from "expo-router";
 import { useCallback } from "react";
 

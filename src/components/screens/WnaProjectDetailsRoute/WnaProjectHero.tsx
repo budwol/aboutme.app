@@ -6,12 +6,12 @@ import { convertHexToRgba } from "@utils/colorConverter";
 import { ReactNode } from "react";
 import { Text, View } from "react-native";
 import type { TFunction } from "i18next";
-import { styles } from "./styles";
+import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
   WnaProjectDetailsProject,
   WnaProjectDetailsThemeProps,
   WnaProjectLink,
-} from "./types";
+} from "./wnaProjectDetailsRouteTypes";
 
 type WnaProjectHeroProps = WnaProjectDetailsThemeProps & {
   currentWindowWidth: number;

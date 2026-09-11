@@ -25,12 +25,38 @@ describe("html sanitizer", () => {
       sanitizeHtml(
         '<a href="https://example.com" target="_blank" rel="noopener">safe</a>',
       ),
-    ).toBe('<a href="https://example.com" target="_blank">safe</a>');
+    ).toBe(
+      '<a href="https://example.com" target="_blank" rel="noopener noreferrer">safe</a>',
+    );
     expect(sanitizeHtml('<a href="/contact">local</a>')).toBe(
       '<a href="/contact">local</a>',
     );
     expect(sanitizeHtml('<a href="data:text/html;base64,abc">unsafe</a>')).toBe(
       "<a>unsafe</a>",
+    );
+  });
+
+  it("forces rel=noopener noreferrer on target=_blank links regardless of input", () => {
+    expect(
+      sanitizeHtml('<a href="https://example.com" target="_blank">x</a>'),
+    ).toBe(
+      '<a href="https://example.com" target="_blank" rel="noopener noreferrer">x</a>',
+    );
+    expect(
+      sanitizeHtml(
+        '<a href="https://example.com" target="_blank" rel="opener">x</a>',
+      ),
+    ).toBe(
+      '<a href="https://example.com" target="_blank" rel="noopener noreferrer">x</a>',
+    );
+  });
+
+  it("does not add rel when target is not _blank", () => {
+    expect(
+      sanitizeHtml('<a href="https://example.com" target="_self">x</a>'),
+    ).toBe('<a href="https://example.com" target="_self">x</a>');
+    expect(sanitizeHtml('<a href="https://example.com">x</a>')).toBe(
+      '<a href="https://example.com">x</a>',
     );
   });
 

@@ -7,7 +7,7 @@ import { testAppData } from "@/app-data/testAppData";
 import { createProjectSlug } from "@utils/projectRoutes";
 import { Linking } from "react-native";
 
-jest.mock("@components/WnaAppContext", () => {
+jest.mock("@/state/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { jest: jestModule } = require("@jest/globals");
 
@@ -28,13 +28,13 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
 
   return function MockMenuHeaderRight(props: unknown) {
     return ReactModule.createElement(
-      "WnaMenuHeaderRight",
+      "WnaMenuToggleButton",
       props as Record<string, unknown>,
     );
   };
@@ -101,13 +101,13 @@ jest.mock("@components/buttons/WnaButtonIcon", () => {
   };
 });
 
-jest.mock("@components/sections/WnaTechStackCard", () => {
+jest.mock("@components/sections/WnaTechStackSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
 
   return function MockTechstackCard(props: unknown) {
     return ReactModule.createElement(
-      "WnaTechStackCard",
+      "WnaTechStackSection",
       props as Record<string, unknown>,
     );
   };
@@ -162,7 +162,7 @@ describe("WnaProjectDetailsRoute", () => {
     jest.clearAllMocks();
     jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
 
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
       useWnaTheme: jest.Mock;
@@ -218,7 +218,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("renders the matching project details for a known slug", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
     const expoRouter = jest.requireMock("expo-router") as {
@@ -251,7 +251,7 @@ describe("WnaProjectDetailsRoute", () => {
     const scrollViewScreen = tree!.root.findByType("WnaScrollViewScreen");
     const heroImage = tree!.root.findByType("WnaHeroImage");
     const links = tree!.root.findAllByType("WnaButtonIconText");
-    const techstackCard = tree!.root.findByType("WnaTechStackCard");
+    const techstackCard = tree!.root.findByType("WnaTechStackSection");
     const title = tree!.root.findByType("WnaSectionTitle");
     const texts = tree!.root.findAllByType("Text");
     const textValues = texts.map(
@@ -263,7 +263,6 @@ describe("WnaProjectDetailsRoute", () => {
       "/(drawer)/(tabs-de)/projekte",
     );
     expect(scrollViewScreen.props.headerTitle).toBe(appData.projects[0].title);
-    expect(scrollViewScreen.props.showFooter).toBe(false);
     expect(heroImage.props.imageUrl).toBe(
       `images/${appData.projects[0].imageL}`,
     );
@@ -301,7 +300,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("opens a modal for private repositories and offers continue and contact actions", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
     const expoRouter = jest.requireMock("expo-router") as {
@@ -442,7 +441,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("renders bullet lines in project descriptions as separate bullet rows", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
     const expoRouter = jest.requireMock("expo-router") as {
@@ -484,7 +483,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("renders compact icon actions in portrait mode", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
     };
@@ -537,7 +536,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("uses dark dialog colors when the active theme is dark", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaTheme: jest.Mock;
     };
@@ -641,7 +640,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("opens the private repo modal from the compact portrait actions and dismisses it via backdrop and close button", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
     };
@@ -729,7 +728,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("hides the compact portrait action row when the project has no links", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
     };
@@ -776,7 +775,7 @@ describe("WnaProjectDetailsRoute", () => {
   });
 
   it("omits the optional sections when techstack, context, and description are absent", async () => {
-    const appContext = jest.requireMock("@components/WnaAppContext") as {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
     const expoRouter = jest.requireMock("expo-router") as {
@@ -805,6 +804,6 @@ describe("WnaProjectDetailsRoute", () => {
       tree = TestRenderer.create(<WnaProjectDetailsRoute />);
     });
 
-    expect(tree!.root.findAllByType("WnaTechStackCard")).toHaveLength(0);
+    expect(tree!.root.findAllByType("WnaTechStackSection")).toHaveLength(0);
   });
 });

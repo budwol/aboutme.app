@@ -26,16 +26,16 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({}),
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaMenuHeaderRight");
+  return createMockComponent("WnaMenuToggleButton");
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaNavigationHeaderButtonRight");
+  return createMockComponent("WnaHeaderRouteButton");
 });
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -44,10 +44,10 @@ jest.mock("@components/cards/WnaSurfaceCard", () => {
   return createMockComponent("WnaSurfaceCard", true);
 });
 
-jest.mock("@components/sections/WnaExperienceCard", () => {
+jest.mock("@components/sections/WnaExperienceSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaExperienceCard");
+  return createMockComponent("WnaExperienceSection");
 });
 
 jest.mock("@components/screens/WnaScrollViewScreen", () => {
@@ -68,10 +68,9 @@ describe("WnaExperienceRoute integration", () => {
   it("renders the shared screen shell and forwards seeded experience data", async () => {
     const tree = await renderWithAppContext(<WnaExperienceRoute />);
     const scrollViewScreen = tree.root.findByType("WnaScrollViewScreen");
-    const experienceCard = tree.root.findByType("WnaExperienceCard");
+    const experienceCard = tree.root.findByType("WnaExperienceSection");
 
     expect(scrollViewScreen.props.isRootPage).toBe(true);
-    expect(scrollViewScreen.props.showFooter).toBe(false);
     expect(scrollViewScreen.props.headerTitle).toBe("screenTitleExperience");
     expect(experienceCard.props.appData.experience[0].company).toBe(
       testAppData.experience[0].company,
@@ -96,7 +95,7 @@ describe("WnaExperienceRoute integration", () => {
     const tree = await renderWithAppContext(<WnaExperienceRoute />, {
       appData,
     });
-    const experienceCard = tree.root.findByType("WnaExperienceCard");
+    const experienceCard = tree.root.findByType("WnaExperienceSection");
 
     expect(experienceCard.props.appData.experience[0].company).toBe(
       "Employer Without Link",

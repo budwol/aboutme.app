@@ -5,11 +5,11 @@ import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
 import { ReactNode } from "react";
 import { Linking, Modal, Pressable, Text, View } from "react-native";
-import { styles } from "./styles";
+import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
   WnaProjectDetailsProject,
   WnaProjectDetailsThemeProps,
-} from "./types";
+} from "./wnaProjectDetailsRouteTypes";
 
 type WnaPrivateRepoModalProps = WnaProjectDetailsThemeProps & {
   privateRepoMailToUrl: string;

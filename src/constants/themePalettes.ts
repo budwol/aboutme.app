@@ -2,7 +2,7 @@ import { shadeHexColor } from "@/utils/colorConverter";
 import Colors from "@constants/theme/colors";
 import { StaticColors } from "@constants/theme/staticColors";
 
-export let accentColor = "#61afa7";
+const accentColor = "#61afa7";
 
 const accent1Light = shadeHexColor(accentColor, 0.8);
 const accent2Light = shadeHexColor(accentColor, 0.6);

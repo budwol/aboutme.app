@@ -49,6 +49,12 @@ function getOptionalOwner(): string | undefined {
   return value || undefined;
 }
 
+function isSourceMapsEnabled(): boolean {
+  return (
+    process.env.EXPO_PUBLIC_ENABLE_SOURCE_MAPS?.trim().toLowerCase() === "true"
+  );
+}
+
 const appName = getRequiredEnv("APP_NAME");
 const appDescription = getRequiredEnv("APP_DESCRIPTION");
 const appVersion = packageJson.version;
@@ -111,7 +117,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     themeColor: "#181818",
     display: "fullscreen",
     orientation: "portrait-primary",
-    sourceMaps: false,
+    sourceMaps: isSourceMapsEnabled(),
   },
   plugins: [
     "expo-font",

@@ -24,7 +24,7 @@ import {
   useWnaAppLifecycle,
   useWnaLayout,
   useWnaTheme,
-} from "@components/WnaAppContext";
+} from "@/state/WnaAppContext";
 import { appMotionConstants } from "@constants/motionConstants";
 import { Theme } from "@/storage/themeStorage";
 import Colors from "@constants/theme/colors";

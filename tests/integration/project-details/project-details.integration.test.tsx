@@ -28,16 +28,16 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaMenuHeaderRight");
+  return createMockComponent("WnaMenuToggleButton");
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaNavigationHeaderButtonRight");
+  return createMockComponent("WnaHeaderRouteButton");
 });
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -70,10 +70,10 @@ jest.mock("@components/buttons/WnaButtonIcon", () => {
   return createMockComponent("WnaButtonIcon");
 });
 
-jest.mock("@components/sections/WnaTechStackCard", () => {
+jest.mock("@components/sections/WnaTechStackSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaTechStackCard");
+  return createMockComponent("WnaTechStackSection");
 });
 
 jest.mock("@components/screens/WnaScrollViewScreen", () => {

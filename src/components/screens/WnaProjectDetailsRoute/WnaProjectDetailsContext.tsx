@@ -1,8 +1,8 @@
 import { convertHexToRgba } from "@utils/colorConverter";
 import { ReactNode } from "react";
 import { Text, View } from "react-native";
-import { styles } from "./styles";
-import type { WnaProjectDetailsThemeProps } from "./types";
+import { styles } from "./wnaProjectDetailsRouteStyles";
+import type { WnaProjectDetailsThemeProps } from "./wnaProjectDetailsRouteTypes";
 
 type WnaProjectDetailsContextProps = WnaProjectDetailsThemeProps & {
   context: string;

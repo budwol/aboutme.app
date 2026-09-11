@@ -5,7 +5,7 @@ import WnaDisclaimerRoute from "@components/screens/WnaDisclaimerRoute";
 
 const mockAppData = {};
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppData: () => ({ appData: mockAppData }),
 }));
 

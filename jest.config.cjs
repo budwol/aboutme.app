@@ -8,9 +8,7 @@ module.exports = {
     "^@assets/(.*)$": "<rootDir>/assets/$1",
     "^@components/(.*)$": "<rootDir>/src/components/$1",
     "^@constants/(.*)$": "<rootDir>/src/constants/$1",
-    "^@hooks/(.*)$": "<rootDir>/src/hooks/$1",
     "^@utils/(.*)$": "<rootDir>/src/utils/$1",
-    "^@secrets/(.*)$": "<rootDir>/secrets/$1",
     "^wna-logger$": "<rootDir>/src/utils/logger.ts",
   },
   testPathIgnorePatterns: [

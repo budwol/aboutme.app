@@ -61,7 +61,7 @@ describe("WnaImageBackground", () => {
     expect(image.props.fetchPriority).toBe("high");
     expect(image.props.loading).toBe("eager");
     expect(blur.props.forceExperimentalBlur).toBe(true);
-    expect(blur.props.blurTint).toBe("dark");
+    expect(blur.props.blurTint).toBe("light");
     expect(blur.props.blurIntensity).toBe(40);
   });
 

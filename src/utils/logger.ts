@@ -10,22 +10,24 @@ function ensureLogger() {
   if (!__DEV__ || LoggerBase) return;
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  LoggerBase = require("@utils/logger.base").default as LoggerBaseType;
+  LoggerBase = require("@utils/loggerBase").default as LoggerBaseType;
 }
 
-export default class Logger {
-  public static info(msg: unknown) {
+const Logger = {
+  info(msg: unknown) {
     ensureLogger();
     LoggerBase?.info(msg);
-  }
+  },
 
-  public static warn(methodName: string, msg: unknown) {
+  warn(methodName: string, msg: unknown) {
     ensureLogger();
     LoggerBase?.warn(methodName, msg);
-  }
+  },
 
-  public static error(methodName: string, msg: unknown) {
+  error(methodName: string, msg: unknown) {
     ensureLogger();
     LoggerBase?.error(methodName, msg);
-  }
-}
+  },
+};
+
+export default Logger;

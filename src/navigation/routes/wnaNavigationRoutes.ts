@@ -1,4 +1,3 @@
-import { getConfiguredSiteUrl, normalizeSiteUrl } from "@utils/appConfig";
 import { getProjectPathSegment } from "@utils/projectRoutes";
 import { Href } from "expo-router";
 import { getLangCode } from "@/i18n/i18n";
@@ -29,18 +28,8 @@ const routeDefinitions: Record<WnaRouteKey, RouteDefinition> = {
   contact: { de: "/kontakt", en: "/contact" },
 };
 
-let currentBaseUrl = getConfiguredSiteUrl();
-
 export function getNavigationLang(lang = getLangCode()): WnaRouteLang {
   return lang === "de" ? "de" : "en";
-}
-
-export function getNavigationBaseUrl() {
-  return currentBaseUrl;
-}
-
-export function setNavigationBaseUrl(value: string) {
-  currentBaseUrl = normalizeSiteUrl(value);
 }
 
 export function getNavigationPath(
@@ -61,20 +50,6 @@ export function getDrawerNavigationPath(
   }
 
   return `/(drawer)/(tabs-${lang})${path}`;
-}
-
-export function getAbsoluteNavigationPath(
-  key: WnaRouteKey,
-  lang = getNavigationLang(),
-): Href {
-  return `${currentBaseUrl}${getNavigationPath(key, lang)}` as Href;
-}
-
-export function getProjectNavigationPath(
-  slug: string,
-  lang = getNavigationLang(),
-): Href {
-  return `/${getProjectPathSegment(lang)}/${slug}` as Href;
 }
 
 export function getDrawerProjectNavigationPath(

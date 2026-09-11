@@ -1,6 +1,6 @@
 import { testAppData } from "@/app-data/testAppData";
-import { useWnaAppData, useWnaTheme } from "@components/WnaAppContext";
-import WnaContactCard from "@components/sections/WnaContactCard";
+import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
+import WnaContactSection from "@components/sections/WnaContactSection";
 import {
   afterEach,
   beforeEach,
@@ -21,7 +21,7 @@ function ContactCardHost() {
   const { appColors, appStyle } = useWnaTheme();
 
   return (
-    <WnaContactCard
+    <WnaContactSection
       appColors={appColors}
       appData={appData}
       appStyle={appStyle}
@@ -67,7 +67,7 @@ jest.mock("@components/buttons/WnaButtonIcon", () => {
   return createMockComponent("WnaButtonIcon");
 });
 
-describe("WnaContactCard action integration", () => {
+describe("WnaContactSection action integration", () => {
   const canOpenURL = jest.spyOn(Linking, "canOpenURL");
   const openURL = jest.spyOn(Linking, "openURL");
 
@@ -104,7 +104,7 @@ describe("WnaContactCard action integration", () => {
     expect(canOpenURL).toHaveBeenCalledWith(appData.contact.github);
     expect(openURL).not.toHaveBeenCalled();
     expect(loggerError).toHaveBeenCalledWith(
-      WnaContactCard.name,
+      WnaContactSection.name,
       "github not supported",
     );
   });

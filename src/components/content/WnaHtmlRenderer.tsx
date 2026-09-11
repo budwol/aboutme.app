@@ -4,11 +4,6 @@ import { FontFamilies } from "@constants/theme/fontFamilies";
 import { LinearGradient } from "expo-linear-gradient";
 import { sanitizeHtml } from "@utils/htmlSanitizer";
 import { CSSProperties, FC, memo } from "react";
-import { Platform } from "react-native";
-import RenderHtml, {
-  defaultSystemFonts,
-  MixedStyleDeclaration,
-} from "react-native-render-html";
 
 export type WnaHtmlRendererProps = {
   appColors: Colors;
@@ -26,8 +21,7 @@ const fallbackHtml = '<!DOCTYPE html><html lang="de"><body></body></html>';
 
 const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
   appColors,
-  appStyle,
-  width,
+  appStyle: _appStyle,
   maxHeight,
   html,
   padding,
@@ -39,63 +33,7 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
   const effectiveFontSize = fontSize ?? 14;
   const effectiveFontFamily = fontFamily ?? FontFamilies.UI;
   const effectiveFontColor = fontColor ?? appColors.coolgray6;
-  const systemFonts = [
-    ...defaultSystemFonts,
-    FontFamilies.MonoSpace,
-    FontFamilies.UI,
-  ];
-  const isMaxHeightSet = maxHeight ?? false;
-  const overlayHeight = maxHeight ?? 1;
-  const nativeStyles: Readonly<Record<string, MixedStyleDeclaration>> = {
-    body: {
-      padding: effectivePadding,
-      color: effectiveFontColor,
-      fontFamily: effectiveFontFamily,
-      fontSize: effectiveFontSize,
-      lineHeight: appStyle.textSmall.lineHeight,
-    },
-    a: {
-      color: effectiveFontColor,
-    },
-    p: {
-      fontSize: appStyle.textSmall.fontSize,
-      lineHeight: appStyle.textSmall.lineHeight! * 2,
-      color: appStyle.textSmall.color,
-      fontWeight: appStyle.textSmall.fontWeight,
-      marginBottom: 24,
-    },
-    ul: {
-      listStyleType: "none",
-      marginBottom: 24,
-    },
-    li: {
-      fontSize: appStyle.textSmall.fontSize,
-      lineHeight: appStyle.textSmall.lineHeight! * 2,
-      color: appStyle.textSmall.color,
-      fontWeight: appStyle.textSmall.fontWeight,
-      marginBottom: 24,
-    },
-    h1: {
-      fontSize: appStyle.textNeutralLarge.fontSize,
-      lineHeight: appStyle.textNeutralLarge.lineHeight! * 3,
-      color: appStyle.textNeutralLarge.color,
-      fontWeight: appStyle.textNeutralLarge.fontWeight,
-    },
-    h2: {
-      fontSize: appStyle.textNeutralTitleLarge.fontSize,
-      lineHeight: appStyle.textNeutralTitleLarge.lineHeight! * 3,
-      color: appStyle.textNeutralTitleLarge.color,
-      fontWeight: appStyle.textNeutralTitleLarge.fontWeight,
-      marginVertical: 8,
-    },
-    h3: {
-      fontSize: appStyle.textNeutralMedium.fontSize,
-      lineHeight: appStyle.textNeutralMedium.lineHeight! * 3,
-      color: appStyle.textNeutralMedium.color,
-      fontWeight: appStyle.textNeutralMedium.fontWeight,
-    },
-  };
-
+  const effectiveHtml = sanitizeHtml(html === "" ? fallbackHtml : html);
   const webStyles: CSSProperties = {
     padding: effectivePadding,
     fontFamily: effectiveFontFamily,
@@ -105,24 +43,13 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
     color: effectiveFontColor,
   };
 
-  const effectiveHtml = sanitizeHtml(html === "" ? fallbackHtml : html);
-
   return (
     <>
-      {Platform.OS === "web" ? (
-        <div
-          style={webStyles}
-          dangerouslySetInnerHTML={{ __html: effectiveHtml ?? "" }}
-        ></div>
-      ) : (
-        <RenderHtml
-          source={{ html: effectiveHtml ?? "" }}
-          contentWidth={width}
-          tagsStyles={nativeStyles}
-          systemFonts={systemFonts}
-        />
-      )}
-      {isMaxHeightSet ? (
+      <div
+        style={webStyles}
+        dangerouslySetInnerHTML={{ __html: effectiveHtml }}
+      />
+      {maxHeight ? (
         <LinearGradient
           start={[1, 1]}
           end={[1, 0]}
@@ -133,7 +60,7 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
             bottom: 0,
             left: 0,
             right: 0,
-            height: overlayHeight / 2,
+            height: maxHeight / 2,
           }}
         />
       ) : null}
@@ -141,11 +68,19 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
   );
 };
 
+export function areWnaHtmlRendererPropsEqual(
+  prevProps: WnaHtmlRendererProps,
+  nextProps: WnaHtmlRendererProps,
+) {
+  return (
+    prevProps.html === nextProps.html &&
+    prevProps.appColors.isDark === nextProps.appColors.isDark
+  );
+}
+
 const WnaHtmlRenderer = memo(
   WnaHtmlRendererComponent,
-  (prevProps, nextProps) =>
-    prevProps.html === nextProps.html &&
-    prevProps.appColors.isDark === nextProps.appColors.isDark,
+  areWnaHtmlRendererPropsEqual,
 );
 
 WnaHtmlRenderer.displayName = "WnaHtmlRenderer";

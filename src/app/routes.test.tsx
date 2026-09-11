@@ -102,7 +102,7 @@ jest.mock(
     },
 );
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   WnaAppContextProvider: ({ children }: { children?: React.ReactNode }) =>
     require("react").createElement("WnaAppContextProvider", null, children),
   useWnaTheme: jest.fn(() => ({
@@ -136,9 +136,8 @@ jest.mock("@/storage/themeStorage", () => ({
   getThemeFromStorageAsync: jest.fn(async () => "dark"),
 }));
 
-jest.mock("@/navigation/routes/wnaNavigationRouteProvider", () => ({
+jest.mock("@/navigation/routes/wnaNavigationRoutes", () => ({
   getNavigationPath: jest.fn(() => "/root"),
-  setNavigationBaseUrl: jest.fn(),
 }));
 
 jest.mock("@/i18n/i18n", () => ({ i18n: { language: "de" } }));
@@ -190,7 +189,7 @@ jest.mock("expo-router/drawer", () => {
 });
 
 jest.mock(
-  "./(drawer)/WnaDrawerMenu",
+  "@/navigation/components/WnaDrawerMenu",
   () =>
     function WnaDrawerMenu() {
       return require("react").createElement("WnaDrawerMenu");
@@ -359,7 +358,7 @@ describe("app routes", () => {
   });
 
   it("uses the dark drawer background in dark mode", () => {
-    const { useWnaTheme } = require("@components/WnaAppContext");
+    const { useWnaTheme } = require("@/state/WnaAppContext");
     useWnaTheme.mockReturnValueOnce({
       appColors: {
         isDark: true,
@@ -381,9 +380,6 @@ describe("app routes", () => {
   });
 
   it("initializes app data and theme before rendering the root layout content", async () => {
-    const {
-      setNavigationBaseUrl,
-    } = require("@/navigation/routes/wnaNavigationRouteProvider");
     const RootLayout = require("./_layout").default;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -393,7 +389,6 @@ describe("app routes", () => {
 
     await act(async () => undefined);
 
-    expect(setNavigationBaseUrl).toHaveBeenCalledWith("https://example.test");
     expect(tree!.root.findByType("WnaAppContextProvider")).toBeTruthy();
     expect(tree!.root.findByType("GestureHandlerRootView").props.style).toEqual(
       { flex: 1 },

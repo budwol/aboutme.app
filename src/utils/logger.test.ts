@@ -7,7 +7,7 @@ const mockLoggerBase = {
   error: jest.fn(),
 };
 
-jest.mock("@utils/logger.base", () => ({
+jest.mock("@utils/loggerBase", () => ({
   __esModule: true,
   default: mockLoggerBase,
 }));

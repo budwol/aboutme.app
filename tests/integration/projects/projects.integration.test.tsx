@@ -1,4 +1,4 @@
-import { getDrawerProjectNavigationPath } from "@/navigation/routes/wnaNavigationRouteProvider";
+import { getDrawerProjectNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import { testAppData } from "@/app-data/testAppData";
 import WnaProjectsRoute from "@components/screens/WnaProjectsRoute";
 import { createProjectSlug } from "@utils/projectRoutes";
@@ -37,16 +37,16 @@ jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
   }),
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaMenuHeaderRight");
+  return createMockComponent("WnaMenuToggleButton");
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaNavigationHeaderButtonRight");
+  return createMockComponent("WnaHeaderRouteButton");
 });
 
 jest.mock("@components/screens/WnaBaseScreen", () => {
@@ -55,7 +55,7 @@ jest.mock("@components/screens/WnaBaseScreen", () => {
   return createMockComponent("WnaBaseScreen", true);
 });
 
-jest.mock("@components/screens/WnaContactFooter", () => {
+jest.mock("@components/chrome/WnaContactFooter", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
   return createMockComponent("WnaContactFooter");

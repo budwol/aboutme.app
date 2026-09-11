@@ -1,4 +1,4 @@
-import WnaButtonIconInnerIcon from "@components/buttons/WnaButtonIconInnerIcon";
+import WnaButtonIconBadge from "@components/buttons/WnaButtonIcon/WnaButtonIconBadge";
 import WnaPressable from "@components/buttons/WnaPressable";
 import { createRoundIconButtonStyle } from "@components/buttons/wnaButtonStyles";
 import {
@@ -6,7 +6,7 @@ import {
   WnaButtonThemeProps,
 } from "@components/buttons/wnaButtonTypes";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
-import { WnaShadowStyle } from "@components/effects/WnaShadowStyle";
+import { createShadowStyle } from "@components/effects/wnaShadowStyle";
 import { FC, memo } from "react";
 import { View, ViewStyle } from "react-native";
 
@@ -34,7 +34,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
   style,
   toolTipPosition,
 }) => (
-  <View style={[WnaShadowStyle(), style as ViewStyle]}>
+  <View style={[createShadowStyle(), style as ViewStyle]}>
     <WnaPressable
       ripple={"light"}
       toolTip={toolTip}
@@ -44,7 +44,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
       t={t}
       onPress={onPress}
     >
-      <WnaButtonIconInnerIcon
+      <WnaButtonIconBadge
         appStyle={appStyle}
         appColors={appColors}
         color={color}

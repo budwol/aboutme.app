@@ -12,7 +12,7 @@ The app serves German and English content (`de`/`en` routes under `src/app/(draw
 
 ## Decision
 
-Localizable fields in `app-data.json` are authored with `De`/`En` suffixes (`titleDe`/`titleEn`, `descriptionDe`/`descriptionEn`, `periodDe`/`periodEn`, etc.), with an optional unsuffixed plain field as a language-agnostic fallback. `src/app-data/shared.ts` (`normalizeAppData`, `getLocalizedString`, `getLocalizedStringArray`) resolves the active language from `i18n.resolvedLanguage`/`i18n.language` at load time and picks `preferred → plain → alternate`, always falling back to `defaultAppData`'s value so a partially-filled fork never renders empty text. Fields that aren't language-dependent (`techstack`, image paths, URLs) have no suffix variants.
+Localizable fields in `app-data.json` are authored with `De`/`En` suffixes (`titleDe`/`titleEn`, `descriptionDe`/`descriptionEn`, `periodDe`/`periodEn`, etc.), with an optional unsuffixed plain field as a language-agnostic fallback. `src/app-data/normalization.ts` (`normalizeAppData`, re-exported from `src/app-data/index.ts`) uses `getLocalizedString`/`getLocalizedStringArray` from `src/app-data/localization.ts`, which resolve the active language from `i18n.resolvedLanguage`/`i18n.language` at load time and pick `preferred → plain → alternate`, always falling back to `defaultAppData`'s value so a partially-filled fork never renders empty text. Fields that aren't language-dependent (`techstack`, image paths, URLs) have no suffix variants.
 
 ## Consequences
 

@@ -27,16 +27,16 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({}),
 }));
 
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaMenuHeaderRight");
+  return createMockComponent("WnaMenuToggleButton");
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaNavigationHeaderButtonRight");
+  return createMockComponent("WnaHeaderRouteButton");
 });
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -63,10 +63,10 @@ jest.mock("@components/text/WnaSectionTitle", () => {
   return createMockComponent("WnaSectionTitle");
 });
 
-jest.mock("@components/sections/WnaContactCard", () => {
+jest.mock("@components/sections/WnaContactSection", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");
-  return createMockComponent("WnaContactCard");
+  return createMockComponent("WnaContactSection");
 });
 
 jest.mock("@components/screens/WnaScrollViewScreen", () => {
@@ -87,7 +87,7 @@ describe("WnaContactRoute integration", () => {
   it("renders the seeded contact details and wires the contact card with app data", async () => {
     const tree = await renderWithAppContext(<WnaContactRoute />);
     const scrollViewScreen = tree.root.findByType("WnaScrollViewScreen");
-    const contactCard = tree.root.findByType("WnaContactCard");
+    const contactCard = tree.root.findByType("WnaContactSection");
     const texts = tree.root
       .findAllByType("Text")
       .map(
@@ -95,7 +95,6 @@ describe("WnaContactRoute integration", () => {
           node.props.children,
       );
 
-    expect(scrollViewScreen.props.showFooter).toBe(false);
     expect(scrollViewScreen.props.showContactFooter).toBe(false);
     expect(texts).toContain(testAppData.profile.name);
     expect(texts).toContain(testAppData.contact.addressStreet);

@@ -47,21 +47,4 @@ describe("wnaNavigationRoutes", () => {
       "/(drawer)/(tabs-de)/projekte/my-project",
     );
   });
-
-  it("builds absolute and project navigation paths", () => {
-    const {
-      setNavigationBaseUrl,
-      getAbsoluteNavigationPath,
-      getProjectNavigationPath,
-    } = loadRoutesWithLang("en");
-
-    setNavigationBaseUrl("https://portfolio.example.com");
-
-    expect(getAbsoluteNavigationPath("menu", "en")).toBe(
-      "https://portfolio.example.com/menu",
-    );
-    expect(getProjectNavigationPath("my-project", "en")).toBe(
-      "/projects/my-project",
-    );
-  });
 });

@@ -52,7 +52,7 @@ let mockAppColors = {
   coolgray8: "#111111",
 };
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppLifecycle: () => ({
     finishNavigationTransition: mockFinishNavigationTransition,
     isAppInitialized: mockIsAppInitialized,

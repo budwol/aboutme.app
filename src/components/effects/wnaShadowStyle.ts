@@ -1,0 +1,19 @@
+import { convertHexToRgba } from "@utils/colorConverter";
+import { ViewStyle } from "react-native";
+
+export function createShadowStyle(
+  opacity: number = 1,
+  color: string = "#000000",
+): ViewStyle {
+  const destOpacity = opacity * 0.08;
+
+  const offsetX = 0;
+  const offsetY = 1;
+  const blurRadius = 8;
+  const rgbaShadow = color.startsWith("#")
+    ? convertHexToRgba(color, destOpacity)
+    : color;
+  return {
+    boxShadow: `${offsetX}px ${offsetY}px ${blurRadius}px ${rgbaShadow}`,
+  };
+}

@@ -1,4 +1,4 @@
-import { useWnaAppData } from "@components/WnaAppContext";
+import { useWnaAppData } from "@/state/WnaAppContext";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";

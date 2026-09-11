@@ -9,7 +9,7 @@ const mockAppData = { experience: [] };
 const mockNavigation = { openDrawer: jest.fn() };
 const mockRouter = { push: jest.fn() };
 
-jest.mock("@components/WnaAppContext", () => ({
+jest.mock("@/state/WnaAppContext", () => ({
   useWnaTheme: () => ({ appColors: mockAppColors, appStyle: mockAppStyle }),
   useWnaAppData: () => ({ appData: mockAppData }),
 }));
@@ -39,37 +39,40 @@ jest.mock("@components/cards/WnaSurfaceCard", () => {
   };
 });
 
-jest.mock("@components/sections/WnaExperienceCard", () => {
+jest.mock("@components/sections/WnaExperienceSection", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaExperienceCard(props: unknown) {
-    return createElement("WnaExperienceCard", props as Record<string, unknown>);
-  };
-});
-
-jest.mock("@/navigation/components/WnaMenuHeaderRight", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return function MockWnaMenuHeaderRight(props: unknown) {
+  return function MockWnaExperienceSection(props: unknown) {
     return createElement(
-      "WnaMenuHeaderRight",
+      "WnaExperienceSection",
       props as Record<string, unknown>,
     );
   };
 });
 
-jest.mock("@/navigation/components/WnaNavigationHeaderButtonRight", () => {
+jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaNavigationHeaderButtonRight(props: unknown) {
+  return function MockWnaMenuToggleButton(props: unknown) {
     return createElement(
-      "WnaNavigationHeaderButtonRight",
+      "WnaMenuToggleButton",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
+jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
+  const { createElement } = jest.requireActual(
+    "react",
+  ) as typeof import("react");
+
+  return function MockWnaHeaderRouteButton(props: unknown) {
+    return createElement(
+      "WnaHeaderRouteButton",
       props as Record<string, unknown>,
     );
   };
@@ -100,10 +103,9 @@ describe("WnaExperienceRoute", () => {
     const screen = tree!.root.findByType("WnaScrollViewScreen");
     const homeButton = screen.props.headerButton0;
     const menuButton = screen.props.headerButton1;
-    const card = tree!.root.findByType("WnaExperienceCard");
+    const card = tree!.root.findByType("WnaExperienceSection");
 
     expect(screen.props.isRootPage).toBe(true);
-    expect(screen.props.showFooter).toBe(false);
     expect(screen.props.headerTitle).toBe("screenTitleExperience");
     expect(homeButton.props.route).toBe("home");
     expect(homeButton.props.router).toBe(mockRouter);
