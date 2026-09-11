@@ -16,7 +16,7 @@ export type WnaNavigationItemProps = {
   text: string;
   iconName: keyof typeof iconMap;
   onPress: (text: string) => void;
-  iconRightName?: keyof typeof iconMap;
+  iconRightName?: keyof typeof iconMap | null;
   t: TFunction<string[], undefined>;
   style?: ViewStyle;
   type?: "first" | "last" | "middle" | "standalone" | undefined;
@@ -32,7 +32,8 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
   t,
   type,
 }) => {
-  const effectiveIconRightName = iconRightName ?? "chevron-right";
+  const effectiveIconRightName =
+    iconRightName === undefined ? "chevron-right" : iconRightName;
   const effectiveType = type ?? "standalone";
   const borderStyle = useMemo(
     () =>
@@ -91,13 +92,15 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
               {text}
             </Text>
           </View>
-          <View style={styles.trailingIcon}>
-            <WnaIcon
-              iconName={effectiveIconRightName}
-              size={24}
-              color={rightIconColor}
-            />
-          </View>
+          {effectiveIconRightName ? (
+            <View style={styles.trailingIcon}>
+              <WnaIcon
+                iconName={effectiveIconRightName}
+                size={24}
+                color={rightIconColor}
+              />
+            </View>
+          ) : null}
         </View>
       </WnaSurfaceCard>
     </WnaPressable>
