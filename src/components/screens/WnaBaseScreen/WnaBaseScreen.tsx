@@ -33,6 +33,7 @@ export type WnaBaseScreenProps = {
   backHref?: Href;
   titleHref?: Href;
   headerTitle?: string;
+  documentTitle?: string;
   icon?: string;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
@@ -189,6 +190,7 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   backHref,
   titleHref,
   headerTitle,
+  documentTitle,
   icon,
   headerButton0,
   headerButton1,
@@ -207,7 +209,11 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   if (!isAppInitialized) return null;
 
   return (
-    <WnaWebBaseScreen title={headerTitle}>
+    // The browser tab title and the on-screen header text usually match
+    // (headerTitle), but the home page wants a more specific tab title for
+    // bookmarking (e.g. "Portfolio - Jane Doe") without changing what its
+    // header chrome actually displays — documentTitle overrides just that.
+    <WnaWebBaseScreen title={documentTitle ?? headerTitle}>
       <WnaImageBackground
         imageUri={backgroundImageUrl ?? appLayout.backgroundImageUrl}
         appColors={appColors}
