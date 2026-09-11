@@ -2,6 +2,12 @@ import { describe, expect, it, jest } from "@jest/globals";
 import { defaultAppData, loadAppData, normalizeAppData } from "@/app-data";
 import { i18n } from "@/i18n/i18n";
 
+const mockLoggerWarn = jest.fn();
+
+jest.mock("@/utils/logger", () => ({
+  warn: (...args: unknown[]) => mockLoggerWarn(...args),
+}));
+
 describe("normalizeAppData", () => {
   it("deep-merges nested objects instead of dropping defaults", () => {
     const data = normalizeAppData(
@@ -315,7 +321,7 @@ describe("normalizeAppData", () => {
   });
 
   it("normalizes the default fallback when app-data loading fails", async () => {
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    mockLoggerWarn.mockClear();
 
     const data = await loadAppData(async () => {
       throw new Error("missing");
@@ -323,11 +329,10 @@ describe("normalizeAppData", () => {
 
     expect(data).toEqual(normalizeAppData(defaultAppData));
     expect(data).not.toBe(defaultAppData);
-    expect(warnSpy).toHaveBeenCalledWith(
+    expect(mockLoggerWarn).toHaveBeenCalledWith(
+      "loadAppData",
       "app-data.json not found -> using defaults",
     );
-
-    warnSpy.mockRestore();
   });
 
   it("loads app-data from a direct json object export", async () => {
@@ -450,16 +455,16 @@ describe("normalizeAppData", () => {
       status: 404,
       json: async () => ({}),
     } as Response);
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    mockLoggerWarn.mockClear();
 
     const data = await loadAppData();
 
     expect(data).toEqual(normalizeAppData(defaultAppData));
-    expect(warnSpy).toHaveBeenCalledWith(
+    expect(mockLoggerWarn).toHaveBeenCalledWith(
+      "loadAppData",
       "app-data.json not found -> using defaults",
     );
 
     fetchSpy.mockRestore();
-    warnSpy.mockRestore();
   });
 });
