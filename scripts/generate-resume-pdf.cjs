@@ -35,6 +35,7 @@ const LABELS = {
     techStack: "Tech-Stack",
     tools: "Tools",
     softSkills: "Soft Skills",
+    certificates: "Zertifikate",
     contact: "Kontakt",
     pageWord: "Seite",
     pageOfWord: "von",
@@ -45,6 +46,7 @@ const LABELS = {
     techStack: "Tech Stack",
     tools: "Tools",
     softSkills: "Soft Skills",
+    certificates: "Certifications",
     contact: "Contact",
     pageWord: "Page",
     pageOfWord: "of",
@@ -55,6 +57,30 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 const TEXT_COLOR = "#1a1a1a";
 const MUTED_COLOR = "#555555";
 const DEFAULT_ACCENT_COLOR = "#61afa7";
+
+// Mirrors the homepage's own curated preview: WnaHomeRoute passes
+// maxItems={4} to WnaExperienceCard, so the resume shouldn't list more
+// history than the live site's front page already shows.
+const HOME_EXPERIENCE_LIMIT = 4;
+
+function limitExperienceToHomepage(experience) {
+  return experience.slice(0, HOME_EXPERIENCE_LIMIT);
+}
+
+// Each experience entry's own tech-stack pill row wraps onto multiple lines
+// once it runs past ~5 short items, which reads as more cluttered than the
+// entry's actual bullet content above it. Capping it keeps that row a
+// single line; the full list still exists in the data and on the live site.
+// A trailing "…" pill marks the row as cut off rather than silently
+// implying that's the entry's whole tech stack.
+const ENTRY_TECHSTACK_LIMIT = 5;
+
+function limitEntryTechstack(entryTechstack) {
+  if (entryTechstack.length <= ENTRY_TECHSTACK_LIMIT) {
+    return entryTechstack;
+  }
+  return [...entryTechstack.slice(0, ENTRY_TECHSTACK_LIMIT), "…"];
+}
 
 const SIDEBAR_WIDTH = 190;
 const SIDEBAR_PADDING = 22;
@@ -271,7 +297,11 @@ function buildContactLines(contact, siteUrl) {
   if (addressParts.length > 0) {
     lines.push({
       icon: ICONS.mapMarker,
-      text: addressParts.join(", "),
+      // One line each for street / zip+city / country rather than a
+      // comma-joined run — left to wrap on width alone, that string broke
+      // wherever it happened to run out of room (e.g. mid zip code) instead
+      // of at a sensible boundary.
+      text: addressParts.join("\n"),
       link: buildGoogleMapsUrl(addressParts),
     });
   }
@@ -332,7 +362,7 @@ function buildAtsContactLines(contact, siteUrl) {
   ].filter((part) => typeof part === "string" && part.trim() !== "");
   if (addressParts.length > 0) {
     lines.push({
-      text: addressParts.join(", "),
+      text: addressParts.join("\n"),
       link: buildGoogleMapsUrl(addressParts),
     });
   }
@@ -410,6 +440,21 @@ function buildSoftSkillEntries(softSkills, lang) {
     .filter((entry) => entry.label !== "");
 }
 
+// Certificates are shown as a plain name list (no proficiency bar/level),
+// so unlike buildSoftSkillEntries this only needs the resolved label.
+function buildCertificateList(certificates, lang) {
+  const list = Array.isArray(certificates) ? certificates : [];
+  return list
+    .map(
+      (item) =>
+        (lang === "de" ? item?.nameDe : item?.nameEn) ??
+        item?.nameDe ??
+        item?.nameEn ??
+        "",
+    )
+    .filter((name) => name !== "");
+}
+
 function capitalize(word) {
   return typeof word === "string" && word.length > 0
     ? word.charAt(0).toUpperCase() + word.slice(1)
@@ -449,6 +494,42 @@ function buildAtsSoftSkillList(softSkills, lang) {
 function buildAbsoluteUrl(siteUrl, pathSegment) {
   const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
   return `${base}/${pathSegment}`;
+}
+
+const GERMAN_DIACRITICS = {
+  ä: "ae",
+  ö: "oe",
+  ü: "ue",
+  Ä: "Ae",
+  Ö: "Oe",
+  Ü: "Ue",
+  ß: "ss",
+};
+
+// A profile name can contain characters that are neither filesystem- nor
+// URL-safe (umlauts, accents, punctuation) — this filename ends up both as
+// an actual file on disk and as a URL path segment (buildAbsoluteUrl,
+// getResumePdfUrl on the website side), so it needs to survive both
+// untouched rather than relying on percent-encoding to paper over it.
+// German umlauts/ß are spelled out since this is a German name; anything
+// else non-ASCII is dropped rather than guessed at.
+function slugifyName(name) {
+  if (typeof name !== "string") {
+    return "";
+  }
+  return name
+    .replace(/[äöüÄÖÜß]/g, (char) => GERMAN_DIACRITICS[char])
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Za-z0-9_-]/g, "");
+}
+
+// "Vorname_Nachname_-_Portfolio_DE.pdf" / "..._DE_ATS.pdf" — a filename a
+// recipient recognizes and can save without renaming, rather than the
+// generic "Portfolio-DE.pdf" every candidate's export used to share.
+function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
+  const atsSuffix = ats ? "_ATS" : "";
+  return `${slugifyName(name)}_-_Portfolio_${langCode.toUpperCase()}${atsSuffix}.pdf`;
 }
 
 // Renders a "heading + one bar per skill" block (used for both Tech-Stack
@@ -504,9 +585,10 @@ function fitFontSize(doc, text, maxWidth, { max, min, font }) {
 }
 
 // pageIndex is 0 for page 1 (photo/contact/tech-stack), 1 for the second
-// page (compact name + Tools), 2 for the third page (compact name + Soft
-// Skills), and 3+ for any page after that (just the compact name — none of
-// the skill sections repeat a second time).
+// page (compact name + Tools), and 2+ for any page after that (just the
+// compact name — Tools doesn't repeat a second time). Soft Skills isn't a
+// sidebar section at all; it renders as its own block in the main column,
+// under Berufserfahrung/Experience.
 function drawSidebar(doc, data, lang, labels, colors, avatarPath, pageIndex) {
   // The sidebar deliberately draws all the way down to the physical page
   // edge (its background rect spans 0 to page.height, ignoring margins
@@ -585,25 +667,6 @@ function drawSidebarContent(
         doc,
         labels.tools,
         toolEntries,
-        contentX,
-        cursorY,
-        contentWidth,
-        colors,
-      );
-    } else if (pageIndex === 2) {
-      cursorY = drawSidebarDivider(
-        doc,
-        contentX,
-        cursorY,
-        contentWidth,
-        colors.sidebarMuted,
-      );
-
-      const softSkillEntries = buildSoftSkillEntries(data.softSkills, lang);
-      drawSkillBarSection(
-        doc,
-        labels.softSkills,
-        softSkillEntries,
         contentX,
         cursorY,
         contentWidth,
@@ -736,6 +799,12 @@ function drawSidebarContent(
 }
 
 function drawSectionHeading(doc, text, accentColor) {
+  // moveDown's distance scales with whatever font size was last active. Left
+  // ambient, a heading following something drawn in a small font (e.g. an
+  // 8pt pill row) got a visibly smaller gap above it than one following
+  // regular body text — every heading should read as the same fixed break,
+  // so pin the baseline font first regardless of what preceded this call.
+  doc.font("Helvetica").fontSize(10.5);
   doc.moveDown(1);
   doc
     .fillColor(accentColor)
@@ -752,43 +821,8 @@ function drawSectionHeading(doc, text, accentColor) {
   doc.fillColor(TEXT_COLOR);
 }
 
-const BULLET_GAP = 12;
 const TIMELINE_DOT_RADIUS = 4;
 const TIMELINE_INDENT = 18;
-
-function drawBulletPoint(doc, text) {
-  // A single `.text("• " + detail)` call only indents its first rendered
-  // line (pdfkit's `indent` option is a first-line paragraph indent, not a
-  // hanging indent) — wrapped continuation lines fall back to the bullet's
-  // own left edge instead of aligning under the text. Draw the bullet glyph
-  // on its own, then flow the detail text from a shifted cursor so every
-  // wrapped line lines up under the first one.
-  let baseX = doc.x;
-  const availableWidth =
-    doc.page.width - doc.page.margins.right - (baseX + BULLET_GAP);
-  const neededHeight = doc.heightOfString(text, { width: availableWidth });
-  const bottomLimit = doc.page.height - doc.page.margins.bottom;
-
-  if (doc.y + neededHeight > bottomLimit) {
-    // If pdfkit's own automatic page break landed mid-way through this
-    // bullet's text, the glyph stays on the old page while the wrapped
-    // continuation (with no bullet and no hanging indent) starts the new
-    // one. Move the whole bullet to the next page as a unit instead — the
-    // `pageAdded` listener in writeResumePdf redraws the sidebar and
-    // resets the cursor for us.
-    doc.addPage();
-    baseX = doc.x;
-  }
-
-  const baseY = doc.y;
-  doc.text("•", baseX, baseY, { lineBreak: false });
-
-  doc.x = baseX + BULLET_GAP;
-  doc.y = baseY;
-  doc.text(text);
-
-  doc.x = baseX;
-}
 
 function drawPillRow(doc, items, x, y, maxWidth, options) {
   const {
@@ -839,7 +873,9 @@ function drawPillRow(doc, items, x, y, maxWidth, options) {
 
 function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
   const profile = data.profile ?? {};
-  const experience = Array.isArray(data.experience) ? data.experience : [];
+  const experience = limitExperienceToHomepage(
+    Array.isArray(data.experience) ? data.experience : [],
+  );
   const description = pickStringArray(profile, "description", lang);
 
   if (description.length > 0) {
@@ -876,10 +912,9 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
       const role = pickString(entry, "role", lang);
       const company = typeof entry.company === "string" ? entry.company : "";
       const entryDescription = pickString(entry, "description", lang);
-      const details = pickStringArray(entry, "details", lang);
-      const entryTechstack = Array.isArray(entry.techstack)
-        ? entry.techstack
-        : [];
+      const entryTechstack = limitEntryTechstack(
+        Array.isArray(entry.techstack) ? entry.techstack : [],
+      );
       const headingText = [role, company].filter(Boolean).join(" – ");
       const contentWidth =
         doc.page.width - doc.page.margins.right - (timelineX + TIMELINE_INDENT);
@@ -900,18 +935,6 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
         doc.font("Helvetica").fontSize(10);
         entryHeight +=
           doc.heightOfString(entryDescription, { width: contentWidth }) + 5;
-      }
-
-      if (details.length > 0) {
-        doc.font("Helvetica").fontSize(9.5);
-        for (const detail of details) {
-          entryHeight += doc.heightOfString(detail, {
-            width: contentWidth - BULLET_GAP,
-          });
-        }
-        // +3 for the leading gap before the list, +2 per item for the
-        // small breathing room between bullets added below.
-        entryHeight += 3 + Math.max(0, details.length - 1) * 2;
       }
 
       if (entryTechstack.length > 0) {
@@ -981,16 +1004,10 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
           .text(entryDescription);
       }
 
-      if (details.length > 0) {
-        doc.moveDown(0.3);
-        doc.font("Helvetica").fontSize(9.5).fillColor(TEXT_COLOR);
-        details.forEach((detail, detailIndex) => {
-          if (detailIndex > 0) {
-            doc.moveDown(0.2);
-          }
-          drawBulletPoint(doc, detail);
-        });
-      }
+      // detailsDe/En (the bullet list of individual tasks/achievements) is
+      // deliberately not rendered here: the resume already summarizes each
+      // role via entryDescription, and the live site's own experience
+      // timeline is where the full bullet-level detail lives instead.
 
       if (entryTechstack.length > 0) {
         doc.moveDown(0.3);
@@ -1009,6 +1026,66 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
       }
     });
   }
+
+  // Soft Skills used to live in the sidebar of a third page, only reachable
+  // once Experience overflowed that far. Capping Experience to the
+  // homepage's own preview length means that third page mostly stopped
+  // happening, which silently dropped the whole section — so it (and
+  // Certificates, which never had a sidebar section at all) render here
+  // instead, as optional blocks in the main column right under
+  // Berufserfahrung/Experience, wherever that naturally ends.
+  const softSkillEntries = buildSoftSkillEntries(data.softSkills, lang);
+  drawMainColumnPillBlock(
+    doc,
+    labels.softSkills,
+    softSkillEntries.map((entry) => entry.label),
+    accentColor,
+    colors,
+  );
+
+  const certificateEntries = buildCertificateList(data.certificates, lang);
+  drawMainColumnPillBlock(
+    doc,
+    labels.certificates,
+    certificateEntries,
+    accentColor,
+    colors,
+  );
+}
+
+// Renders a "heading + pill row" block in the main column (used for both
+// Soft Skills and Certificates) and leaves the cursor right after it. A
+// no-op when there's nothing to show, since both sections are optional.
+function drawMainColumnPillBlock(doc, heading, items, accentColor, colors) {
+  if (items.length === 0) {
+    return;
+  }
+
+  doc.x = PAGE_MARGINS.left;
+  const blockWidth = doc.page.width - doc.page.margins.right - doc.x;
+  const pillsHeight = drawPillRow(doc, items, 0, 0, blockWidth, {
+    measureOnly: true,
+  });
+
+  // Check before drawing anything so the heading can't get orphaned alone
+  // at the bottom of a page while the pills it labels start the next one.
+  // 45 is a generous estimate of drawSectionHeading's own height (moveDown
+  // + one heading line + underline + moveDown) at its fixed 13pt heading
+  // font.
+  if (doc.y + 45 + pillsHeight > doc.page.height - doc.page.margins.bottom) {
+    doc.addPage();
+  }
+
+  doc.x = PAGE_MARGINS.left;
+  drawSectionHeading(doc, heading, accentColor);
+  const columnLeft = doc.x;
+  const maxWidth = doc.page.width - doc.page.margins.right - columnLeft;
+  const bottomY = drawPillRow(doc, items, columnLeft, doc.y, maxWidth, {
+    textColor: colors.pillText,
+    fillColor: colors.pillFill,
+  });
+  doc.x = columnLeft;
+  doc.y = bottomY;
 }
 
 function drawAtsSkillLine(doc, heading, entries) {
@@ -1032,6 +1109,27 @@ function drawAtsSkillLine(doc, heading, entries) {
         .map((entry) => `${entry.name} [${capitalize(entry.level)}]`)
         .join(", "),
     );
+}
+
+// Same idea as drawAtsSkillLine, but for a plain name list with no
+// proficiency level to spell out (Certificates has no bar/level concept).
+function drawAtsPlainList(doc, heading, items) {
+  if (items.length === 0) {
+    return;
+  }
+
+  doc.moveDown(1);
+  doc
+    .font("Helvetica-Bold")
+    .fontSize(12)
+    .fillColor(TEXT_COLOR)
+    .text(heading.toUpperCase());
+  doc.moveDown(0.3);
+  doc
+    .font("Helvetica")
+    .fontSize(10)
+    .fillColor(TEXT_COLOR)
+    .text(items.join(", "));
 }
 
 // A deliberately plain, single-column companion PDF: no sidebar, no bars,
@@ -1065,7 +1163,9 @@ function writeAtsResumePdf(filePath, data, lang) {
     const name = typeof profile.name === "string" ? profile.name : "";
     const title = pickString(profile, "title", lang);
     const description = pickStringArray(profile, "description", lang);
-    const experience = Array.isArray(data.experience) ? data.experience : [];
+    const experience = limitExperienceToHomepage(
+      Array.isArray(data.experience) ? data.experience : [],
+    );
 
     doc.font("Helvetica-Bold").fontSize(20).fillColor(TEXT_COLOR).text(name);
     if (title) {
@@ -1116,6 +1216,11 @@ function writeAtsResumePdf(filePath, data, lang) {
       labels.softSkills,
       buildAtsSoftSkillList(data.softSkills, lang),
     );
+    drawAtsPlainList(
+      doc,
+      labels.certificates,
+      buildCertificateList(data.certificates, lang),
+    );
 
     if (experience.length > 0) {
       doc.moveDown(1);
@@ -1132,10 +1237,9 @@ function writeAtsResumePdf(filePath, data, lang) {
         const role = pickString(entry, "role", lang);
         const company = typeof entry.company === "string" ? entry.company : "";
         const entryDescription = pickString(entry, "description", lang);
-        const details = pickStringArray(entry, "details", lang);
-        const entryTechstack = Array.isArray(entry.techstack)
-          ? entry.techstack
-          : [];
+        const entryTechstack = limitEntryTechstack(
+          Array.isArray(entry.techstack) ? entry.techstack : [],
+        );
 
         doc
           .font("Helvetica-Bold")
@@ -1153,13 +1257,8 @@ function writeAtsResumePdf(filePath, data, lang) {
             .text(entryDescription);
         }
 
-        if (details.length > 0) {
-          doc.moveDown(0.2);
-          doc.font("Helvetica").fontSize(9.5).fillColor(TEXT_COLOR);
-          for (const detail of details) {
-            doc.text(`- ${detail}`);
-          }
-        }
+        // Same reasoning as the designed PDF: detailsDe/En bullets aren't
+        // shown here either, so both variants stay in sync.
 
         if (entryTechstack.length > 0) {
           doc.moveDown(0.2);
@@ -1259,8 +1358,9 @@ function writeResumePdf(filePath, data, lang, avatarPath) {
 
     buildMainColumn(doc, data, lang, labels, accentColor, colors);
 
-    const atsFileName =
-      lang === "de" ? "Portfolio-DE-ATS.pdf" : "Portfolio-EN-ATS.pdf";
+    const atsFileName = buildPortfolioFileName(data.profile?.name, lang, {
+      ats: true,
+    });
     const atsUrl = buildAbsoluteUrl(data.siteUrl, atsFileName);
     const atsLinkLabel =
       lang === "de" ? "Text-Version (ATS)" : "Text-only version (ATS)";
@@ -1321,10 +1421,17 @@ async function generateResumePdf(rootDir, logger = console.log) {
   const targetDir = path.join(rootDir, "public");
   fs.mkdirSync(targetDir, { recursive: true });
 
-  const deTargetFile = path.join(targetDir, "Portfolio-DE.pdf");
-  const enTargetFile = path.join(targetDir, "Portfolio-EN.pdf");
-  const deAtsTargetFile = path.join(targetDir, "Portfolio-DE-ATS.pdf");
-  const enAtsTargetFile = path.join(targetDir, "Portfolio-EN-ATS.pdf");
+  const name = data.profile?.name;
+  const deTargetFile = path.join(targetDir, buildPortfolioFileName(name, "de"));
+  const enTargetFile = path.join(targetDir, buildPortfolioFileName(name, "en"));
+  const deAtsTargetFile = path.join(
+    targetDir,
+    buildPortfolioFileName(name, "de", { ats: true }),
+  );
+  const enAtsTargetFile = path.join(
+    targetDir,
+    buildPortfolioFileName(name, "en", { ats: true }),
+  );
   const avatar = prepareEmbeddableAvatar(rootDir, data, logger);
 
   try {
@@ -1336,10 +1443,16 @@ async function generateResumePdf(rootDir, logger = console.log) {
     avatar.cleanup();
   }
 
-  logger("generated .aboutme/app-data.json -> public/Portfolio-DE.pdf");
-  logger("generated .aboutme/app-data.json -> public/Portfolio-EN.pdf");
-  logger("generated .aboutme/app-data.json -> public/Portfolio-DE-ATS.pdf");
-  logger("generated .aboutme/app-data.json -> public/Portfolio-EN-ATS.pdf");
+  for (const targetFile of [
+    deTargetFile,
+    enTargetFile,
+    deAtsTargetFile,
+    enAtsTargetFile,
+  ]) {
+    logger(
+      `generated .aboutme/app-data.json -> public/${path.basename(targetFile)}`,
+    );
+  }
 
   return { deTargetFile, enTargetFile, deAtsTargetFile, enAtsTargetFile };
 }
