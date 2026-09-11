@@ -2,12 +2,14 @@ import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { FlatList } from "react-native";
-import WnaNavigationList from "@/navigation/components/WnaNavigationList";
+import WnaNavigationList, {
+  WnaMenuItem,
+} from "@/navigation/components/WnaNavigationList";
 
 describe("WnaNavigationList", () => {
   it("passes list props and helpers to FlatList", () => {
-    const items = [
-      { route: "/one", text: "One", type: "primary" },
+    const items: WnaMenuItem[] = [
+      { route: "/one", text: "One", type: "nav" },
       { text: "Two", type: "secondary" },
     ];
     let tree: ReturnType<typeof TestRenderer.create> | undefined;

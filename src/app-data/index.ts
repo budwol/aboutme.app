@@ -3,6 +3,7 @@ import {
   normalizeAppData,
   normalizeLoadedAppData,
 } from "@/app-data/normalization";
+import Logger from "@/utils/logger";
 
 export { defaultAppData } from "@/app-data/defaults";
 export { normalizeAppData } from "@/app-data/normalization";
@@ -50,7 +51,7 @@ export const loadAppData = async (
   try {
     return normalizeLoadedAppData(await loadModule());
   } catch {
-    console.warn("app-data.json not found -> using defaults");
+    Logger.warn(loadAppData.name, "app-data.json not found -> using defaults");
     return normalizeAppData(defaultAppData);
   }
 };

@@ -8,10 +8,7 @@ export interface WnaMenuItem {
   route?: string;
   text: string;
   iconName?: keyof typeof iconMap;
-  iconRightName?: keyof typeof iconMap;
-  type: string;
-  data?: unknown;
-  onPress?: () => void | Promise<void>;
+  type: "nav" | "secondary";
 }
 
 export type WnaNavigationListProps = {
