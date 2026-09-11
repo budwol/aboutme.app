@@ -151,7 +151,12 @@ export default function WnaContactCard({
             appColors={appColors}
             appStyle={appStyle}
             iconName={"file-pdf-box"}
-            onPress={() => handleOpenUrl(getResumePdfUrl(resumeLang), "resume")}
+            onPress={() =>
+              handleOpenUrl(
+                getResumePdfUrl(resumeLang, appData.profile.name),
+                "resume",
+              )
+            }
             checkInternetConnection={false}
             toolTipPosition="top"
             toolTip={t(i18nKeys.actionDownloadResume)}
