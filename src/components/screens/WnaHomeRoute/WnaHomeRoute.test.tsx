@@ -239,6 +239,16 @@ describe("WnaHomeRoute", () => {
     jest.useRealTimers();
   });
 
+  it("uses a name-specific browser tab title without changing the header text", () => {
+    const tree = renderHomeRoute();
+    const baseScreen = tree.root.findByType("WnaBaseScreen");
+
+    expect(baseScreen.props.headerTitle).toBe("appBrand");
+    expect(baseScreen.props.documentTitle).toBe(
+      `appBrand - ${testAppData.profile.name}`,
+    );
+  });
+
   it("scrolls to the top when the header title is pressed", () => {
     const tree = renderHomeRoute();
     const baseScreen = tree.root.findByType("WnaBaseScreen");

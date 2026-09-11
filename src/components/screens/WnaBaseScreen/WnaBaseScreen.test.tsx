@@ -152,6 +152,27 @@ describe("WnaBaseScreen", () => {
     expect(header.props.isRootPage).toBe(true);
   });
 
+  it("uses documentTitle for the browser tab without changing the header text", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBaseScreen
+          headerTitle="Portfolio"
+          documentTitle="Portfolio - Jane Doe"
+        >
+          <></>
+        </WnaBaseScreen>,
+      );
+    });
+
+    const webBaseScreen = tree!.root.findByType("WnaWebBaseScreen");
+    const header = tree!.root.findByType("WnaHeader");
+
+    expect(webBaseScreen.props.title).toBe("Portfolio - Jane Doe");
+    expect(header.props.headerTitle).toBe("Portfolio");
+  });
+
   it("shows the busy overlay and text when busy", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
