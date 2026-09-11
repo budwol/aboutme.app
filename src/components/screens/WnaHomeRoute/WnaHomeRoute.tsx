@@ -64,6 +64,7 @@ export default function WnaHomeRoute(): ReactNode {
   const { appData } = useWnaAppData();
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
+  const appBrand = t(i18nKeys.appBrand);
   const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const navigation = useNavigation();
@@ -131,8 +132,8 @@ export default function WnaHomeRoute(): ReactNode {
   return (
     <WnaBaseScreen
       isRootPage
-      headerTitle={t(i18nKeys.appBrand)}
-      documentTitle={`${t(i18nKeys.appBrand)} - ${appData.profile.name}`}
+      headerTitle={appBrand}
+      documentTitle={`${appBrand} - ${appData.profile.name}`}
       icon="home"
       onTitlePress={handleTitlePress}
       scrollY={scrollY}

@@ -426,24 +426,11 @@ function buildSkillEntries(skillGroup, skillLevels, limits) {
   ].slice(0, totalLimit);
 }
 
-function buildSoftSkillEntries(softSkills, lang) {
-  const primary = Array.isArray(softSkills?.primary) ? softSkills.primary : [];
-  return primary
-    .map((item) => ({
-      label:
-        (lang === "de" ? item?.nameDe : item?.nameEn) ??
-        item?.nameDe ??
-        item?.nameEn ??
-        "",
-      ratio: levelToRatio(item?.level),
-    }))
-    .filter((entry) => entry.label !== "");
-}
-
-// Certificates are shown as a plain name list (no proficiency bar/level),
-// so unlike buildSoftSkillEntries this only needs the resolved label.
-function buildCertificateList(certificates, lang) {
-  const list = Array.isArray(certificates) ? certificates : [];
+// Soft skills and certificates are both shown as a plain pill list in the
+// main column (see drawMainColumnPillBlock) rather than sidebar skill bars,
+// so both just need each item's resolved label, not a proficiency ratio.
+function buildLocalizedNameList(items, lang) {
+  const list = Array.isArray(items) ? items : [];
   return list
     .map(
       (item) =>
@@ -452,7 +439,7 @@ function buildCertificateList(certificates, lang) {
         item?.nameEn ??
         "",
     )
-    .filter((name) => name !== "");
+    .filter((label) => label !== "");
 }
 
 function capitalize(word) {
@@ -1034,20 +1021,18 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
   // Certificates, which never had a sidebar section at all) render here
   // instead, as optional blocks in the main column right under
   // Berufserfahrung/Experience, wherever that naturally ends.
-  const softSkillEntries = buildSoftSkillEntries(data.softSkills, lang);
   drawMainColumnPillBlock(
     doc,
     labels.softSkills,
-    softSkillEntries.map((entry) => entry.label),
+    buildLocalizedNameList(data.softSkills?.primary, lang),
     accentColor,
     colors,
   );
 
-  const certificateEntries = buildCertificateList(data.certificates, lang);
   drawMainColumnPillBlock(
     doc,
     labels.certificates,
-    certificateEntries,
+    buildLocalizedNameList(data.certificates, lang),
     accentColor,
     colors,
   );
@@ -1219,7 +1204,7 @@ function writeAtsResumePdf(filePath, data, lang) {
     drawAtsPlainList(
       doc,
       labels.certificates,
-      buildCertificateList(data.certificates, lang),
+      buildLocalizedNameList(data.certificates, lang),
     );
 
     if (experience.length > 0) {
@@ -1457,7 +1442,7 @@ async function generateResumePdf(rootDir, logger = console.log) {
   return { deTargetFile, enTargetFile, deAtsTargetFile, enAtsTargetFile };
 }
 
-module.exports = { generateResumePdf };
+module.exports = { generateResumePdf, buildPortfolioFileName };
 
 if (require.main === module) {
   generateResumePdf(process.cwd()).catch((error) => {
