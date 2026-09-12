@@ -7,7 +7,7 @@ describe("getAvatarImageSources", () => {
       {
         imageUrl: "images/ava_300.webp",
         width: 300,
-        webMaxViewportWidth: 1200,
+        webMaxViewportWidth: 2048,
       },
       {
         imageUrl: "images/ava.webp",
