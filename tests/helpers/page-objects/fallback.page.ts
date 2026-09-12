@@ -20,6 +20,7 @@ export class FallbackPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppData.projects.items[0].title,
     );
+    this.clearBrowserErrors();
     await this.assertScreenBackgroundImageCoversViewport();
   }
 
@@ -29,6 +30,7 @@ export class FallbackPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppData.projects.items[0].title,
     );
+    this.clearBrowserErrors();
     await this.assertScreenBackgroundImageCoversViewport();
   }
 }

@@ -3,9 +3,25 @@ import { installExternalUrlCapture } from "../external-routes";
 
 export abstract class BasePage {
   readonly page: Page;
+  private readonly browserErrors: string[] = [];
 
   constructor(page: Page) {
     this.page = page;
+    page.on("pageerror", (error) => {
+      this.browserErrors.push(`pageerror: ${error.message}`);
+    });
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        this.browserErrors.push(`console.error: ${message.text()}`);
+      }
+    });
+    page.on("requestfailed", (request) => {
+      if (request.url().startsWith("http://127.0.0.1:")) {
+        this.browserErrors.push(
+          `requestfailed: ${request.method()} ${request.url()} (${request.failure()?.errorText ?? "unknown"})`,
+        );
+      }
+    });
   }
 
   protected body() {
@@ -26,6 +42,7 @@ export abstract class BasePage {
         ),
       )
       .toBeGreaterThan(0);
+    this.assertNoBrowserErrors();
   }
 
   async assertScreenBackgroundImageCoversViewport() {
@@ -96,6 +113,15 @@ export abstract class BasePage {
           whiteOnlyBackgroundCount: 0,
         }),
       );
+    this.assertNoBrowserErrors();
+  }
+
+  private assertNoBrowserErrors() {
+    expect(this.browserErrors).toEqual([]);
+  }
+
+  protected clearBrowserErrors() {
+    this.browserErrors.length = 0;
   }
 
   async prepareExternalUrlCapture() {
@@ -115,5 +141,6 @@ export abstract class BasePage {
         ),
       )
       .toMatch(pattern);
+    this.assertNoBrowserErrors();
   }
 }
