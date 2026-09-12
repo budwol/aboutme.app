@@ -648,7 +648,7 @@ describe("WnaApp", () => {
     };
     const originalWithTiming = reanimated.withTiming;
 
-    reanimated.withTiming = (value, config, callback) => {
+    reanimated.withTiming = (value, _config, callback) => {
       callback?.(false);
 
       return value;

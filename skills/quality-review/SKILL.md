@@ -11,6 +11,7 @@ Use this skill when the repository needs a complete review focused on correctnes
 
 1. **Data contract**: identify sources of truth, generated copies, fixtures, schemas, localization, asset references, and drift.
 2. **Architecture**: inspect boundaries, dependency direction, naming, duplication, coupling, data flow, and technical debt.
+   Include a repository-wide leftover scan for unused symbols, exports, imports, helpers, scripts, fixtures, assets, stale suppressions, and obsolete configuration.
 3. **Frontend implementation and quality**: verify user flows, responsive behavior, accessibility, loading/error states, navigation, media, and transitions. Use `frontend-engineer` for implementation only when a confirmed defect requires code changes; use `frontend-quality` for the assessment.
 4. **Performance**: measure the current build and analyze Lighthouse, bundle, asset, caching, and runtime evidence without weakening intentional policies.
 5. **Test engineering**: map findings to unit, integration, smoke, and E2E coverage; add regression and edge-case tests; verify the promised coverage scope and thresholds.

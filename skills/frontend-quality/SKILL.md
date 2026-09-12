@@ -16,3 +16,4 @@ Use this skill for frontend regressions, visual inconsistencies, responsive issu
 5. Prefer existing icon, typography, spacing, and motion patterns over introducing parallel styles.
 6. Add interaction tests that assert user-visible behavior and visual checks only where they protect a meaningful invariant.
 7. Verify that fixes do not remove background media, break transitions, or introduce console/request errors.
+8. Include a cleanup pass: find unused components, hooks, styles, test helpers, mocks, selectors, assets, and temporary diagnostics in the reviewed flow; distinguish intentional exports from dead code before recommending removal.

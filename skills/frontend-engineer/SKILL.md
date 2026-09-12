@@ -16,7 +16,8 @@ Use this skill when implementing or changing frontend functionality. Read the ex
 5. Preserve existing navigation transitions, background media, caching, and platform-specific behavior unless the task explicitly changes them.
 6. Use semantic elements and accessible names; expose selected, disabled, expanded, busy, and pressed states where they affect user understanding. Ensure interactive controls are reachable and usable without a pointer.
 7. Add focused unit tests plus browser-level accessibility tests for critical roles, names, keyboard paths, state announcements, and error/retry flows. Prefer user-visible assertions over implementation details.
-8. Run formatting, linting, type checks, focused tests, accessibility checks, and the relevant integration/E2E flow.
+8. Before finishing, remove temporary probes, debug logs, unused imports, abandoned helpers, obsolete mocks, and dead styles introduced during the task. Run unused-symbol and stale-asset checks across the touched flow.
+9. Run formatting, linting, type checks, focused tests, accessibility checks, and the relevant integration/E2E flow.
 
 ## Design Rules
 

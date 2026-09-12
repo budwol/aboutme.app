@@ -2,7 +2,7 @@ const { FlatCompat } = require("@eslint/eslintrc");
 const compat = new FlatCompat();
 module.exports = [
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
+    files: ["**/*.{cjs,mjs,js,jsx,ts,tsx}"],
     ignores: ["dist", "build", "node_modules", ".expo", ".expo-shared"],
   },
   ...compat.extends("expo", "prettier"),
@@ -72,6 +72,21 @@ module.exports = [
           ],
         },
       ],
+    },
+  },
+  {
+    files: ["scripts/**/*.{cjs,mjs,js}"],
+    languageOptions: {
+      globals: {
+        __dirname: "readonly",
+        __filename: "readonly",
+        module: "readonly",
+        process: "readonly",
+        require: "readonly",
+      },
+    },
+    rules: {
+      "no-console": "off",
     },
   },
 ];
