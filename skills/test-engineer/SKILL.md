@@ -13,10 +13,11 @@ Use this skill when the task is to improve test confidence, investigate coverage
 2. Establish a baseline with the narrowest relevant test command, then run the complete pipeline when the change affects shared test infrastructure.
 3. Inspect per-file line, branch, statement, and function coverage. Do not treat a global percentage as proof that every file or behavior is tested.
 4. Identify untested behavior from implementation paths, not from the coverage number alone. Prioritize error handling, fallback logic, empty data, malformed input, boundary values, async timing, navigation transitions, and external-process failures.
-5. Add behavioral assertions that would fail for a real regression. Avoid tests that only assert implementation wording, snapshots without meaningful invariants, or coverage-only execution.
-6. Keep test data representative of the current application schema. When an example fixture is used by integration or E2E tests, add a schema/fixture consistency test so it cannot silently become stale.
-7. Preserve production behavior while improving tests. Do not weaken assertions, delete branches, add coverage ignores, or lower thresholds merely to make the pipeline green.
-8. Run formatting, linting, type checks, the focused tests, and the full validation pipeline as appropriate. Report failures separately when a test exposes an unrelated existing defect.
+5. Run static cleanup checks as part of test review: strict TypeScript unused-symbol checks, repository-wide lint, unused test helpers/mocks/fixtures, stale selectors, skipped or focused tests, and obsolete coverage suppressions. Remove confirmed leftovers and fail CI on newly introduced warnings.
+6. Add behavioral assertions that would fail for a real regression. Avoid tests that only assert implementation wording, snapshots without meaningful invariants, or coverage-only execution.
+7. Keep test data representative of the current application schema. When an example fixture is used by integration or E2E tests, add a schema/fixture consistency test so it cannot silently become stale.
+8. Preserve production behavior while improving tests. Do not weaken assertions, delete branches, add coverage ignores, or lower thresholds merely to make the pipeline green.
+9. Run formatting, linting, type checks, the focused tests, and the full validation pipeline as appropriate. Report failures separately when a test exposes an unrelated existing defect.
 
 ## Coverage Rules
 

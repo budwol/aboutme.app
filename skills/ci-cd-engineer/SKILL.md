@@ -14,9 +14,10 @@ Use this skill when changing or debugging continuous integration, continuous del
 3. Reproduce the failing stage locally with the smallest equivalent command and preserve the first meaningful error.
 4. Keep CI deterministic: use the tracked lockfile, pinned or explicitly controlled tool versions, isolated fixtures, stable ports, and explicit environment setup.
 5. Make failures actionable with clear stage boundaries, meaningful logs, strict exit codes, and assertions that detect browser, network, asset, and artifact errors.
-6. Cache only safe immutable inputs and verify that cache hits cannot hide stale dependencies, generated files, or missing assets.
-7. Treat credentials, registry access, deployment targets, and remote mutations as explicit authorization boundaries.
-8. Add regression tests for pipeline scripts and configuration where practical, then run the full pipeline after shared workflow changes.
+6. Include repository hygiene in quality gates: lint `src`, `tests`, and `scripts`, enforce strict TypeScript unused-symbol checks, and reject new warnings, stale generated artifacts, debug code, or obsolete test helpers.
+7. Cache only safe immutable inputs and verify that cache hits cannot hide stale dependencies, generated files, or missing assets.
+8. Treat credentials, registry access, deployment targets, and remote mutations as explicit authorization boundaries.
+9. Add regression tests for pipeline scripts and configuration where practical, then run the full pipeline after shared workflow changes.
 
 ## Release Safety
 

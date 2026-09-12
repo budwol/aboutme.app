@@ -18,5 +18,6 @@ export async function getThemeFromStorageAsync() {
     return value !== null ? (value as Theme) : "system";
   } catch (e) {
     Logger.error(getThemeFromStorageAsync.name, e);
+    return undefined;
   }
 }

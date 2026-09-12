@@ -12,10 +12,11 @@ Use this skill for an architecture review or when a change may affect module bou
 1. Inspect repository structure, dependency direction, entry points, configuration, and existing architectural documentation.
 2. Trace the relevant data and control flow before judging abstractions.
 3. Check ownership boundaries, coupling, circular dependencies, duplicated logic, leaky abstractions, inconsistent naming, and unused compatibility code.
-4. Separate correctness defects from design risks, cleanup opportunities, and subjective preferences.
-5. Report findings first, ordered by impact, with file references and concrete consequences.
-6. Implement only confirmed improvements within the requested scope and add focused regression tests.
-7. Update ADRs only when a durable architectural decision changed; keep them concise and implementation-independent.
+4. Run a repository-wide cleanup scan for unused locals, parameters, exports, imports, helpers, scripts, stale fixtures, duplicate configuration, and dead compatibility paths. Confirm every suspected leftover with references and preserve intentional public/test entry points.
+5. Separate correctness defects from design risks, cleanup opportunities, and subjective preferences.
+6. Report findings first, ordered by impact, with file references and concrete consequences.
+7. Implement only confirmed improvements within the requested scope and add focused regression tests.
+8. Update ADRs only when a durable architectural decision changed; keep them concise and implementation-independent.
 
 ## Rules
 

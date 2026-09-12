@@ -255,7 +255,7 @@ If you want the short answer to "is this thing still standing right?", this is t
 
 - `npm run test:security`
 - `npm run test:prettier`
-- `npm run lint`
+- `npm run lint` (checks `src`, `tests`, and `scripts`; strict unused-symbol checks run through `npm run test:types`)
 - `npm run test:types`
 - `npm run test:unit`
 - `npm run test:integration`

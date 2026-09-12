@@ -14,8 +14,9 @@ Use this skill for build failures, container deployments, release preparation, C
 3. Validate configuration and build artifacts before any external push or deployment.
 4. Keep lockfiles deterministic and never delete or regenerate them as an incidental release step.
 5. Verify image names, tags, build context, runtime assets, health checks, environment variables, and cache behavior.
-6. Run the complete release pipeline after changing shared build or deployment logic.
-7. Do not push images, deploy services, or mutate remote state without explicit authorization.
+6. Run a final cleanup scan for unused build helpers, stale artifacts, temporary diagnostics, obsolete scripts, and configuration left behind by the release change.
+7. Run the complete release pipeline after changing shared build or deployment logic.
+8. Do not push images, deploy services, or mutate remote state without explicit authorization.
 
 ## Completion
 
