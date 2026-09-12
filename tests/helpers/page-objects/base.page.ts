@@ -31,23 +31,6 @@ export abstract class BasePage {
     return this.page.locator("body");
   }
 
-  async assertNavigationTransitionUsesBackground() {
-    const overlay = this.page.locator("#navigation-transition-overlay");
-    const background = this.page.locator("#navigation-transition-background");
-    const image = background.locator("img");
-
-    await expect(overlay).toBeVisible({ timeout: 1000 });
-    await expect(image).toHaveAttribute("src", /bg\.webp/);
-    await expect
-      .poll(async () =>
-        overlay.evaluate((element) =>
-          Number(window.getComputedStyle(element).opacity),
-        ),
-      )
-      .toBeGreaterThan(0);
-    this.assertNoBrowserErrors();
-  }
-
   async assertScreenBackgroundImageCoversViewport() {
     await expect
       .poll(async () =>
