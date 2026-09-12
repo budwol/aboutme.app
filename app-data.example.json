@@ -22,6 +22,41 @@
     "primary": ["PHP", "Basic"],
     "secondary": ["Perl", "Java"]
   },
+  "tools": {
+    "primary": ["Linux", "JetBrains IDEs", "VS Code", "Docker", "GitHub"],
+    "secondary": ["Draw.io", "Grafana"]
+  },
+  "skillLevels": {
+    "PHP": "senior",
+    "Basic": "mid",
+    "Perl": "mid",
+    "Java": "mid",
+    "Linux": "mid",
+    "JetBrains IDEs": "expert",
+    "VS Code": "senior",
+    "Docker": "senior",
+    "GitHub": "senior",
+    "Draw.io": "mid",
+    "Grafana": "mid"
+  },
+  "softSkills": {
+    "primary": [
+      {
+        "nameDe": "Kommunikationsstark",
+        "nameEn": "Strong Communicator",
+        "level": "mid"
+      },
+      {
+        "nameDe": "Selbstorganisiert",
+        "nameEn": "Self-Organized",
+        "level": "senior"
+      }
+    ]
+  },
+  "certificates": [
+    { "nameDe": "ISTQB 4.0 CTFL", "nameEn": "ISTQB 4.0 CTFL" },
+    { "nameDe": "ITIL 4 CFL", "nameEn": "ITIL 4 CFL" }
+  ],
   "projectsSubtitleDe": "Einige private Nebenprojekte",
   "projectsSubtitleEn": "Some private side projects",
   "projectsContextDe": "Private End-to-End-Projekte von Konzeption und Architektur bis Deployment und Betrieb.",

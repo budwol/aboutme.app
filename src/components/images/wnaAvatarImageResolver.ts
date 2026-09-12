@@ -31,7 +31,7 @@ export function getAvatarImageSources(
     {
       imageUrl: `images/${normalizedFileName}`,
       width: imageConstants.avatarOriginalSize,
-      webMaxViewportWidth: imageConstants.avatarOriginalSize * 2,
+      webMaxViewportWidth: imageConstants.avatarOriginalViewportWidth,
     },
   ];
 }

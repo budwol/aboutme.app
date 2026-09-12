@@ -1442,7 +1442,21 @@ async function generateResumePdf(rootDir, logger = console.log) {
   return { deTargetFile, enTargetFile, deAtsTargetFile, enAtsTargetFile };
 }
 
-module.exports = { generateResumePdf, buildPortfolioFileName };
+module.exports = {
+  buildAtsSkillList,
+  buildAtsSoftSkillList,
+  buildGoogleMapsUrl,
+  buildLocalizedNameList,
+  buildPortfolioFileName,
+  buildSkillEntries,
+  formatPhoneNumber,
+  generateResumePdf,
+  groupDigits,
+  limitEntryTechstack,
+  pickString,
+  pickStringArray,
+  slugifyName,
+};
 
 if (require.main === module) {
   generateResumePdf(process.cwd()).catch((error) => {

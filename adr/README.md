@@ -18,7 +18,7 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0010](0010-build-time-resume-pdf-generation.md)                | A condensed resume PDF is generated at build time from the same source data              |
 | [0011](0011-ats-safe-resume-variant.md)                         | A separate, single-column resume variant is generated for ATS pipelines                  |
 | [0012](0012-react-test-renderer-for-component-tests.md)         | Component tests use `react-test-renderer`, not `@testing-library/react-native`           |
-| [0013](0013-100-percent-line-and-branch-coverage-target.md)     | 100% line and branch coverage is the target, enforced via `coverageThreshold`            |
+| [0013](0013-100-percent-line-and-branch-coverage-target.md)     | 100% coverage is the target, enforced via `coverageThreshold`                            |
 | [0014](0014-wna-side-file-naming-convention.md)                 | Non-component side-files (types/styles/state) are `camelCase`, prefixed with their owner |
 | [0015](0015-app-wide-state-lives-outside-components.md)         | App-wide state lives in `src/state/`, separate from `src/components/`                    |
 | [0016](0016-layer-boundaries-enforced-by-lint-and-ci.md)        | Layer boundaries are enforced by ESLint and a CI circular-dependency gate                |

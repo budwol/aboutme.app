@@ -329,6 +329,8 @@ The quality gates are meant to run in this order:
 - `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
+Coverage is collected for executable TypeScript under `src/`. The 100% lines/branches/statements/functions target is not a claim that every file contains runtime statements: TypeScript-only files and Expo Router re-export entry points correctly appear as `0/0`. Build scripts under `scripts/` have dedicated Jest tests and are exercised by the full pipeline, but are outside the Istanbul threshold because their CLI entry points and external tool adapters are process-boundary code. Always inspect the per-file report, especially when adding a new build script.
+
 `npm run test:all` is the broad local test stack for `prettier + types + circular deps + unit + coverage + integration + e2e`. `smoke` stays separate on purpose.
 
 The Git hook path is intentionally smaller:
@@ -366,7 +368,7 @@ If you want the full local CI pass:
 npm run ci:local
 ```
 
-`ci:local` recreates `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, coverage, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
+`ci:local` preserves the tracked `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, coverage, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
 
 The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 

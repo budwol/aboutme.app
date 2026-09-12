@@ -4,8 +4,9 @@ import os from "os";
 import path from "path";
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const { injectHtml, injectWebShell } =
+const { collectHtmlFiles, injectHtml, injectWebShell } =
   require("../../../scripts/inject-web-shell.cjs") as {
+    collectHtmlFiles: (dir: string) => string[];
     injectHtml: (html: string, appData: unknown) => string;
     injectWebShell: (
       rootDir: string,
@@ -41,6 +42,34 @@ describe("inject-web-shell", () => {
     expect(injected).toContain("Jane &lt;Example&gt;");
     expect(injected).toContain("Platform Engineer");
     expect(injected).toContain("\\u003cExample\\u003e");
+  });
+
+  it("collects nested html files and returns an empty list for a missing directory", () => {
+    const fixtureRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), "aboutme-shell-"),
+    );
+    createdFixtures.push(fixtureRoot);
+    fs.mkdirSync(path.join(fixtureRoot, "nested"), { recursive: true });
+    fs.writeFileSync(path.join(fixtureRoot, "index.html"), "", "utf8");
+    fs.writeFileSync(path.join(fixtureRoot, "nested", "page.html"), "", "utf8");
+    fs.writeFileSync(path.join(fixtureRoot, "notes.txt"), "", "utf8");
+
+    expect(collectHtmlFiles(fixtureRoot)).toEqual([
+      path.join(fixtureRoot, "index.html"),
+      path.join(fixtureRoot, "nested", "page.html"),
+    ]);
+    expect(collectHtmlFiles(path.join(fixtureRoot, "missing"))).toEqual([]);
+  });
+
+  it("fails when the export app-data file is missing", () => {
+    const fixtureRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), "aboutme-shell-"),
+    );
+    createdFixtures.push(fixtureRoot);
+
+    expect(() => injectWebShell(fixtureRoot)).toThrow(
+      "missing export app-data: dist/app-data.json",
+    );
   });
 
   it("keeps repeated injections idempotent", () => {

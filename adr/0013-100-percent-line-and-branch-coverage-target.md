@@ -1,4 +1,4 @@
-# 13. 100% line and branch coverage is the target, enforced via `coverageThreshold`
+# 13. 100% coverage is the target, enforced via `coverageThreshold`
 
 Date: 2026-09-09
 
@@ -12,16 +12,20 @@ Prior to this ADR, `jest.config.cjs` had no `collectCoverageFrom`, so `--coverag
 
 ## Decision
 
-The target is 100% line coverage and 100% branch coverage across all of `src/**/*.{ts,tsx}` (test files and `.d.ts` declaration files excluded, since they have nothing meaningful to cover) — including `src/app/**`'s Expo Router route and layout files, not just component/utility logic. `jest.config.cjs` now sets:
+The target is 100% line coverage and 100% branch coverage across the instrumented application code. `jest.config.cjs` measures `src/**/*.{ts,tsx}`; test files and `.d.ts` declaration files are excluded. Build scripts under `scripts/` are tested through their dedicated Jest suites and the full CI pipeline, but are not part of this Istanbul threshold because their CLI entry points and external tool adapters are process-boundary code. `jest.config.cjs` sets:
 
-- `collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.test.{ts,tsx}", "!src/**/*.d.ts"]` — so every source file is measured, whether or not any test happens to load it.
-- `coverageThreshold.global: { branches: 100, lines: 100 }` — so `jest --coverage` fails the moment either metric drops below 100%, not just when it regresses from whatever the last measured number happened to be.
+- `collectCoverageFrom: ["src/**/*.{ts,tsx}", "!src/**/*.test.{ts,tsx}", "!src/**/*.d.ts"]` — so every application source file is measured, whether or not any test happens to load it.
+- `coverageThreshold.global: { branches: 100, lines: 100, functions: 100, statements: 100 }` — so `jest --coverage` fails when any tracked metric drops below 100%, not just when it regresses from whatever the last measured number happened to be.
 
 `npm run test:coverage` runs `jest --coverage` against `src`. It is wired into `ci:local`, `test:all`, and the GitHub Actions chain via `ci-coverage.yml`, after the unit gate and before integration.
 
+## Interpretation
+
+The percentage is only meaningful when the report's file list is inspected as well. A `0/0` entry means that a file has no executable instrumentable statements, typically because it contains only TypeScript types or an Expo Router re-export. It is not evidence that runtime behavior was tested. Route behavior is covered by direct component/integration/E2E tests; pure re-export files remain structural entry points. Build scripts are verified by their dedicated tests and by the full pipeline.
+
 ## Consequences
 
-- Baseline after closing the target: **100% statements / 100% branches / 99%+ functions / 100% lines**. The enforced thresholds are line and branch coverage; function coverage is visible in the report but not a configured gate.
-- Because `src/app/**` counts, route/layout files that are currently only exercised indirectly via `tests/integration/**` or Playwright e2e (which don't feed into this Jest coverage run at all) now need direct unit-test coverage too, or the target is permanently out of reach.
+- Lines, branches, statements, and functions are all enforced at 100%.
+- Playwright E2E coverage does not contribute to the Jest percentage. Critical route behavior therefore needs Jest or integration assertions as well as E2E coverage where the behavior warrants both.
 - Every new file added under `src/` is now in-scope by default (the glob, not a maintained list) — a PR that adds an untested file makes the number worse immediately, it can't hide the way it could before this ADR.
 - CI now has a dedicated coverage gate. The next risk is runtime cost rather than trust: if coverage gets slow enough to hurt feedback, tune Jest execution, not the threshold.

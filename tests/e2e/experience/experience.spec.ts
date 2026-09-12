@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { stubEmployerRoutes } from "../../helpers/external-routes";
 import { ExperiencePage } from "../../helpers/page-objects/experience.page";
 import { HomePage } from "../../helpers/page-objects/home.page";
@@ -30,6 +30,11 @@ test("user reviews experience items, toggles details, and navigates to the exper
   await test.step("navigate to the experience page and verify it", async () => {
     await homePage.openExperiencePage();
     await experiencePage.assertIsOnPage();
+    const avatarResponse = await page.request.get(
+      "/images/default_avatar_300.webp",
+    );
+    expect(avatarResponse.ok()).toBe(true);
+    expect(avatarResponse.status()).toBe(200);
   });
 
   await test.step("verify the full experience page content", async () => {

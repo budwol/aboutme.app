@@ -14,7 +14,11 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
     sitemapXml: string;
     manifest: string;
   };
+  buildAvatarVariantFileName: (fileName: string, size: number) => string;
+  findBackgroundSource: (directory: string) => string | null;
+  getRequiredImageFiles: (data: unknown) => string[];
   normalizeSiteUrl: (siteUrl?: string) => string;
+  parseCliArgs: (args: string[]) => { dryRun: boolean };
   runInitProcess: (
     rootDir: string,
     options?: {
@@ -26,10 +30,39 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
     },
   ) => { generated: boolean; migrated: boolean };
 };
-const { buildGeneratedFiles, normalizeSiteUrl, runInitProcess } =
-  initProcessModule;
+const {
+  buildAvatarVariantFileName,
+  buildGeneratedFiles,
+  findBackgroundSource,
+  getRequiredImageFiles,
+  normalizeSiteUrl,
+  parseCliArgs,
+  runInitProcess,
+} = initProcessModule;
 
 describe("init process security", () => {
+  it("handles CLI flags, image variants, and required image references", () => {
+    expect(parseCliArgs(["--dry-run"])).toEqual({ dryRun: true });
+    expect(parseCliArgs([])).toEqual({ dryRun: false });
+    expect(buildAvatarVariantFileName("avatar.png", 300)).toBe(
+      "avatar_300.webp",
+    );
+    expect(
+      getRequiredImageFiles({
+        profile: { avatar: "avatar.webp" },
+        projects: [
+          {
+            imageL: "large.webp",
+            imageM: "medium.webp",
+            imageS: "small.webp",
+          },
+          { imageL: "large.webp" },
+        ],
+      }),
+    ).toEqual(["avatar.webp", "large.webp", "medium.webp", "small.webp"]);
+    expect(getRequiredImageFiles({ profile: {}, projects: [] })).toEqual([]);
+  });
+
   it("accepts https urls and local http urls", () => {
     expect(normalizeSiteUrl("https://portfolio.example.com/")).toBe(
       "https://portfolio.example.com",
@@ -40,6 +73,7 @@ describe("init process security", () => {
   });
 
   it("rejects unsafe site urls", () => {
+    expect(() => normalizeSiteUrl()).toThrow("siteUrl is missing");
     expect(() => normalizeSiteUrl("http://example.com")).toThrow(
       /invalid siteUrl/,
     );
@@ -81,6 +115,22 @@ describe("init process security", () => {
     );
     expect(generated.manifest).toContain('"scope": "/"');
     expect(generated.manifest).toContain('"start_url": "/"');
+  });
+
+  it("selects the first available background source", () => {
+    const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-bg-"));
+    const imagesDir = path.join(fixtureRoot, "images");
+    fs.mkdirSync(imagesDir, { recursive: true });
+    expect(findBackgroundSource(imagesDir)).toBe(null);
+    fs.writeFileSync(path.join(imagesDir, "bg.jpg"), "background", "utf8");
+    expect(findBackgroundSource(imagesDir)).toBe(
+      path.join(imagesDir, "bg.jpg"),
+    );
+    fs.writeFileSync(path.join(imagesDir, "bg.webp"), "preferred", "utf8");
+    expect(findBackgroundSource(imagesDir)).toBe(
+      path.join(imagesDir, "bg.webp"),
+    );
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
   });
 });
 

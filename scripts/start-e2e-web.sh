@@ -35,6 +35,15 @@ fi
 
 cp "$EXAMPLE_FILE" "$TARGET_FILE"
 
+mkdir -p "$ROOT_DIR/public/images"
+cp "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
+  "$ROOT_DIR/public/images/default_avatar.webp"
+cp "$ROOT_DIR/assets/defaults/images/default_project.webp" \
+  "$ROOT_DIR/public/images/default_project.webp"
+convert "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
+  -resize 300x300 -quality 80 \
+  "$ROOT_DIR/public/images/default_avatar_300.webp"
+
 load_env_file "$ROOT_DIR/.env.example"
 load_env_file "$ROOT_DIR/.env"
 load_env_file "$ROOT_DIR/.env.local"
