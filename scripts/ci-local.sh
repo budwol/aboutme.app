@@ -6,10 +6,8 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_DIR"
 
-[ ! -e ./package-lock.json ] || rm ./package-lock.json
 rm -rf dist web-build .expo .expo/web .cache
 npm prune
-HUSKY=0 npm i --package-lock-only
 ./node_modules/.bin/expo-doctor
 npm run test:prettier
 npm run lint
