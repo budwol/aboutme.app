@@ -16,7 +16,7 @@
     "lint": "eslint ./src --no-cache",
     "lint-fix": "eslint ./src --fix --no-cache",
     "prepare": "husky",
-    "start": "expo start",
+    "start": "npm run web",
     "test": "jest --watchAll",
     "test:all": "npm run test:prettier && npm run test:types && npm run test:circular && npm run test:unit && npm run test:coverage && npm run test:integration && npm run test:e2e",
     "test:circular": "madge --circular --extensions ts,tsx --ts-config tsconfig.json src",

@@ -18,6 +18,12 @@ function readRootFile(relativePath: string): string {
 }
 
 describe("package scripts", () => {
+  it("starts the prepared local web app by default", () => {
+    const packageJson = readPackageJson();
+
+    expect(packageJson.scripts?.start).toBe("npm run web");
+  });
+
   it("re-syncs the real app-data after the local CI path", () => {
     const packageJson = readPackageJson();
     const ciLocal = packageJson.scripts?.["ci:local"];
