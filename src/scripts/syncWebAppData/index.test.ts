@@ -103,6 +103,12 @@ describe("sync-web-app-data", () => {
       "project-image",
       "utf8",
     );
+    fs.mkdirSync(path.join(sourceImagesDir, "nested"), { recursive: true });
+    fs.writeFileSync(
+      path.join(sourceImagesDir, "nested", "detail.webp"),
+      "nested-image",
+      "utf8",
+    );
     fs.writeFileSync(
       path.join(publicImagesDir, "ava.webp"),
       "old-avatar",
@@ -118,6 +124,12 @@ describe("sync-web-app-data", () => {
     expect(
       fs.readFileSync(path.join(publicImagesDir, "project.webp"), "utf8"),
     ).toBe("project-image");
+    expect(
+      fs.readFileSync(
+        path.join(publicImagesDir, "nested", "detail.webp"),
+        "utf8",
+      ),
+    ).toBe("nested-image");
     expect(fs.existsSync(path.join(publicImagesDir, "stale.webp"))).toBe(false);
   });
 

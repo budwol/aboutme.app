@@ -4,7 +4,7 @@ import {
   type ReporterDescription,
 } from "@playwright/test";
 
-const port = 3000;
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
 const reporter: "list" | ReporterDescription[] = process.env.CI
   ? ([
       ["github"],

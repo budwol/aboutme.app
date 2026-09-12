@@ -12,7 +12,10 @@ export abstract class BasePage {
     });
     page.on("console", (message) => {
       if (message.type() === "error") {
-        this.browserErrors.push(`console.error: ${message.text()}`);
+        const location = message.location().url;
+        this.browserErrors.push(
+          `console.error: ${message.text()}${location ? ` [${location}]` : ""}`,
+        );
       }
     });
     page.on("requestfailed", (request) => {

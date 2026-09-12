@@ -54,6 +54,18 @@ function writeAppData(fixtureRoot: string, data: unknown) {
   );
 }
 
+function copyExampleAppData(fixtureRoot: string) {
+  writeAppData(
+    fixtureRoot,
+    JSON.parse(
+      fs.readFileSync(
+        path.resolve(process.cwd(), "app-data.example.json"),
+        "utf8",
+      ),
+    ),
+  );
+}
+
 describe("generate-resume-pdf", () => {
   afterEach(() => {
     for (const fixture of createdFixtures.splice(0)) {
@@ -153,6 +165,26 @@ describe("generate-resume-pdf", () => {
     expect(logger).toHaveBeenCalledWith(
       expect.stringContaining("Jane_Example_-_Portfolio_EN_ATS.pdf"),
     );
+  });
+
+  it("renders the current example data including the extended resume sections", async () => {
+    const fixtureRoot = createFixtureRoot();
+    copyExampleAppData(fixtureRoot);
+
+    const result = await generateResumePdf(fixtureRoot, silentLogger);
+    const generatedFiles = [
+      result.deTargetFile,
+      result.enTargetFile,
+      result.deAtsTargetFile,
+      result.enAtsTargetFile,
+    ];
+
+    expect(generatedFiles).toHaveLength(4);
+    for (const file of generatedFiles) {
+      const pdf = fs.readFileSync(file);
+      expect(pdf.subarray(0, 5).toString("latin1")).toBe("%PDF-");
+      expect(pdf.length).toBeGreaterThan(1000);
+    }
   });
 
   it("renders successfully when a PNG avatar is configured", async () => {
