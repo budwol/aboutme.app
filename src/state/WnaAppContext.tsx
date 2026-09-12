@@ -23,6 +23,10 @@ type WnaLifecycleState = {
   isStatusBarVisible: boolean;
   setIsStatusBarVisible: (value: boolean) => void;
   isNavigationTransitionActive: boolean;
+  navigationTransitionBackgroundImageUrl?: string;
+  registerNavigationTransitionBackgroundImageUrl: (
+    backgroundImageUrl?: string,
+  ) => () => void;
   startNavigationTransition: (action: () => void) => void;
   finishNavigationTransition: () => void;
 };
@@ -68,6 +72,11 @@ const WnaLayoutContext = createContext<WnaLayoutState | null>(null);
 const WnaThemeContext = createContext<WnaThemeState | null>(null);
 const WnaDataContext = createContext<WnaDataState | null>(null);
 
+type NavigationTransitionBackgroundRegistration = {
+  id: number;
+  backgroundImageUrl?: string;
+};
+
 function useRequiredContext<T>(
   context: React.Context<T | null>,
   name: string,
@@ -108,9 +117,17 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
   const [appData, setAppData] = useState<AppData>(defaultAppData);
   const [theme, setTheme] = useState<Theme>("system");
   const [appColors, setAppColors] = useState<Colors>(initialColors);
+  const [
+    navigationTransitionBackgroundImageUrl,
+    setNavigationTransitionBackgroundImageUrl,
+  ] = useState<string | undefined>(undefined);
   const navigationTransitionTimerRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
+  const navigationTransitionBackgroundRegistrationIdRef = useRef(0);
+  const navigationTransitionBackgroundRegistrationsRef = useRef<
+    NavigationTransitionBackgroundRegistration[]
+  >([]);
 
   const [currentScreenWidth, setCurrentScreenWidth] = useState(
     dimensions.screenWidth,
@@ -137,6 +154,36 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
 
   const appStyle = useMemo(() => setAppStyle(appColors), [appColors]);
   const appLayout = useMemo(() => getAppLayout(isLandscape), [isLandscape]);
+
+  const registerNavigationTransitionBackgroundImageUrl = useCallback(
+    (backgroundImageUrl?: string) => {
+      navigationTransitionBackgroundRegistrationIdRef.current += 1;
+      const registrationId =
+        navigationTransitionBackgroundRegistrationIdRef.current;
+
+      navigationTransitionBackgroundRegistrationsRef.current = [
+        ...navigationTransitionBackgroundRegistrationsRef.current,
+        { id: registrationId, backgroundImageUrl },
+      ];
+      setNavigationTransitionBackgroundImageUrl(backgroundImageUrl);
+
+      return () => {
+        navigationTransitionBackgroundRegistrationsRef.current =
+          navigationTransitionBackgroundRegistrationsRef.current.filter(
+            (registration) => registration.id !== registrationId,
+          );
+        const currentRegistration =
+          navigationTransitionBackgroundRegistrationsRef.current[
+            navigationTransitionBackgroundRegistrationsRef.current.length - 1
+          ];
+
+        setNavigationTransitionBackgroundImageUrl(
+          currentRegistration?.backgroundImageUrl,
+        );
+      };
+    },
+    [],
+  );
 
   const startNavigationTransition = useCallback(
     (action: () => void) => {
@@ -182,6 +229,8 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
       isStatusBarVisible,
       setIsStatusBarVisible,
       isNavigationTransitionActive,
+      navigationTransitionBackgroundImageUrl,
+      registerNavigationTransitionBackgroundImageUrl,
       startNavigationTransition,
       finishNavigationTransition,
     }),
@@ -190,6 +239,8 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
       isAppInitialized,
       isNavigationTransitionActive,
       isStatusBarVisible,
+      navigationTransitionBackgroundImageUrl,
+      registerNavigationTransitionBackgroundImageUrl,
       startNavigationTransition,
     ],
   );

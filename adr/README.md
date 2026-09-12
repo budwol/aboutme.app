@@ -2,7 +2,7 @@
 
 This directory captures decisions already made in this codebase that weren't written down anywhere. They were reconstructed from the existing implementation, not designed fresh — treat them as documentation of established conventions, not as a design proposal.
 
-Format: lightweight ADR (Context / Decision / Consequences). New ADRs get the next sequential number.
+Format: concise ADR (Context / Decision / Consequences). Keep each record focused on the decision and its practical consequence; omit implementation history and unnecessary detail. New ADRs get the next sequential number.
 
 | ADR                                                             | Title                                                                                    |
 | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -25,3 +25,4 @@ Format: lightweight ADR (Context / Decision / Consequences). New ADRs get the ne
 | [0017](0017-naming-avoids-c-java-conventions.md)                | Naming avoids C#/Java conventions; overlapping type names are disambiguated by owner     |
 | [0018](0018-clear-metro-cache-on-export.md)                     | `export:web` always clears the Metro bundler cache                                       |
 | [0019](0019-splash-shell-and-intro-overlay-must-match.md)       | The static splash shell and the app's intro overlay must match                           |
+| [0020](0020-commit-message-convention.md)                       | Commit messages use professional one-line Gitmoji descriptions                           |

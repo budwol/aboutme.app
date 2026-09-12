@@ -1,14 +1,22 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
 
 let mockIsAppInitialized = true;
 let mockBackgroundImageUrl = "default-background.webp";
+const mockUnregisterNavigationTransitionBackgroundImageUrl = jest.fn();
+const mockRegisterNavigationTransitionBackgroundImageUrl = jest.fn(
+  () => mockUnregisterNavigationTransitionBackgroundImageUrl,
+);
+type FocusEffectCallback = () => void | (() => void);
+let mockFocusEffectCallbacks: FocusEffectCallback[] = [];
 
 jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppLifecycle: () => ({
     isAppInitialized: mockIsAppInitialized,
+    registerNavigationTransitionBackgroundImageUrl:
+      mockRegisterNavigationTransitionBackgroundImageUrl,
   }),
   useWnaTheme: () => ({
     appColors: {
@@ -26,6 +34,12 @@ jest.mock("@/state/WnaAppContext", () => ({
       backgroundImageUrl: mockBackgroundImageUrl,
     },
   }),
+}));
+
+jest.mock("@react-navigation/native", () => ({
+  useFocusEffect: (callback: FocusEffectCallback) => {
+    mockFocusEffectCallbacks.push(callback);
+  },
 }));
 
 jest.mock("react-i18next", () => ({
@@ -118,6 +132,20 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaBaseScreen", () => {
+  beforeEach(() => {
+    mockIsAppInitialized = true;
+    mockBackgroundImageUrl = "default-background.webp";
+    mockFocusEffectCallbacks = [];
+    mockRegisterNavigationTransitionBackgroundImageUrl.mockClear();
+    mockUnregisterNavigationTransitionBackgroundImageUrl.mockClear();
+  });
+
+  function focusScreen(index = mockFocusEffectCallbacks.length - 1) {
+    const cleanup = mockFocusEffectCallbacks[index]?.();
+
+    return typeof cleanup === "function" ? cleanup : () => undefined;
+  }
+
   it("renders nothing until the app is initialized", () => {
     mockIsAppInitialized = false;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -127,7 +155,12 @@ describe("WnaBaseScreen", () => {
     });
 
     expect(tree!.toJSON()).toBeNull();
-    mockIsAppInitialized = true;
+
+    focusScreen();
+
+    expect(
+      mockRegisterNavigationTransitionBackgroundImageUrl,
+    ).not.toHaveBeenCalled();
   });
 
   it("uses the layout background and forwards header props", () => {
@@ -145,11 +178,99 @@ describe("WnaBaseScreen", () => {
     const imageBackground = tree!.root.findByType("WnaImageBackground");
     const header = tree!.root.findByType("WnaHeader");
 
+    focusScreen();
+
     expect(webBaseScreen.props.title).toBe("Projects");
+    expect(imageBackground.props.testID).toBe("screen-background");
     expect(imageBackground.props.imageUri).toBe("default-background.webp");
+    expect(
+      mockRegisterNavigationTransitionBackgroundImageUrl,
+    ).toHaveBeenCalledWith("default-background.webp");
     expect(header.props.headerTitle).toBe("Projects");
     expect(header.props.icon).toBe("rocket");
     expect(header.props.isRootPage).toBe(true);
+  });
+
+  it("uses a screen-specific background image", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBaseScreen
+          headerTitle="Projects"
+          backgroundImageUrl="/project-background.webp"
+        >
+          <></>
+        </WnaBaseScreen>,
+      );
+    });
+
+    const imageBackground = tree!.root.findByType("WnaImageBackground");
+    const blurScreen = focusScreen();
+
+    expect(imageBackground.props.imageUri).toBe("/project-background.webp");
+    expect(
+      mockRegisterNavigationTransitionBackgroundImageUrl,
+    ).toHaveBeenCalledWith("/project-background.webp");
+
+    act(() => {
+      blurScreen();
+      tree!.unmount();
+    });
+
+    expect(
+      mockUnregisterNavigationTransitionBackgroundImageUrl,
+    ).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates the transition background when focus moves between mounted screens", () => {
+    const unregisterFirst = jest.fn();
+    const unregisterSecond = jest.fn();
+    mockRegisterNavigationTransitionBackgroundImageUrl
+      .mockReturnValueOnce(unregisterFirst)
+      .mockReturnValueOnce(unregisterSecond);
+
+    act(() => {
+      TestRenderer.create(
+        <>
+          <WnaBaseScreen
+            headerTitle="First"
+            backgroundImageUrl="/first-background.webp"
+          >
+            <></>
+          </WnaBaseScreen>
+          <WnaBaseScreen
+            headerTitle="Second"
+            backgroundImageUrl="/second-background.webp"
+          >
+            <></>
+          </WnaBaseScreen>
+        </>,
+      );
+    });
+
+    const blurFirst = focusScreen(0);
+    const blurSecond = focusScreen(1);
+
+    expect(
+      mockRegisterNavigationTransitionBackgroundImageUrl,
+    ).toHaveBeenNthCalledWith(1, "/first-background.webp");
+    expect(
+      mockRegisterNavigationTransitionBackgroundImageUrl,
+    ).toHaveBeenNthCalledWith(2, "/second-background.webp");
+
+    act(() => {
+      blurSecond();
+    });
+
+    expect(unregisterSecond).toHaveBeenCalledTimes(1);
+    expect(unregisterFirst).not.toHaveBeenCalled();
+
+    act(() => {
+      blurFirst();
+    });
+
+    expect(unregisterFirst).toHaveBeenCalledTimes(1);
   });
 
   it("uses documentTitle for the browser tab without changing the header text", () => {

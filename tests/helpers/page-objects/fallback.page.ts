@@ -20,6 +20,7 @@ export class FallbackPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppData.projects.items[0].title,
     );
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertRedirectedToProjects() {
@@ -28,5 +29,6 @@ export class FallbackPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppData.projects.items[0].title,
     );
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 }

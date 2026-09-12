@@ -353,6 +353,9 @@ describe("app routes", () => {
     expect(drawer.props.screenOptions.drawerStyle.backgroundColor).toBe(
       "#ffffff",
     );
+    expect(drawer.props.screenOptions.sceneStyle.backgroundColor).toBe(
+      "transparent",
+    );
     expect(drawer.props.drawerContent().type.name).toBe("WnaDrawerMenu");
     expect(tree!.root.findAllByType("DrawerScreen")).toHaveLength(2);
   });

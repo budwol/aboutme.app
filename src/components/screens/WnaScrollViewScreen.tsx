@@ -31,6 +31,7 @@ export type WnaScrollViewScreenProps = {
 
 const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
   children,
+  backgroundImageUrl,
   headerTitle,
   iconName,
   backHref,
@@ -59,6 +60,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
       isRootPage={isRootPage}
       headerTitle={headerTitle}
       icon={iconName}
+      backgroundImageUrl={backgroundImageUrl}
       backHref={backHref}
       titleHref={titleHref}
       scrollY={scrollY}

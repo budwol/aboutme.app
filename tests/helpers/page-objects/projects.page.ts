@@ -21,6 +21,7 @@ export class ProjectsPage extends BasePage {
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/projects$/);
     await expect(this.body()).toContainText(exampleAppData.projects.title);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertGermanIsOnPage() {
@@ -29,6 +30,7 @@ export class ProjectsPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppDataDe.projects.highlights[0],
     );
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertContent() {

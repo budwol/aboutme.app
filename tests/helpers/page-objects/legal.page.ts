@@ -25,6 +25,7 @@ export class LegalPage extends BasePage {
   async assertIsOnPage(pathSuffix: RegExp, expectedText: string) {
     await expect(this.page).toHaveURL(pathSuffix);
     await expect(this.body()).toContainText(expectedText);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertIsOnGermanPrivacyPage() {

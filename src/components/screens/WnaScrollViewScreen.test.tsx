@@ -104,4 +104,25 @@ describe("WnaScrollViewScreen", () => {
 
     expect(tree!.root.findAllByType("WnaContactFooter")).toHaveLength(0);
   });
+
+  it("forwards a screen-specific background image", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaScrollViewScreen
+          headerTitle="Project"
+          backgroundImageUrl="/project-background.webp"
+        >
+          <></>
+        </WnaScrollViewScreen>,
+      );
+    });
+
+    const baseScreen = tree!.root.findByType("WnaBaseScreen");
+
+    expect(baseScreen.props.backgroundImageUrl).toBe(
+      "/project-background.webp",
+    );
+  });
 });

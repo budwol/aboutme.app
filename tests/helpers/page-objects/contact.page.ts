@@ -22,6 +22,7 @@ export class ContactPage extends BasePage {
     await expect(this.page).toHaveURL(/\/contact$/);
     await expect(this.body()).toContainText(exampleAppData.contact.title);
     await expect(this.body()).toContainText(exampleAppData.contact.subtitle);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertGermanIsOnPage() {
@@ -29,6 +30,7 @@ export class ContactPage extends BasePage {
     await expect(this.body()).toContainText(exampleAppDataDe.contact.title);
     await expect(this.body()).toContainText(exampleAppDataDe.contact.subtitle);
     await expect(this.body()).toContainText(exampleAppDataDe.contact.name);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertGermanContent() {

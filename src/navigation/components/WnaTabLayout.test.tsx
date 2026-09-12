@@ -131,7 +131,7 @@ describe("WnaTabLayout", () => {
 
     expect(screenOptions.tabBarActiveTintColor).toBe("#111");
     expect(screenOptions.tabBarInactiveTintColor).toBe("#666");
-    expect(screen.options.sceneStyle.backgroundColor).toBe("#222");
+    expect(screen.options.sceneStyle.backgroundColor).toBe("transparent");
     expect(icon!.root.findByType("WnaIcon").props).toEqual(
       expect.objectContaining({
         color: "#abc",

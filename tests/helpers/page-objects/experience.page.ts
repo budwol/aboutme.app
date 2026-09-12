@@ -17,11 +17,13 @@ export class ExperiencePage extends BasePage {
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/experience$/);
     await expect(this.body()).toContainText(exampleAppData.experience.title);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertGermanIsOnPage() {
     await expect(this.page).toHaveURL(/\/taetigkeiten$/);
     await expect(this.body()).toContainText(exampleAppDataDe.experience.title);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertContent() {
