@@ -14,4 +14,8 @@ test("user opens the menu page on a mobile portrait viewport and sees the expect
   await test.step("verify the menu content", async () => {
     await menuPage.assertContent();
   });
+
+  await test.step("verify accessible navigation controls", async () => {
+    await menuPage.assertAccessibility();
+  });
 });

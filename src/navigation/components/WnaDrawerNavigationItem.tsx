@@ -43,6 +43,10 @@ export default function WnaDrawerNavigationItem({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={text}
+      accessibilityState={{ selected: isActive }}
+      aria-current={isActive ? "page" : undefined}
       style={({ pressed }) => [
         styles.container,
         {

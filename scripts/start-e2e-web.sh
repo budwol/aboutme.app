@@ -35,6 +35,10 @@ fi
 
 cp "$EXAMPLE_FILE" "$TARGET_FILE"
 
+# Expo can serve an existing static export with embedded app data. Remove it
+# so the E2E server always builds from the example data prepared above.
+rm -rf "$ROOT_DIR/dist"
+
 mkdir -p "$ROOT_DIR/public/images"
 cp "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
   "$ROOT_DIR/public/images/default_avatar.webp"

@@ -63,6 +63,9 @@ describe("WnaDrawerNavigationItem", () => {
       (node: TestNode) => node.props.children === "Projects",
     );
 
+    expect(pressable.props.accessibilityRole).toBe("button");
+    expect(pressable.props.accessibilityLabel).toBe("Projects");
+    expect(pressable.props.accessibilityState).toEqual({ selected: false });
     expect(pressable.props.style({ pressed: true })[1]).toEqual({
       paddingLeft: 32,
       backgroundColor: "#eeeeee",
@@ -109,6 +112,7 @@ describe("WnaDrawerNavigationItem", () => {
         node.props.style.some((style: { width?: number }) => style.width === 4),
     );
 
+    expect(pressable.props.accessibilityState).toEqual({ selected: true });
     expect(pressable.props.style({ pressed: false })[1]).toEqual({
       paddingLeft: 16,
       backgroundColor: "#222222",

@@ -13,6 +13,7 @@ const i18nKeys = {
   actionWebApp: "actionWebApp",
   actionXing: "actionXing",
   actionPlayStore: "actionPlayStore",
+  actionRetry: "actionRetry",
   actionContinueToPage: "actionContinueToPage",
   actionDownloadResume: "actionDownloadResume",
   answerNo: "answerNo",

@@ -22,6 +22,33 @@ export class MenuPage extends BasePage {
     await expect(this.body()).toContainText(exampleAppData.menu.licenses);
   }
 
+  async assertAccessibility() {
+    for (const label of [
+      "Profile",
+      "Experience",
+      "Contact",
+      "Some Projects",
+      "More",
+    ]) {
+      await expect(
+        this.page.getByRole("button", { name: label, exact: true }),
+      ).toBeVisible();
+    }
+
+    await expect(
+      this.page.getByRole("button", { name: "More", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      this.page.getByRole("button", {
+        name: "Download portfolio",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      this.page.getByRole("button", { name: /Theme: / }).last(),
+    ).toBeVisible();
+  }
+
   async openDisclaimerPage() {
     await this.page.getByText(exampleAppData.menu.disclaimer).first().click();
   }

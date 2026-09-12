@@ -14,9 +14,9 @@ Use this skill when implementing or changing frontend functionality. Read the ex
 3. Implement the complete behavior, including loading, empty, error, disabled, focus, keyboard, hover, responsive, and reduced-motion states where relevant.
 4. Keep text inside stable containers, preserve layout dimensions, and verify mobile and desktop behavior.
 5. Preserve existing navigation transitions, background media, caching, and platform-specific behavior unless the task explicitly changes them.
-6. Use semantic elements and accessible names; ensure interactive controls are reachable and usable without a pointer.
-7. Add focused tests for the new behavior and edge cases. Prefer user-visible assertions over implementation details.
-8. Run formatting, linting, type checks, focused tests, and the relevant integration/E2E flow.
+6. Use semantic elements and accessible names; expose selected, disabled, expanded, busy, and pressed states where they affect user understanding. Ensure interactive controls are reachable and usable without a pointer.
+7. Add focused unit tests plus browser-level accessibility tests for critical roles, names, keyboard paths, state announcements, and error/retry flows. Prefer user-visible assertions over implementation details.
+8. Run formatting, linting, type checks, focused tests, accessibility checks, and the relevant integration/E2E flow.
 
 ## Design Rules
 
