@@ -18,11 +18,13 @@ export class HomePage extends BasePage {
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/$/);
     await expect(this.page.getByText("Portfolio").first()).toBeVisible();
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertGermanIsOnPage() {
     await expect(this.page).toHaveURL(/\/$/);
     await expect(this.page.getByText("Portfolio").first()).toBeVisible();
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   private introName(): Locator {

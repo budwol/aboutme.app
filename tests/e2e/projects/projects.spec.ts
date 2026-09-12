@@ -19,6 +19,7 @@ test("user navigates from home to the projects page and verifies its content", a
   await test.step("navigate to the projects page from home", async () => {
     await homePage.openProjectsPage();
     await projectsPage.assertIsOnPage();
+    await projectsPage.assertScreenBackgroundImageCoversViewport();
   });
 
   await test.step("verify the projects page content", async () => {

@@ -17,6 +17,9 @@ export default function DrawerLayout() {
             ? appColors.staticCoolgray8
             : appColors.white,
         },
+        sceneStyle: {
+          backgroundColor: "transparent",
+        },
       }}
       drawerContent={() => <WnaDrawerMenu />}
     >

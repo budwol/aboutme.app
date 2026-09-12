@@ -36,6 +36,7 @@ const mockSetAppData = jest.fn();
 const mockSetAppColors = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetDimensions = jest.fn();
+let mockNavigationTransitionBackgroundImageUrl: string | undefined;
 let mockIsAppInitialized = true;
 let mockIsNavigationTransitionActive = false;
 const mockFinishNavigationTransition = jest.fn();
@@ -57,10 +58,12 @@ jest.mock("@/state/WnaAppContext", () => ({
     finishNavigationTransition: mockFinishNavigationTransition,
     isAppInitialized: mockIsAppInitialized,
     isNavigationTransitionActive: mockIsNavigationTransitionActive,
+    navigationTransitionBackgroundImageUrl:
+      mockNavigationTransitionBackgroundImageUrl,
     setIsAppInitialized: mockSetIsAppInitialized,
   }),
   useWnaLayout: () => ({
-    appLayout: { footerHeight: 48 },
+    appLayout: { backgroundImageUrl: "/background.webp", footerHeight: 48 },
     setDimensions: mockSetDimensions,
   }),
   useWnaTheme: () => ({
@@ -132,6 +135,19 @@ jest.mock("@components/sections/WnaProfileHero", () => {
   };
 });
 
+jest.mock("@components/images/WnaImageBackground", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ReactModule = require("react") as typeof import("react");
+
+  return function MockWnaImageBackground(props: unknown) {
+    return ReactModule.createElement(
+      "WnaImageBackground",
+      props as Record<string, unknown>,
+      (props as { children?: React.ReactNode }).children,
+    );
+  };
+});
+
 jest.mock("react-native-reanimated", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
@@ -168,6 +184,7 @@ jest.mock("react-native-reanimated", () => {
 
 describe("WnaApp", () => {
   beforeEach(() => {
+    mockNavigationTransitionBackgroundImageUrl = undefined;
     mockIsAppInitialized = true;
     mockIsNavigationTransitionActive = false;
     mockPathname = "/start";
@@ -453,7 +470,7 @@ describe("WnaApp", () => {
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
   });
 
-  it("renders dark intro and navigation transition overlays", () => {
+  it("renders the navigation transition over its background image", () => {
     mockAppColors = { ...mockAppColors, isDark: true };
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
@@ -494,17 +511,122 @@ describe("WnaApp", () => {
       );
     });
 
-    const navigationOverlay = tree!.root.find(
+    const transitionContent = tree!.root.find(
       (node: { type: { name?: string } }) =>
         typeof node.type === "function" &&
         node.type.name === "WnaNavigationTransitionOverlay",
-    ).parent;
+    );
+    const transitionBackground = transitionContent.parent;
+    const navigationOverlay = tree!.root
+      .findAllByType("AnimatedView")
+      .find(
+        (node: { findAllByType: (type: string) => unknown[] }) =>
+          node.findAllByType("WnaImageBackground").length > 0,
+      );
 
+    expect(transitionBackground?.type).toBe("WnaImageBackground");
     expect(navigationOverlay?.props.style).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({ zIndex: 20 }),
         expect.objectContaining({ backgroundColor: "#111111" }),
       ]),
     );
+    expect(navigationOverlay?.props.pointerEvents).toBe("auto");
+    expect(transitionBackground?.props).toEqual(
+      expect.objectContaining({
+        testID: "navigation-transition-background",
+        imageUri: "/background.webp",
+        appColors: mockAppColors,
+        isDarkMode: true,
+      }),
+    );
+    expect(navigationOverlay?.props.testID).toBe(
+      "navigation-transition-overlay",
+    );
+  });
+
+  it("uses the active screen background image for the navigation transition", () => {
+    mockNavigationTransitionBackgroundImageUrl = "/project-background.webp";
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      callback(0);
+
+      return 1;
+    }) as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    mockIsNavigationTransitionActive = true;
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const transitionBackground = tree!.root.find(
+      (node: { type: string; props: { imageUri?: string } }) =>
+        node.type === "WnaImageBackground" &&
+        node.props.imageUri === "/project-background.webp",
+    );
+
+    expect(transitionBackground.props.imageUri).toBe(
+      "/project-background.webp",
+    );
+  });
+
+  it("falls back to the layout background when the active transition background is blank", () => {
+    mockNavigationTransitionBackgroundImageUrl = "   ";
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      callback(0);
+
+      return 1;
+    }) as never;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+
+    act(() => {
+      contentView.props.onLayout({});
+    });
+
+    mockIsNavigationTransitionActive = true;
+
+    act(() => {
+      tree!.update(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    const transitionBackground = tree!.root.findByProps({
+      testID: "navigation-transition-background",
+    });
+
+    expect(transitionBackground.props.imageUri).toBe("/background.webp");
   });
 
   it("does not finish the navigation transition when the outgoing animation is interrupted", () => {

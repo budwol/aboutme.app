@@ -16,9 +16,6 @@ export default function WnaTabLayout({ screens }: WnaTabLayoutProps) {
   const iconSize = navigationLayoutConstants.tabBarIconSize;
   const iconSizeFocused = navigationLayoutConstants.tabBarIconSizeFocused;
   const tabBarHeight = navigationLayoutConstants.tabBarHeight;
-  const backgroundColor = appColors.isDark
-    ? appColors.staticCoolgray8
-    : appColors.staticCoolgray1;
   const headerShown = false;
 
   const getScreenTitle = (screenName: string) => {
@@ -69,7 +66,7 @@ export default function WnaTabLayout({ screens }: WnaTabLayoutProps) {
             title: getScreenTitle(screen.name),
             headerShown,
             sceneStyle: {
-              backgroundColor,
+              backgroundColor: "transparent",
             },
             tabBarLabel: () => null,
             tabBarIcon: ({ focused, color }) => (

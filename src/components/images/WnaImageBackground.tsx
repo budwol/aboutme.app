@@ -1,6 +1,5 @@
 import Colors from "@constants/theme/colors";
 import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
-import { ImageStyle } from "expo-image";
 import React, { ReactNode, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { WnaBlurView } from "../effects/WnaBlurView";
@@ -8,18 +7,18 @@ import { WnaBlurView } from "../effects/WnaBlurView";
 export type WnaImageBackgroundProps = {
   imageUri?: string;
   appColors: Colors;
-  imageStyle?: ImageStyle;
   children: ReactNode;
   isDarkMode: boolean;
+  testID?: string;
 };
 
 const WnaImageBackground = React.memo(
   ({
     imageUri,
     appColors,
-    imageStyle: _imageStyle,
     children,
     isDarkMode,
+    testID,
   }: WnaImageBackgroundProps) => {
     const resolvedUri = useMemo(() => {
       return imageUri && imageUri.trim() !== ""
@@ -29,14 +28,22 @@ const WnaImageBackground = React.memo(
 
     if (!resolvedUri) {
       return (
-        <View style={[styles.container, { backgroundColor: appColors.white }]}>
+        <View
+          nativeID={testID}
+          testID={testID}
+          style={[styles.container, { backgroundColor: appColors.white }]}
+        >
           {children}
         </View>
       );
     }
 
     return (
-      <View style={[styles.container, { backgroundColor: appColors.white }]}>
+      <View
+        nativeID={testID}
+        testID={testID}
+        style={[styles.container, { backgroundColor: appColors.white }]}
+      >
         <img
           src={resolvedUri}
           alt=""
@@ -50,7 +57,7 @@ const WnaImageBackground = React.memo(
         <WnaBlurView
           forceExperimentalBlur
           isBackground
-          style={styles.container}
+          style={styles.backgroundLayer}
           blurTint={isDarkMode ? "dark" : "light"}
           blurIntensity={40}
         >
@@ -70,6 +77,10 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
+    overflow: "hidden",
+  },
+  backgroundLayer: {
+    ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
   },
   webImage: {

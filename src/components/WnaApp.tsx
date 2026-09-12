@@ -32,6 +32,7 @@ import { FontFamilies } from "@constants/theme/fontFamilies";
 import { resolveAppColors } from "@utils/themeColors";
 import { WnaHeroField } from "@components/sections/WnaProfileHero";
 import WnaAccentBar from "@components/display/WnaAccentBar";
+import WnaImageBackground from "@components/images/WnaImageBackground";
 import WnaToastHost from "@components/feedback/WnaToastHost";
 
 type WnaLoadingCopyProps = {
@@ -118,9 +119,10 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     finishNavigationTransition,
     isAppInitialized,
     isNavigationTransitionActive,
+    navigationTransitionBackgroundImageUrl,
     setIsAppInitialized,
   } = useWnaAppLifecycle();
-  const { setDimensions } = useWnaLayout();
+  const { appLayout, setDimensions } = useWnaLayout();
   const { appColors, setAppColors, setTheme } = useWnaTheme();
   const { setAppData } = useWnaAppData();
 
@@ -333,6 +335,11 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     opacity: navigationTransitionOpacity.value,
     transform: [{ scale: navigationTransitionScale.value }],
   }));
+  const navigationTransitionBackgroundImageUri =
+    navigationTransitionBackgroundImageUrl &&
+    navigationTransitionBackgroundImageUrl.trim() !== ""
+      ? navigationTransitionBackgroundImageUrl
+      : appLayout.backgroundImageUrl;
 
   function handleContentLayout(_event: LayoutChangeEvent) {
     if (!hasContentLayout) {
@@ -367,6 +374,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
         <Animated.View
           pointerEvents="none"
           style={[
+            styles.fullScreenOverlay,
             styles.introOverlay,
             {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
@@ -383,16 +391,26 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 
       {showNavigationTransition ? (
         <Animated.View
+          nativeID="navigation-transition-overlay"
+          testID="navigation-transition-overlay"
           pointerEvents="auto"
           style={[
-            styles.introOverlay,
+            styles.fullScreenOverlay,
+            styles.navigationTransitionOverlay,
             {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
             },
             navigationTransitionAnimatedStyle,
           ]}
         >
-          <WnaNavigationTransitionOverlay appColors={appColors} />
+          <WnaImageBackground
+            testID="navigation-transition-background"
+            imageUri={navigationTransitionBackgroundImageUri}
+            appColors={appColors}
+            isDarkMode={appColors.isDark}
+          >
+            <WnaNavigationTransitionOverlay appColors={appColors} />
+          </WnaImageBackground>
         </Animated.View>
       ) : null}
 
@@ -405,11 +423,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  introOverlay: {
+  fullScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
+    zIndex: 20,
+  },
+  introOverlay: {
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 20,
+  },
+  navigationTransitionOverlay: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   introContent: {
     ...StyleSheet.absoluteFillObject,

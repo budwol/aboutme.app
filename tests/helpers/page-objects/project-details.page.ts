@@ -16,6 +16,7 @@ export class ProjectDetailsPage extends BasePage {
     await expect(this.body()).toContainText(
       exampleAppData.projectDetails.firstProject.title,
     );
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertContent() {

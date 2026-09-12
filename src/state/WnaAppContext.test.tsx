@@ -65,6 +65,9 @@ describe("WnaAppContext", () => {
     expect(captured!.lifecycle.isAppInitialized).toBe(false);
     expect(captured!.lifecycle.isStatusBarVisible).toBe(true);
     expect(captured!.layout.appLayout).toBeDefined();
+    expect(
+      captured!.lifecycle.navigationTransitionBackgroundImageUrl,
+    ).toBeUndefined();
     expect(captured!.layout.currentWindowWidth).toBeGreaterThan(0);
     expect(captured!.theme.theme).toBe("system");
     expect(captured!.theme.appColors).toBe(themePalettes.light);
@@ -76,6 +79,9 @@ describe("WnaAppContext", () => {
       captured!.theme.setTheme("dark");
       captured!.theme.setAppColors(themePalettes.dark);
       captured!.data.setAppData({ profile: { name: "WNA" } } as never);
+      captured!.lifecycle.registerNavigationTransitionBackgroundImageUrl(
+        "/screen-background.webp",
+      );
       captured!.layout.setDimensions();
     });
 
@@ -84,6 +90,146 @@ describe("WnaAppContext", () => {
     expect(captured!.theme.theme).toBe("dark");
     expect(captured!.theme.appColors).toBe(themePalettes.dark);
     expect(captured!.data.appData).toEqual({ profile: { name: "WNA" } });
+    expect(captured!.lifecycle.navigationTransitionBackgroundImageUrl).toBe(
+      "/screen-background.webp",
+    );
+  });
+
+  it("keeps transition background registrations in screen stack order", () => {
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaAppContextProvider>
+          <ContextProbe
+            onValue={(value) =>
+              (lifecycle = (
+                value as { lifecycle: ReturnType<typeof useWnaAppLifecycle> }
+              ).lifecycle)
+            }
+          />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    let cleanupFirst: (() => void) | undefined;
+    let cleanupSecond: (() => void) | undefined;
+
+    act(() => {
+      cleanupFirst =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/first.webp",
+        );
+      cleanupSecond =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/second.webp",
+        );
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBe(
+      "/second.webp",
+    );
+
+    act(() => {
+      cleanupFirst!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBe(
+      "/second.webp",
+    );
+
+    act(() => {
+      cleanupSecond!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBeUndefined();
+  });
+
+  it("restores the previous transition background when the current screen unmounts first", () => {
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaAppContextProvider>
+          <ContextProbe
+            onValue={(value) =>
+              (lifecycle = (
+                value as { lifecycle: ReturnType<typeof useWnaAppLifecycle> }
+              ).lifecycle)
+            }
+          />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    let cleanupFirst: (() => void) | undefined;
+    let cleanupSecond: (() => void) | undefined;
+
+    act(() => {
+      cleanupFirst =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/first.webp",
+        );
+      cleanupSecond =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/second.webp",
+        );
+    });
+
+    act(() => {
+      cleanupSecond!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBe(
+      "/first.webp",
+    );
+
+    act(() => {
+      cleanupFirst!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBeUndefined();
+  });
+
+  it("keeps the current transition background stable when an old cleanup runs twice", () => {
+    let lifecycle: ReturnType<typeof useWnaAppLifecycle> | null = null;
+
+    act(() => {
+      TestRenderer.create(
+        <WnaAppContextProvider>
+          <LifecycleProbe onValue={(value) => (lifecycle = value)} />
+        </WnaAppContextProvider>,
+      );
+    });
+
+    let cleanupFirst: (() => void) | undefined;
+    let cleanupSecond: (() => void) | undefined;
+
+    act(() => {
+      cleanupFirst =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/first.webp",
+        );
+      cleanupSecond =
+        lifecycle!.registerNavigationTransitionBackgroundImageUrl(
+          "/second.webp",
+        );
+    });
+
+    act(() => {
+      cleanupFirst!();
+      cleanupFirst!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBe(
+      "/second.webp",
+    );
+
+    act(() => {
+      cleanupSecond!();
+    });
+
+    expect(lifecycle!.navigationTransitionBackgroundImageUrl).toBeUndefined();
   });
 
   it("guards concurrent navigation transitions and clears them on finish", () => {

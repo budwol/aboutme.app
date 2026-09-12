@@ -10,7 +10,8 @@ import { WnaHeader } from "@components/chrome/WnaHeader";
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
 import { appMotionConstants } from "@constants/motionConstants";
 import { Href } from "expo-router";
-import { FC, ReactNode, memo, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { FC, ReactNode, memo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -202,9 +203,28 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   onTitlePress,
 }) => {
   const { t } = useTranslation(["common"]);
-  const { isAppInitialized } = useWnaAppLifecycle();
+  const { isAppInitialized, registerNavigationTransitionBackgroundImageUrl } =
+    useWnaAppLifecycle();
   const { appColors, appStyle } = useWnaTheme();
   const { appLayout, isLandscape } = useWnaLayout();
+  const resolvedBackgroundImageUrl =
+    backgroundImageUrl ?? appLayout.backgroundImageUrl;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!isAppInitialized) {
+        return undefined;
+      }
+
+      return registerNavigationTransitionBackgroundImageUrl(
+        resolvedBackgroundImageUrl,
+      );
+    }, [
+      isAppInitialized,
+      registerNavigationTransitionBackgroundImageUrl,
+      resolvedBackgroundImageUrl,
+    ]),
+  );
 
   if (!isAppInitialized) return null;
 
@@ -213,7 +233,8 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
     // on-screen header (headerTitle) — used for bookmarking-friendly titles.
     <WnaWebBaseScreen title={documentTitle ?? headerTitle}>
       <WnaImageBackground
-        imageUri={backgroundImageUrl ?? appLayout.backgroundImageUrl}
+        testID="screen-background"
+        imageUri={resolvedBackgroundImageUrl}
         appColors={appColors}
         isDarkMode={appColors.isDark}
       >

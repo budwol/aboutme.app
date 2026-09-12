@@ -10,6 +10,7 @@ export class MenuPage extends BasePage {
   async assertIsOnPage() {
     await expect(this.page).toHaveURL(/\/menu$/);
     await expect(this.body()).toContainText(exampleAppData.menu.title);
+    await this.assertScreenBackgroundImageCoversViewport();
   }
 
   async assertContent() {

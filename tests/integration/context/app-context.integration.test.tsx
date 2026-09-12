@@ -26,6 +26,8 @@ function ContextProbe() {
     finishNavigationTransition,
     isAppInitialized,
     isNavigationTransitionActive,
+    navigationTransitionBackgroundImageUrl,
+    registerNavigationTransitionBackgroundImageUrl,
     startNavigationTransition,
   } = useWnaAppLifecycle();
   const { appLayout, isLandscape, setDimensions } = useWnaLayout();
@@ -38,6 +40,8 @@ function ContextProbe() {
     isAppInitialized,
     isLandscape,
     isNavigationTransitionActive,
+    navigationTransitionBackgroundImageUrl,
+    registerNavigationTransitionBackgroundImageUrl,
     setDimensions,
     startNavigationTransition,
     theme,
@@ -66,7 +70,31 @@ describe("WnaAppContextProvider integration", () => {
     expect(probe.props.appLayout.headerHeight).toBe(
       appLayoutConstants.headerButtonHeight,
     );
+    expect(probe.props.navigationTransitionBackgroundImageUrl).toBeUndefined();
     expect(probe.props.theme).toBe("system");
+
+    let unregisterBackground: (() => void) | undefined;
+
+    await act(async () => {
+      unregisterBackground =
+        probe.props.registerNavigationTransitionBackgroundImageUrl(
+          "/integration-background.webp",
+        );
+    });
+
+    probe = tree.root.findByType("ContextProbe");
+
+    expect(probe.props.navigationTransitionBackgroundImageUrl).toBe(
+      "/integration-background.webp",
+    );
+
+    await act(async () => {
+      unregisterBackground!();
+    });
+
+    probe = tree.root.findByType("ContextProbe");
+
+    expect(probe.props.navigationTransitionBackgroundImageUrl).toBeUndefined();
 
     dimensionsSpy.mockImplementation(() => ({
       width: 1280,
