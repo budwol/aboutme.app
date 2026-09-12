@@ -26,3 +26,4 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0018](0018-clear-metro-cache-on-export.md)                     | `export:web` always clears the Metro bundler cache                                       |
 | [0019](0019-splash-shell-and-intro-overlay-must-match.md)       | The static splash shell and the app's intro overlay must match                           |
 | [0020](0020-commit-message-convention.md)                       | Commit messages use professional one-line Gitmoji descriptions                           |
+| [0021](0021-production-source-maps-are-not-published.md)        | Production web builds do not publish source maps                                         |

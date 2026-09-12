@@ -33,6 +33,27 @@ jest.mock("react-native-popable", () => {
 });
 
 describe("WnaPressable", () => {
+  it("does not invoke a disabled action and marks the base pressable disabled", () => {
+    const onPress = jest.fn();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaPressable onPress={onPress} ripple="light" disabled>
+          child
+        </WnaPressable>,
+      );
+    });
+
+    const base = tree!.root.findByType("WnaBasePressable");
+
+    expect(base.props.isEnabled).toBe(false);
+    act(() => {
+      base.props.onPress();
+    });
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
   it("renders a top tooltip and throttles repeated presses", () => {
     jest.useFakeTimers();
     const onPress = jest.fn();

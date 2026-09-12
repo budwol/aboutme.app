@@ -14,4 +14,8 @@ test("user opens the menu page and sees the expected menu content", async ({
   await test.step("verify menu content", async () => {
     await menuPage.assertContent();
   });
+
+  await test.step("verify accessible navigation controls", async () => {
+    await menuPage.assertAccessibility();
+  });
 });

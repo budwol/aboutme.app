@@ -3,6 +3,7 @@ import { AppData } from "@/app-data";
 import {
   Dimensions,
   LayoutChangeEvent,
+  Pressable,
   StyleSheet,
   Text,
   useColorScheme,
@@ -34,6 +35,8 @@ import { WnaHeroField } from "@components/sections/WnaProfileHero";
 import WnaAccentBar from "@components/display/WnaAccentBar";
 import WnaImageBackground from "@components/images/WnaImageBackground";
 import WnaToastHost from "@components/feedback/WnaToastHost";
+import { i18nKeys } from "@/i18n/i18nKeys";
+import { useTranslation } from "react-i18next";
 
 type WnaLoadingCopyProps = {
   appColors: Colors;
@@ -69,6 +72,8 @@ function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
 }
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const { t } = useTranslation(["common"]);
+
   useEffect(() => {
     Logger.error(ErrorBoundary.name, error);
   }, [error]);
@@ -83,9 +88,14 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
       }}
     >
       <Text style={{ color: "white", marginBottom: 12 }}>{error.message}</Text>
-      <Text style={{ color: "white" }} onPress={retry}>
-        retry
-      </Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t(i18nKeys.actionRetry)}
+        onPress={retry}
+        style={styles.retryButton}
+      >
+        <Text style={styles.retryButtonText}>{t(i18nKeys.actionRetry)}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -467,6 +477,18 @@ const styles = StyleSheet.create({
     letterSpacing: 1.75,
     textAlign: "center",
     textTransform: "uppercase",
+  },
+  retryButton: {
+    minWidth: 140,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 4,
+    backgroundColor: "white",
+    alignItems: "center",
+  },
+  retryButtonText: {
+    color: "#991b1b",
+    fontWeight: "700",
   },
 });
 

@@ -35,7 +35,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
   const [isEnabled, setIsEnabled] = useState(true);
   const isEnabledRef = useRef(true);
   const onPress = async () => {
-    if (!isEnabledRef.current) return;
+    if (props.disabled || !isEnabledRef.current) return;
 
     setIsEnabled(false);
     isEnabledRef.current = false;
@@ -97,7 +97,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
           ripple={props.ripple}
           baseStyle={props.baseStyle}
           onPress={onPress}
-          isEnabled={isEnabled}
+          isEnabled={isEnabled && !props.disabled}
           onHoverIn={() => setIsToolTipVisible(true)}
           onHoverOut={() => setIsToolTipVisible(false)}
           disableHover={props.disableHover}

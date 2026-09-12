@@ -19,6 +19,9 @@ let mockPathname = "/start";
 type RenderedTextNode = {
   props: {
     children?: unknown;
+    accessibilityRole?: string;
+    accessibilityLabel?: string;
+    onPress?: () => void;
   };
 };
 
@@ -711,13 +714,17 @@ describe("ErrorBoundary", () => {
       .findAllByType("Text")
       .map((node: RenderedTextNode) => node.props.children);
     expect(textValues).toContain("boom");
-    expect(textValues).toContain("retry");
+    expect(textValues).toContain("actionRetry");
 
-    const retryText = tree!.root
-      .findAllByType("Text")
-      .find((node: RenderedTextNode) => node.props.children === "retry");
+    const retryButton = tree!.root.find(
+      (node: RenderedTextNode) =>
+        node.props.accessibilityRole === "button" &&
+        node.props.accessibilityLabel === "actionRetry",
+    );
+    expect(retryButton.props.accessibilityRole).toBe("button");
+    expect(retryButton.props.accessibilityLabel).toBe("actionRetry");
     act(() => {
-      (retryText!.props as { onPress: () => void }).onPress();
+      retryButton.props.onPress!();
     });
 
     expect(retry).toHaveBeenCalledTimes(1);
