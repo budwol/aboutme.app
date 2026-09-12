@@ -47,6 +47,10 @@ export abstract class BasePage {
               image instanceof HTMLImageElement
                 ? image.currentSrc || image.src
                 : "";
+            const imageLoaded =
+              image instanceof HTMLImageElement &&
+              image.complete &&
+              image.naturalWidth > 0;
 
             return {
               backgroundColor:
@@ -55,6 +59,7 @@ export abstract class BasePage {
                 backgroundRect.width >= window.innerWidth - 1 &&
                 backgroundRect.height >= window.innerHeight - 1,
               hasDefaultImage: imageSource.includes("bg.webp"),
+              imageLoaded,
               imageCoversViewport:
                 !!imageRect &&
                 imageRect.width >= window.innerWidth - 1 &&
@@ -68,6 +73,7 @@ export abstract class BasePage {
               (candidate) =>
                 candidate.backgroundCoversViewport &&
                 candidate.hasDefaultImage &&
+                candidate.imageLoaded &&
                 candidate.imageCoversViewport,
             ),
             visibleBackgroundCount: candidates.filter(
