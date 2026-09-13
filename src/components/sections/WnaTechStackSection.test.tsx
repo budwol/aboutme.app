@@ -43,6 +43,15 @@ describe("WnaTechStackSection", () => {
     const wrapper = tree!.root.findAllByType("View")[0];
 
     expect(wrapper.props.style.gap).toBe(appLayoutConstants.globalListGap / 2);
+    expect(
+      tree!.root
+        .findAllByType("View")
+        .some(
+          (view: { props: { style?: Record<string, unknown> } }) =>
+            view.props.style?.flexWrap === "wrap" &&
+            view.props.style?.alignItems === "flex-start",
+        ),
+    ).toBe(true);
   });
 
   it("falls back to empty stacks and renders nothing when techStack data is missing", () => {
