@@ -4,6 +4,7 @@ import path from "path";
 import { ConfigContext, ExpoConfig } from "expo/config";
 
 type PackageJson = {
+  dependencies?: Record<string, string>;
   scripts?: Record<string, string>;
   version: string;
 };
@@ -155,6 +156,12 @@ describe("package scripts", () => {
 
     expect(expoConfig.version).toBe(packageJson.version);
     expect(expoConfig.extra?.appVersion).toBe(packageJson.version);
-    expect(expoConfig.plugins).toEqual(["expo-font", "expo-router"]);
+    expect(expoConfig.plugins).toEqual(["expo-router"]);
+  });
+
+  it("does not reintroduce the removed direct font dependency", () => {
+    const packageJson = readPackageJson();
+
+    expect(packageJson.dependencies).not.toHaveProperty("expo-font");
   });
 });
