@@ -65,19 +65,21 @@ describe("web linking adapter", () => {
     expect(open).not.toHaveBeenCalled();
   });
 
-  it("falls back to browser navigation when a new tab is blocked", async () => {
+  it("does not navigate the active tab when a new tab is blocked", async () => {
     const assign = jest.fn();
+    const open = jest.fn(() => null);
     Object.defineProperty(globalThis, "window", {
       configurable: true,
       value: {
         location: { href: "https://app.example.com/", assign },
-        open: jest.fn(() => null),
+        open,
       },
     });
 
     await Linking.openURL("https://example.com");
 
-    expect(assign).toHaveBeenCalledWith("https://example.com/");
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(assign).not.toHaveBeenCalled();
   });
 
   it("throws before opening unsupported URLs", async () => {

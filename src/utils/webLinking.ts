@@ -29,14 +29,7 @@ async function openURL(url: string): Promise<void> {
     return;
   }
 
-  const openedWindow = window.open(
-    parsedUrl.href,
-    "_blank",
-    "noopener,noreferrer",
-  );
-  if (!openedWindow) {
-    window.location.assign(parsedUrl.href);
-  }
+  window.open(parsedUrl.href, "_blank", "noopener,noreferrer");
 }
 
 export const Linking = { canOpenURL, openURL };
