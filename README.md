@@ -7,6 +7,12 @@
 
 AboutMe is my little portfolio app built with Expo and React Native Web.
 
+Current release: `1.4.0`. The app is already shipped as a static, installable
+web PWA, while the runtime still uses Expo Router and React Native Web. The
+next planned step is the staged move to plain React and React DOM; see
+[PLAIN-REACT-MIGRATION.md](PLAIN-REACT-MIGRATION.md) for the fixed phases and
+exit criteria.
+
 Clone it, throw in your own data and images, run `npm run init`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
 
 If you just want the happy path, it is this:
@@ -259,10 +265,14 @@ If you want the short answer to "is this thing still standing right?", this is t
 - `npm run test:prettier`
 - `npm run lint` (checks `src`, `tests`, and `scripts`; strict unused-symbol checks run through `npm run test:types`)
 - `npm run test:types`
+- `npm run test:circular`
 - `npm run test:unit`
+- `npm run test:coverage` (100% statements, branches, functions, and lines)
 - `npm run test:integration`
+- `npm run test:dry-run`
 - `npm run test:smoke`
 - `npm run test:e2e`
+- `npm run test:deps`
 - CI passing on the current branch
 - generated `nginx/site.conf` still listening on `8080`
 - container healthcheck still hitting `127.0.0.1:8080`
