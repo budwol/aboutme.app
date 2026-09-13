@@ -230,6 +230,72 @@ describe("WnaProjectDetailsRoute", () => {
     }
   });
 
+  it("fades the web modal out before unmounting it", () => {
+    const originalDocument = globalThis.document;
+    const originalWindow = globalThis.window;
+    const addEventListener = jest.fn();
+    const removeEventListener = jest.fn();
+
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: { body: {}, addEventListener, removeEventListener },
+    });
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: globalThis,
+    });
+    jest.useFakeTimers();
+
+    try {
+      let tree: ReturnType<typeof TestRenderer.create> | undefined;
+      act(() => {
+        tree = TestRenderer.create(
+          <WnaWebModal visible onRequestClose={() => undefined}>
+            <React.Fragment />
+          </WnaWebModal>,
+        );
+      });
+
+      act(() => jest.advanceTimersByTime(16));
+      expect(
+        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+      ).toEqual(expect.objectContaining({ opacity: 1 }));
+
+      act(() => {
+        tree!.update(
+          <WnaWebModal visible={false} onRequestClose={() => undefined}>
+            <React.Fragment />
+          </WnaWebModal>,
+        );
+      });
+
+      expect(
+        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+      ).toEqual(expect.objectContaining({ opacity: 0, pointerEvents: "none" }));
+
+      act(() => jest.runAllTimers());
+      expect(
+        tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+      ).toHaveLength(0);
+    } finally {
+      jest.useRealTimers();
+      if (originalDocument === undefined)
+        delete (globalThis as { document?: Document }).document;
+      else
+        Object.defineProperty(globalThis, "document", {
+          configurable: true,
+          value: originalDocument,
+        });
+      if (originalWindow === undefined)
+        delete (globalThis as { window?: Window }).window;
+      else
+        Object.defineProperty(globalThis, "window", {
+          configurable: true,
+          value: originalWindow,
+        });
+    }
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
@@ -442,6 +508,14 @@ describe("WnaProjectDetailsRoute", () => {
         backgroundColor: "rgba(0, 0, 0, 0.58)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }),
     );
     expect(modalCloseButton.type).toBe("button");
@@ -654,6 +728,7 @@ describe("WnaProjectDetailsRoute", () => {
       appColors: {
         background: "#181818",
         black: "#ffffff",
+        isDark: true,
         staticWhite: "#ffffff",
         staticCoolgray2: "#cccccc",
         staticCoolgray8: "#222222",
@@ -711,9 +786,11 @@ describe("WnaProjectDetailsRoute", () => {
     });
     expect(modalActions[0].props.textColor).toBe("#ffffff");
     expect(modalActions[1].props.textColor).toBe("#ffffff");
-    expect(modalActions[1].props.backgroundColor).toBe("rgba(24,24,24,0.98)");
+    expect(modalActions[1].props.backgroundColor).toBe(
+      "rgba(255,255,255,0.12)",
+    );
     expect(modalActions[1].props.style).toMatchObject({
-      borderColor: "rgba(40,45,55,0.72)",
+      borderColor: "rgba(255,255,255,0.4)",
     });
   });
 

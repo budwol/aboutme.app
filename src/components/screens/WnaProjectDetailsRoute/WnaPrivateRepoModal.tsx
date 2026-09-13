@@ -35,6 +35,7 @@ export function WnaWebModal({
   const canAnimate = typeof document !== "undefined" && Boolean(document.body);
   const [mounted, setMounted] = useState(visible);
   const [isClosing, setIsClosing] = useState(false);
+  const [isActive, setIsActive] = useState(!canAnimate);
 
   useEffect(() => {
     if (visible) {
@@ -49,6 +50,7 @@ export function WnaWebModal({
     }
 
     setIsClosing(true);
+    setIsActive(false);
     const timeout = window.setTimeout(() => {
       setMounted(false);
       setIsClosing(false);
@@ -56,6 +58,14 @@ export function WnaWebModal({
 
     return () => window.clearTimeout(timeout);
   }, [canAnimate, mounted, visible]);
+
+  useEffect(() => {
+    if (!visible || !canAnimate) return;
+
+    setIsActive(false);
+    const timeout = window.setTimeout(() => setIsActive(true), 16);
+    return () => window.clearTimeout(timeout);
+  }, [canAnimate, visible]);
 
   useEffect(() => {
     if (!visible || typeof document === "undefined") return;
@@ -90,7 +100,7 @@ export function WnaWebModal({
         justifyContent: "center",
         alignItems: "center",
         zIndex: 1000,
-        opacity: isClosing ? 0 : 1,
+        opacity: isClosing || !isActive ? 0 : 1,
         pointerEvents: isClosing ? "none" : "auto",
         transition: "opacity 180ms ease-out",
       } as React.CSSProperties,
@@ -112,13 +122,28 @@ export default function WnaPrivateRepoModal({
   t,
   visible,
 }: WnaPrivateRepoModalProps): ReactNode {
+  const continueButtonTextColor = appColors.isDark
+    ? appColors.staticWhite
+    : appColors.black;
+  const continueButtonBackgroundColor = appColors.isDark
+    ? convertHexToRgba(appColors.staticWhite, 0.12)
+    : convertHexToRgba(appColors.background, 0.98);
+  const continueButtonBorderColor = appColors.isDark
+    ? convertHexToRgba(appColors.staticWhite, 0.4)
+    : convertHexToRgba(appColors.coolgray2, 0.72);
+
   return (
     <WnaWebModal visible={visible} onRequestClose={onClose}>
       {React.createElement(
         "div",
         {
           "data-testid": "private-repo-modal-backdrop",
-          style: styles.modalBackdrop as React.CSSProperties,
+          style: {
+            ...StyleSheet.flatten(styles.modalBackdrop),
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          } as React.CSSProperties,
           onClick: onClose,
         },
         React.createElement(
@@ -218,13 +243,13 @@ export default function WnaPrivateRepoModal({
                 appStyle={appStyle}
                 iconName="github"
                 text={t(i18nKeys.actionContinueToPage)}
-                textColor={appColors.black}
-                backgroundColor={convertHexToRgba(appColors.background, 0.98)}
+                textColor={continueButtonTextColor}
+                backgroundColor={continueButtonBackgroundColor}
                 borderWidth={1}
                 style={{
                   ...styles.actionButton,
                   ...styles.modalActionButton,
-                  borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+                  borderColor: continueButtonBorderColor,
                   marginHorizontal: 0,
                 }}
                 onPress={() => {
