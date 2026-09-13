@@ -23,9 +23,9 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { createProjectSlug } from "@utils/projectRoutes";
 import { useNavigation, useRouter } from "expo-router";
-import { ReactNode, useCallback, useMemo } from "react";
+import { Fragment, ReactNode, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
   itemSeparator: {
@@ -716,17 +716,20 @@ export default function WnaProjectsRoute(): ReactNode {
       {isLandscape ? (
         renderLandscapeLayout
       ) : (
-        <FlatList
+        <ScrollView
           scrollEventThrottle={appLayout.scrollEventThrottle}
           onScroll={onScroll}
-          keyExtractor={(item) => item.title}
-          ItemSeparatorComponent={itemSeparator}
-          data={projects}
           contentContainerStyle={contentContainerStyle}
-          ListHeaderComponent={renderPortraitIntro}
-          ListFooterComponent={<WnaContactFooter />}
-          renderItem={({ item, index }) => renderProjectCard(item, index)}
-        />
+        >
+          {renderPortraitIntro}
+          {projects.map((item, index) => (
+            <Fragment key={`${item.title}-${index}`}>
+              {renderProjectCard(item, index)}
+              {index < projects.length - 1 ? itemSeparator() : null}
+            </Fragment>
+          ))}
+          <WnaContactFooter />
+        </ScrollView>
       )}
     </WnaBaseScreen>
   );

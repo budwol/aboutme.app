@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[#################---] 82%` (23 von 28 Arbeitspaketen)
+Fortschritt: `[#################---] 86%` (24 von 28 Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -80,6 +80,8 @@ Status: **in Arbeit**
 - [x] `SafeAreaView` durch einen Web-Container mit CSS-Safe-Area-Insets ersetzen.
 - [x] Statische Navigationslisten von `FlatList` auf `ScrollView` mit stabilen
       Keys und Separatoren umstellen.
+- [x] Die statische Portrait-Projektliste von `FlatList` auf `ScrollView` mit
+      stabilen Keys und unverändertem Scroll-Callback umstellen.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
 - [x] Resize-Events im App-Frame über `window.resize` statt Native-
       `Dimensions` abonnieren.
@@ -176,6 +178,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 3     | Native Dependencies auf direkte und transitive Nutzung geprüft         | Router/Drawer als verbleibende transitive Grenze dokumentiert  |
 | 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                     | Transitiver Bezug über Expo Router dokumentiert                |
 | 2026-09-13 | 2     | Statische Navigationsliste von `FlatList` auf `ScrollView` umgestellt  | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt       | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
