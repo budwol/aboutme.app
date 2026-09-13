@@ -174,6 +174,7 @@ describe("package scripts", () => {
       "react-native-reanimated",
       "react-native-safe-area-context",
       "react-native-screens",
+      "react-native-worklets",
     ];
 
     for (const dependency of requiredPeers) {
