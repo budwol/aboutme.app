@@ -76,7 +76,6 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
     backgroundColor: isPressed || isHovered ? interactionColor : "transparent",
     border: "none",
     boxSizing: "border-box" as const,
-    borderRadius: appLayoutConstants.globalCornerRadius,
     cursor: "pointer" as const,
     display: "block" as const,
     padding: 0,

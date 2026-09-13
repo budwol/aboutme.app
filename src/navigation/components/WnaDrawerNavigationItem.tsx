@@ -52,6 +52,7 @@ export default function WnaDrawerNavigationItem({
     display: "flex" as const,
     fontFamily: "inherit",
     fontSize: "inherit",
+    margin: 0,
     paddingBottom: 14,
     paddingLeft: isSecondary ? 32 : 16,
     paddingRight: 16,
@@ -81,41 +82,32 @@ export default function WnaDrawerNavigationItem({
       style: buttonStyle as React.CSSProperties,
       testID: `drawer-navigation-item-${text}`,
     },
-    <View style={styles.content}>
-      {isActive && (
-        <View style={[styles.accentBar, { backgroundColor: accent }]} />
-      )}
-
-      <WnaIcon
-        iconName={iconName}
-        size={isActive ? 21 : 20}
-        color={iconColor}
-        style={{ width: 28, opacity }}
-      />
-
-      <Text
-        style={[
-          appStyle.textNeutralMedium,
-          styles.text,
-          {
-            color: textColor,
-            opacity,
-            fontWeight: isActive ? "600" : "400",
-          },
-        ]}
-      >
-        {text}
-      </Text>
-    </View>,
+    isActive ? (
+      <View style={[styles.accentBar, { backgroundColor: accent }]} />
+    ) : null,
+    <WnaIcon
+      iconName={iconName}
+      size={isActive ? 21 : 20}
+      color={iconColor}
+      style={{ width: 28, opacity }}
+    />,
+    <Text
+      style={[
+        appStyle.textNeutralMedium,
+        styles.text,
+        {
+          color: textColor,
+          opacity,
+          fontWeight: isActive ? "600" : "400",
+        },
+      ]}
+    >
+      {text}
+    </Text>,
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-  },
   accentBar: {
     position: "absolute",
     left: 0,

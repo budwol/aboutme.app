@@ -120,6 +120,12 @@ describe("WnaButtonHeader", () => {
     expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(true);
 
     act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.14)");
+
+    act(() => {
+      button.props.onMouseUp();
       button.props.onMouseLeave();
     });
 

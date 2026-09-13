@@ -1,7 +1,9 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import WnaNavigationItem from "@/navigation/components/WnaNavigationItem";
+import WnaNavigationItem, {
+  WnaNavigationItemProps,
+} from "@/navigation/components/WnaNavigationItem";
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
   const { createElement } = jest.requireActual(
@@ -28,6 +30,49 @@ jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
 });
 
 describe("WnaNavigationItem", () => {
+  it.each<[NonNullable<WnaNavigationItemProps["type"]>, number[]]>([
+    ["standalone", [8, 8, 8, 8]],
+    ["first", [8, 8, 0, 0]],
+    ["middle", [0, 0, 0, 0]],
+    ["last", [0, 0, 8, 8]],
+  ])(
+    "preserves %s grouped corner radii",
+    (type: WnaNavigationItemProps["type"], radii) => {
+      let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+      act(() => {
+        tree = TestRenderer.create(
+          <WnaNavigationItem
+            appColors={
+              {
+                isDark: false,
+                black: "#000",
+                accent5: "#0af",
+                coolgray4: "#999",
+              } as never
+            }
+            appStyle={{ textNeutralMedium: {} } as never}
+            text="Grouped"
+            iconName="scale-balance"
+            type={type}
+            onPress={jest.fn()}
+            t={((value: string) => value) as never}
+          />,
+        );
+      });
+
+      const button = tree!.root.findByType("button");
+      expect(button.props.style).toEqual(
+        expect.objectContaining({
+          borderTopLeftRadius: radii[0],
+          borderTopRightRadius: radii[1],
+          borderBottomLeftRadius: radii[2],
+          borderBottomRightRadius: radii[3],
+        }),
+      );
+    },
+  );
+
   it("updates icon and handler props when they change", () => {
     const onPressA = jest.fn();
     const onPressB = jest.fn();
@@ -123,6 +168,8 @@ describe("WnaNavigationItem", () => {
       }),
     );
 
+    expect(button.props.style.borderRadius).toBeUndefined();
+
     act(() => {
       button.props.onMouseEnter();
     });
@@ -191,9 +238,17 @@ describe("WnaNavigationItem", () => {
     const button = tree!.root.findByType("button");
 
     act(() => {
+      button.props.onMouseDown();
+      button.props.onMouseUp();
       button.props.onMouseEnter();
     });
 
     expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.06)");
+
+    act(() => {
+      button.props.onMouseLeave();
+    });
+
+    expect(button.props.style.backgroundColor).toBe("transparent");
   });
 });

@@ -25,6 +25,14 @@ export const appLayoutConstants = {
   experienceDetailsHeightBuffer: 4,
 };
 
+export const appSpacingConstants = {
+  xs: 8,
+  sm: 16,
+  md: 24,
+  lg: 32,
+  xl: 40,
+} as const;
+
 export interface AppLayout {
   backgroundImageUrl: string;
   contentListPaddingTop: number;
