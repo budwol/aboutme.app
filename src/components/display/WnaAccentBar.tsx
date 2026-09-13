@@ -1,7 +1,24 @@
 import Colors from "@constants/theme/colors";
 import { createShadowStyle } from "@components/effects/wnaShadowStyle";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
+
+type WebStyleTarget = {
+  style?: {
+    setProperty: (property: string, value: string) => void;
+  };
+};
+
+export function applyAccentBarWebStyles(
+  target: WebStyleTarget | null,
+  pulseScale: number,
+  duration: string,
+) {
+  if (typeof target?.style?.setProperty !== "function") return;
+
+  target.style.setProperty("--wna-accent-bar-pulse-scale", String(pulseScale));
+  target.style.setProperty("--wna-accent-bar-duration", duration);
+}
 
 type WnaAccentBarProps = {
   appColors: Colors;
@@ -26,7 +43,10 @@ function useWnaAccentBarAnimation(
   if (pulseToWidth !== undefined) {
     return {
       "--wna-accent-bar-pulse-scale": pulseToWidth / width,
-      animation: `wna-accent-bar-pulse ${pulseDuration * 2}ms ease-in-out infinite alternate`,
+      "--wna-accent-bar-duration": `${pulseDuration * 2}ms`,
+      animation: `wna-accent-bar-pulse${
+        width === 112 && pulseToWidth === 24 ? "-hero" : ""
+      } ${pulseDuration * 2}ms ease-in-out infinite alternate`,
     } as ViewStyle;
   }
 
@@ -45,6 +65,7 @@ export default function WnaAccentBar({
   pulseToWidth,
   pulseDuration = 3600,
 }: WnaAccentBarProps) {
+  const barRef = useRef<View>(null);
   const barAnimatedStyle = useWnaAccentBarAnimation(
     width,
     animated,
@@ -52,9 +73,29 @@ export default function WnaAccentBar({
     pulseDuration,
   );
 
+  useEffect(() => {
+    if (pulseToWidth === undefined) return;
+
+    const target = barRef.current as unknown as WebStyleTarget | null;
+    applyAccentBarWebStyles(
+      target,
+      pulseToWidth / width,
+      `${pulseDuration * 2}ms`,
+    );
+  }, [pulseDuration, pulseToWidth, width]);
+
   return (
     <View style={[styles.row, { width }]}>
       <View
+        ref={barRef}
+        {...(pulseToWidth !== undefined
+          ? {
+              className:
+                width === 112 && pulseToWidth === 24
+                  ? "wna-accent-bar-pulse-hero"
+                  : "wna-accent-bar-pulse",
+            }
+          : {})}
         style={[
           styles.bar,
           {

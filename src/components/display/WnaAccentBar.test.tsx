@@ -1,7 +1,9 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import WnaAccentBar from "@components/display/WnaAccentBar";
+import WnaAccentBar, {
+  applyAccentBarWebStyles,
+} from "@components/display/WnaAccentBar";
 
 const appColors = {
   accent5: "#2277ee",
@@ -71,7 +73,46 @@ describe("WnaAccentBar", () => {
     const bar = tree!.root.findAllByType("View")[1];
     expect(bar.props.style[2]).toEqual({
       "--wna-accent-bar-pulse-scale": 0.25,
+      "--wna-accent-bar-duration": "2400ms",
       animation: "wna-accent-bar-pulse 2400ms ease-in-out infinite alternate",
     });
+    expect(bar.props.className).toBe("wna-accent-bar-pulse");
+  });
+
+  it("sets pulsing CSS variables on a web element", () => {
+    const setProperty = jest.fn();
+
+    applyAccentBarWebStyles({ style: { setProperty } }, 0.25, "2400ms");
+
+    expect(setProperty).toHaveBeenCalledWith(
+      "--wna-accent-bar-pulse-scale",
+      "0.25",
+    );
+    expect(setProperty).toHaveBeenCalledWith(
+      "--wna-accent-bar-duration",
+      "2400ms",
+    );
+  });
+
+  it("uses the dedicated slow hero pulse for the profile bar", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaAccentBar
+          appColors={appColors}
+          width={112}
+          pulseToWidth={24}
+          pulseDuration={30000}
+        />,
+      );
+    });
+
+    const bar = tree!.root.findAllByType("View")[1];
+    expect(bar.props.className).toBe("wna-accent-bar-pulse-hero");
+    expect(bar.props.style[2].animation).toBe(
+      "wna-accent-bar-pulse-hero 60000ms ease-in-out infinite alternate",
+    );
+    expect(bar.props.style[2]["--wna-accent-bar-pulse-scale"]).toBe(24 / 112);
   });
 });

@@ -9,6 +9,24 @@ import Colors from "@constants/theme/colors";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { useEffect, useRef } from "react";
+
+type WebStyleTarget = {
+  style?: {
+    setProperty: (property: string, value: string) => void;
+  };
+};
+
+export function applyHeroShapeWebStyles(
+  target: WebStyleTarget | null,
+  variables: Record<string, string>,
+) {
+  if (typeof target?.style?.setProperty !== "function") return;
+
+  Object.entries(variables).forEach(([property, value]) => {
+    target.style?.setProperty(property, value);
+  });
+}
 
 type HeroShape = {
   top?: number;
@@ -276,6 +294,7 @@ function WnaHeroShape({
   index: number;
   appColors: Colors;
 }) {
+  const shapeRef = useRef<View>(null);
   const startScale = shape.swing === 1 ? 0.96 : 1.04;
   const endScale = shape.swing === 1 ? 1.04 : 0.96;
   const startOpacity = shape.swing === 1 ? 0.5 : 0.8;
@@ -300,15 +319,59 @@ function WnaHeroShape({
         "--wna-hero-shape-end-x": `${endTranslateX}px`,
         "--wna-hero-shape-start-y": `${startTranslateY}px`,
         "--wna-hero-shape-end-y": `${endTranslateY}px`,
+        animation: `wna-hero-shape-swing-${
+          shape.swing === 1 ? "positive" : "negative"
+        } ${sectionConstants.heroFieldMotionDuration}ms ease-in-out infinite alternate`,
       } as ViewStyle)
     : {
         opacity: 1,
         transform: [{ rotate: `${shape.rotate}deg` }],
       };
 
+  useEffect(() => {
+    if (!shape.animated) return;
+
+    const target = shapeRef.current as unknown as WebStyleTarget | null;
+    const variables = {
+      "--wna-hero-shape-duration": `${sectionConstants.heroFieldMotionDuration}ms`,
+      "--wna-hero-shape-start-scale": String(startScale),
+      "--wna-hero-shape-end-scale": String(endScale),
+      "--wna-hero-shape-start-opacity": String(startOpacity),
+      "--wna-hero-shape-end-opacity": String(endOpacity),
+      "--wna-hero-shape-start-rotate": `${startRotate}deg`,
+      "--wna-hero-shape-end-rotate": `${endRotate}deg`,
+      "--wna-hero-shape-start-x": `${startTranslateX}px`,
+      "--wna-hero-shape-end-x": `${endTranslateX}px`,
+      "--wna-hero-shape-start-y": `${startTranslateY}px`,
+      "--wna-hero-shape-end-y": `${endTranslateY}px`,
+    };
+
+    applyHeroShapeWebStyles(target, variables);
+  }, [
+    endOpacity,
+    endScale,
+    endTranslateX,
+    endTranslateY,
+    endRotate,
+    shape.animated,
+    startOpacity,
+    startScale,
+    startTranslateX,
+    startTranslateY,
+    startRotate,
+  ]);
+
   return (
     <View
+      ref={shapeRef}
       nativeID={shape.animated ? `wna-hero-shape-${index}` : undefined}
+      {...(shape.animated
+        ? {
+            className: `wna-hero-shape wna-hero-shape-swing-${
+              shape.swing === 1 ? "positive" : "negative"
+            }`,
+          }
+        : {})}
       style={[
         {
           position: "absolute",

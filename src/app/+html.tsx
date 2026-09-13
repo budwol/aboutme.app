@@ -57,6 +57,21 @@ export default function Root({ children }: PropsWithChildren) {
                       to { transform: scaleX(var(--wna-accent-bar-pulse-scale)); }
                     }
 
+                    @keyframes wna-accent-bar-pulse-hero {
+                      from { transform: scaleX(1); }
+                      to { transform: scaleX(.2142857); }
+                    }
+
+                    .wna-accent-bar-pulse {
+                      animation: wna-accent-bar-pulse var(--wna-accent-bar-duration) ease-in-out infinite alternate;
+                      transform-origin: center;
+                    }
+
+                    .wna-accent-bar-pulse-hero {
+                      animation: wna-accent-bar-pulse-hero 60s ease-in-out infinite alternate;
+                      transform-origin: center;
+                    }
+
                     @keyframes wna-hero-shape-swing {
                       from {
                         opacity: var(--wna-hero-shape-start-opacity);
@@ -76,8 +91,22 @@ export default function Root({ children }: PropsWithChildren) {
                       }
                     }
 
-                    [id^="wna-hero-shape-"] {
-                      animation: wna-hero-shape-swing var(--wna-hero-shape-duration) ease-in-out infinite alternate;
+                    @keyframes wna-hero-shape-swing-positive {
+                      from { opacity: .5; transform: translate(-4px, 3px) rotate(-2.5deg) scale(.96); }
+                      to { opacity: .82; transform: translate(4px, -3px) rotate(2.5deg) scale(1.04); }
+                    }
+
+                    .wna-hero-shape-swing-positive {
+                      animation: wna-hero-shape-swing-positive 13s ease-in-out infinite alternate;
+                    }
+
+                    @keyframes wna-hero-shape-swing-negative {
+                      from { opacity: .8; transform: translate(4px, -3px) rotate(12.5deg) scale(1.04); }
+                      to { opacity: .52; transform: translate(-4px, 3px) rotate(7.5deg) scale(.96); }
+                    }
+
+                    .wna-hero-shape-swing-negative {
+                      animation: wna-hero-shape-swing-negative 13s ease-in-out infinite alternate;
                     }
 
                     [id^="wna-experience-details-"] {
@@ -130,7 +159,8 @@ export default function Root({ children }: PropsWithChildren) {
                     }
 
                     @media (prefers-reduced-motion: reduce) {
-                      [id^="wna-hero-shape-"] {
+                      .wna-hero-shape-swing-positive,
+                      .wna-hero-shape-swing-negative {
                         animation: none;
                       }
                     }

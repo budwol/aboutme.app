@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaProfileHero, {
+  applyHeroShapeWebStyles,
   WnaHeroField,
 } from "@components/sections/WnaProfileHero";
 import { testAppData } from "@/app-data/testAppData";
@@ -134,7 +135,49 @@ describe("WnaProfileHero", () => {
         "--wna-hero-shape-end-scale": expect.any(Number),
         "--wna-hero-shape-start-opacity": expect.any(Number),
         "--wna-hero-shape-end-opacity": expect.any(Number),
+        animation:
+          "wna-hero-shape-swing-positive 13000ms ease-in-out infinite alternate",
       }),
+    );
+    expect(animatedShape?.props.className).toBe(
+      "wna-hero-shape wna-hero-shape-swing-positive",
+    );
+    expect(animatedShape?.props.style[1].animation).toBe(
+      "wna-hero-shape-swing-positive 13000ms ease-in-out infinite alternate",
+    );
+
+    const negativeShape = tree!.root
+      .findAllByType("View")
+      .find(
+        (node: { props: { nativeID?: string } }) =>
+          node.props.nativeID === "wna-hero-shape-1",
+      );
+    expect(negativeShape?.props.className).toBe(
+      "wna-hero-shape wna-hero-shape-swing-negative",
+    );
+    expect(negativeShape?.props.style[1].animation).toBe(
+      "wna-hero-shape-swing-negative 13000ms ease-in-out infinite alternate",
+    );
+  });
+
+  it("sets hero motion variables on a web element", () => {
+    const setProperty = jest.fn();
+
+    applyHeroShapeWebStyles(
+      { style: { setProperty } },
+      {
+        "--wna-hero-shape-duration": "13000ms",
+        "--wna-hero-shape-start-x": "-4px",
+      },
+    );
+
+    expect(setProperty).toHaveBeenCalledWith(
+      "--wna-hero-shape-duration",
+      "13000ms",
+    );
+    expect(setProperty).toHaveBeenCalledWith(
+      "--wna-hero-shape-start-x",
+      "-4px",
     );
   });
 
