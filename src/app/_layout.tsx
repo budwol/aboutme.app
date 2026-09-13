@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Slot } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { I18nextProvider } from "react-i18next";
 
 import WnaApp from "@components/WnaApp";
@@ -30,13 +29,11 @@ function RootLayoutContent() {
   }, []);
 
   return !appData ? null : (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <I18nextProvider i18n={i18n}>
-        <WnaApp appData={appData} theme={theme}>
-          <Slot />
-        </WnaApp>
-      </I18nextProvider>
-    </GestureHandlerRootView>
+    <I18nextProvider i18n={i18n}>
+      <WnaApp appData={appData} theme={theme}>
+        <Slot />
+      </WnaApp>
+    </I18nextProvider>
   );
 }
 
