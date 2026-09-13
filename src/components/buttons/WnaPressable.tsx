@@ -1,10 +1,8 @@
 import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressable";
-import { appLayoutConstants } from "@constants/layoutConstants";
-import { FontFamilies } from "@constants/theme/fontFamilies";
+import WnaTooltip from "@components/effects/WnaTooltip";
 import { TFunction } from "i18next";
 import { FC, ReactNode, useRef, useState } from "react";
-import { Text, View, ViewStyle } from "react-native";
-import { Popable } from "react-native-popable";
+import { View, ViewStyle } from "react-native";
 
 export type WnaPressableState = Readonly<{
   pressed: boolean;
@@ -27,8 +25,6 @@ export type WnaPressableProps = {
   disabled?: boolean;
 };
 
-const _toolTipZindex = 1000;
-
 const WnaPressable: FC<WnaPressableProps> = (props) => {
   const [isToolTipVisible, setIsToolTipVisible] = useState(false);
   const toolTip = props.toolTip ?? "";
@@ -48,67 +44,17 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
       isEnabledRef.current = true;
     }, 500);
   };
-  const toolTipStyle = {
-    zIndex: _toolTipZindex,
-    pointerEvents: "none",
-  } as ViewStyle;
-  const tooltipHorizontalOffset = appLayoutConstants.headerButtonHeight;
-
-  const toolTipStyleTop = [
-    toolTipStyle,
-    {
-      position: "absolute",
-      bottom: "100%",
-      zIndex: _toolTipZindex,
-    },
-  ] as ViewStyle[];
-
-  const toolTipStyleLeft = [
-    toolTipStyle,
-    {
-      position: "absolute",
-      top: tooltipHorizontalOffset / 2,
-      right: tooltipHorizontalOffset,
-    },
-  ] as ViewStyle[];
-
-  const toolTipStyleBottom = [toolTipStyle] as ViewStyle[];
-  const toolTipContent = (
-    <Text
-      style={{
-        color: "#ffffff",
-        fontFamily: FontFamilies.UI,
-        fontSize: 12,
-        fontWeight: "600",
-        lineHeight: 16,
-        padding: 2,
-        textAlign: "center",
-      }}
-    >
-      {toolTip}
-    </Text>
-  );
+  const hasTooltip = Boolean(toolTip && toolTipPosition);
   return (
-    <>
-      {toolTip &&
-        toolTip !== "" &&
-        toolTipPosition &&
-        (toolTipPosition === "left" || toolTipPosition === "top") && (
-          <Popable
-            animated={false}
-            content={toolTipContent}
-            position={toolTipPosition}
-            visible={isToolTipVisible}
-            style={
-              props.toolTipPosition === "top"
-                ? toolTipStyleTop
-                : toolTipStyleLeft
-            }
-          >
-            {null}
-          </Popable>
-        )}
-      <View style={[{ overflow: "hidden" }, props.style]}>
+    <View style={[{ overflow: "visible", position: "relative" }, props.style]}>
+      {hasTooltip && (
+        <WnaTooltip
+          content={toolTip}
+          position={toolTipPosition!}
+          visible={isToolTipVisible}
+        />
+      )}
+      <View style={{ overflow: "hidden" }}>
         <WnaBasePressable
           accessibilityLabel={props.accessibilityLabel}
           ripple={props.ripple}
@@ -123,25 +69,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
           {props.children}
         </WnaBasePressable>
       </View>
-      {toolTip &&
-        toolTip !== "" &&
-        toolTipPosition &&
-        (toolTipPosition === "bottom" || toolTipPosition === "right") && (
-          <Popable
-            animated={false}
-            content={toolTipContent}
-            position={props.toolTipPosition}
-            visible={isToolTipVisible}
-            style={
-              toolTipPosition === "bottom"
-                ? toolTipStyleBottom
-                : toolTipStyleBottom
-            }
-          >
-            {null}
-          </Popable>
-        )}
-    </>
+    </View>
   );
 };
 export default WnaPressable;
