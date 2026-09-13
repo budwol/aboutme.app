@@ -2,7 +2,7 @@ import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressa
 import WnaTooltip from "@components/effects/WnaTooltip";
 import { TFunction } from "i18next";
 import { FC, ReactNode, useRef, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 export type WnaPressableState = Readonly<{
   pressed: boolean;
@@ -45,6 +45,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
     }, 500);
   };
   const hasTooltip = Boolean(toolTip && toolTipPosition);
+  const flattenedStyle = StyleSheet.flatten(props.style);
   return (
     <View style={[{ overflow: "visible", position: "relative" }, props.style]}>
       {hasTooltip && (
@@ -54,7 +55,13 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
           visible={isToolTipVisible}
         />
       )}
-      <View style={{ flex: 1, overflow: "hidden" }}>
+      <View
+        style={{
+          borderRadius: flattenedStyle?.borderRadius,
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
         <WnaBasePressable
           accessibilityLabel={props.accessibilityLabel}
           ripple={props.ripple}

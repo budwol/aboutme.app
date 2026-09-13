@@ -178,4 +178,24 @@ describe("WnaPressable", () => {
 
     expect(tree!.root.findAllByType("WnaTooltip")).toHaveLength(0);
   });
+
+  it("preserves the rounded hover clipping from the pressable style", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaPressable
+          onPress={() => undefined}
+          ripple="light"
+          style={{ borderRadius: 24 }}
+        >
+          child
+        </WnaPressable>,
+      );
+    });
+
+    expect(tree!.root.findAllByType("View")[1].props.style).toEqual(
+      expect.objectContaining({ borderRadius: 24, overflow: "hidden" }),
+    );
+  });
 });
