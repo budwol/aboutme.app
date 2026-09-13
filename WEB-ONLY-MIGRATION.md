@@ -24,6 +24,9 @@ nicht aktiviert werden.
 - Semantisches HTML und CSS ersetzen React-Native-Layout-Primitives.
 - CSS-Transitions oder Web Animations ersetzen Reanimated.
 - `srcset`/`picture` ersetzen die plattformübergreifende Bildauflösung.
+- `expo-constants` und `expo-linking` bleiben bis zur Expo-Router-Ablösung als
+  direkte Peer-Dependencies installiert; der eigene Code nutzt den Browser-
+  Adapter.
 - Routing wird erst nach Stabilisierung der Web-Shell ausgetauscht.
 - Jede Phase benötigt fokussierte Unit-, Integrations- und E2E-Regressionstests.
 - Nach jeder Phase werden Lighthouse, Bundle-Größe, Accessibility und
