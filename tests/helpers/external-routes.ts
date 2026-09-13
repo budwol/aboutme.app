@@ -116,6 +116,9 @@ export async function installExternalUrlCapture(page: Page) {
     ) {
       const originalOpen = window.open.bind(window);
       const originalAnchorClick = HTMLAnchorElement.prototype.click;
+      const originalLocationAssign = window.location.assign.bind(
+        window.location,
+      );
 
       window.open = (url?: string | URL, target?: string) => {
         (
@@ -136,6 +139,16 @@ export async function installExternalUrlCapture(page: Page) {
         ).__wnaLastOpenedUrl = this.href;
 
         return originalAnchorClick.call(this);
+      };
+
+      window.location.assign = (url: string | URL) => {
+        (
+          window as Window & {
+            __wnaLastOpenedUrl?: string | null;
+          }
+        ).__wnaLastOpenedUrl = String(url);
+
+        originalLocationAssign(url);
       };
 
       (
