@@ -50,8 +50,8 @@ describe("WnaBlurView", () => {
     expect(blur.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          backdropFilter: "blur(64px)",
-          WebkitBackdropFilter: "blur(64px)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
         }),
       ]),
     );
