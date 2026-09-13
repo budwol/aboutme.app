@@ -44,6 +44,7 @@ export default function WnaTechStackSection({
       style={{
         flexDirection: "row",
         flexWrap: "wrap",
+        alignItems: "flex-start",
         gap: 8,
       }}
     >
