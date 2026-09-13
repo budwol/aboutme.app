@@ -1,5 +1,4 @@
 import Logger from "@/utils/logger";
-import * as Localization from "expo-localization";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import translationDe from "./de.json";
@@ -8,8 +7,11 @@ import translationEn from "./en.json";
 const getLangCode = () => {
   let langCode = "de";
   try {
-    const code = Localization.getLocales().shift();
-    if (code) langCode = code.languageCode ?? "";
+    const locale =
+      typeof navigator !== "undefined"
+        ? (navigator.languages?.[0] ?? navigator.language)
+        : undefined;
+    if (locale) langCode = locale.split("-")[0]?.toLowerCase() ?? "";
 
     if (langCode !== "de" && langCode !== "en") langCode = "en";
   } catch (error) {
