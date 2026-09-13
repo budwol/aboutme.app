@@ -81,7 +81,11 @@ npx expo export -p web
 test -f dist/index.html
 test -f public/app-data.json
 test -f public/site.webmanifest
+test -f public/sw.js
 test -f nginx/site.conf
+
+grep -q 'name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"' dist/index.html
+grep -q 'serviceWorker.register("/sw.js"' dist/index.html
 
 grep -q "listen 8080 default_server;" nginx/site.conf
 
