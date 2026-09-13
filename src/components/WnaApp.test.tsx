@@ -469,6 +469,13 @@ describe("WnaApp", () => {
     act(() => queuedFrames.shift()?.(0));
     act(() => queuedFrames.shift()?.(0));
 
+    expect(
+      tree!.root.findByProps({ nativeID: "navigation-transition-overlay" })
+        .props.style,
+    ).toEqual(
+      expect.arrayContaining([expect.objectContaining({ opacity: 0 })]),
+    );
+
     act(() => {
       jest.advanceTimersByTime(560);
     });

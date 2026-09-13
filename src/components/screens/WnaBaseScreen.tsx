@@ -137,7 +137,8 @@ const WnaBusyOverlay = memo(
             opacity: isBusy ? 1 : 0,
             backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
             pointerEvents: isBusy ? "auto" : "none",
-          },
+            transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
+          } as never,
         ]}
       >
         <WnaActivityIndicator appColors={appColors} />

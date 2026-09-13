@@ -114,7 +114,9 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     useState(false);
   const [isNavigationContentVisible, setIsNavigationContentVisible] =
     useState(true);
-  const [, setNavigationTransitionPhase] = useState<"enter" | "exit">("enter");
+  const [navigationTransitionPhase, setNavigationTransitionPhase] = useState<
+    "enter" | "exit"
+  >("enter");
   const [hasContentLayout, setHasContentLayout] = useState(false);
   const [isContentReadyForReveal, setIsContentReadyForReveal] = useState(false);
   const {
@@ -208,6 +210,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     }
 
     setShowNavigationTransition(true);
+    setIsNavigationContentVisible(false);
     setNavigationTransitionPhase("enter");
   }, [isNavigationTransitionActive, showIntro]);
 
@@ -222,8 +225,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     ) {
       return;
     }
-
-    setIsNavigationContentVisible(false);
 
     navigationRevealFrameRef.current = requestAnimationFrame(() => {
       navigationRevealFrameRef.current = requestAnimationFrame(() => {
@@ -343,7 +344,9 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
             {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
               pointerEvents: "auto",
-            },
+              opacity: navigationTransitionPhase === "exit" ? 0 : 1,
+              transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+            } as never,
           ]}
         >
           <WnaImageBackground

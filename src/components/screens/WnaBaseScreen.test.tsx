@@ -296,7 +296,11 @@ describe("WnaBaseScreen", () => {
         node.props.nativeID === "wna-busy-overlay",
     );
     expect(busyOverlay.props.style[1]).toEqual(
-      expect.objectContaining({ opacity: 1, pointerEvents: "auto" }),
+      expect.objectContaining({
+        opacity: 1,
+        pointerEvents: "auto",
+        transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
+      }),
     );
   });
 
