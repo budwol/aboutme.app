@@ -1,8 +1,8 @@
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { AppLayout } from "@constants/layoutConstants";
 import AppStyle from "@/theme/appStyle";
-import { ReactNode, useCallback, useMemo } from "react";
-import { FlatList, StyleSheet, View, ViewStyle } from "react-native";
+import { Fragment, ReactNode, useCallback, useMemo } from "react";
+import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
 
 export interface WnaMenuItem {
   route?: string;
@@ -51,10 +51,9 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
   const separatorHeight = overrideGap ?? appLayout.globalListGap;
 
   const renderMenuItem = useCallback(
-    ({ item }: { item: WnaMenuItem }) =>
-      !item ? null : (
-        <View style={appStyle.containerCenterMaxWidth}>{renderItem(item)}</View>
-      ),
+    ({ item }: { item: WnaMenuItem }) => (
+      <View style={appStyle.containerCenterMaxWidth}>{renderItem(item)}</View>
+    ),
     [appStyle.containerCenterMaxWidth, renderItem],
   );
 
@@ -63,21 +62,18 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
     [separatorHeight],
   );
 
-  const keyExtractor = useCallback(
-    (item: WnaMenuItem, index: number) => item.route ?? `${item.text}-${index}`,
-    [],
-  );
-
   return (
-    <FlatList
-      extraData={items}
+    <ScrollView
       style={listStyle}
-      ItemSeparatorComponent={renderSeparator}
-      keyExtractor={keyExtractor}
-      data={items}
-      renderItem={renderMenuItem}
       scrollEventThrottle={appLayout.scrollEventThrottle}
-    />
+    >
+      {items.map((item, index) => (
+        <Fragment key={item.route ?? `${item.text}-${index}`}>
+          {renderMenuItem({ item })}
+          {index < items.length - 1 ? renderSeparator() : null}
+        </Fragment>
+      ))}
+    </ScrollView>
   );
 }
 
