@@ -66,6 +66,7 @@ const WnaCardVerticalSmallComponent: FC<WnaCardVerticalSmallProps> = ({
             fontColor={appColors.coolgray8}
             style={{
               backgroundColor: appColors.coolgray1,
+              height: 20,
               paddingHorizontal: 4,
               paddingVertical: 2,
               borderRadius: 3,
