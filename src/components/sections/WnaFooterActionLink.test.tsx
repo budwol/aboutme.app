@@ -33,6 +33,19 @@ describe("WnaFooterActionLink", () => {
     );
 
     expect(button.props.type).toBe("button");
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        appearance: "none",
+        alignItems: "center",
+        borderStyle: "solid",
+        boxSizing: "border-box",
+        cursor: "pointer",
+        display: "flex",
+        fontFamily: "inherit",
+        fontSize: "inherit",
+        justifyContent: "center",
+      }),
+    );
     expect(button.props.style.backgroundColor).toBe("rgba(0,170,204,0.08)");
 
     act(() => {

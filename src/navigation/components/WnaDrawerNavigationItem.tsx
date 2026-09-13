@@ -45,10 +45,14 @@ export default function WnaDrawerNavigationItem({
     ...styles.container,
     appearance: "none" as const,
     border: "none",
+    boxSizing: "border-box" as const,
+    display: "flex" as const,
+    alignItems: "center" as const,
     fontFamily: "inherit",
     fontSize: "inherit",
     paddingLeft: isSecondary ? 32 : 16,
     backgroundColor: getBackgroundColor(isPressed),
+    position: "relative" as const,
     textAlign: "left" as const,
     width: "100%",
   };
@@ -66,7 +70,7 @@ export default function WnaDrawerNavigationItem({
       style: buttonStyle as React.CSSProperties,
       testID: `drawer-navigation-item-${text}`,
     },
-    <View>
+    <View style={styles.content}>
       {isActive && (
         <View style={[styles.accentBar, { backgroundColor: accent }]} />
       )}
@@ -102,6 +106,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingRight: 16,
     borderRadius: 4,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
   },
   accentBar: {
     position: "absolute",
