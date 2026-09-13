@@ -44,6 +44,10 @@ describe("WnaFooterActionLink", () => {
         fontFamily: "inherit",
         fontSize: "inherit",
         justifyContent: "center",
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingTop: 8,
+        paddingBottom: 8,
       }),
     );
     expect(button.props.style.backgroundColor).toBe("rgba(0,170,204,0.08)");
