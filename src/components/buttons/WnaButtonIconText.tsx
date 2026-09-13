@@ -59,7 +59,7 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
         setIsHovered(false);
         setIsPressed(false);
       },
-      style: {
+      style: StyleSheet.flatten({
         ...componentStyle.pressableContainer,
         ...createShadowStyle(),
         ...createButtonOutlineStyle(appColors),
@@ -74,8 +74,8 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
         display: "flex",
         opacity: isDisabled ? 0.5 : isPressed ? 0.8 : isHovered ? 0.9 : 1,
         padding: 0,
-        ...style,
-      } as React.CSSProperties,
+        ...StyleSheet.flatten(style),
+      }) as React.CSSProperties,
     },
     <WnaButtonTextContent
       text={text}
