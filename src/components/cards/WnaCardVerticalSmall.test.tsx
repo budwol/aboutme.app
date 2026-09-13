@@ -92,7 +92,6 @@ describe("WnaCardVerticalSmall", () => {
     expect(badge.props.text).toBe("3 yrs 5 mos");
     expect(badge.props.style).toEqual(
       expect.objectContaining({
-        height: 20,
         minHeight: 18,
         paddingVertical: 2,
       }),

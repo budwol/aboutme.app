@@ -68,7 +68,7 @@ describe("WnaBadge", () => {
           display: "flex",
           flexGrow: 0,
           flexShrink: 0,
-          height: 24,
+          minHeight: 24,
         }),
       }),
     );
