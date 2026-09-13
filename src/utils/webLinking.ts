@@ -1,29 +1,33 @@
 const supportedProtocols = new Set(["http:", "https:", "mailto:", "tel:"]);
 
-async function canOpenURL(url: string): Promise<boolean> {
+function parseOpenableURL(url: string): URL | undefined {
   try {
     const trimmedUrl = url.trim();
     if (
       !trimmedUrl ||
       (!/^[a-z][a-z\d+.-]*:/i.test(trimmedUrl) && !trimmedUrl.startsWith("/"))
     ) {
-      return false;
+      return undefined;
     }
     const parsedUrl = new URL(trimmedUrl, window.location.href);
-    return supportedProtocols.has(parsedUrl.protocol);
+    return supportedProtocols.has(parsedUrl.protocol) ? parsedUrl : undefined;
   } catch {
-    return false;
+    return undefined;
   }
+}
+
+async function canOpenURL(url: string): Promise<boolean> {
+  return parseOpenableURL(url) !== undefined;
 }
 
 async function openURL(url: string): Promise<void> {
   if (typeof window === "undefined") return;
 
-  if (!(await canOpenURL(url))) {
+  const parsedUrl = parseOpenableURL(url);
+  if (!parsedUrl) {
     throw new Error(`Unsupported URL: ${url}`);
   }
 
-  const parsedUrl = new URL(url, window.location.href);
   if (parsedUrl.protocol === "mailto:" || parsedUrl.protocol === "tel:") {
     window.open(parsedUrl.href, "_self");
     return;
