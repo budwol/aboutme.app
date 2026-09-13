@@ -50,10 +50,19 @@ const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
 
   const buttonStyle = {
     ...styles.footerActionButton,
+    appearance: "none" as const,
+    alignItems: "center" as const,
     borderColor: isHovered ? hoverBorderColor : borderColor,
+    borderStyle: "solid" as const,
     backgroundColor: isHovered
       ? convertHexToRgba(appColors.accent5, 0.14)
       : surfaceColor,
+    boxSizing: "border-box" as const,
+    cursor: "pointer" as const,
+    display: "flex" as const,
+    fontFamily: "inherit",
+    fontSize: "inherit",
+    justifyContent: "center" as const,
   };
 
   return (

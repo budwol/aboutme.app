@@ -3,7 +3,11 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerNavigationItem from "@/navigation/components/WnaDrawerNavigationItem";
 
-type TestNode = { props: Record<string, unknown> };
+type TestNode = {
+  props: Record<string, unknown> & {
+    style?: Record<string, unknown>;
+  };
+};
 
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const { createElement } = jest.requireActual(
@@ -69,7 +73,18 @@ describe("WnaDrawerNavigationItem", () => {
       expect.objectContaining({
         paddingLeft: 32,
         backgroundColor: "transparent",
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
       }),
+    );
+    const content = tree!.root.find(
+      (node: TestNode) =>
+        node.props.style?.flexDirection === "row" &&
+        node.props.style?.alignItems === "center",
+    );
+    expect(content.props.style).toEqual(
+      expect.objectContaining({ flexDirection: "row", alignItems: "center" }),
     );
     expect(icon.props.size).toBe(20);
     expect(icon.props.color).toBe("#111111");
