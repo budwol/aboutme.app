@@ -3,7 +3,7 @@ import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { LinearGradient } from "expo-linear-gradient";
+import WnaCssGradient from "@components/effects/WnaCssGradient";
 import { TFunction } from "i18next";
 import { FC, memo } from "react";
 import { Text, TextStyle, ViewStyle } from "react-native";
@@ -26,7 +26,7 @@ export const WnaFooter: FC<WnaFooterProps> = memo(
     return (
       <>
         {!isInternetReachable && (
-          <LinearGradient
+          <WnaCssGradient
             start={[0, 0]}
             end={[1, 0]}
             colors={[
@@ -44,7 +44,7 @@ export const WnaFooter: FC<WnaFooterProps> = memo(
             >
               {t(i18nKeys.errorNoInternet).toUpperCase()}
             </Text>
-          </LinearGradient>
+          </WnaCssGradient>
         )}
       </>
     );

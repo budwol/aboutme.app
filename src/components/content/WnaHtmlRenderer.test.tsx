@@ -5,14 +5,15 @@ import WnaHtmlRenderer, {
   areWnaHtmlRendererPropsEqual,
 } from "@components/content/WnaHtmlRenderer";
 
-jest.mock("expo-linear-gradient", () => {
+jest.mock("@components/effects/WnaCssGradient", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
   return {
-    LinearGradient: (props: unknown) =>
-      createElement("LinearGradient", props as Record<string, unknown>),
+    __esModule: true,
+    default: (props: unknown) =>
+      createElement("WnaCssGradient", props as Record<string, unknown>),
   };
 });
 
@@ -55,7 +56,7 @@ describe("WnaHtmlRenderer", () => {
 
     expect(plainTree!.root.findAllByType("div")).toHaveLength(1);
     expect(overlayTree!.root.findAllByType("div")).toHaveLength(1);
-    expect(overlayTree!.root.findAllByType("LinearGradient")).toHaveLength(1);
+    expect(overlayTree!.root.findAllByType("WnaCssGradient")).toHaveLength(1);
 
     expect(
       areWnaHtmlRendererPropsEqual(

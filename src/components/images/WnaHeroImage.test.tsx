@@ -15,14 +15,15 @@ jest.mock("@components/images/WnaImage", () => {
   };
 });
 
-jest.mock("expo-linear-gradient", () => {
+jest.mock("@components/effects/WnaCssGradient", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
 
   return {
-    LinearGradient: (props: unknown) =>
+    __esModule: true,
+    default: (props: unknown) =>
       ReactModule.createElement(
-        "LinearGradient",
+        "WnaCssGradient",
         props as Record<string, unknown>,
       ),
   };
@@ -71,6 +72,6 @@ describe("WnaHeroImage", () => {
       );
     });
 
-    expect(tree!.root.findAllByType("LinearGradient")).toHaveLength(1);
+    expect(tree!.root.findAllByType("WnaCssGradient")).toHaveLength(1);
   });
 });
