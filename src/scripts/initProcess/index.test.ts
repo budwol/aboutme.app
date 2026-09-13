@@ -327,6 +327,11 @@ describe("init.sh", () => {
     ).toBe(true);
     expect(
       fs.existsSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_384.webp"),
+      ),
+    ).toBe(true);
+    expect(
+      fs.existsSync(
         path.join(fixtureRoot, "public", "images", "default_avatar_512.webp"),
       ),
     ).toBe(true);
@@ -336,6 +341,12 @@ describe("init.sh", () => {
         "utf8",
       ),
     ).toBe("responsive-avatar-300");
+    expect(
+      fs.readFileSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_384.webp"),
+        "utf8",
+      ),
+    ).toBe("responsive-avatar-384");
     expect(
       fs.readFileSync(
         path.join(fixtureRoot, "public", "images", "default_avatar_512.webp"),
