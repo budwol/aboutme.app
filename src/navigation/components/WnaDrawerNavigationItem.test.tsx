@@ -75,6 +75,7 @@ describe("WnaDrawerNavigationItem", () => {
         paddingTop: 14,
         paddingBottom: 14,
         paddingRight: 16,
+        margin: 0,
         backgroundColor: "transparent",
         position: "relative",
         display: "flex",
@@ -82,13 +83,12 @@ describe("WnaDrawerNavigationItem", () => {
         cursor: "pointer",
       }),
     );
-    const content = tree!.root.find(
-      (node: TestNode) =>
-        node.props.style?.flexDirection === "row" &&
-        node.props.style?.alignItems === "center",
-    );
-    expect(content.props.style).toEqual(
-      expect.objectContaining({ flexDirection: "row", alignItems: "center" }),
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        paddingTop: 14,
+        paddingBottom: 14,
+        paddingRight: 16,
+      }),
     );
     expect(icon.props.size).toBe(20);
     expect(icon.props.color).toBe("#111111");
@@ -151,6 +151,7 @@ describe("WnaDrawerNavigationItem", () => {
       expect.objectContaining({
         paddingLeft: 16,
         backgroundColor: "#222222",
+        margin: 0,
       }),
     );
     act(() => {
@@ -163,10 +164,23 @@ describe("WnaDrawerNavigationItem", () => {
     expect(icon.props.color).toBe("#00aa99");
     expect(accentBar.props.style).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ width: 4 }),
+        expect.objectContaining({
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          position: "absolute",
+        }),
         { backgroundColor: "#00aa99" },
       ]),
     );
+    expect(icon.props.style).toEqual(
+      expect.objectContaining({ width: 28, opacity: 1 }),
+    );
+    expect(
+      tree!.root.find((node: TestNode) => node.props.children === "Projects")
+        .props.style[1],
+    ).toEqual(expect.objectContaining({ marginLeft: 12 }));
   });
 
   it("keeps the dark inactive hover state visible against the drawer", () => {

@@ -23,7 +23,10 @@ import {
   getDrawerNavigationPath,
   getNavigationLang,
 } from "@/navigation/routes/wnaNavigationRoutes";
-import { appLayoutConstants } from "@constants/layoutConstants";
+import {
+  appLayoutConstants,
+  appSpacingConstants,
+} from "@constants/layoutConstants";
 import { navigationLayoutConstants } from "@constants/navigationLayoutConstants";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
@@ -197,7 +200,7 @@ export default function WnaDrawerMenu() {
                 { color: appColors.black },
               ]}
             >
-              {t(i18nKeys.appBrand)}
+              {appData.profile.name}
             </Text>
             <Text
               style={[
@@ -217,8 +220,8 @@ export default function WnaDrawerMenu() {
           appStyle={appStyle}
           appLayout={appLayout}
           items={items}
-          overridePaddingTop={1}
-          overrideGap={1}
+          overridePaddingTop={appSpacingConstants.xs}
+          overrideGap={appSpacingConstants.xs}
           style={styles.navList}
           renderItem={renderItem}
         />
@@ -329,9 +332,11 @@ const styles = StyleSheet.create({
   navWrapper: {
     flex: 1,
     justifyContent: "center",
+    marginTop: appSpacingConstants.sm,
   },
   navList: {
-    padding: 10,
+    paddingHorizontal: appSpacingConstants.xs,
+    paddingBottom: appSpacingConstants.xs,
   },
   footer: {
     position: "absolute",

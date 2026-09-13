@@ -3,7 +3,10 @@ import React from "react";
 import { Linking } from "@utils/webLinking";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
-import { appLayoutConstants } from "@constants/layoutConstants";
+import {
+  appLayoutConstants,
+  appSpacingConstants,
+} from "@constants/layoutConstants";
 
 const mockHeaderButtonHeight = appLayoutConstants.headerButtonHeight;
 const mockGlobalCornerRadius = appLayoutConstants.globalCornerRadius;
@@ -258,6 +261,60 @@ describe("WnaDrawerMenu", () => {
 
     expect(profileItem).toBeDefined();
     expect(profileItem!.props.isActive).toBe(true);
+  });
+
+  it("renders the profile name and title in the drawer header", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const headerTexts = tree!.root
+      .findAllByType("Text")
+      .map((node: { props: { children?: unknown } }) => node.props.children);
+
+    expect(headerTexts).toContain("John Doe");
+    expect(headerTexts).toContain("SOFTWARE ENGINEER");
+    expect(headerTexts).not.toContain("appBrand");
+  });
+
+  it("keeps the drawer navigation top spacing separate from list padding", async () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const navigationList = tree!.root.findByType("WnaNavigationList");
+
+    expect(navigationList.props.overridePaddingTop).toBe(
+      appSpacingConstants.xs,
+    );
+    expect(navigationList.props.overrideGap).toBe(appSpacingConstants.xs);
+    expect(navigationList.props.style).toEqual({
+      paddingHorizontal: appSpacingConstants.xs,
+      paddingBottom: appSpacingConstants.xs,
+    });
+
+    const navWrapper = tree!.root.find(
+      (node: { props: { style?: unknown } }) =>
+        Array.isArray(node.props.style)
+          ? node.props.style.some(
+              (style: { justifyContent?: string }) =>
+                style.justifyContent === "center",
+            )
+          : (node.props.style as { justifyContent?: string } | undefined)
+              ?.justifyContent === "center",
+    );
+
+    expect(navWrapper.props.style).toEqual(
+      expect.objectContaining({
+        flex: 1,
+        justifyContent: "center",
+        marginTop: appSpacingConstants.sm,
+      }),
+    );
   });
 
   it("disables drawer animation when the drawer is open", async () => {

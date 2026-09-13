@@ -94,6 +94,14 @@ describe("WnaButtonIcon", () => {
       button.props.onMouseDown();
     });
     expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.14)");
+    act(() => {
+      button.props.onMouseUp();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.08)");
+    act(() => {
+      button.props.onMouseLeave();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(0,0,0,0.6)");
     expect(icon.props.iconName).toBe("account");
     expect(icon.props.color).toBe("#ff0000");
   });
