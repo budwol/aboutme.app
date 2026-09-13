@@ -25,6 +25,7 @@ const DEFAULT_ASSETS = [
     label: ".aboutme/images/default_project.webp",
   },
 ];
+const RESPONSIVE_AVATAR_SIZES = [300, 512];
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
@@ -321,10 +322,10 @@ function buildAvatarVariantFileName(fileName, size) {
   return `${baseName}_${size}.webp`;
 }
 
-function defaultCreateResponsiveAvatar(sourcePath, targetPath) {
+function defaultCreateResponsiveAvatar(sourcePath, targetPath, size = 300) {
   execFileSync(
     "convert",
-    [sourcePath, "-resize", "300x300", "-quality", "80", targetPath],
+    [sourcePath, "-resize", `${size}x${size}`, "-quality", "80", targetPath],
     { stdio: "inherit" },
   );
 }
@@ -492,14 +493,8 @@ function runInitProcess(rootDir, options = {}) {
   );
   const avatarFileName =
     typeof appData?.profile?.avatar === "string" ? appData.profile.avatar : "";
-  const responsiveAvatarFileName = avatarFileName
-    ? buildAvatarVariantFileName(avatarFileName, 300)
-    : "";
   const sourceAvatarPath = avatarFileName
     ? path.join(sourceImagesDir, avatarFileName)
-    : "";
-  const responsiveAvatarPath = responsiveAvatarFileName
-    ? path.join(sourceImagesDir, responsiveAvatarFileName)
     : "";
   const missingAssets = [];
 
@@ -547,20 +542,29 @@ function runInitProcess(rootDir, options = {}) {
     return { generated: false, migrated };
   }
 
-  if (
-    avatarFileName &&
-    fs.existsSync(sourceAvatarPath) &&
-    !fs.existsSync(responsiveAvatarPath)
-  ) {
-    if (dryRun) {
-      logger(
-        `would generate responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+  if (avatarFileName && fs.existsSync(sourceAvatarPath)) {
+    for (const size of RESPONSIVE_AVATAR_SIZES) {
+      const responsiveAvatarFileName = buildAvatarVariantFileName(
+        avatarFileName,
+        size,
       );
-    } else {
-      createResponsiveAvatar(sourceAvatarPath, responsiveAvatarPath);
-      logger(
-        `generated responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+      const responsiveAvatarPath = path.join(
+        sourceImagesDir,
+        responsiveAvatarFileName,
       );
+
+      if (!fs.existsSync(responsiveAvatarPath)) {
+        if (dryRun) {
+          logger(
+            `would generate responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+          );
+        } else {
+          createResponsiveAvatar(sourceAvatarPath, responsiveAvatarPath, size);
+          logger(
+            `generated responsive avatar .aboutme/images/${responsiveAvatarFileName}`,
+          );
+        }
+      }
     }
   }
 

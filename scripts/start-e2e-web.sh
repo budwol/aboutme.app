@@ -47,6 +47,9 @@ cp "$ROOT_DIR/assets/defaults/images/default_project.webp" \
 convert "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
   -resize 300x300 -quality 80 \
   "$ROOT_DIR/public/images/default_avatar_300.webp"
+convert "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
+  -resize 512x512 -quality 80 \
+  "$ROOT_DIR/public/images/default_avatar_512.webp"
 
 load_env_file "$ROOT_DIR/.env.example"
 load_env_file "$ROOT_DIR/.env"
