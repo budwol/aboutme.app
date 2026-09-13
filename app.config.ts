@@ -119,6 +119,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     orientation: "portrait-primary",
     sourceMaps: isSourceMapsEnabled(),
   },
-  plugins: ["expo-font", "expo-router"],
+  plugins: ["expo-router"],
   scheme: appScheme,
 });
