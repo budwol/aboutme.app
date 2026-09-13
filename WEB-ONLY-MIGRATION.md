@@ -1,9 +1,13 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[##################--] 94%` (35 von 37 priorisierten Arbeitspaketen)
+Fortschritt: `[###############-----] 77%` (40 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
+
+Die Fortschrittsmetrik zählt ausschließlich die 52 Arbeitspakete dieser
+Checkliste. Der Nenner bleibt während der Migration stabil; neue Erkenntnisse
+werden als Backlog dokumentiert und verändern den Prozentwert nicht rückwirkend.
 
 Aktueller Fokus: Phase 2 mit verbleibenden Native-UI-Primitives abschließen,
 danach den Drawer in Phase 3 durch Web-Navigation ersetzen. Erst dann können
@@ -212,6 +216,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Theme-Persistenz auf Browser-`localStorage` umgestellt; AsyncStorage entfernt | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Firmenlink auf Web-`<a>` mit `href` und neuem Tab umgestellt                  | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Footer-Aktion auf Web-`button` mit `type="button"` umgestellt                 | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Sidebar-, Header- und Aktionsbuttons auf Web-`button` umgestellt              | 507 Unit-Tests, Lint und TypeScript erfolgreich                |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
