@@ -110,6 +110,8 @@ export default function WnaAccentBar({
 
 const styles: { row: CSSProperties; bar: CSSProperties } = {
   row: {
+    display: "flex",
+    flexDirection: "column",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",

@@ -24,6 +24,8 @@ describe("WnaAccentBar", () => {
 
     expect(row.props.style).toEqual(
       expect.objectContaining({
+        display: "flex",
+        flexDirection: "column",
         alignSelf: "center",
         marginLeft: "auto",
         marginRight: "auto",
