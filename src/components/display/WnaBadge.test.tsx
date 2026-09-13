@@ -1,6 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
-import { Text } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaBadge from "@components/display/WnaBadge";
 
@@ -52,14 +51,15 @@ describe("WnaBadge", () => {
     });
 
     const icon = tree!.root.findByType("WnaIcon");
-    const text = tree!.root.findByType(Text);
+    const text = tree!.root.findByType("span");
 
     expect(icon.props.iconName).toBe("account");
     expect(icon.props.color).toBe("#222222");
     expect(text.props.children).toBe("Profile");
     expect(text.props.style).toEqual(
-      expect.arrayContaining([{ color: "#ffffff" }]),
+      expect.objectContaining({ color: "#ffffff" }),
     );
+    expect(tree!.root.findByType("div").props["aria-label"]).toBe("Profile");
   });
 
   it("keeps array text styles when provided", () => {
@@ -72,19 +72,29 @@ describe("WnaBadge", () => {
           appStyle={appStyle}
           text="Profile"
           fontColor="#123456"
+          style={{ paddingHorizontal: 4, paddingVertical: 2 }}
           textStyle={[{ marginTop: 1 }, { marginBottom: 2 }]}
         />,
       );
     });
 
-    const text = tree!.root.findByType(Text);
+    const text = tree!.root.findByType("span");
 
     expect(text.props.style).toEqual(
-      expect.arrayContaining([
-        { color: "#123456" },
-        { marginTop: 1 },
-        { marginBottom: 2 },
-      ]),
+      expect.objectContaining({
+        color: "#123456",
+        marginTop: 1,
+        marginBottom: 2,
+      }),
+    );
+
+    expect(tree!.root.findByType("div").props.style).toEqual(
+      expect.objectContaining({
+        paddingLeft: 4,
+        paddingRight: 4,
+        paddingTop: 2,
+        paddingBottom: 2,
+      }),
     );
   });
 
@@ -102,10 +112,10 @@ describe("WnaBadge", () => {
       );
     });
 
-    const text = tree!.root.findByType(Text);
+    const text = tree!.root.findByType("span");
 
     expect(text.props.style).toEqual(
-      expect.arrayContaining([{ color: "#ffffff" }, { marginTop: 1 }]),
+      expect.objectContaining({ color: "#ffffff", marginTop: 1 }),
     );
   });
 });
