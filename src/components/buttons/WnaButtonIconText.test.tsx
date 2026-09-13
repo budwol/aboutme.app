@@ -7,16 +7,6 @@ import {
   appLayoutConstants,
 } from "@constants/layoutConstants";
 
-jest.mock("@components/buttons/WnaPressable", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return function MockWnaPressable(props: unknown) {
-    return createElement("WnaPressable", props as Record<string, unknown>);
-  };
-});
-
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const { createElement } = jest.requireActual(
     "react",
@@ -66,16 +56,18 @@ describe("WnaButtonIconText", () => {
       );
     });
 
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
     const content = tree!.root.findByType("WnaButtonTextContent");
-    expect(pressable.props.disabled).toBe(true);
-    expect(pressable.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          height: actionButtonRightConstants.size,
-          borderRadius: appLayoutConstants.globalCornerRadius,
-        }),
-      ]),
+    expect(button.props.disabled).toBe(true);
+    expect(button.props["aria-disabled"]).toBe(true);
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        appearance: "none",
+        height: actionButtonRightConstants.size,
+        borderRadius: appLayoutConstants.globalCornerRadius,
+        cursor: "not-allowed",
+        opacity: 0.5,
+      }),
     );
     expect(content.props.text).toBe("Open profile");
     expect(content.props.childrenLeft.props.iconName).toBe("account");
@@ -159,15 +151,29 @@ describe("WnaButtonIconText", () => {
       );
     });
 
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
 
-    expect(pressable.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          backgroundColor: "#333",
-          borderWidth: 3,
-        }),
-      ]),
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        backgroundColor: "#333",
+        borderWidth: 3,
+      }),
     );
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.opacity).toBe(0.9);
+
+    act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.opacity).toBe(0.8);
+
+    act(() => {
+      button.props.onMouseUp();
+      button.props.onMouseLeave();
+    });
+    expect(button.props.style.opacity).toBe(1);
   });
 });

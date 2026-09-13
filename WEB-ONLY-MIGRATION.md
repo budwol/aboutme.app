@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[###############-----] 77%` (40 von 52 festen Arbeitspaketen)
+Fortschritt: `[################----] 79%` (41 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -105,6 +105,8 @@ Status: **in Arbeit**
       Badge rendern.
 - [x] Runde Aktions-Icon-Buttons mit Web-Button-Semantik, Tooltip, Badge und
       Hover-/Pressed-Ripple rendern.
+- [x] Zusammengesetzte Icon-Text-Aktionen mit Web-Button-Semantik und
+      Disabled-/Hover-/Pressed-State rendern.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
 - [x] Resize-Events im App-Frame über `window.resize` statt Native-
       `Dimensions` abonnieren.
@@ -218,6 +220,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Footer-Aktion auf Web-`button` mit `type="button"` umgestellt                 | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Sidebar-, Header- und Aktionsbuttons auf Web-`button` umgestellt              | 507 Unit-Tests, Lint und TypeScript erfolgreich                |
 | 2026-09-13 | 4     | Unbenutzte direkte `expo-constants`- und `expo-linking`-Dependencies entfernt | Typecheck, Lint und Dependency-Tree erfolgreich                |
+| 2026-09-13 | 2     | Zusammengesetzte Icon-Text-Aktionen auf Web-`button` umgestellt               | 507 Unit-Tests, Lint und TypeScript erfolgreich                |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

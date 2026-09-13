@@ -1,5 +1,4 @@
 import WnaButtonTextContent from "@components/buttons/WnaButtonTextContent";
-import WnaPressable from "@components/buttons/WnaPressable";
 import { createButtonOutlineStyle } from "@components/buttons/wnaButtonStyles";
 import {
   WnaButtonActionProps,
@@ -13,7 +12,7 @@ import {
   appLayoutConstants,
 } from "@constants/layoutConstants";
 import { StaticColors } from "@constants/theme/staticColors";
-import { FC, memo } from "react";
+import React, { FC, memo, useState } from "react";
 import { StyleSheet, ViewStyle } from "react-native";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
@@ -37,6 +36,8 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
   style,
   disabled,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const effectiveTextColor = textColor ?? appColors.staticWhite;
   const effectiveBackgroundColor =
     backgroundColor ??
@@ -44,33 +45,44 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
   const effectiveBorderWidth = borderWidth ?? 1;
   const isDisabled = disabled ?? false;
 
-  return (
-    <WnaPressable
-      disabled={isDisabled}
-      ripple={"light"}
-      style={[
-        createShadowStyle(),
-        componentStyle.pressableContainer,
-        {
-          backgroundColor: effectiveBackgroundColor,
-          borderColor: StaticColors.staticWarmgray6,
-          borderWidth: effectiveBorderWidth,
-          ...createButtonOutlineStyle(appColors),
-          pointerEvents: isDisabled ? "none" : "auto",
-        },
-        isDisabled ? { opacity: 0.5 } : {},
-        style ?? {},
-      ]}
-      onPress={onPress}
-    >
-      <WnaButtonTextContent
-        text={text}
-        textColor={effectiveTextColor}
-        childrenLeft={
-          <WnaIcon iconName={iconName} size={20} color={effectiveTextColor} />
-        }
-      />
-    </WnaPressable>
+  return React.createElement(
+    "button",
+    {
+      type: "button",
+      disabled: isDisabled,
+      "aria-disabled": isDisabled,
+      onClick: onPress,
+      onMouseDown: () => setIsPressed(true),
+      onMouseUp: () => setIsPressed(false),
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => {
+        setIsHovered(false);
+        setIsPressed(false);
+      },
+      style: {
+        ...componentStyle.pressableContainer,
+        ...createShadowStyle(),
+        ...createButtonOutlineStyle(appColors),
+        alignItems: "center",
+        appearance: "none",
+        backgroundColor: effectiveBackgroundColor,
+        borderColor: StaticColors.staticWarmgray6,
+        borderWidth: effectiveBorderWidth,
+        boxSizing: "border-box",
+        cursor: isDisabled ? "not-allowed" : "pointer",
+        display: "flex",
+        opacity: isDisabled ? 0.5 : isPressed ? 0.8 : isHovered ? 0.9 : 1,
+        padding: 0,
+        ...style,
+      } as React.CSSProperties,
+    },
+    <WnaButtonTextContent
+      text={text}
+      textColor={effectiveTextColor}
+      childrenLeft={
+        <WnaIcon iconName={iconName} size={20} color={effectiveTextColor} />
+      }
+    />,
   );
 };
 
