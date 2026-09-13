@@ -3,15 +3,16 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { WnaFooter } from "@components/chrome/WnaFooter";
 
-jest.mock("expo-linear-gradient", () => {
+jest.mock("@components/effects/WnaCssGradient", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
   return {
-    LinearGradient: (props: unknown) =>
+    __esModule: true,
+    default: (props: unknown) =>
       createElement(
-        "LinearGradient",
+        "WnaCssGradient",
         props as Record<string, unknown>,
         (props as { children?: React.ReactNode }).children,
       ),
@@ -63,7 +64,7 @@ describe("WnaFooter", () => {
       );
     });
 
-    const gradient = tree!.root.findByType("LinearGradient");
+    const gradient = tree!.root.findByType("WnaCssGradient");
     const text = tree!.root.findByType("Text");
 
     expect(gradient.props.colors).toEqual([
@@ -92,7 +93,7 @@ describe("WnaFooter", () => {
       );
     });
 
-    const gradient = tree!.root.findByType("LinearGradient");
+    const gradient = tree!.root.findByType("WnaCssGradient");
 
     expect(gradient.props.style.alignItems).toBe("center");
   });

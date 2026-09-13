@@ -1,7 +1,7 @@
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
 import { FontFamilies } from "@constants/theme/fontFamilies";
-import { LinearGradient } from "expo-linear-gradient";
+import WnaCssGradient from "@components/effects/WnaCssGradient";
 import { sanitizeHtml } from "@utils/htmlSanitizer";
 import { CSSProperties, FC, memo } from "react";
 
@@ -50,7 +50,7 @@ const WnaHtmlRendererComponent: FC<WnaHtmlRendererProps> = ({
         dangerouslySetInnerHTML={{ __html: effectiveHtml }}
       />
       {maxHeight ? (
-        <LinearGradient
+        <WnaCssGradient
           start={[1, 1]}
           end={[1, 0]}
           colors={[appColors.white, "transparent"]}

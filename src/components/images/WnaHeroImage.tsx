@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { View, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import WnaCssGradient from "@components/effects/WnaCssGradient";
 
 import WnaImage, { WnaImageProps } from "@components/images/WnaImage";
 import { WnaImageStyle } from "@components/images/WnaImageElement/wnaImageElementTypes";
@@ -53,7 +53,7 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
       />
 
       {showGradient && (
-        <LinearGradient
+        <WnaCssGradient
           colors={[
             convertHexToRgba(appColors.staticBlack, 0.24),
             convertHexToRgba(appColors.staticBlack, 0.0),
