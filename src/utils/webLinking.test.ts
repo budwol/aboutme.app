@@ -30,6 +30,15 @@ describe("web linking adapter", () => {
     await expect(Linking.canOpenURL("not a url")).resolves.toBe(false);
   });
 
+  it("rejects URLs that the browser URL parser cannot parse", async () => {
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: { location: { href: "https://app.example.com/" } },
+    });
+
+    await expect(Linking.canOpenURL("https://[")).resolves.toBe(false);
+  });
+
   it("opens web URLs in a new tab with safe window features", async () => {
     const open = jest.fn(() => ({}));
     Object.defineProperty(globalThis, "window", {
@@ -91,5 +100,11 @@ describe("web linking adapter", () => {
     await expect(Linking.openURL("javascript:alert(1)")).rejects.toThrow(
       "Unsupported URL",
     );
+  });
+
+  it("does nothing when opened outside a browser", async () => {
+    await expect(
+      Linking.openURL("https://example.com"),
+    ).resolves.toBeUndefined();
   });
 });

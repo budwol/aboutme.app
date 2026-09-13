@@ -55,6 +55,18 @@ describe("i18n getLangCode", () => {
     expect(loadI18n().getLangCode()).toBe("en");
   });
 
+  it("falls back to english when a malformed locale has no language segment", () => {
+    setNavigator({
+      languages: [
+        {
+          split: () => [],
+        } as unknown as string,
+      ],
+    });
+
+    expect(loadI18n().getLangCode()).toBe("en");
+  });
+
   it("uses the default language when the browser global is unavailable", () => {
     expect(loadI18n().getLangCode()).toBe("de");
   });

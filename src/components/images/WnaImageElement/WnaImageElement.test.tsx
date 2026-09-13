@@ -105,6 +105,40 @@ describe("WnaImageElement", () => {
     expect(image.props.fetchPriority).toBe("high");
   });
 
+  it("accepts a single responsive source object", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageElement
+          appColors={{} as never}
+          altText="Avatar"
+          source={{ uri: "/images/avatar.webp", width: 1024 }}
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("img");
+    expect(image.props.src).toBe("/images/avatar.webp");
+    expect(image.props.srcSet).toBe("/images/avatar.webp 1024w");
+  });
+
+  it("accepts a string source", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageElement
+          appColors={{} as never}
+          altText="Image"
+          source="/images/image.webp"
+        />,
+      );
+    });
+
+    expect(tree!.root.findByType("img").props.src).toBe("/images/image.webp");
+  });
+
   it("falls back to an empty source when neither source nor imageUrl is given", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -117,5 +151,28 @@ describe("WnaImageElement", () => {
     const image = tree!.root.findByType("img");
 
     expect(image.props.src).toBe("");
+  });
+
+  it("reveals the image after it has loaded", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageElement
+          appColors={{} as never}
+          imageUrl="/image.webp"
+          altText="Image"
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("img");
+    expect(image.props.style.opacity).toBe(0);
+
+    act(() => {
+      image.props.onLoad();
+    });
+
+    expect(tree!.root.findByType("img").props.style.opacity).toBe(1);
   });
 });
