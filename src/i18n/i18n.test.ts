@@ -1,102 +1,78 @@
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
+
+type BrowserNavigator = { language?: string; languages?: string[] };
+
+const setNavigator = (value: BrowserNavigator) => {
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value,
+  });
+};
+
+const loadI18n = () => {
+  let i18nModule!: typeof import("@/i18n/i18n");
+  jest.isolateModules(() => {
+    i18nModule = jest.requireActual(
+      "@/i18n/i18n",
+    ) as typeof import("@/i18n/i18n");
+  });
+  return i18nModule;
+};
 
 describe("i18n getLangCode", () => {
   beforeEach(() => {
     jest.resetModules();
   });
 
-  it("falls back to the default language and logs when locale detection throws", () => {
-    const errorSpy = jest.fn();
+  afterEach(() => {
+    Reflect.deleteProperty(globalThis, "navigator");
+  });
 
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => {
-        throw new Error("locale detection failed");
-      },
-    }));
+  it("uses the browser language list and normalizes regional locales", () => {
+    setNavigator({ languages: ["de-DE", "en-US"], language: "en-US" });
+    expect(loadI18n().getLangCode()).toBe("de");
+  });
+
+  it("uses navigator.language when the language list is empty", () => {
+    setNavigator({ languages: [], language: "en-US" });
+    expect(loadI18n().getLangCode()).toBe("en");
+  });
+
+  it("stays on the default language without a browser locale", () => {
+    setNavigator({ languages: [] });
+    expect(loadI18n().getLangCode()).toBe("de");
+  });
+
+  it("falls back to english for unsupported locales", () => {
+    setNavigator({ languages: ["fr-FR"], language: "fr-FR" });
+    expect(loadI18n().getLangCode()).toBe("en");
+  });
+
+  it("uses the default language when the browser global is unavailable", () => {
+    expect(loadI18n().getLangCode()).toBe("de");
+  });
+
+  it("falls back to the default language and logs detection errors", () => {
+    const errorSpy = jest.fn();
     jest.doMock("@/utils/logger", () => ({
       __esModule: true,
       default: { error: errorSpy, info: jest.fn(), warn: jest.fn() },
     }));
-
-    jest.isolateModules(() => {
-      jest.requireActual("@/i18n/i18n");
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      get: () => {
+        throw new Error("locale detection failed");
+      },
     });
 
+    expect(loadI18n().getLangCode()).toBe("de");
     expect(errorSpy).toHaveBeenCalledWith("getLangCode", expect.any(Error));
-  });
-
-  it("stays on the default language when no locales are reported", () => {
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => [],
-    }));
-
-    let i18nModule!: typeof import("@/i18n/i18n");
-    jest.isolateModules(() => {
-      i18nModule = jest.requireActual(
-        "@/i18n/i18n",
-      ) as typeof import("@/i18n/i18n");
-    });
-
-    expect(i18nModule.getLangCode()).toBe("de");
-  });
-
-  it("falls back to english when the reported locale has no language code", () => {
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => [{ languageCode: undefined }],
-    }));
-
-    let i18nModule!: typeof import("@/i18n/i18n");
-    jest.isolateModules(() => {
-      i18nModule = jest.requireActual(
-        "@/i18n/i18n",
-      ) as typeof import("@/i18n/i18n");
-    });
-
-    expect(i18nModule.getLangCode()).toBe("en");
-  });
-
-  it("falls back to english for unsupported locales", () => {
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => [{ languageCode: "fr" }],
-    }));
-
-    let i18nModule!: typeof import("@/i18n/i18n");
-    jest.isolateModules(() => {
-      i18nModule = jest.requireActual(
-        "@/i18n/i18n",
-      ) as typeof import("@/i18n/i18n");
-    });
-
-    expect(i18nModule.getLangCode()).toBe("en");
-  });
-
-  it("keeps a supported german locale", () => {
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => [{ languageCode: "de" }],
-    }));
-
-    let i18nModule!: typeof import("@/i18n/i18n");
-    jest.isolateModules(() => {
-      i18nModule = jest.requireActual(
-        "@/i18n/i18n",
-      ) as typeof import("@/i18n/i18n");
-    });
-
-    expect(i18nModule.getLangCode()).toBe("de");
-  });
-
-  it("keeps a supported english locale", () => {
-    jest.doMock("expo-localization", () => ({
-      getLocales: () => [{ languageCode: "en" }],
-    }));
-
-    let i18nModule!: typeof import("@/i18n/i18n");
-    jest.isolateModules(() => {
-      i18nModule = jest.requireActual(
-        "@/i18n/i18n",
-      ) as typeof import("@/i18n/i18n");
-    });
-
-    expect(i18nModule.getLangCode()).toBe("en");
   });
 });

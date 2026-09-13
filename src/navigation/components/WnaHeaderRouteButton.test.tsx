@@ -77,7 +77,7 @@ describe("WnaHeaderRouteButton", () => {
     expect(buttonHeader.props.text).toBe("tx:screenTitleStartPage");
   });
 
-  it("pushes the resolved route when the header button is pressed", () => {
+  it("pushes the German resolved route when the header button is pressed", () => {
     const router = { push: jest.fn() };
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -100,6 +100,6 @@ describe("WnaHeaderRouteButton", () => {
     });
 
     expect(router.push).toHaveBeenCalledTimes(1);
-    expect(router.push).toHaveBeenCalledWith("/projects");
+    expect(router.push).toHaveBeenCalledWith("/projekte");
   });
 });
