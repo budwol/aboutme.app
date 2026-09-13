@@ -56,10 +56,12 @@ const setAppStyle = (colors: Colors) => {
       paddingHorizontal: 16,
     },
     containerCenter: {
+      display: "flex",
       alignItems: "center",
     },
 
     containerCenterCenter: {
+      display: "flex",
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
@@ -74,6 +76,7 @@ const setAppStyle = (colors: Colors) => {
     },
 
     containerFillPageMaxWidth: {
+      display: "flex",
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
       alignSelf: "stretch",
@@ -85,6 +88,7 @@ const setAppStyle = (colors: Colors) => {
     },
 
     containerForInputTopCenter: {
+      display: "flex",
       alignItems: "center",
       justifyContent: "flex-start",
       flex: 1,
@@ -94,6 +98,7 @@ const setAppStyle = (colors: Colors) => {
     },
 
     containerForInputCenterCenter: {
+      display: "flex",
       alignItems: "center",
       justifyContent: "center",
       flex: 1,

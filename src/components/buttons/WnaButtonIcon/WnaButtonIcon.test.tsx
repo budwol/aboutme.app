@@ -60,17 +60,15 @@ describe("WnaButtonIcon", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const wrapper = tree!.root.findByType("div");
     const button = tree!.root.findByType("button");
     const icon = tree!.root.findByType("WnaButtonIconBadge");
 
-    expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)",
-        }),
-        expect.objectContaining({ marginTop: 12 }),
-      ]),
+    expect(wrapper.props.style).toEqual(
+      expect.objectContaining({
+        boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)",
+        marginTop: 12,
+      }),
     );
     expect(button.props.type).toBe("button");
     expect(button.props["aria-label"]).toBe("Open profile");

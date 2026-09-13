@@ -194,7 +194,7 @@ describe("WnaPressable", () => {
       );
     });
 
-    expect(tree!.root.findAllByType("View")[1].props.style).toEqual(
+    expect(tree!.root.findAllByType("div")[1].props.style).toEqual(
       expect.objectContaining({ borderRadius: 24, overflow: "hidden" }),
     );
   });

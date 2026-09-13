@@ -40,18 +40,16 @@ describe("WnaButtonIconBadge", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const view = tree!.root.findByType("div");
     const icon = tree!.root.findByType("WnaIcon");
 
     expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        { alignItems: "center" },
-        expect.objectContaining({
-          width: 52,
-          height: 52,
-          backgroundColor: "rgba(0,0,0,0.6)",
-        }),
-      ]),
+      expect.objectContaining({
+        alignItems: "center",
+        width: 52,
+        height: 52,
+        backgroundColor: "rgba(0,0,0,0.6)",
+      }),
     );
     expect(icon.props.iconName).toBe("cube");
     expect(icon.props.color).toBe("#ffffff");
@@ -78,10 +76,10 @@ describe("WnaButtonIconBadge", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const view = tree!.root.findByType("div");
     const icon = tree!.root.findByType("WnaIcon");
 
-    expect(view.props.style[1]).toEqual(
+    expect(view.props.style).toEqual(
       expect.objectContaining({ width: 32, height: 32 }),
     );
     expect(icon.props.iconName).toBe("account");

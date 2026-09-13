@@ -1,5 +1,4 @@
-import React, { FC, memo, useMemo, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { CSSProperties, FC, memo, useMemo, useState } from "react";
 import { TFunction } from "i18next";
 
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
@@ -49,66 +48,74 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
       ? "rgba(255,255,255,0.08)"
       : "transparent";
 
-  return (
-    <View style={styles.wrapper}>
-      {text ? (
-        <WnaTooltip content={text} position="bottom" visible={isHovered} />
-      ) : null}
-      {React.createElement(
-        "button",
-        {
-          type: "button",
-          "aria-label": text || iconName,
-          onClick: onPress,
-          onMouseDown: () => setIsPressed(true),
-          onMouseUp: () => setIsPressed(false),
-          onMouseEnter: () => setIsHovered(true),
-          onMouseLeave: () => {
-            setIsHovered(false);
-            setIsPressed(false);
-          },
-          style: {
-            ...styles.pressable,
-            appearance: "none",
-            backgroundColor: interactionColor,
-            border: "none",
-            borderRadius: size / 2,
-            boxSizing: "border-box",
-            cursor: "pointer",
-            height: size,
-            outlineColor,
-            padding: 0,
-            width: size,
-          } as React.CSSProperties,
+  return React.createElement(
+    "div",
+    { style: styles.wrapper },
+    text ? (
+      <WnaTooltip content={text} position="bottom" visible={isHovered} />
+    ) : null,
+    React.createElement(
+      "button",
+      {
+        type: "button",
+        "aria-label": text || iconName,
+        onClick: onPress,
+        onMouseDown: () => setIsPressed(true),
+        onMouseUp: () => setIsPressed(false),
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => {
+          setIsHovered(false);
+          setIsPressed(false);
         },
-        <View
-          style={[
-            appStyle.containerCenterCenter,
-            styles.inner,
-            { width: size, height: size },
-          ]}
-        >
-          <WnaIcon iconName={iconName} size={iconSize} color={resolvedColor} />
-
-          {badgeVisible && (
-            <View style={[styles.badge, { backgroundColor: appColors.red3 }]} />
-          )}
-        </View>,
-      )}
-    </View>
+        style: {
+          ...styles.pressable,
+          appearance: "none",
+          backgroundColor: interactionColor,
+          border: "none",
+          borderRadius: size / 2,
+          boxSizing: "border-box",
+          cursor: "pointer",
+          height: size,
+          outlineColor,
+          padding: 0,
+          width: size,
+        } as CSSProperties,
+      },
+      React.createElement(
+        "div",
+        {
+          style: {
+            ...appStyle.containerCenterCenter,
+            ...styles.inner,
+            width: size,
+            height: size,
+          } as CSSProperties,
+        },
+        <WnaIcon iconName={iconName} size={iconSize} color={resolvedColor} />,
+        badgeVisible &&
+          React.createElement("div", {
+            style: {
+              ...styles.badge,
+              backgroundColor: appColors.red3,
+            } as CSSProperties,
+          }),
+      ),
+    ),
   );
 };
 
 export default memo(WnaButtonHeader);
 
-const styles = StyleSheet.create({
+const styles = {
   wrapper: {
+    display: "flex",
     alignItems: "center",
   },
   pressable: {
     outlineOffset: 2,
   },
   inner: {
+    position: "relative",
     backgroundColor: "transparent",
   },
   badge: {
@@ -119,4 +126,4 @@ const styles = StyleSheet.create({
     top: 14,
     right: 14,
   },
-});
+} satisfies Record<string, CSSProperties>;

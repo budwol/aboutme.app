@@ -85,11 +85,8 @@ describe("WnaButtonHeader", () => {
     expect(button.props["aria-label"]).toBe("menu");
     expect(
       tree!.root.findAll(
-        (node: { props: { style?: unknown } }) =>
-          Array.isArray(node.props.style) &&
-          node.props.style.some(
-            (s: { height?: number }) => s && s.height === 8,
-          ),
+        (node: { props: { style?: { height?: number } } }) =>
+          node.props.style?.height === 8,
       ),
     ).toHaveLength(0);
   });
@@ -153,12 +150,8 @@ describe("WnaButtonHeader", () => {
     expect(icon.props.color).toBe("#123456");
     expect(
       tree!.root.findAll(
-        (node: { props: { style?: unknown } }) =>
-          Array.isArray(node.props.style) &&
-          node.props.style.some(
-            (s: { backgroundColor?: string }) =>
-              s && s.backgroundColor === "#f00",
-          ),
+        (node: { props: { style?: { backgroundColor?: string } } }) =>
+          node.props.style?.backgroundColor === "#f00",
       ).length,
     ).toBeGreaterThan(0);
   });

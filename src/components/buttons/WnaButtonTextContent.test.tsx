@@ -1,6 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
 import React from "react";
-import { Text, View } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonTextContent from "@components/buttons/WnaButtonTextContent";
 
@@ -17,13 +16,18 @@ describe("WnaButtonTextContent", () => {
           appStyle={appStyle}
           text="Open"
           textColor="#ffffff"
-          childrenLeft={<View testID="left-icon" />}
+          childrenLeft={<span data-testid="left-icon" />}
         />,
       );
     });
 
-    expect(tree!.root.findByType(Text).props.children).toBe("Open");
-    expect(tree!.root.findByProps({ testID: "left-icon" })).toBeTruthy();
+    expect(
+      tree!.root.find(
+        (node: { type: unknown; props: { children?: unknown } }) =>
+          node.type === "span" && node.props.children === "Open",
+      ),
+    ).toBeTruthy();
+    expect(tree!.root.findByProps({ "data-testid": "left-icon" })).toBeTruthy();
   });
 
   it("falls back to the default text style when no app style is given", () => {
@@ -35,10 +39,8 @@ describe("WnaButtonTextContent", () => {
       );
     });
 
-    expect(tree!.root.findByType(Text).props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ fontSize: 16, fontWeight: "500" }),
-      ]),
+    expect(tree!.root.findByType("span").props.style).toEqual(
+      expect.objectContaining({ fontSize: 16, fontWeight: "500" }),
     );
   });
 });

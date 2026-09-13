@@ -1,28 +1,28 @@
 import AppStyle from "@/theme/appStyle";
-import { FC, memo, ReactNode } from "react";
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo, ReactNode } from "react";
 
 export type WnaButtonTextContentProps = {
   appStyle?: AppStyle;
   text: string;
   textColor: string;
-  textStyle?: TextStyle | TextStyle[];
-  containerStyle?: ViewStyle | ViewStyle[];
+  textStyle?: CSSProperties;
+  containerStyle?: CSSProperties;
   childrenLeft?: ReactNode;
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
+    display: "flex",
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     alignContent: "center",
-    marginHorizontal: 16,
+    marginInline: 16,
   },
   text: {
     fontWeight: "500",
-    marginHorizontal: 8,
+    marginInline: 8,
     alignSelf: "center",
     letterSpacing: 0.5,
   },
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 const WnaButtonTextContent: FC<WnaButtonTextContentProps> = ({
   appStyle,
@@ -39,23 +39,29 @@ const WnaButtonTextContent: FC<WnaButtonTextContentProps> = ({
   textStyle,
   containerStyle,
   childrenLeft,
-}) => (
-  <View style={[styles.container, containerStyle]}>
-    {childrenLeft}
-    <Text
-      style={[
-        appStyle?.textNeutralMedium ?? styles.fallbackText,
-        styles.text,
-        {
+}) =>
+  React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.container,
+        ...containerStyle,
+      } as CSSProperties,
+    },
+    childrenLeft,
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...(appStyle?.textNeutralMedium ?? styles.fallbackText),
+          ...styles.text,
           color: textColor,
-        },
-        textStyle,
-      ]}
-    >
-      {text}
-    </Text>
-  </View>
-);
+          ...textStyle,
+        } as CSSProperties,
+      },
+      text,
+    ),
+  );
 
 WnaButtonTextContent.displayName = "WnaButtonTextContent";
 

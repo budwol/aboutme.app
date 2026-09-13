@@ -1,7 +1,7 @@
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { TFunction } from "i18next";
-import { ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
 export type WnaButtonActionProps = {
   onPress: () => void;
@@ -14,7 +14,7 @@ export type WnaButtonTextAppearanceProps = {
   text: string;
   textColor?: string;
   backgroundColor?: string;
-  style?: ViewStyle | ViewStyle[];
+  style?: CSSProperties | CSSProperties[];
 };
 
 export type WnaButtonThemeProps = {

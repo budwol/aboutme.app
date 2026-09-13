@@ -12,8 +12,8 @@ import {
   appLayoutConstants,
 } from "@constants/layoutConstants";
 import { StaticColors } from "@constants/theme/staticColors";
-import React, { FC, memo, useState } from "react";
-import { StyleSheet, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo, useState } from "react";
+import { StyleSheet } from "react-native";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
 export type WnaButtonIconTextProps = WnaButtonThemeProps &
@@ -22,7 +22,7 @@ export type WnaButtonIconTextProps = WnaButtonThemeProps &
   Pick<WnaButtonActionProps, "checkInternetConnection" | "t" | "disabled"> & {
     iconName: keyof typeof iconMap;
     borderWidth?: number;
-    style?: ViewStyle;
+    style?: CSSProperties;
   };
 
 const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({

@@ -231,7 +231,6 @@ export default function WnaPrivateRepoModal({
                   ...styles.actionButton,
                   ...styles.modalActionButton,
                   borderColor: convertHexToRgba(appColors.coolgray2, 0.4),
-                  marginHorizontal: 0,
                 }}
                 onPress={() => {
                   onClose();
@@ -250,7 +249,6 @@ export default function WnaPrivateRepoModal({
                   ...styles.actionButton,
                   ...styles.modalActionButton,
                   borderColor: continueButtonBorderColor,
-                  marginHorizontal: 0,
                 }}
                 onPress={() => {
                   onClose();
