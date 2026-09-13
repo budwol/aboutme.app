@@ -416,10 +416,12 @@ describe("WnaProjectDetailsRoute", () => {
           node.props.text === i18nKeys.actionContinueToPage,
       );
 
+    (Linking.openURL as jest.Mock).mockClear();
     await act(async () => {
       await continueAction.props.onPress();
     });
 
+    expect(Linking.openURL).toHaveBeenCalledTimes(1);
     expect(Linking.openURL).toHaveBeenCalledWith(appData.projects[0].repoUrl);
 
     await act(async () => {
