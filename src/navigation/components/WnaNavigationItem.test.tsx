@@ -164,4 +164,36 @@ describe("WnaNavigationItem", () => {
     expect(icons).toHaveLength(1);
     expect(icons[0].props.iconName).toBe("scale-balance");
   });
+
+  it("uses a visible light ripple for dark-theme sidebar items", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaNavigationItem
+          appColors={
+            {
+              isDark: true,
+              black: "#000",
+              accent5: "#f50",
+              coolgray4: "#222",
+            } as never
+          }
+          appStyle={{ textNeutralMedium: {} } as never}
+          text="Privacy"
+          iconName="shield-account"
+          onPress={jest.fn()}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const button = tree!.root.findByType("button");
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.06)");
+  });
 });
