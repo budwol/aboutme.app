@@ -65,6 +65,8 @@ describe("WnaButtonIconText", () => {
         appearance: "none",
         height: actionButtonRightConstants.size,
         borderRadius: appLayoutConstants.globalCornerRadius,
+        borderColor: "#747067",
+        borderStyle: "solid",
         cursor: "not-allowed",
         opacity: 0.5,
       }),
@@ -156,6 +158,8 @@ describe("WnaButtonIconText", () => {
     expect(button.props.style).toEqual(
       expect.objectContaining({
         backgroundColor: "#333",
+        borderColor: "#747067",
+        borderStyle: "solid",
         borderWidth: 3,
       }),
     );
