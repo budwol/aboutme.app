@@ -59,7 +59,12 @@ describe("WnaBadge", () => {
     expect(text.props.style).toEqual(
       expect.objectContaining({ color: "#ffffff" }),
     );
-    expect(tree!.root.findByType("div").props["aria-label"]).toBe("Profile");
+    expect(tree!.root.findByType("div").props).toEqual(
+      expect.objectContaining({
+        "aria-label": "Profile",
+        style: expect.objectContaining({ display: "flex" }),
+      }),
+    );
   });
 
   it("keeps array text styles when provided", () => {
