@@ -173,11 +173,25 @@ export default function Root({ children }: PropsWithChildren) {
                     }
 
                     @media (prefers-reduced-motion: reduce) {
+                      *,
+                      *::before,
+                      *::after {
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                        transition-duration: 0.01ms !important;
+                        scroll-behavior: auto !important;
+                      }
+
                       .wna-hero-shape-swing-positive,
                       .wna-hero-shape-swing-negative,
                       .wna-activity-indicator > div {
                         animation: none;
                       }
+                    }
+
+                    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+                      outline: 2px solid #61afa7;
+                      outline-offset: 3px;
                     }
 
                     /* firefox and brave */

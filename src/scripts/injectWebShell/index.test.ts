@@ -42,6 +42,11 @@ describe("inject-web-shell", () => {
     expect(injected).toContain("Jane &lt;Example&gt;");
     expect(injected).toContain("Platform Engineer");
     expect(injected).toContain("\\u003cExample\\u003e");
+    expect(injected).toContain(
+      ":where(a,button,input,select,textarea,[tabindex]):focus-visible",
+    );
+    expect(injected).toContain("animation-iteration-count:1!important");
+    expect(injected).toContain("scroll-behavior:auto!important");
   });
 
   it("collects nested html files and returns an empty list for a missing directory", () => {
