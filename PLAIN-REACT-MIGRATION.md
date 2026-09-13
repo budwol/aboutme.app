@@ -33,6 +33,7 @@ Navigationstransitions, Background-Image, Offline-Verhalten und die bestehende
 | `react-native`             | entfernen | keine Runtime- oder Test-Imports mehr               |
 | `react-native-web`         | entfernen | alle UI-Primitives sind DOM/CSS                     |
 | `react-native-logs`        | entfernen | Browser-Logger mit gleicher API und Tests           |
+| `react-native-worklets`    | entfernen | Reanimated und Drawer vollständig abgelöst          |
 | `@react-navigation/drawer` | entfernen | Web-Drawer und Tastaturbedienung fertig             |
 | `@react-navigation/native` | entfernen | keine Navigation-Container-/Action-Imports mehr     |
 | `expo-router`              | entfernen | statische Route-Auflösung und Deep Links abgedeckt  |

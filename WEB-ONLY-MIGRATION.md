@@ -31,9 +31,9 @@ nicht aktiviert werden.
 - `srcset`/`picture` ersetzen die plattformübergreifende Bildauflösung.
 - `expo-constants`, `expo-linking`, `react-native-gesture-handler`,
   `react-native-reanimated`, `react-native-safe-area-context` und
-  `react-native-screens` bleiben bis zur Expo-Router-/Drawer-Ablösung als
-  direkte Peer-Dependencies installiert; der eigene Code nutzt, wo möglich,
-  bereits Browser-Adapter.
+  `react-native-screens` sowie der Reanimated-Peer `react-native-worklets`
+  bleiben bis zur Expo-Router-/Drawer-Ablösung als direkte Peer-Dependencies
+  installiert; der eigene Code nutzt, wo möglich, bereits Browser-Adapter.
 - Routing wird erst nach Stabilisierung der Web-Shell ausgetauscht.
 - Jede Phase benötigt fokussierte Unit-, Integrations- und E2E-Regressionstests.
 - Nach jeder Phase werden Lighthouse, Bundle-Größe, Accessibility und
@@ -157,8 +157,8 @@ Status: **in Arbeit**
       zentrale `package.json`-Versionsquelle ersetzen; `expo-constants` bleibt
       als Expo-Router-Peer installiert.
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
-- [x] Direkte `react-native-worklets`-Dependency entfernen; transitiver Bezug
-      bleibt bis zur Navigation-Migration bestehen.
+- [x] Eigene Nutzung von `react-native-worklets` entfernen; als Reanimated-
+      Peer bleibt die Dependency bis zur Navigation-Migration installiert.
 - [x] Eigene Nutzung von `react-native-screens` entfernen; als direkter Peer
       bleibt die Dependency bis zur Expo-Router-Migration installiert.
 - [x] Theme-Persistenz von `AsyncStorage` auf den SSR-sicheren Browser-
@@ -207,7 +207,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt                                       | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
 | 2026-09-13 | 4     | Eigene `react-native-reanimated`-Nutzung aus dem Web-Pfad entfernt                                  | 497 Unit-Tests, Lint und TypeScript erfolgreich; direkter Router-Peer bleibt erforderlich                |
 | 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert                              | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
-| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                                                 | Transitiver Bezug über Drawer-Navigation dokumentiert                                                    |
+| 2026-09-13 | 4     | Eigene Nutzung von `react-native-worklets` entfernt                                                 | Reanimated-Peer bleibt bis zur Navigation-Migration erforderlich                                         |
 | 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                                                   | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
 | 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt                                           | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
 | 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                                                           | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
