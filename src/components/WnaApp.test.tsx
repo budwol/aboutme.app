@@ -534,7 +534,11 @@ describe("WnaApp", () => {
         expect.objectContaining({ backgroundColor: "#111111" }),
       ]),
     );
-    expect(navigationOverlay?.props.pointerEvents).toBe("auto");
+    expect(navigationOverlay?.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ pointerEvents: "auto" }),
+      ]),
+    );
     expect(transitionBackground?.props).toEqual(
       expect.objectContaining({
         testID: "navigation-transition-background",

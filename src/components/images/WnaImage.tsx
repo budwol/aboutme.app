@@ -4,11 +4,14 @@ import { cleanAndTruncate } from "@utils/cleanAndTruncate";
 import { getVersionedLocalAssetUrl } from "@/utils/versionedAssetUrl";
 import WnaActivityIndicator from "@components/feedback/WnaActivityIndicator";
 import Colors from "@constants/theme/colors";
-import { ImageProps, ImageSource } from "expo-image";
 import { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import WnaImageElement from "@components/images/WnaImageElement/WnaImageElement";
-import { WnaImageStyleProps } from "@components/images/WnaImageElement/wnaImageElementTypes";
+import {
+  WnaImageSource,
+  WnaImageStyle,
+  WnaImageStyleProps,
+} from "@components/images/WnaImageElement/wnaImageElementTypes";
 
 export type { WnaImageStyleProps };
 
@@ -16,7 +19,7 @@ export type WnaImageProps = {
   appColors: Colors;
   imageUrl: string;
   imageTitle: string;
-  style?: WnaImageStyleProps | WnaImageStyleProps[];
+  style?: WnaImageStyle;
   sources?: WnaResponsiveImageSource[];
   thumbnailUrl?: string | null;
   placeholderUrl?: string | null;
@@ -25,8 +28,8 @@ export type WnaImageProps = {
   grayScale?: boolean;
   contentFit?: "contain" | "cover";
   overwriteAnimationSpeed?: number;
-  priority?: ImageProps["priority"];
-  responsivePolicy?: ImageProps["responsivePolicy"];
+  priority?: "low" | "normal" | "high";
+  responsivePolicy?: "static" | "live";
 };
 
 export type WnaResponsiveImageSource = {
@@ -133,7 +136,7 @@ function WnaImage(props: WnaImageProps) {
     () => cleanAndTruncate(props.imageTitle ?? props.imageUrl),
     [props.imageTitle, props.imageUrl],
   );
-  const normalizedSources = useMemo<ImageSource[] | undefined>(() => {
+  const normalizedSources = useMemo<WnaImageSource[] | undefined>(() => {
     if (!props.sources || props.sources.length === 0) {
       return undefined;
     }

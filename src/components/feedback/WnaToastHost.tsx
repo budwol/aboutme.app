@@ -142,7 +142,7 @@ export default function WnaToastHost({ appColors }: WnaToastHostProps) {
   }
 
   return (
-    <View pointerEvents="none" style={styles.host}>
+    <View style={[styles.host, { pointerEvents: "none" }]}>
       {renderWnaToastCard(
         toast.props?.appColors ?? appColors,
         toast.text1,

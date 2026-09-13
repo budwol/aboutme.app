@@ -78,6 +78,7 @@ describe("WnaPressable", () => {
     expect(popable.props.content).toBe("Open");
     expect(popable.props.position).toBe("top");
     expect(popable.props.visible).toBe(false);
+    expect(popable.props.animated).toBe(false);
 
     act(() => {
       base.props.onHoverIn();

@@ -382,12 +382,12 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 
       {showIntro ? (
         <Animated.View
-          pointerEvents="none"
           style={[
             styles.fullScreenOverlay,
             styles.introOverlay,
             {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
+              pointerEvents: "none",
             },
             introAnimatedStyle,
           ]}
@@ -403,12 +403,12 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
         <Animated.View
           nativeID="navigation-transition-overlay"
           testID="navigation-transition-overlay"
-          pointerEvents="auto"
           style={[
             styles.fullScreenOverlay,
             styles.navigationTransitionOverlay,
             {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
+              pointerEvents: "auto",
             },
             navigationTransitionAnimatedStyle,
           ]}
