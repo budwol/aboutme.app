@@ -91,8 +91,9 @@ Status: **offen**
 - [x] `expo-blur` durch CSS `backdrop-filter` ersetzen.
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
 - [x] `expo-image` vollständig entfernen.
-- [ ] `expo-application`, `expo-constants` und Linking-
-      Sonderpfade durch Web-APIs oder kleine lokale Adapter ersetzen.
+- [ ] Linking-Sonderpfade durch Web-APIs oder kleine lokale Adapter ersetzen.
+- [x] `expo-application` und `expo-constants` durch die zentrale
+      `package.json`-Versionsquelle ersetzen.
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
 
 Exit-Kriterium: Relevante Expo-/Native-Dependencies sind aus dem Web-Bundle

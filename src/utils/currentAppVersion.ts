@@ -1,11 +1,5 @@
-import * as Application from "expo-application";
-import Constants from "expo-constants";
+import packageJson from "../../package.json";
 
 export default function currentAppVersion() {
-  return (
-    Constants.expoConfig?.extra?.appVersion ??
-    Constants.expoConfig?.version ??
-    Application.nativeApplicationVersion ??
-    "unknown"
-  );
+  return packageJson.version;
 }

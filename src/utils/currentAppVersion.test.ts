@@ -1,53 +1,9 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-import { afterEach, describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
+import packageJson from "../../package.json";
+import currentAppVersion from "@utils/currentAppVersion";
 
 describe("currentAppVersion", () => {
-  afterEach(() => {
-    jest.resetModules();
-  });
-
-  it("prefers extra appVersion over Expo and native versions", () => {
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: {
-        expoConfig: { extra: { appVersion: "1.2.3" }, version: "1.2.0" },
-      },
-    }));
-    jest.doMock("expo-application", () => ({
-      nativeApplicationVersion: "1.1.0",
-    }));
-
-    expect(require("@utils/currentAppVersion").default()).toBe("1.2.3");
-  });
-
-  it("falls back through Expo version, native version and unknown", () => {
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: { expoConfig: { version: "2.0.0" } },
-    }));
-    jest.doMock("expo-application", () => ({
-      nativeApplicationVersion: "1.1.0",
-    }));
-    expect(require("@utils/currentAppVersion").default()).toBe("2.0.0");
-
-    jest.resetModules();
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: { expoConfig: undefined },
-    }));
-    jest.doMock("expo-application", () => ({
-      nativeApplicationVersion: "1.1.0",
-    }));
-    expect(require("@utils/currentAppVersion").default()).toBe("1.1.0");
-
-    jest.resetModules();
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: { expoConfig: undefined },
-    }));
-    jest.doMock("expo-application", () => ({
-      nativeApplicationVersion: undefined,
-    }));
-    expect(require("@utils/currentAppVersion").default()).toBe("unknown");
+  it("uses package.json as the single web version source", () => {
+    expect(currentAppVersion()).toBe(packageJson.version);
   });
 });
