@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[###############-----] 68%` (19 von 28 Arbeitspaketen)
+Fortschritt: `[################----] 71%` (20 von 28 Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -105,6 +105,7 @@ Status: **in Arbeit**
 - [x] Experience-Detailbox durch CSS-Höhen-Transition ersetzen.
 - [x] Header-Busy-Fade durch CSS-Opacity-Transition ersetzen.
 - [x] Busy-Overlay der Base-Screens durch CSS-Opacity-Transition ersetzen.
+- [x] Scroll-State, Header-Shadow und Header-Blur auf Web-State umstellen.
 - [x] `expo-linear-gradient` durch CSS ersetzen.
 - [x] `expo-blur` durch CSS `backdrop-filter` ersetzen.
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
@@ -153,6 +154,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt            | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt              | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                  | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt             | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

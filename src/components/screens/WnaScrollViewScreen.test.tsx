@@ -30,7 +30,7 @@ jest.mock("react-i18next", () => ({
 
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
-    scrollY: { value: 0 },
+    scrollY: 0,
     onScroll: () => undefined,
   }),
 }));
@@ -56,20 +56,6 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
 
   return function MockContactFooter(props: unknown) {
     return createElement("WnaContactFooter", props as Record<string, unknown>);
-  };
-});
-
-jest.mock("react-native-reanimated", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      ScrollView: (props: unknown) =>
-        createElement("AnimatedScrollView", props as Record<string, unknown>),
-    },
   };
 });
 

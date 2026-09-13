@@ -60,7 +60,7 @@ jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
 
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
-    scrollY: { value: 0 },
+    scrollY: 0,
     onScroll: () => undefined,
   }),
 }));
@@ -152,25 +152,26 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
+jest.mock("react-native", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const actual = require("@jest/globals").jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
 
   return {
-    __esModule: true,
-    default: {
-      ScrollView: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedScrollView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-      FlatList: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedFlatList",
-          props as Record<string, unknown>,
-        ),
-    },
+    StyleSheet: actual.StyleSheet,
+    Text: actual.Text,
+    View: actual.View,
+    ScrollView: (props: unknown) =>
+      ReactModule.createElement(
+        "ScrollView",
+        props as Record<string, unknown>,
+        (props as { children?: React.ReactNode }).children,
+      ),
+    FlatList: (props: unknown) =>
+      ReactModule.createElement("FlatList", props as Record<string, unknown>),
   };
 });
 
@@ -224,7 +225,7 @@ describe("WnaProjectsRoute", () => {
     });
 
     const baseScreen = tree!.root.findByType("WnaBaseScreen");
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
     const header = flatList.props.ListHeaderComponent as React.ReactElement;
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -271,7 +272,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("AnimatedScrollView");
+    const scrollView = tree!.root.findByType("ScrollView");
     const pressables = tree!.root.findAllByType("WnaPressable");
     const textValues = tree!.root
       .findAllByType("Text")
@@ -281,7 +282,7 @@ describe("WnaProjectsRoute", () => {
       );
 
     expect(scrollView).toBeDefined();
-    expect(tree!.root.findAllByType("AnimatedFlatList")).toHaveLength(0);
+    expect(tree!.root.findAllByType("FlatList")).toHaveLength(0);
     expect(textValues).toContain("screenTitleProjects");
     expect(textValues).toContain(testAppData.projectsSubtitle?.toUpperCase());
     expect(textValues).toContain(testAppData.projectsContext);
@@ -297,7 +298,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
     const renderItemOutput = flatList.props.renderItem({
       item: {
         ...testAppData.projects[0],
@@ -386,7 +387,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
 
     expect(flatList.props.ListHeaderComponent).toBeNull();
   });
@@ -408,7 +409,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
     const header = flatList.props.ListHeaderComponent as React.ReactElement;
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -443,7 +444,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
     const header = flatList.props.ListHeaderComponent as React.ReactElement;
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -493,7 +494,7 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("AnimatedFlatList");
+    const flatList = tree!.root.findByType("FlatList");
     const renderItemOutput = flatList.props.renderItem({
       item: { ...testAppData.projects[0], subtitle: undefined },
       index: 0,
