@@ -90,6 +90,10 @@ jest.mock("@components/buttons/WnaButtonIconText", () => {
   };
 });
 
+jest.mock("react-dom", () => ({
+  createPortal: (children: React.ReactNode) => children,
+}));
+
 jest.mock("@components/buttons/WnaButtonIcon", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
@@ -195,6 +199,8 @@ describe("WnaProjectDetailsRoute", () => {
           bottom: 0,
           left: 0,
           zIndex: 1000,
+          justifyContent: "center",
+          alignItems: "center",
         }),
       );
       const handleKeyDown = addEventListener.mock.calls[0][1] as (
@@ -431,6 +437,13 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(modal.props["aria-modal"]).toBe(true);
     expect(modalBackdrop.type).toBe("div");
+    expect(modalBackdrop.props.style).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(0, 0, 0, 0.58)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
+      }),
+    );
     expect(modalCloseButton.type).toBe("button");
     expect(modalCloseButton.props.type).toBe("button");
     const stopPropagation = jest.fn();
@@ -452,6 +465,9 @@ describe("WnaProjectDetailsRoute", () => {
     expect(modalCloseButton.props.style).toMatchObject({
       backgroundColor: "rgba(252,252,252,0.98)",
       borderColor: "rgba(214,214,214,0.72)",
+      borderStyle: "solid",
+      appearance: "none",
+      padding: 0,
     });
     expect(modalActions[0].props.textColor).toBe("#ffffff");
     expect(modalActions[0].props.backgroundColor).toBe("rgba(42,127,255,0.92)");
