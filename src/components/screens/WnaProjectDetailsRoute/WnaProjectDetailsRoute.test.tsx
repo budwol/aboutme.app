@@ -413,8 +413,17 @@ describe("WnaProjectDetailsRoute", () => {
     const modalCloseButton = tree!.root.findByProps({
       testID: "private-repo-modal-close",
     });
+    const modalBackdrop = tree!.root.findByProps({
+      testID: "private-repo-modal-backdrop",
+    });
 
     expect(modal.props["aria-modal"]).toBe(true);
+    expect(modalBackdrop.type).toBe("div");
+    expect(modalCloseButton.type).toBe("button");
+    expect(modalCloseButton.props.type).toBe("button");
+    const stopPropagation = jest.fn();
+    modalDialog.props.onClick({ stopPropagation });
+    expect(stopPropagation).toHaveBeenCalledTimes(1);
     expect(textValues).toContain(i18nKeys.titlePrivateRepo);
     expect(textValues).toContainEqual([
       i18nKeys.infoPrivateRepoHint,
@@ -492,7 +501,7 @@ describe("WnaProjectDetailsRoute", () => {
     await act(async () => {
       tree!.root
         .findByProps({ testID: "private-repo-modal-close" })
-        .props.onPress();
+        .props.onClick();
     });
 
     expect(
@@ -753,14 +762,10 @@ describe("WnaProjectDetailsRoute", () => {
       tree!.root.findAllByProps({ testID: "private-repo-modal" }).length,
     ).toBeGreaterThan(0);
 
-    const findPressables = () =>
-      tree!.root.findAll(
-        (node: { type: unknown }) =>
-          (node.type as { name?: string })?.name === "Pressable",
-      );
-
     act(() => {
-      (findPressables()[0].props as { onPress: () => void }).onPress();
+      tree!.root
+        .findByProps({ testID: "private-repo-modal-backdrop" })
+        .props.onClick();
     });
 
     expect(
@@ -780,7 +785,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     act(() => {
-      modalCloseButton.props.onPress();
+      modalCloseButton.props.onClick();
     });
 
     expect(
