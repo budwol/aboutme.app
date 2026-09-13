@@ -19,11 +19,11 @@ describe("WnaAccentBar", () => {
       );
     });
 
-    const row = tree!.root.findByType("View");
-    const bar = tree!.root.findAllByType("View")[1];
+    const row = tree!.root.findByType("div");
+    const bar = tree!.root.findAllByType("div")[1];
 
-    expect(row.props.style[1].width).toBe(180);
-    expect(bar.props.style[2].width).toBe(180);
+    expect(row.props.style.width).toBe(180);
+    expect(bar.props.style.width).toBe(180);
   });
 
   it("defaults to the standard width when none is given", () => {
@@ -33,9 +33,9 @@ describe("WnaAccentBar", () => {
       tree = TestRenderer.create(<WnaAccentBar appColors={appColors} />);
     });
 
-    const row = tree!.root.findByType("View");
+    const row = tree!.root.findByType("div");
 
-    expect(row.props.style[1].width).toBe(220);
+    expect(row.props.style.width).toBe(220);
   });
 
   it("uses a CSS transition when enabled", () => {
@@ -47,8 +47,8 @@ describe("WnaAccentBar", () => {
       );
     });
 
-    const bar = tree!.root.findAllByType("View")[1];
-    expect(bar.props.style[2]).toEqual(
+    const bar = tree!.root.findAllByType("div")[1];
+    expect(bar.props.style).toEqual(
       expect.objectContaining({
         width: 8,
         transition: "width 820ms cubic-bezier(0.33, 1, 0.68, 1)",
@@ -70,12 +70,14 @@ describe("WnaAccentBar", () => {
       );
     });
 
-    const bar = tree!.root.findAllByType("View")[1];
-    expect(bar.props.style[2]).toEqual({
-      "--wna-accent-bar-pulse-scale": 0.25,
-      "--wna-accent-bar-duration": "2400ms",
-      animation: "wna-accent-bar-pulse 2400ms ease-in-out infinite alternate",
-    });
+    const bar = tree!.root.findAllByType("div")[1];
+    expect(bar.props.style).toEqual(
+      expect.objectContaining({
+        "--wna-accent-bar-pulse-scale": 0.25,
+        "--wna-accent-bar-duration": "2400ms",
+        animation: "wna-accent-bar-pulse 2400ms ease-in-out infinite alternate",
+      }),
+    );
     expect(bar.props.className).toBe("wna-accent-bar-pulse");
   });
 
@@ -108,11 +110,11 @@ describe("WnaAccentBar", () => {
       );
     });
 
-    const bar = tree!.root.findAllByType("View")[1];
+    const bar = tree!.root.findAllByType("div")[1];
     expect(bar.props.className).toBe("wna-accent-bar-pulse-hero");
-    expect(bar.props.style[2].animation).toBe(
+    expect(bar.props.style.animation).toBe(
       "wna-accent-bar-pulse-hero 60000ms ease-in-out infinite alternate",
     );
-    expect(bar.props.style[2]["--wna-accent-bar-pulse-scale"]).toBe(24 / 112);
+    expect(bar.props.style["--wna-accent-bar-pulse-scale"]).toBe(24 / 112);
   });
 });

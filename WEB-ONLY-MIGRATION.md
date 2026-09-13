@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[##################--] 88%` (46 von 52 festen Arbeitspaketen)
+Fortschritt: `[##################--] 90%` (47 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -232,6 +232,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Native Resize-Fallbacks durch einen browserbasierten Viewport-Adapter ersetzt                       | 519 Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich    |
 | 2026-09-13 | 2     | Horizontalen Separator auf semantisches Web-Markup und CSS umgestellt                               | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
 | 2026-09-13 | 2     | Badge auf semantisches Web-Markup, CSS und zugängliche Beschriftung umgestellt                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
+| 2026-09-13 | 2     | Accent-Bar auf Web-Markup und CSS-Animation umgestellt                                              | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
