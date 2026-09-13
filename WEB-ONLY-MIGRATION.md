@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[##################--] 93%` (28 von 30 priorisierten Arbeitspaketen)
+Fortschritt: `[###################-] 97%` (29 von 30 priorisierten Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -87,6 +87,8 @@ Status: **in Arbeit**
       Motion-Regel ersetzen.
 - [x] Den privaten Repository-Dialog durch einen Web-Modal mit ARIA-Semantik
       und Escape-Close ersetzen.
+- [x] Externe Firmenlinks als echte Web-`<a>`-Elemente mit `href`, neuem Tab
+      und sicherem `rel`-Attribut rendern.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
 - [x] Resize-Events im App-Frame über `window.resize` statt Native-
       `Dimensions` abonnieren.
@@ -190,6 +192,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                         | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt          | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 4     | Theme-Persistenz auf Browser-`localStorage` umgestellt; AsyncStorage entfernt | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Firmenlink auf Web-`<a>` mit `href` und neuem Tab umgestellt                  | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

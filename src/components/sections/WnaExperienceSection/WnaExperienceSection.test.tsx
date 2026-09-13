@@ -3,7 +3,6 @@ import WnaExperienceSection from "@components/sections/WnaExperienceSection";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
-import * as WebLinking from "@utils/webLinking";
 
 type RenderedTextNode = {
   props: {
@@ -72,11 +71,8 @@ jest.mock("@components/display/WnaBadge", () => {
 });
 
 describe("WnaExperienceSection", () => {
-  const openURL = jest.spyOn(WebLinking.Linking, "openURL");
-
   beforeEach(() => {
     jest.clearAllMocks();
-    openURL.mockResolvedValue(undefined);
   });
 
   it("renders one timeline card per experience entry", () => {
@@ -253,43 +249,41 @@ describe("WnaExperienceSection", () => {
     });
     const linkText = companyLink.findByType("Text");
 
-    expect(companyLink.props.accessibilityRole).toBe("link");
-    expect(typeof companyLink.props.onHoverIn).toBe("function");
-    expect(typeof companyLink.props.onHoverOut).toBe("function");
+    expect(companyLink.props.href).toBe("https://linked-employer.example.com");
+    expect(companyLink.props.target).toBe("_blank");
+    expect(companyLink.props.rel).toBe("noreferrer");
+    expect(companyLink.props["aria-label"]).toBe("Linked Employer");
+    expect(typeof companyLink.props.onMouseEnter).toBe("function");
+    expect(typeof companyLink.props.onMouseLeave).toBe("function");
     expect(flattenText(linkText.props.children)).toBe("Linked Employer");
 
     act(() => {
-      companyLink.props.onHoverIn();
+      companyLink.props.onMouseEnter();
     });
 
     const hoveredLink = tree!.root.findByProps({
       testID: "experience-company-link-0",
     });
-    const hoveredStyle = hoveredLink.props.style as unknown[];
+    const hoveredStyle = hoveredLink.props.style as Record<string, unknown>;
 
-    expect(hoveredStyle).toContainEqual(
-      expect.objectContaining({
-        backgroundColor: expect.any(String),
-      }),
-    );
+    expect(hoveredStyle.backgroundColor).toEqual(expect.any(String));
 
     act(() => {
-      companyLink.props.onHoverOut();
+      companyLink.props.onMouseLeave();
     });
 
     const unhoveredLink = tree!.root.findByProps({
       testID: "experience-company-link-0",
     });
 
-    expect((unhoveredLink.props.style as unknown[])[1]).toBe(false);
+    expect(unhoveredLink.props.style.backgroundColor).toBeUndefined();
 
-    await act(async () => {
-      await companyLink.props.onPress({
-        stopPropagation: jest.fn(),
-      });
+    const stopPropagation = jest.fn();
+    act(() => {
+      companyLink.props.onClick({ stopPropagation } as never);
     });
 
-    expect(openURL).toHaveBeenCalledWith("https://linked-employer.example.com");
+    expect(stopPropagation).toHaveBeenCalledTimes(1);
   });
 
   it("renders a plain company subtitle when no employer URL is provided", () => {

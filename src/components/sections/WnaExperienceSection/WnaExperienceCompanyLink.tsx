@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import { Linking } from "@utils/webLinking";
+import { Text, View } from "react-native";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { styles } from "./wnaExperienceSectionStyles";
@@ -24,23 +23,28 @@ export default function WnaExperienceCompanyLink({
 }: WnaExperienceCompanyLinkProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  return (
-    <Pressable
-      accessibilityRole="link"
-      onHoverIn={() => setIsHovered(true)}
-      onHoverOut={() => setIsHovered(false)}
-      onPress={(event) => {
-        event.stopPropagation();
-        void Linking.openURL(companyUrl);
-      }}
-      style={[
-        styles.companyLinkPressable,
-        isHovered && {
-          backgroundColor: convertHexToRgba(appColors.accent5, 0.08),
-        },
-      ]}
-      testID={`experience-company-link-${index}`}
-    >
+  const linkStyle = {
+    ...styles.companyLinkPressable,
+    ...(isHovered && {
+      backgroundColor: convertHexToRgba(appColors.accent5, 0.08),
+    }),
+  };
+
+  return React.createElement(
+    "a",
+    {
+      href: companyUrl,
+      target: "_blank",
+      rel: "noreferrer",
+      "aria-label": company,
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => setIsHovered(false),
+      onClick: (event: React.MouseEvent<HTMLAnchorElement>) =>
+        event.stopPropagation(),
+      style: linkStyle as React.CSSProperties,
+      testID: `experience-company-link-${index}`,
+    },
+    <View>
       <View style={styles.companyLinkRow}>
         <Text
           style={[
@@ -65,6 +69,6 @@ export default function WnaExperienceCompanyLink({
           style={styles.companyLinkIcon}
         />
       </View>
-    </Pressable>
+    </View>,
   );
 }
