@@ -67,6 +67,7 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
         appearance: "none",
         backgroundColor: effectiveBackgroundColor,
         borderColor: StaticColors.staticWarmgray6,
+        borderStyle: "solid",
         borderWidth: effectiveBorderWidth,
         boxSizing: "border-box",
         cursor: isDisabled ? "not-allowed" : "pointer",
