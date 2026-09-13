@@ -47,6 +47,7 @@ export function WnaWebModal({
   return (
     <View
       nativeID="private-repo-modal"
+      style={styles.modalRoot}
       accessibilityLabel="private-repo-modal"
       {...{ role: "dialog", "aria-modal": true }}
     >

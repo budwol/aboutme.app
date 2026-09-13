@@ -185,6 +185,18 @@ describe("WnaProjectDetailsRoute", () => {
         "keydown",
         expect.any(Function),
       );
+      expect(
+        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+      ).toEqual(
+        expect.objectContaining({
+          position: "fixed",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: 1000,
+        }),
+      );
       const handleKeyDown = addEventListener.mock.calls[0][1] as (
         event: KeyboardEvent,
       ) => void;
