@@ -53,23 +53,24 @@ describe("WnaDrawerNavigationItem", () => {
       );
     });
 
-    const pressable = tree!.root.find(
+    const button = tree!.root.find(
       (node: TestNode) =>
-        typeof node.props.onPress === "function" &&
-        typeof node.props.style === "function",
+        node.props.type === "button" &&
+        typeof node.props.onClick === "function",
     );
     const icon = tree!.root.findByType("WnaIcon");
     const text = tree!.root.find(
       (node: TestNode) => node.props.children === "Projects",
     );
 
-    expect(pressable.props.accessibilityRole).toBe("button");
-    expect(pressable.props.accessibilityLabel).toBe("Projects");
-    expect(pressable.props.accessibilityState).toEqual({ selected: false });
-    expect(pressable.props.style({ pressed: true })[1]).toEqual({
-      paddingLeft: 32,
-      backgroundColor: "#eeeeee",
-    });
+    expect(button.props["aria-label"]).toBe("Projects");
+    expect(button.props["aria-current"]).toBeUndefined();
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        paddingLeft: 32,
+        backgroundColor: "transparent",
+      }),
+    );
     expect(icon.props.size).toBe(20);
     expect(icon.props.color).toBe("#111111");
     expect(icon.props.style.opacity).toBe(0.7);
@@ -78,10 +79,18 @@ describe("WnaDrawerNavigationItem", () => {
     );
 
     act(() => {
-      pressable.props.onPress();
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("#eeeeee");
+
+    act(() => {
+      button.props.onMouseUp();
+      button.props.onClick();
+      button.props.onMouseLeave();
     });
 
     expect(onPress).toHaveBeenCalledTimes(1);
+    expect(button.props.style.backgroundColor).toBe("transparent");
   });
 
   it("renders an active item with accent styles", () => {
@@ -100,10 +109,10 @@ describe("WnaDrawerNavigationItem", () => {
       );
     });
 
-    const pressable = tree!.root.find(
+    const button = tree!.root.find(
       (node: TestNode) =>
-        typeof node.props.onPress === "function" &&
-        typeof node.props.style === "function",
+        node.props.type === "button" &&
+        typeof node.props.onClick === "function",
     );
     const icon = tree!.root.findByType("WnaIcon");
     const accentBar = tree!.root.find(
@@ -112,11 +121,19 @@ describe("WnaDrawerNavigationItem", () => {
         node.props.style.some((style: { width?: number }) => style.width === 4),
     );
 
-    expect(pressable.props.accessibilityState).toEqual({ selected: true });
-    expect(pressable.props.style({ pressed: false })[1]).toEqual({
-      paddingLeft: 16,
-      backgroundColor: "#222222",
+    expect(button.props["aria-label"]).toBe("Projects");
+    expect(button.props["aria-current"]).toBe("page");
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        paddingLeft: 16,
+        backgroundColor: "#222222",
+      }),
+    );
+    act(() => {
+      button.props.onMouseDown();
+      button.props.onMouseLeave();
     });
+    expect(button.props.style.backgroundColor).toBe("#222222");
     expect(icon.props.size).toBe(21);
     expect(icon.props.color).toBe("#00aa99");
     expect(accentBar.props.style).toEqual(
