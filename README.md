@@ -249,6 +249,7 @@ The runtime path is meant to stay plain and inspectable, not clever.
 - Production web builds do not publish JavaScript source maps. For bundle analysis, create a temporary export with `npx expo export -p web --source-maps`, inspect it, and remove it afterward. See [ADR 0021](adr/0021-production-source-maps-are-not-published.md).
 - The production SEO restriction is intentional: `noindex, nofollow` remains enabled and must not be removed to improve Lighthouse.
 - The planned migration from Expo/React Native primitives to a web-only PWA is tracked in [WEB-ONLY-MIGRATION.md](WEB-ONLY-MIGRATION.md).
+- The follow-up migration from the web-only Expo shell to plain React is tracked in [PLAIN-REACT-MIGRATION.md](PLAIN-REACT-MIGRATION.md).
 
 ## Production Checklist
 
