@@ -5,6 +5,11 @@ Fortschritt: `[############----------] 50%` (14 von 28 Arbeitspaketen)
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
 
+Aktueller Fokus: Phase 1 abschließen (Background-Image und Navigationstransition
+als Browser-Regression), danach Phase 4 mit Linking und Reanimated beenden.
+Neue Phasen werden erst begonnen, wenn die jeweils aktiven Exit-Kriterien erfüllt
+sind.
+
 ## Ziel
 
 Die Anwendung wird als statische, installierbare Web-PWA betrieben. Native
