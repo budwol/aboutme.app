@@ -325,6 +325,43 @@ describe("WnaApp", () => {
     jest.useRealTimers();
   });
 
+  it("uses the browser resize event when the web target is available", () => {
+    const originalWindow = global.window;
+    const addEventListener = jest.fn();
+    const removeEventListener = jest.fn();
+    Object.defineProperty(global, "window", {
+      configurable: true,
+      value: { addEventListener, removeEventListener },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaApp appData={testAppData} theme="system">
+          <Text>content</Text>
+        </WnaApp>,
+      );
+    });
+
+    expect(addEventListener).toHaveBeenCalledWith(
+      "resize",
+      expect.any(Function),
+    );
+
+    act(() => {
+      tree!.unmount();
+    });
+
+    expect(removeEventListener).toHaveBeenCalledWith(
+      "resize",
+      expect.any(Function),
+    );
+    Object.defineProperty(global, "window", {
+      configurable: true,
+      value: originalWindow,
+    });
+  });
+
   it("shows the navigation transition overlay after the intro completed", () => {
     jest.useFakeTimers();
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {

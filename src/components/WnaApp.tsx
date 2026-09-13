@@ -147,7 +147,15 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       }, 100);
     };
 
-    const subscription = Dimensions.addEventListener("change", handleChange);
+    const resizeTarget =
+      typeof window !== "undefined" &&
+      typeof window.addEventListener === "function"
+        ? window
+        : null;
+    const nativeSubscription = resizeTarget
+      ? null
+      : Dimensions.addEventListener("change", handleChange);
+    resizeTarget?.addEventListener("resize", handleChange);
 
     setDimensions();
 
@@ -155,7 +163,8 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       if (dimensionTimerRef.current) {
         clearTimeout(dimensionTimerRef.current);
       }
-      subscription.remove();
+      resizeTarget?.removeEventListener("resize", handleChange);
+      nativeSubscription?.remove();
     };
   }, [setDimensions]);
 
