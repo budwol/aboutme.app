@@ -59,10 +59,12 @@ export function WnaBlurView(props: WnaBlurViewProps) {
     );
   };
 
+  // Expo intensity is a 0-100 scale; CSS blur uses a pixel radius.
+  const cssBlurRadius = Math.min(8, Math.max(0, intensity / 5));
   const blurStyle = props.forceExperimentalBlur
     ? ({
-        backdropFilter: `blur(${intensity}px)`,
-        WebkitBackdropFilter: `blur(${intensity}px)`,
+        backdropFilter: `blur(${cssBlurRadius}px)`,
+        WebkitBackdropFilter: `blur(${cssBlurRadius}px)`,
       } as ViewStyle)
     : null;
 
