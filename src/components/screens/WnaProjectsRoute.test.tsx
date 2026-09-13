@@ -170,8 +170,6 @@ jest.mock("react-native", () => {
         props as Record<string, unknown>,
         (props as { children?: React.ReactNode }).children,
       ),
-    FlatList: (props: unknown) =>
-      ReactModule.createElement("FlatList", props as Record<string, unknown>),
   };
 });
 
@@ -225,8 +223,9 @@ describe("WnaProjectsRoute", () => {
     });
 
     const baseScreen = tree!.root.findByType("WnaBaseScreen");
-    const flatList = tree!.root.findByType("FlatList");
-    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    const scrollView = tree!.root.findByType("ScrollView");
+    const children = scrollView.props.children as React.ReactElement[];
+    const header = children[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -244,10 +243,10 @@ describe("WnaProjectsRoute", () => {
     expect(headerTextValues).toContain(testAppData.projectsContext);
     expect(headerTextValues).toContain(testAppData.projectsHighlights[0].text);
     expect(headerTextValues).toContain(testAppData.projectsHighlights[1].text);
-    expect(flatList.props.ListFooterComponent.type.name).toBe(
+    expect((children.at(-1)?.type as { name?: string }).name).toBe(
       "MockContactFooter",
     );
-    expect(flatList.props.contentContainerStyle.paddingBottom).toBe(16);
+    expect(scrollView.props.contentContainerStyle.paddingBottom).toBe(16);
   });
 
   it("renders the dedicated landscape projects layout when the screen is wide", () => {
@@ -298,28 +297,14 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("FlatList");
-    const renderItemOutput = flatList.props.renderItem({
-      item: {
-        ...testAppData.projects[0],
-        subtitle: "Android / Web App",
-      },
-      index: 0,
-    }) as React.ReactElement;
-    let itemTree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      itemTree = TestRenderer.create(renderItemOutput);
-    });
-
-    const textValues = itemTree!.root
+    const textValues = tree!.root
       .findAllByType("Text")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
       );
 
-    expect(textValues).toContain("Android / Web App");
+    expect(textValues).toContain(testAppData.projects[0].subtitle);
     expect(textValues).toContain(testAppData.projects[0].title);
   });
 
@@ -387,9 +372,9 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("FlatList");
+    const scrollView = tree!.root.findByType("ScrollView");
 
-    expect(flatList.props.ListHeaderComponent).toBeNull();
+    expect((scrollView.props.children as React.ReactNode[])[0]).toBeNull();
   });
 
   it("renders only the highlights in the portrait intro when there is no context", () => {
@@ -409,8 +394,8 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("FlatList");
-    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    const scrollView = tree!.root.findByType("ScrollView");
+    const header = (scrollView.props.children as React.ReactElement[])[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -444,8 +429,8 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("FlatList");
-    const header = flatList.props.ListHeaderComponent as React.ReactElement;
+    const scrollView = tree!.root.findByType("ScrollView");
+    const header = (scrollView.props.children as React.ReactElement[])[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -464,8 +449,18 @@ describe("WnaProjectsRoute", () => {
 
   it("uses a light ripple color and navigates on press in dark mode", () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
       useWnaTheme: jest.Mock;
     };
+    appContext.useWnaAppData.mockReturnValue({
+      appData: {
+        ...testAppData,
+        projects: [
+          { ...testAppData.projects[0], subtitle: undefined },
+          ...testAppData.projects.slice(1),
+        ],
+      },
+    });
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         isDark: true,
@@ -494,18 +489,8 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const flatList = tree!.root.findByType("FlatList");
-    const renderItemOutput = flatList.props.renderItem({
-      item: { ...testAppData.projects[0], subtitle: undefined },
-      index: 0,
-    }) as React.ReactElement;
-    let itemTree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    act(() => {
-      itemTree = TestRenderer.create(renderItemOutput);
-    });
-
-    const pressable = itemTree!.root.findByType("WnaPressable");
+    const scrollView = tree!.root.findByType("ScrollView");
+    const pressable = tree!.root.findAllByType("WnaPressable")[0];
 
     expect(pressable.props.ripple).toBe("light");
 
@@ -515,11 +500,13 @@ describe("WnaProjectsRoute", () => {
       });
     }).not.toThrow();
 
-    expect(flatList.props.keyExtractor(testAppData.projects[0])).toBe(
-      testAppData.projects[0].title,
+    expect(scrollView.props.scrollEventThrottle).toBe(16);
+    expect(scrollView.props.onScroll).toEqual(expect.any(Function));
+    const projectGroups = scrollView.props.children[1] as React.ReactElement[];
+    expect(projectGroups).toHaveLength(testAppData.projects.length);
+    expect(projectGroups.map((group) => group.key)).toEqual(
+      testAppData.projects.map((project, index) => `${project.title}-${index}`),
     );
-    expect(flatList.props.ItemSeparatorComponent).toBeDefined();
-    expect(() => flatList.props.ItemSeparatorComponent()).not.toThrow();
   });
 
   it("collapses the landscape layout when there is no context data or projects", () => {
