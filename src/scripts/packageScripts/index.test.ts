@@ -164,4 +164,20 @@ describe("package scripts", () => {
 
     expect(packageJson.dependencies).not.toHaveProperty("expo-font");
   });
+
+  it("keeps required Expo Router and drawer peers installed directly", () => {
+    const packageJson = readPackageJson();
+    const requiredPeers = [
+      "expo-constants",
+      "expo-linking",
+      "react-native-gesture-handler",
+      "react-native-reanimated",
+      "react-native-safe-area-context",
+      "react-native-screens",
+    ];
+
+    for (const dependency of requiredPeers) {
+      expect(packageJson.dependencies).toHaveProperty(dependency);
+    }
+  });
 });

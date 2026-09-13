@@ -29,9 +29,11 @@ nicht aktiviert werden.
 - Semantisches HTML und CSS ersetzen React-Native-Layout-Primitives.
 - CSS-Transitions oder Web Animations ersetzen Reanimated.
 - `srcset`/`picture` ersetzen die plattformübergreifende Bildauflösung.
-- `expo-constants` und `expo-linking` bleiben bis zur Expo-Router-Ablösung als
-  direkte Peer-Dependencies installiert; der eigene Code nutzt den Browser-
-  Adapter.
+- `expo-constants`, `expo-linking`, `react-native-gesture-handler`,
+  `react-native-reanimated`, `react-native-safe-area-context` und
+  `react-native-screens` bleiben bis zur Expo-Router-/Drawer-Ablösung als
+  direkte Peer-Dependencies installiert; der eigene Code nutzt, wo möglich,
+  bereits Browser-Adapter.
 - Routing wird erst nach Stabilisierung der Web-Shell ausgetauscht.
 - Jede Phase benötigt fokussierte Unit-, Integrations- und E2E-Regressionstests.
 - Nach jeder Phase werden Lighthouse, Bundle-Größe, Accessibility und
@@ -151,19 +153,20 @@ Status: **in Arbeit**
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
 - [x] `expo-image` vollständig entfernen.
 - [x] Linking-Sonderpfade durch einen getesteten Browser-Adapter ersetzen.
-- [x] `expo-application` und `expo-constants` durch die zentrale
-      `package.json`-Versionsquelle ersetzen.
+- [x] Eigene Nutzung von `expo-application` und `expo-constants` durch die
+      zentrale `package.json`-Versionsquelle ersetzen; `expo-constants` bleibt
+      als Expo-Router-Peer installiert.
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
 - [x] Direkte `react-native-worklets`-Dependency entfernen; transitiver Bezug
       bleibt bis zur Navigation-Migration bestehen.
-- [x] Direkte `react-native-screens`-Dependency entfernen; transitiver Bezug
-      bleibt bis zur Expo-Router-Migration bestehen.
+- [x] Eigene Nutzung von `react-native-screens` entfernen; als direkter Peer
+      bleibt die Dependency bis zur Expo-Router-Migration installiert.
 - [x] Theme-Persistenz von `AsyncStorage` auf den SSR-sicheren Browser-
       `localStorage`-Adapter umstellen.
 
-Exit-Kriterium: Relevante Expo-/Native-Dependencies sind aus dem Web-Bundle
-und aus `package.json` entfernt; Motion- und Theme-Tests decken die Browserpfade
-ab.
+Exit-Kriterium: Relevante eigene Expo-/Native-Nutzung ist aus dem Web-Bundle
+entfernt; verpflichtende Router-/Drawer-Peers bleiben bis zu deren Ablösung
+direkt installiert. Motion- und Theme-Tests decken die Browserpfade ab.
 
 ### 5. Sanitizing, Bundle und PWA-Finalisierung
 
@@ -182,62 +185,63 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 
 ## Umsetzungsstand
 
-| Datum      | Phase | Änderung                                                                                            | Validierung                                                                                            |
-| ---------- | ----- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                                                             | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich                                              |
-| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                                                   | E2E-Artefakt analysiert; fehlendes `convert` behoben                                                   |
-| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                                                 | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz                                              |
-| 2026-09-13 | 1     | DOM-Style-Regression behoben                                                                        | 470 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt                                             | 18 Tooltip-Tests, Lint und TypeScript erfolgreich                                                      |
-| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert                                               | 484 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                                                    | 484 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                                                               | 483 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                                                               | 54 fokussierte Tests, Lint und TypeScript erfolgreich                                                  |
-| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt                                 | 491 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                                                  | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests                                              |
-| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt                                          | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                                                    | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt                                            | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt                                              | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                                                  | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt                                             | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt                                       | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | `react-native-reanimated` aus dem Web-Pfad und package.json entfernt                                | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert                              | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                                                 | Transitiver Bezug über Drawer-Navigation dokumentiert                                                  |
-| 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                                                   | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt                                           | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                                                           | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 3     | Native Dependencies auf direkte und transitive Nutzung geprüft                                      | Router/Drawer als verbleibende transitive Grenze dokumentiert                                          |
-| 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                                                  | Transitiver Bezug über Expo Router dokumentiert                                                        |
-| 2026-09-13 | 2     | Statische Navigationsliste von `FlatList` auf `ScrollView` umgestellt                               | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt                                    | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Verwaiste `FlatList`-Test-Assertion entfernt                                                        | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                                               | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt                                | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 4     | Theme-Persistenz auf Browser-`localStorage` umgestellt; AsyncStorage entfernt                       | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Firmenlink auf Web-`<a>` mit `href` und neuem Tab umgestellt                                        | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Footer-Aktion auf Web-`button` mit `type="button"` umgestellt                                       | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Sidebar-, Header- und Aktionsbuttons auf Web-`button` umgestellt                                    | 507 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 2     | Drawer-Header, Akzentleiste sowie Margin und Padding gegen den Vor-Migrationsstand abgeglichen      | 512 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Globales 8er-Abstandsrasters für die Drawer-Navigation verwendet                                    | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | 16px Abstand zwischen Drawer-Header und Navigation ergänzt                                          | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | Private-Repository-Dialog auf DOM-Backdrop und DOM-Close-Button umgestellt                          | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 2     | DOM-Props und flache Modal-Styles gegen Web-React-Fehler abgesichert                                | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 4     | Externe Weblinks synchron im Click-Stack geöffnet, damit GitHub-Popups nicht blockiert werden       | 515 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                         |
-| 2026-09-13 | 4     | Unbenutzte direkte `expo-constants`- und `expo-linking`-Dependencies entfernt                       | Typecheck, Lint und Dependency-Tree erfolgreich                                                        |
-| 2026-09-13 | 2     | Zusammengesetzte Icon-Text-Aktionen auf Web-`button` umgestellt                                     | 507 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
-| 2026-09-13 | 1     | Background-Image und Navigationstransition mit Fade-, Layer- und Deep-Link-Regressionen abgesichert | 516 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich; E2E-Port-Allocator weiterhin blockiert |
-| 2026-09-13 | 2     | Web-Fokusindikator und globale Reduced-Motion-Regeln in Hydration- und Static-Shell ergänzt         | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
-| 2026-09-13 | 2     | Native Resize-Fallbacks durch einen browserbasierten Viewport-Adapter ersetzt                       | 519 Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich    |
-| 2026-09-13 | 2     | Horizontalen Separator auf semantisches Web-Markup und CSS umgestellt                               | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
-| 2026-09-13 | 2     | Badge auf semantisches Web-Markup, CSS und zugängliche Beschriftung umgestellt                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
-| 2026-09-13 | 2     | Accent-Bar auf Web-Markup und CSS-Animation umgestellt                                              | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
-| 2026-09-13 | 2     | Blur-Wrapper auf Web-Markup und CSS-Backdrop-Filter umgestellt                                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
-| 2026-09-13 | 5     | Service Worker mit Cache-Strategie und Offline-Navigation in die Web-Ausgabe aufgenommen            | Unit-Tests, Lint, Prettier und TypeScript erfolgreich; Browser-E2E durch Port-Allocator blockiert      |
-| 2026-09-13 | 5     | Export-Smoke-Test als PWA- und `noindex`-Release-Gate verschärft                                    | Smoke-Export, 520 Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich                 |
-| 2026-09-13 | 5     | Web-Bundle-Budget und Ausschluss nativer Bild-/Animationsmarker als Export-Gate ergänzt             | Bundle-Gate, Smoke-Export, Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich        |
-| 2026-09-13 | 5     | PWA-Release-Gate für Manifest, Service Worker und beabsichtigtes `noindex` abgeschlossen            | PWA-Gate, Smoke-Export, 524 Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich       |
+| Datum      | Phase | Änderung                                                                                            | Validierung                                                                                              |
+| ---------- | ----- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                                                             | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich                                                |
+| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                                                   | E2E-Artefakt analysiert; fehlendes `convert` behoben                                                     |
+| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                                                 | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz                                                |
+| 2026-09-13 | 1     | DOM-Style-Regression behoben                                                                        | 470 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt                                             | 18 Tooltip-Tests, Lint und TypeScript erfolgreich                                                        |
+| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert                                               | 484 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                                                    | 484 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                                                               | 483 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                                                               | 54 fokussierte Tests, Lint und TypeScript erfolgreich                                                    |
+| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt                                 | 491 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                                                  | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests                                                |
+| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt                                          | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                                                    | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt                                            | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt                                              | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                                                  | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt                                             | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt                                       | 497 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 4     | Eigene `react-native-reanimated`-Nutzung aus dem Web-Pfad entfernt                                  | 497 Unit-Tests, Lint und TypeScript erfolgreich; direkter Router-Peer bleibt erforderlich                |
+| 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert                              | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                                                 | Transitiver Bezug über Drawer-Navigation dokumentiert                                                    |
+| 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                                                   | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt                                           | 500 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                                                           | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 3     | Native Dependencies auf direkte und transitive Nutzung geprüft                                      | Router/Drawer als verbleibende transitive Grenze dokumentiert                                            |
+| 2026-09-13 | 4     | Eigene `react-native-screens`-Nutzung entfernt                                                      | Router-Peer bleibt bis zur Expo-Router-Ablösung erforderlich                                             |
+| 2026-09-13 | 2     | Statische Navigationsliste von `FlatList` auf `ScrollView` umgestellt                               | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt                                    | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Verwaiste `FlatList`-Test-Assertion entfernt                                                        | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                                               | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt                                | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 4     | Theme-Persistenz auf Browser-`localStorage` umgestellt; AsyncStorage entfernt                       | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Firmenlink auf Web-`<a>` mit `href` und neuem Tab umgestellt                                        | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Footer-Aktion auf Web-`button` mit `type="button"` umgestellt                                       | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Sidebar-, Header- und Aktionsbuttons auf Web-`button` umgestellt                                    | 507 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 2     | Drawer-Header, Akzentleiste sowie Margin und Padding gegen den Vor-Migrationsstand abgeglichen      | 512 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Globales 8er-Abstandsrasters für die Drawer-Navigation verwendet                                    | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | 16px Abstand zwischen Drawer-Header und Navigation ergänzt                                          | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | Private-Repository-Dialog auf DOM-Backdrop und DOM-Close-Button umgestellt                          | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 2     | DOM-Props und flache Modal-Styles gegen Web-React-Fehler abgesichert                                | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 4     | Externe Weblinks synchron im Click-Stack geöffnet, damit GitHub-Popups nicht blockiert werden       | 515 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich                                           |
+| 2026-09-13 | 4     | Eigene Nutzung von `expo-constants` und `expo-linking` durch Browser-Adapter ersetzt                | Router-Peers bleiben bis zur Expo-Router-Ablösung erforderlich                                           |
+| 2026-09-13 | 2     | Zusammengesetzte Icon-Text-Aktionen auf Web-`button` umgestellt                                     | 507 Unit-Tests, Lint und TypeScript erfolgreich                                                          |
+| 2026-09-13 | 1     | Background-Image und Navigationstransition mit Fade-, Layer- und Deep-Link-Regressionen abgesichert | 516 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich; E2E-Port-Allocator weiterhin blockiert   |
+| 2026-09-13 | 2     | Web-Fokusindikator und globale Reduced-Motion-Regeln in Hydration- und Static-Shell ergänzt         | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich          |
+| 2026-09-13 | 2     | Native Resize-Fallbacks durch einen browserbasierten Viewport-Adapter ersetzt                       | 519 Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich      |
+| 2026-09-13 | 2     | Horizontalen Separator auf semantisches Web-Markup und CSS umgestellt                               | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich          |
+| 2026-09-13 | 2     | Badge auf semantisches Web-Markup, CSS und zugängliche Beschriftung umgestellt                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich          |
+| 2026-09-13 | 2     | Accent-Bar auf Web-Markup und CSS-Animation umgestellt                                              | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich          |
+| 2026-09-13 | 2     | Blur-Wrapper auf Web-Markup und CSS-Backdrop-Filter umgestellt                                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich          |
+| 2026-09-13 | 5     | Service Worker mit Cache-Strategie und Offline-Navigation in die Web-Ausgabe aufgenommen            | Unit-Tests, Lint, Prettier und TypeScript erfolgreich; Browser-E2E durch Port-Allocator blockiert        |
+| 2026-09-13 | 5     | Export-Smoke-Test als PWA- und `noindex`-Release-Gate verschärft                                    | Smoke-Export, 520 Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich                   |
+| 2026-09-13 | 5     | Web-Bundle-Budget und Ausschluss nativer Bild-/Animationsmarker als Export-Gate ergänzt             | Bundle-Gate, Smoke-Export, Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich          |
+| 2026-09-13 | 5     | PWA-Release-Gate für Manifest, Service Worker und beabsichtigtes `noindex` abgeschlossen            | PWA-Gate, Smoke-Export, 524 Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich         |
+| 2026-09-13 | 3/4   | Verpflichtende Expo-Router-/Drawer-Peers nach Expo-Doctor-Prüfung wieder direkt installiert         | `npm ls` vollständig; Expo-Doctor-Konfigurationscheck wegen fehlender Netzwerkauflösung nicht ausführbar |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
