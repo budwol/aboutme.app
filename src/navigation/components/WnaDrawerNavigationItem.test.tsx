@@ -72,6 +72,9 @@ describe("WnaDrawerNavigationItem", () => {
     expect(button.props.style).toEqual(
       expect.objectContaining({
         paddingLeft: 32,
+        paddingTop: 14,
+        paddingBottom: 14,
+        paddingRight: 16,
         backgroundColor: "transparent",
         position: "relative",
         display: "flex",

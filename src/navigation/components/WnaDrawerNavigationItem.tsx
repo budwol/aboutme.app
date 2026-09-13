@@ -42,16 +42,19 @@ export default function WnaDrawerNavigationItem({
   const opacity = isSecondary && !isActive ? 0.7 : 1;
 
   const buttonStyle = {
-    ...styles.container,
     appearance: "none" as const,
+    alignItems: "center" as const,
     border: "none",
     boxSizing: "border-box" as const,
     display: "flex" as const,
-    alignItems: "center" as const,
     fontFamily: "inherit",
     fontSize: "inherit",
+    paddingBottom: 14,
     paddingLeft: isSecondary ? 32 : 16,
+    paddingRight: 16,
+    paddingTop: 14,
     backgroundColor: getBackgroundColor(isPressed),
+    borderRadius: 4,
     position: "relative" as const,
     textAlign: "left" as const,
     width: "100%",
@@ -100,13 +103,6 @@ export default function WnaDrawerNavigationItem({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingRight: 16,
-    borderRadius: 4,
-  },
   content: {
     flexDirection: "row",
     alignItems: "center",

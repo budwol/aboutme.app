@@ -17,12 +17,6 @@ const styles = StyleSheet.create({
   footerActionRow: {
     alignItems: "center",
   },
-  footerActionButton: {
-    paddingHorizontal: sectionConstants.sectionFooterActionPaddingHorizontal,
-    paddingVertical: sectionConstants.sectionFooterActionPaddingVertical,
-    borderRadius: appLayoutConstants.globalCornerRadius,
-    borderWidth: 1,
-  },
   footerActionButtonText: {
     fontWeight: "600",
   },
@@ -49,20 +43,25 @@ const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
   );
 
   const buttonStyle = {
-    ...styles.footerActionButton,
     appearance: "none" as const,
     alignItems: "center" as const,
-    borderColor: isHovered ? hoverBorderColor : borderColor,
-    borderStyle: "solid" as const,
     backgroundColor: isHovered
       ? convertHexToRgba(appColors.accent5, 0.14)
       : surfaceColor,
+    borderRadius: appLayoutConstants.globalCornerRadius,
+    borderWidth: 1,
+    borderColor: isHovered ? hoverBorderColor : borderColor,
+    borderStyle: "solid" as const,
     boxSizing: "border-box" as const,
     cursor: "pointer" as const,
     display: "flex" as const,
     fontFamily: "inherit",
     fontSize: "inherit",
     justifyContent: "center" as const,
+    paddingBottom: sectionConstants.sectionFooterActionPaddingVertical,
+    paddingLeft: sectionConstants.sectionFooterActionPaddingHorizontal,
+    paddingRight: sectionConstants.sectionFooterActionPaddingHorizontal,
+    paddingTop: sectionConstants.sectionFooterActionPaddingVertical,
   };
 
   return (
