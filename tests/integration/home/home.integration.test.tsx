@@ -19,7 +19,6 @@ import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockPush = jest.fn();
-const mockScrollTo = jest.fn();
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -98,42 +97,16 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
 
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
-    scrollY: { value: 0 },
+    scrollY: 0,
     onScroll: () => undefined,
   }),
 }));
-
-jest.mock("react-native-reanimated", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { jest: jestModule } = require("@jest/globals");
-  const ReactModule = jestModule.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      ScrollView: ReactModule.forwardRef((props: unknown, ref: unknown) => {
-        if (ref && typeof ref === "object") {
-          (ref as { current?: unknown }).current = { scrollTo: mockScrollTo };
-        }
-
-        return ReactModule.createElement(
-          "AnimatedScrollView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        );
-      }),
-    },
-  };
-});
 
 describe("WnaHomeRoute integration", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     mockDimensions(1280, 800);
     mockPush.mockClear();
-    mockScrollTo.mockClear();
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
       return 1;

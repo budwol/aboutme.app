@@ -151,40 +151,6 @@ jest.mock("@components/images/WnaImageBackground", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ReactModule = require("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-    },
-    Easing: {
-      out: (value: unknown) => value,
-      cubic: "cubic",
-    },
-    runOnJS: (callback: (...args: unknown[]) => void) => callback,
-    useAnimatedStyle: (callback: () => Record<string, unknown>) => callback(),
-    useSharedValue: (initialValue: number) => ({ value: initialValue }),
-    withDelay: (_delay: number, value: unknown) => value,
-    withTiming: (
-      value: unknown,
-      _config?: unknown,
-      callback?: (finished?: boolean) => void,
-    ) => {
-      callback?.(true);
-
-      return value;
-    },
-  };
-});
-
 describe("WnaApp", () => {
   beforeEach(() => {
     mockNavigationTransitionBackgroundImageUrl = undefined;
@@ -365,6 +331,7 @@ describe("WnaApp", () => {
   });
 
   it("shows the navigation transition overlay after the intro completed", () => {
+    jest.useFakeTimers();
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
 
@@ -380,10 +347,16 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -401,6 +374,7 @@ describe("WnaApp", () => {
   });
 
   it("finishes the navigation transition after the pathname changes", () => {
+    jest.useFakeTimers();
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
 
@@ -416,10 +390,16 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -442,10 +422,19 @@ describe("WnaApp", () => {
       );
     });
 
+    act(() => {
+      jest.advanceTimersByTime(560);
+    });
+
     expect(mockFinishNavigationTransition).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      tree!.unmount();
+    });
   });
 
   it("keeps the navigation transition inactive during the intro", () => {
+    jest.useFakeTimers();
     mockIsNavigationTransitionActive = true;
     global.requestAnimationFrame = jest.fn(() => 1) as never;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -458,7 +447,10 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
@@ -474,6 +466,7 @@ describe("WnaApp", () => {
   });
 
   it("renders the navigation transition over its background image", () => {
+    jest.useFakeTimers();
     mockAppColors = { ...mockAppColors, isDark: true };
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
@@ -490,7 +483,9 @@ describe("WnaApp", () => {
       );
     });
 
-    const introOverlay = tree!.root.findAllByType("AnimatedView")[1];
+    const introOverlay = tree!.root.findByProps({
+      nativeID: "wna-intro-overlay",
+    });
 
     expect(introOverlay.props.style).toEqual(
       expect.arrayContaining([
@@ -498,10 +493,16 @@ describe("WnaApp", () => {
       ]),
     );
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -520,12 +521,9 @@ describe("WnaApp", () => {
         node.type.name === "WnaNavigationTransitionOverlay",
     );
     const transitionBackground = transitionContent.parent;
-    const navigationOverlay = tree!.root
-      .findAllByType("AnimatedView")
-      .find(
-        (node: { findAllByType: (type: string) => unknown[] }) =>
-          node.findAllByType("WnaImageBackground").length > 0,
-      );
+    const navigationOverlay = tree!.root.findByProps({
+      testID: "navigation-transition-overlay",
+    });
 
     expect(transitionBackground?.type).toBe("WnaImageBackground");
     expect(navigationOverlay?.props.style).toEqual(
@@ -553,6 +551,7 @@ describe("WnaApp", () => {
   });
 
   it("uses the active screen background image for the navigation transition", () => {
+    jest.useFakeTimers();
     mockNavigationTransitionBackgroundImageUrl = "/project-background.webp";
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
@@ -569,10 +568,16 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -597,6 +602,7 @@ describe("WnaApp", () => {
   });
 
   it("falls back to the layout background when the active transition background is blank", () => {
+    jest.useFakeTimers();
     mockNavigationTransitionBackgroundImageUrl = "   ";
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
@@ -613,10 +619,16 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -636,27 +648,13 @@ describe("WnaApp", () => {
     expect(transitionBackground.props.imageUri).toBe("/background.webp");
   });
 
-  it("does not finish the navigation transition when the outgoing animation is interrupted", () => {
+  it("waits for the outgoing CSS transition before finishing navigation", () => {
+    jest.useFakeTimers();
     global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
       callback(0);
 
       return 1;
     }) as never;
-
-    const reanimated = jest.requireMock("react-native-reanimated") as {
-      withTiming: (
-        value: unknown,
-        config?: unknown,
-        callback?: (finished?: boolean) => void,
-      ) => unknown;
-    };
-    const originalWithTiming = reanimated.withTiming;
-
-    reanimated.withTiming = (value, _config, callback) => {
-      callback?.(false);
-
-      return value;
-    };
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -668,10 +666,16 @@ describe("WnaApp", () => {
       );
     });
 
-    const contentView = tree!.root.findAllByType("AnimatedView")[0];
+    const contentView = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
 
     act(() => {
       contentView.props.onLayout({});
+    });
+    act(() => {
+      jest.advanceTimersByTime(1320);
     });
 
     mockIsNavigationTransitionActive = true;
@@ -696,7 +700,11 @@ describe("WnaApp", () => {
 
     expect(mockFinishNavigationTransition).not.toHaveBeenCalled();
 
-    reanimated.withTiming = originalWithTiming;
+    act(() => {
+      jest.advanceTimersByTime(560);
+    });
+
+    expect(mockFinishNavigationTransition).toHaveBeenCalledTimes(1);
   });
 });
 

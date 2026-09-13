@@ -93,6 +93,42 @@ export default function Root({ children }: PropsWithChildren) {
                       transition: opacity 250ms cubic-bezier(.5, .01, 0, 1);
                     }
 
+                    @keyframes wna-content-reveal {
+                      from { opacity: .92; transform: translateY(10px); }
+                      to { opacity: 1; transform: translateY(0); }
+                    }
+
+                    @keyframes wna-intro-exit {
+                      from { opacity: 1; transform: translateY(0) scale(1); }
+                      to { opacity: 0; transform: translateY(-18px) scale(1.03); }
+                    }
+
+                    @keyframes wna-navigation-transition-enter {
+                      from { opacity: 0; }
+                      to { opacity: 1; }
+                    }
+
+                    @keyframes wna-navigation-transition-exit {
+                      from { opacity: 1; }
+                      to { opacity: 0; }
+                    }
+
+                    #wna-content-reveal {
+                      animation: wna-content-reveal 620ms cubic-bezier(.5, .01, 0, 1) 700ms both;
+                    }
+
+                    #wna-intro-overlay {
+                      animation: wna-intro-exit 620ms cubic-bezier(.5, .01, 0, 1) 700ms both;
+                    }
+
+                    [id="navigation-transition-overlay-enter"] {
+                      animation: wna-navigation-transition-enter 420ms cubic-bezier(.5, .01, 0, 1) both;
+                    }
+
+                    [id="navigation-transition-overlay-exit"] {
+                      animation: wna-navigation-transition-exit 560ms cubic-bezier(.5, .01, 0, 1) both;
+                    }
+
                     @media (prefers-reduced-motion: reduce) {
                       [id^="wna-hero-shape-"] {
                         animation: none;

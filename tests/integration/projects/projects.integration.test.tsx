@@ -81,70 +81,10 @@ jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
 
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
-    scrollY: { value: 0 },
+    scrollY: 0,
     onScroll: () => undefined,
   }),
 }));
-
-jest.mock("react-native-reanimated", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { jest: jestModule } = require("@jest/globals");
-  const ReactModule = jestModule.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      ScrollView: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedScrollView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-      FlatList: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedFlatList",
-          props as Record<string, unknown>,
-          <>
-            {(props as { ListHeaderComponent?: React.ReactNode })
-              .ListHeaderComponent ?? null}
-            {(
-              props as {
-                data?: unknown[];
-                renderItem?: (item: {
-                  item: unknown;
-                  index: number;
-                }) => React.ReactNode;
-              }
-            ).data?.map((item, index) =>
-              (
-                props as {
-                  renderItem?: (item: {
-                    item: unknown;
-                    index: number;
-                  }) => React.ReactNode;
-                }
-              ).renderItem?.({ item, index }) ? (
-                <ReactModule.Fragment key={`flat-list-item-${index}`}>
-                  {(
-                    props as {
-                      renderItem?: (item: {
-                        item: unknown;
-                        index: number;
-                      }) => React.ReactNode;
-                    }
-                  ).renderItem?.({ item, index })}
-                </ReactModule.Fragment>
-              ) : null,
-            )}
-            {(props as { ListFooterComponent?: React.ReactNode })
-              .ListFooterComponent ?? null}
-          </>,
-        ),
-    },
-  };
-});
 
 describe("WnaProjectsRoute integration", () => {
   beforeEach(() => {
