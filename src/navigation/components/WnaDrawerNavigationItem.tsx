@@ -34,7 +34,9 @@ export default function WnaDrawerNavigationItem({
 
   const getBackgroundColor = (pressed: boolean, hovered: boolean) => {
     if (isActive) return backgroundColorActive;
-    if (pressed || hovered) return appColors.coolgray1;
+    if (pressed || hovered) {
+      return appColors.isDark ? appColors.coolgray2 : appColors.coolgray1;
+    }
     return "transparent";
   };
 

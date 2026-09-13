@@ -168,4 +168,32 @@ describe("WnaDrawerNavigationItem", () => {
       ]),
     );
   });
+
+  it("keeps the dark inactive hover state visible against the drawer", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaDrawerNavigationItem
+          text="Contact"
+          iconName="email-outline"
+          onPress={() => undefined}
+          appStyle={appStyle}
+          appColors={darkColors}
+        />,
+      );
+    });
+
+    const button = tree!.root.find(
+      (node: TestNode) =>
+        node.props.type === "button" &&
+        typeof node.props.onMouseEnter === "function",
+    );
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+
+    expect(button.props.style.backgroundColor).toBe("#222222");
+  });
 });
