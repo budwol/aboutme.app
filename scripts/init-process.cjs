@@ -609,6 +609,10 @@ function runInitProcess(rootDir, options = {}) {
   writeTextFile(path.join(publicDir, "robots.txt"), robotsTxt);
   writeTextFile(path.join(publicDir, "sitemap.xml"), sitemapXml);
   writeTextFile(path.join(publicDir, "site.webmanifest"), `${manifest}\n`);
+  copyFile(
+    path.join(__dirname, "web-service-worker.js"),
+    path.join(publicDir, "sw.js"),
+  );
 
   logger("");
   logger(`generated public assets from ${sourceDir}`);
