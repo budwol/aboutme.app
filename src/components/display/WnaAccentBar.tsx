@@ -1,15 +1,7 @@
 import Colors from "@constants/theme/colors";
 import { createShadowStyle } from "@components/effects/wnaShadowStyle";
-import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import { useEffect, useState } from "react";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 type WnaAccentBarProps = {
   appColors: Colors;
@@ -25,52 +17,25 @@ function useWnaAccentBarAnimation(
   pulseToWidth: number | undefined,
   pulseDuration: number,
 ) {
-  const barWidth = useSharedValue(width);
-  const barScale = useSharedValue(1);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
-    barWidth.value = width;
-    barScale.value = 1;
+    setIsCollapsed(animated && pulseToWidth === undefined);
+  }, [animated, pulseToWidth, width]);
 
-    if (pulseToWidth !== undefined) {
-      barScale.value = withRepeat(
-        withSequence(
-          withTiming(pulseToWidth / width, {
-            duration: pulseDuration,
-            easing: Easing.inOut(Easing.sin),
-          }),
-          withTiming(1, {
-            duration: pulseDuration,
-            easing: Easing.inOut(Easing.sin),
-          }),
-        ),
-        -1,
-        false,
-      );
-      return;
-    }
-
-    if (!animated) {
-      return;
-    }
-
-    barWidth.value = withTiming(8, {
-      duration: 820,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [animated, barScale, barWidth, pulseDuration, pulseToWidth, width]);
-
-  return useAnimatedStyle(() => {
-    if (pulseToWidth !== undefined) {
-      return {
-        transform: [{ scaleX: barScale.value }],
-      };
-    }
-
+  if (pulseToWidth !== undefined) {
     return {
-      width: barWidth.value,
-    };
-  });
+      "--wna-accent-bar-pulse-scale": pulseToWidth / width,
+      animation: `wna-accent-bar-pulse ${pulseDuration * 2}ms ease-in-out infinite alternate`,
+    } as ViewStyle;
+  }
+
+  return {
+    width: isCollapsed ? 8 : width,
+    transition: animated
+      ? "width 820ms cubic-bezier(0.33, 1, 0.68, 1)"
+      : undefined,
+  } as ViewStyle;
 }
 
 export default function WnaAccentBar({
@@ -89,7 +54,7 @@ export default function WnaAccentBar({
 
   return (
     <View style={[styles.row, { width }]}>
-      <Animated.View
+      <View
         style={[
           styles.bar,
           {
