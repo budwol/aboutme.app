@@ -72,6 +72,12 @@ export default function Root({ children }: PropsWithChildren) {
                       transform-origin: center;
                     }
 
+                    [id="wna-safe-area"] {
+                      padding-left: env(safe-area-inset-left);
+                      padding-right: env(safe-area-inset-right);
+                      padding-bottom: env(safe-area-inset-bottom);
+                    }
+
                     @keyframes wna-hero-shape-swing {
                       from {
                         opacity: var(--wna-hero-shape-start-opacity);

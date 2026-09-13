@@ -97,19 +97,6 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
-jest.mock("react-native-safe-area-context", () => ({
-  SafeAreaView: (props: unknown) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const ReactModule = require("react") as typeof import("react");
-
-    return ReactModule.createElement(
-      "SafeAreaView",
-      props as Record<string, unknown>,
-      (props as { children?: React.ReactNode }).children,
-    );
-  },
-}));
-
 jest.mock("@components/feedback/WnaToastHost", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { jest: jestModule } = require("@jest/globals");
@@ -288,6 +275,14 @@ describe("WnaApp", () => {
     expect(heroField.props.compact).toBe(true);
     expect(textValues).toContain(appData.profile.name);
     expect(textValues).toContain(appData.profile.title.toUpperCase());
+    expect(
+      tree!.root
+        .findAllByType("View")
+        .some(
+          (node: { props: { nativeID?: string } }) =>
+            node.props.nativeID === "wna-safe-area",
+        ),
+    ).toBe(true);
   });
 
   it("wires resize events through the debounced layout updater", () => {

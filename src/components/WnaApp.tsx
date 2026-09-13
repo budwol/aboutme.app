@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { ErrorBoundaryProps, usePathname } from "expo-router";
 import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useWnaAppData,
   useWnaAppLifecycle,
@@ -288,10 +287,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, overflow: "hidden" }}
-      edges={["left", "right", "bottom"]}
-    >
+    <View nativeID="wna-safe-area" style={{ flex: 1, overflow: "hidden" }}>
       <View
         nativeID={isContentReadyForReveal ? "wna-content-reveal" : undefined}
         onLayout={handleContentLayout}
@@ -347,7 +343,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       ) : null}
 
       <WnaToastHost appColors={appColors} />
-    </SafeAreaView>
+    </View>
   );
 };
 
