@@ -3,7 +3,8 @@ import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { StyleSheet, Text, View } from "react-native";
 import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
@@ -31,6 +32,31 @@ export function WnaWebModal({
   onRequestClose,
   visible,
 }: WnaWebModalProps): ReactNode {
+  const canAnimate = typeof document !== "undefined" && Boolean(document.body);
+  const [mounted, setMounted] = useState(visible);
+  const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      setIsClosing(false);
+      return;
+    }
+
+    if (!mounted || !canAnimate) {
+      setMounted(false);
+      return;
+    }
+
+    setIsClosing(true);
+    const timeout = window.setTimeout(() => {
+      setMounted(false);
+      setIsClosing(false);
+    }, 180);
+
+    return () => window.clearTimeout(timeout);
+  }, [canAnimate, mounted, visible]);
+
   useEffect(() => {
     if (!visible || typeof document === "undefined") return;
 
@@ -42,18 +68,39 @@ export function WnaWebModal({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onRequestClose, visible]);
 
-  if (!visible) return null;
+  if (!mounted) return null;
 
-  return (
-    <View
-      nativeID="private-repo-modal"
-      style={styles.modalRoot}
-      accessibilityLabel="private-repo-modal"
-      {...{ role: "dialog", "aria-modal": true }}
-    >
-      {children}
-    </View>
+  const modal = React.createElement(
+    "div",
+    {
+      id: "private-repo-modal",
+      nativeID: "private-repo-modal",
+      "aria-label": "private-repo-modal",
+      role: "dialog",
+      "aria-modal": true,
+      style: {
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+        opacity: isClosing ? 0 : 1,
+        pointerEvents: isClosing ? "none" : "auto",
+        transition: "opacity 180ms ease-out",
+      } as React.CSSProperties,
+    },
+    children,
   );
+
+  return typeof document !== "undefined" && document.body
+    ? createPortal(modal, document.body)
+    : modal;
 }
 
 export default function WnaPrivateRepoModal({
@@ -118,6 +165,10 @@ export default function WnaPrivateRepoModal({
                           appColors.coolgray2,
                           0.72,
                         ),
+                        borderStyle: "solid",
+                        appearance: "none",
+                        cursor: "pointer",
+                        padding: 0,
                       },
                     ]) as React.CSSProperties,
                   },
