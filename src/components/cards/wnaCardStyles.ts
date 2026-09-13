@@ -1,11 +1,11 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
 export type WnaCardGroupType = "first" | "last" | "middle" | "standalone";
 
-export function getGroupedCardRadius(type: WnaCardGroupType): ViewStyle {
+export function getGroupedCardRadius(type: WnaCardGroupType): CSSProperties {
   return {
     borderTopLeftRadius:
       type === "first" || type === "standalone"
@@ -26,7 +26,7 @@ export function getGroupedCardRadius(type: WnaCardGroupType): ViewStyle {
   };
 }
 
-export function getCardBorderStyle(appColors: Colors): ViewStyle {
+export function getCardBorderStyle(appColors: Colors): CSSProperties {
   return {
     borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
     borderWidth: 1,

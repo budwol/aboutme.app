@@ -5,8 +5,7 @@ import {
 import WnaCardTextContent from "@components/cards/WnaCardTextContent";
 import { createVerticalCardContainerStyle } from "@components/cards/wnaCardLayoutStyles";
 import WnaImage from "@components/images/WnaImage";
-import { FC, memo } from "react";
-import { View } from "react-native";
+import React, { CSSProperties, FC, memo } from "react";
 
 export type WnaCardVerticalImageProps = WnaBaseCardProps &
   Pick<WnaVerticalTextCardContent, "title" | "subtitle"> & {
@@ -31,40 +30,44 @@ const WnaCardVerticalImageComponent: FC<WnaCardVerticalImageProps> = ({
   const cardWidth = width ?? 256;
   const cardHeight = height ?? cardWidth * 0.5;
 
-  return (
-    <View
-      style={{
+  return React.createElement(
+    "div",
+    {
+      style: {
         ...createVerticalCardContainerStyle(appColors),
+        display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         width: cardWidth,
-      }}
-    >
-      <WnaImage
-        imageTitle={text1 ?? ""}
+      } as CSSProperties,
+    },
+    <WnaImage
+      imageTitle={text1 ?? ""}
+      appColors={appColors}
+      imageUrl={imageUrl ?? ""}
+      contentFit={"cover"}
+      style={{ width: cardWidth, height: cardHeight }}
+    />,
+    React.createElement(
+      "div",
+      { style: { minHeight: contentMinHeight } as CSSProperties },
+      <WnaCardTextContent
         appColors={appColors}
-        imageUrl={imageUrl ?? ""}
-        contentFit={"cover"}
-        style={{ width: cardWidth, height: cardHeight }}
-      />
-      <View style={{ minHeight: contentMinHeight }}>
-        <WnaCardTextContent
-          appColors={appColors}
-          appStyle={appStyle}
-          title={text1}
-          subtitle={text2}
-          subtitleAlign={"center"}
-          subtitleMinHeight={52}
-          titleAlign={"center"}
-          titleMinHeight={40}
-          titleNumberOfLines={2}
-          titlePaddingHorizontal={12}
-          subtitleNumberOfLines={2}
-          subtitlePaddingHorizontal={12}
-          titlePaddingTop={8}
-          bodyPadding={8}
-        />
-      </View>
-    </View>
+        appStyle={appStyle}
+        title={text1}
+        subtitle={text2}
+        subtitleAlign={"center"}
+        subtitleMinHeight={52}
+        titleAlign={"center"}
+        titleMinHeight={40}
+        titleNumberOfLines={2}
+        titlePaddingHorizontal={12}
+        subtitleNumberOfLines={2}
+        subtitlePaddingHorizontal={12}
+        titlePaddingTop={8}
+        bodyPadding={8}
+      />,
+    ),
   );
 };
 

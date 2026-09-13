@@ -1,7 +1,7 @@
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
-import { FC, memo, ReactNode } from "react";
-import { Text, TextStyle, View } from "react-native";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import React, { CSSProperties, FC, memo, ReactNode } from "react";
 
 export type WnaCardTextContentProps = {
   appColors: Colors;
@@ -10,9 +10,9 @@ export type WnaCardTextContentProps = {
   subtitle?: string;
   subtitleContent?: ReactNode;
   description?: string;
-  subtitleAlign?: TextStyle["textAlign"];
+  subtitleAlign?: "left" | "right" | "center" | "justify";
   subtitleMinHeight?: number;
-  titleAlign?: TextStyle["textAlign"];
+  titleAlign?: "left" | "right" | "center" | "justify";
   titleMinHeight?: number;
   titlePaddingHorizontal?: number;
   titlePaddingTop?: number;
@@ -41,89 +41,96 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
   subtitleNumberOfLines,
 }) => (
   <>
-    {title !== undefined ? (
-      <Text
-        numberOfLines={titleNumberOfLines}
-        style={
-          appStyle
-            ? [
-                appStyle.textNeutralMedium,
-                {
-                  paddingHorizontal: titlePaddingHorizontal ?? 0,
-                  paddingTop: titlePaddingTop ?? 0,
-                  lineHeight:
-                    (appStyle.textNeutralMedium?.lineHeight ?? 18) + 2,
-                  minHeight: titleMinHeight,
-                  textAlign: titleAlign ?? "left",
-                },
-              ]
-            : {
-                color: appColors.black,
-                fontSize: 14,
-                fontWeight: "600",
-                paddingHorizontal: titlePaddingHorizontal ?? 0,
-                paddingTop: titlePaddingTop ?? 0,
-                lineHeight: 18,
-                minHeight: titleMinHeight,
-                textAlign: titleAlign ?? "left",
-              }
-        }
-      >
-        {title}
-      </Text>
-    ) : null}
+    {title !== undefined
+      ? React.createElement(
+          "span",
+          {
+            style: {
+              ...(appStyle
+                ? appStyle.textNeutralMedium
+                : {
+                    color: appColors.black,
+                    fontSize: 14,
+                    fontWeight: "600",
+                    lineHeight: 18,
+                  }),
+              paddingInline: titlePaddingHorizontal ?? 0,
+              paddingTop: titlePaddingTop ?? 0,
+              lineHeight: appStyle
+                ? (appStyle.textNeutralMedium?.lineHeight ?? 18) + 2
+                : 18,
+              minHeight: titleMinHeight,
+              textAlign: titleAlign ?? "left",
+              ...(titleNumberOfLines
+                ? lineClampStyle(titleNumberOfLines)
+                : undefined),
+            } as CSSProperties,
+          },
+          title,
+        )
+      : null}
 
-    {subtitleContent !== undefined ? (
-      <View
-        style={{
-          minHeight: subtitleMinHeight,
-          padding: bodyPadding ?? 0,
-          paddingHorizontal: subtitlePaddingHorizontal ?? bodyPadding ?? 0,
-          alignItems:
-            subtitleAlign === "center"
-              ? "center"
-              : subtitleAlign === "right"
-                ? "flex-end"
-                : "flex-start",
-        }}
-      >
-        {subtitleContent}
-      </View>
-    ) : subtitle !== undefined ? (
-      <Text
-        numberOfLines={subtitleNumberOfLines}
-        style={
-          appStyle
-            ? [
-                appStyle.textNeutralSmall,
-                {
-                  padding: bodyPadding ?? 0,
-                  lineHeight: (appStyle.textNeutralSmall?.lineHeight ?? 16) + 2,
-                  minHeight: subtitleMinHeight,
-                  paddingHorizontal:
-                    subtitlePaddingHorizontal ?? bodyPadding ?? 0,
-                  textAlign: subtitleAlign ?? "left",
-                },
-              ]
-            : {
-                color: appColors.black,
-                fontSize: 13,
-                lineHeight: 16,
+    {subtitleContent !== undefined
+      ? React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              minHeight: subtitleMinHeight,
+              padding: bodyPadding ?? 0,
+              paddingInline: subtitlePaddingHorizontal ?? bodyPadding ?? 0,
+              alignItems:
+                subtitleAlign === "center"
+                  ? "center"
+                  : subtitleAlign === "right"
+                    ? "flex-end"
+                    : "flex-start",
+            } as CSSProperties,
+          },
+          subtitleContent,
+        )
+      : subtitle !== undefined
+        ? React.createElement(
+            "span",
+            {
+              style: {
+                ...(appStyle
+                  ? {
+                      ...appStyle.textNeutralSmall,
+                      padding: bodyPadding ?? 0,
+                      lineHeight:
+                        (appStyle.textNeutralSmall?.lineHeight ?? 16) + 2,
+                      paddingInline:
+                        subtitlePaddingHorizontal ?? bodyPadding ?? 0,
+                    }
+                  : {
+                      color: appColors.black,
+                      fontSize: 13,
+                      lineHeight: 16,
+                      paddingInline: subtitlePaddingHorizontal ?? 0,
+                    }),
                 minHeight: subtitleMinHeight,
-                paddingHorizontal: subtitlePaddingHorizontal ?? 0,
                 textAlign: subtitleAlign ?? "left",
-              }
-        }
-      >
-        {subtitle}
-      </Text>
-    ) : null}
+                ...(subtitleNumberOfLines
+                  ? lineClampStyle(subtitleNumberOfLines)
+                  : undefined),
+              } as CSSProperties,
+            },
+            subtitle,
+          )
+        : null}
 
-    {!!description && (
-      <Text style={appStyle?.textNeutralMicro ?? { color: appColors.black }}>
-        {description}
-      </Text>
-    )}
+    {!!description &&
+      React.createElement(
+        "span",
+        {
+          style: (appStyle?.textNeutralMicro ?? {
+            color: appColors.black,
+          }) as CSSProperties,
+        },
+        description,
+      )}
   </>
 );
 

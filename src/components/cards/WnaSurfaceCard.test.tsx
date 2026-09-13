@@ -43,7 +43,7 @@ describe("WnaSurfaceCard", () => {
     });
 
     const blur = tree!.root.findByType("WnaBlurView");
-    const views = tree!.root.findAllByType("View");
+    const views = tree!.root.findAllByType("div");
 
     expect(blur.props.blurIntensity).toBe(100);
     expect(blur.props.blurTint).toBe("extraLight");
@@ -70,7 +70,7 @@ describe("WnaSurfaceCard", () => {
     });
 
     const blur = tree!.root.findByType("WnaBlurView");
-    const views = tree!.root.findAllByType("View");
+    const views = tree!.root.findAllByType("div");
 
     expect(blur.props.blurIntensity).toBe(50);
     expect(blur.props.blurTint).toBe("dark");
@@ -95,7 +95,7 @@ describe("WnaSurfaceCard", () => {
     });
 
     const blur = tree!.root.findByType("WnaBlurView");
-    const views = tree!.root.findAllByType("View");
+    const views = tree!.root.findAllByType("div");
 
     expect(blur.props.blurTint).toBe("dark");
     expect(views[0].props.style.backgroundColor).toBe("rgba(0,0,0,0.1)");
@@ -126,13 +126,13 @@ describe("WnaSurfaceCard", () => {
       "extraLight",
     );
     expect(
-      lightTree!.root.findAllByType("View")[0].props.style.backgroundColor,
+      lightTree!.root.findAllByType("div")[0].props.style.backgroundColor,
     ).toBe("#ffffff");
     expect(
       transparentDarkTree!.root.findByType("WnaBlurView").props.blurTint,
     ).toBe("dark");
     expect(
-      transparentDarkTree!.root.findAllByType("View")[0].props.style
+      transparentDarkTree!.root.findAllByType("div")[0].props.style
         .backgroundColor,
     ).toBe("rgba(0,0,0,0.1)");
   });
