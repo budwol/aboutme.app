@@ -71,6 +71,7 @@ describe("WnaDrawerNavigationItem", () => {
     expect(button.props["aria-current"]).toBeUndefined();
     expect(button.props.style).toEqual(
       expect.objectContaining({
+        border: "none",
         paddingLeft: 32,
         paddingTop: 14,
         paddingBottom: 14,
