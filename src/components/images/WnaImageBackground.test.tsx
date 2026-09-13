@@ -40,7 +40,9 @@ describe("WnaImageBackground", () => {
         expect.objectContaining({ backgroundColor: "#fff" }),
       ]),
     );
-    expect(tree!.root.findByType("View").props.testID).toBe("plain-background");
+    expect(tree!.root.findByType("View").props.nativeID).toBe(
+      "plain-background",
+    );
   });
 
   it("renders the versioned image and blur overlay for configured images", () => {

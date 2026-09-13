@@ -46,7 +46,7 @@ export default function WnaExperienceCompanyLink({
       onClick: (event: React.MouseEvent<HTMLAnchorElement>) =>
         event.stopPropagation(),
       style: linkStyle as React.CSSProperties,
-      testID: `experience-company-link-${index}`,
+      "data-testid": `experience-company-link-${index}`,
     },
     <View>
       <View style={styles.companyLinkRow}>

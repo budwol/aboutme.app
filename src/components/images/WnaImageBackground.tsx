@@ -30,7 +30,6 @@ const WnaImageBackground = React.memo(
       return (
         <View
           nativeID={testID}
-          testID={testID}
           style={[styles.container, { backgroundColor: appColors.white }]}
         >
           {children}
@@ -41,7 +40,6 @@ const WnaImageBackground = React.memo(
     return (
       <View
         nativeID={testID}
-        testID={testID}
         style={[styles.container, { backgroundColor: appColors.white }]}
       >
         <img

@@ -554,7 +554,7 @@ describe("WnaApp", () => {
     );
     const transitionBackground = transitionContent.parent;
     const navigationOverlay = tree!.root.findByProps({
-      testID: "navigation-transition-overlay",
+      nativeID: "navigation-transition-overlay",
     });
 
     expect(transitionBackground?.type).toBe("WnaImageBackground");
@@ -577,7 +577,7 @@ describe("WnaApp", () => {
         isDarkMode: true,
       }),
     );
-    expect(navigationOverlay?.props.testID).toBe(
+    expect(navigationOverlay?.props.nativeID).toBe(
       "navigation-transition-overlay",
     );
   });

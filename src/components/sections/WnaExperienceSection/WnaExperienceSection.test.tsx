@@ -245,7 +245,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const companyLink = tree!.root.findByProps({
-      testID: "experience-company-link-0",
+      "data-testid": "experience-company-link-0",
     });
     const linkText = companyLink.findByType("Text");
 
@@ -270,7 +270,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const hoveredLink = tree!.root.findByProps({
-      testID: "experience-company-link-0",
+      "data-testid": "experience-company-link-0",
     });
     const hoveredStyle = hoveredLink.props.style as Record<string, unknown>;
 
@@ -281,7 +281,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const unhoveredLink = tree!.root.findByProps({
-      testID: "experience-company-link-0",
+      "data-testid": "experience-company-link-0",
     });
 
     expect(unhoveredLink.props.style.backgroundColor).toBeUndefined();
@@ -338,7 +338,7 @@ describe("WnaExperienceSection", () => {
     expect(card.props.subtitleContent).toBeUndefined();
     expect(
       tree!.root.findAllByProps({
-        testID: "experience-company-link-0",
+        "data-testid": "experience-company-link-0",
       }),
     ).toHaveLength(0);
   });
