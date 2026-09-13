@@ -58,6 +58,26 @@ describe("web linking adapter", () => {
     );
   });
 
+  it("opens web URLs synchronously for browser popup permissions", async () => {
+    const open = jest.fn(() => ({}));
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        location: { href: "https://app.example.com/" },
+        open,
+      },
+    });
+
+    const opening = Linking.openURL("https://github.com/example/repository");
+
+    expect(open).toHaveBeenCalledWith(
+      "https://github.com/example/repository",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    await opening;
+  });
+
   it("uses browser navigation for mail and telephone URLs", async () => {
     const open = jest.fn();
     Object.defineProperty(globalThis, "window", {

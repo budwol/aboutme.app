@@ -224,6 +224,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | 16px Abstand zwischen Drawer-Header und Navigation ergänzt                                     | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Private-Repository-Dialog auf DOM-Backdrop und DOM-Close-Button umgestellt                     | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | DOM-Props und flache Modal-Styles gegen Web-React-Fehler abgesichert                           | 514 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 4     | Externe Weblinks synchron im Click-Stack geöffnet, damit GitHub-Popups nicht blockiert werden  | 515 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 4     | Unbenutzte direkte `expo-constants`- und `expo-linking`-Dependencies entfernt                  | Typecheck, Lint und Dependency-Tree erfolgreich                |
 | 2026-09-13 | 2     | Zusammengesetzte Icon-Text-Aktionen auf Web-`button` umgestellt                                | 507 Unit-Tests, Lint und TypeScript erfolgreich                |
 
