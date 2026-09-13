@@ -52,6 +52,11 @@ export default function Root({ children }: PropsWithChildren) {
                       font-style: normal;
                     }
 
+                    @keyframes wna-accent-bar-pulse {
+                      from { transform: scaleX(1); }
+                      to { transform: scaleX(var(--wna-accent-bar-pulse-scale)); }
+                    }
+
                     /* firefox and brave */
                     * {
                         scrollbar-width: thin;

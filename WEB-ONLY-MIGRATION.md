@@ -143,6 +143,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                               | 54 fokussierte Tests, Lint und TypeScript erfolgreich     |
 | 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt | 491 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                  | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests |
+| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt          | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
