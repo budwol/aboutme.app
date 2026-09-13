@@ -1,17 +1,10 @@
 import { testAppData } from "@/app-data/testAppData";
 import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
 import WnaContactSection from "@components/sections/WnaContactSection";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  jest,
-} from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import Logger from "wna-logger";
 import React from "react";
-import { Linking } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { act } from "react-test-renderer";
 import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
@@ -76,10 +69,6 @@ describe("WnaContactSection action integration", () => {
     jest.clearAllMocks();
     canOpenURL.mockResolvedValue(true);
     openURL.mockResolvedValue(undefined);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it("keeps unsupported links from opening and logs the reason", async () => {
