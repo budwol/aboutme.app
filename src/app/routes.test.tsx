@@ -147,21 +147,6 @@ jest.mock("react-i18next", () => ({
     require("react").createElement("I18nextProvider", null, children),
 }));
 
-jest.mock("react-native-gesture-handler", () => ({
-  GestureHandlerRootView: ({
-    children,
-    style,
-  }: {
-    children?: React.ReactNode;
-    style?: unknown;
-  }) =>
-    require("react").createElement(
-      "GestureHandlerRootView",
-      { style },
-      children,
-    ),
-}));
-
 jest.mock("expo-router", () => ({
   Redirect: (props: unknown) =>
     require("react").createElement(
@@ -406,9 +391,7 @@ describe("app routes", () => {
     await act(async () => undefined);
 
     expect(tree!.root.findByType("WnaAppContextProvider")).toBeTruthy();
-    expect(tree!.root.findByType("GestureHandlerRootView").props.style).toEqual(
-      { flex: 1 },
-    );
+    expect(tree!.root.findAllByType("GestureHandlerRootView")).toHaveLength(0);
     expect(tree!.root.findByType("WnaApp")).toBeTruthy();
     expect(tree!.root.findByType("WnaApp").props.theme).toBe("dark");
     expect(tree!.root.findByType("Slot")).toBeTruthy();
