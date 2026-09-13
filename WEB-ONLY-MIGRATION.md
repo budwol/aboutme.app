@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[####################] 96%` (50 von 52 festen Arbeitspaketen)
+Fortschritt: `[####################] 98%` (51 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -236,6 +236,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Blur-Wrapper auf Web-Markup und CSS-Backdrop-Filter umgestellt                                      | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
 | 2026-09-13 | 5     | Service Worker mit Cache-Strategie und Offline-Navigation in die Web-Ausgabe aufgenommen            | Unit-Tests, Lint, Prettier und TypeScript erfolgreich; Browser-E2E durch Port-Allocator blockiert      |
 | 2026-09-13 | 5     | Export-Smoke-Test als PWA- und `noindex`-Release-Gate verschärft                                    | Smoke-Export, 520 Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich                 |
+| 2026-09-13 | 5     | Web-Bundle-Budget und Ausschluss nativer Bild-/Animationsmarker als Export-Gate ergänzt             | Bundle-Gate, Smoke-Export, Unit-Tests, 100% Coverage, Lint, Prettier und TypeScript erfolgreich        |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
