@@ -7,10 +7,6 @@ import { Href, useRouter } from "expo-router";
 import { FC, memo, ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, useColorScheme, View, ViewStyle } from "react-native";
-import Animated, {
-  SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
 import WnaMultilineHeader from "@components/chrome/WnaMultilineHeader";
@@ -28,7 +24,7 @@ export type WnaHeaderProps = {
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
   headerButton2?: ReactNode;
-  scrollY?: SharedValue<number>;
+  scrollY?: number;
   showShadow?: boolean;
   onTitlePress?: () => void;
 };
@@ -61,41 +57,28 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       typeof window !== "undefined" &&
       window.history.length > 1;
 
-    const headerShadowStyle = useAnimatedStyle(() => {
-      const scrollValue = scrollY?.value ?? 0;
-      const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
-      const shadowStrength =
-        showShadow === true
-          ? 1
-          : showShadow === false
-            ? 0
-            : baseOpacity >= 0.4
-              ? 1
-              : baseOpacity;
+    const scrollValue = scrollY ?? 0;
+    const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
+    const shadowStrength =
+      showShadow === true
+        ? 1
+        : showShadow === false
+          ? 0
+          : baseOpacity >= 0.4
+            ? 1
+            : baseOpacity;
+    const headerShadowStyle = createShadowStyle(shadowStrength);
 
-      return createShadowStyle(shadowStrength);
-    }, [scrollY, showShadow]);
+    const calculatedBlur = Math.min(1, Math.max(0, baseOpacity * 2.4));
+    const blurOpacity =
+      showShadow === true && calculatedBlur < 0.2 ? 0.2 : calculatedBlur;
+    const blurContainerStyle = {
+      opacity: blurOpacity,
+    };
 
-    const blurContainerStyle = useAnimatedStyle(() => {
-      const scrollValue = scrollY?.value ?? 0;
-      const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
-      const calculatedBlur = Math.min(1, Math.max(0, baseOpacity * 2.4));
-      const blurOpacity =
-        showShadow === true && calculatedBlur < 0.2 ? 0.2 : calculatedBlur;
-
-      return {
-        opacity: blurOpacity,
-      };
-    }, [scrollY, showShadow]);
-
-    const blurOverlayStyle = useAnimatedStyle(() => {
-      const scrollValue = scrollY?.value ?? 0;
-      const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
-
-      return {
-        opacity: baseOpacity,
-      };
-    }, [scrollY]);
+    const blurOverlayStyle = {
+      opacity: baseOpacity,
+    };
 
     const handleBack = useCallback(() => {
       if (isBusy) return;
@@ -159,8 +142,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const headerPointerEvents = isBusy ? "none" : "auto";
 
     return (
-      <Animated.View style={[headerStyle, headerShadowStyle]}>
-        <Animated.View
+      <View style={[headerStyle, headerShadowStyle]}>
+        <View
           style={[
             headerStyle,
             {
@@ -168,7 +151,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
             },
           ]}
         >
-          <Animated.View
+          <View
+            nativeID="wna-header-blur-container"
             style={[headerStyle, { zIndex: 1 }, blurContainerStyle]}
           >
             <WnaBlurView
@@ -177,7 +161,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               blurTint="systemThickMaterial"
               style={headerStyle}
             />
-            <Animated.View
+            <View
+              nativeID="wna-header-blur-overlay"
               style={[
                 headerStyle,
                 {
@@ -188,7 +173,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
                 blurOverlayStyle,
               ]}
             />
-          </Animated.View>
+          </View>
 
           <View style={headerContentStyle}>
             <View>
@@ -256,8 +241,8 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               {headerButton2}
             </View>
           </View>
-        </Animated.View>
-      </Animated.View>
+        </View>
+      </View>
     );
   },
 );

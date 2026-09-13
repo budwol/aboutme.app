@@ -1,12 +1,7 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
-
-jest.mock("react-native-reanimated", () => ({
-  useSharedValue: jest.fn((value: number) => ({ value })),
-  useAnimatedScrollHandler: jest.fn((handlers: unknown) => handlers),
-}));
 
 function ScrollProbe({
   onValue,
@@ -20,7 +15,7 @@ function ScrollProbe({
 }
 
 describe("useWnaScrollY", () => {
-  it("updates the shared scroll value from native scroll events", () => {
+  it("updates the scroll value from browser scroll events", () => {
     let controller: ReturnType<typeof useWnaScrollY> | undefined;
 
     act(() => {
@@ -30,13 +25,11 @@ describe("useWnaScrollY", () => {
     });
 
     act(() => {
-      (
-        controller!.onScroll as unknown as {
-          onScroll: (event: { contentOffset: { y: number } }) => void;
-        }
-      ).onScroll({ contentOffset: { y: 42 } });
+      controller!.onScroll({
+        nativeEvent: { contentOffset: { y: 42 } },
+      } as never);
     });
 
-    expect(controller!.scrollY.value).toBe(42);
+    expect(controller!.scrollY).toBe(42);
   });
 });

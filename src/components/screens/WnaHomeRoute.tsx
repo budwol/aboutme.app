@@ -24,7 +24,6 @@ import {
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { createProjectSlug } from "@utils/projectRoutes";
 import { useNavigation, useRouter } from "expo-router";
-import Animated from "react-native-reanimated";
 import {
   ElementRef,
   ReactNode,
@@ -35,7 +34,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 const separatorSpace = appLayoutConstants.contentPaddingBottom;
 const styles = StyleSheet.create({
@@ -70,7 +69,7 @@ export default function WnaHomeRoute(): ReactNode {
   const navigation = useNavigation();
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
-  const scrollViewRef = useRef<ElementRef<typeof Animated.ScrollView>>(null);
+  const scrollViewRef = useRef<ElementRef<typeof ScrollView>>(null);
   const [showDeferredSections, setShowDeferredSections] = useState(false);
 
   useEffect(() => {
@@ -155,7 +154,7 @@ export default function WnaHomeRoute(): ReactNode {
         />
       }
     >
-      <Animated.ScrollView
+      <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={contentContainerStyle}
         scrollEventThrottle={appLayout.scrollEventThrottle}
@@ -202,7 +201,7 @@ export default function WnaHomeRoute(): ReactNode {
             </>
           ) : null}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
     </WnaBaseScreen>
   );
 }

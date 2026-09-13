@@ -1,22 +1,17 @@
-import {
-  SharedValue,
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from "react-native-reanimated";
+import { useState } from "react";
+import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 export type WnaScrollYController = {
-  scrollY: SharedValue<number>;
-  onScroll: ReturnType<typeof useAnimatedScrollHandler>;
+  scrollY: number;
+  onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 };
 
 export function useWnaScrollY(): WnaScrollYController {
-  const scrollY = useSharedValue(0);
+  const [scrollY, setScrollY] = useState(0);
 
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
+  function onScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    setScrollY(event.nativeEvent.contentOffset.y);
+  }
 
   return { scrollY, onScroll };
 }

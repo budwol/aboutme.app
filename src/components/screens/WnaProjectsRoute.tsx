@@ -23,10 +23,9 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { createProjectSlug } from "@utils/projectRoutes";
 import { useNavigation, useRouter } from "expo-router";
-import Animated from "react-native-reanimated";
 import { ReactNode, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const styles = StyleSheet.create({
   itemSeparator: {
@@ -505,7 +504,7 @@ export default function WnaProjectsRoute(): ReactNode {
 
   const renderLandscapeLayout = useMemo(() => {
     return (
-      <Animated.ScrollView
+      <ScrollView
         scrollEventThrottle={appLayout.scrollEventThrottle}
         onScroll={onScroll}
         contentContainerStyle={landscapeContentContainerStyle}
@@ -671,7 +670,7 @@ export default function WnaProjectsRoute(): ReactNode {
             </View>
           </View>
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
     );
   }, [
     appColors,
@@ -717,7 +716,7 @@ export default function WnaProjectsRoute(): ReactNode {
       {isLandscape ? (
         renderLandscapeLayout
       ) : (
-        <Animated.FlatList
+        <FlatList
           scrollEventThrottle={appLayout.scrollEventThrottle}
           onScroll={onScroll}
           keyExtractor={(item) => item.title}

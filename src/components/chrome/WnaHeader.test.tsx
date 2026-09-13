@@ -122,27 +122,6 @@ const mockShowWnaToast = (
   }
 ).showWnaToast;
 
-jest.mock("react-native-reanimated", () => {
-  const ReactModule = require("react") as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-        ),
-    },
-    Easing: {
-      bezier: () => 0,
-    },
-    useAnimatedStyle: (factory: () => unknown) => factory(),
-    useSharedValue: (value: unknown) => ({ value }),
-    withTiming: (value: unknown) => value,
-  };
-});
-
 describe("WnaHeader", () => {
   beforeEach(() => {
     mockReplace.mockClear();
@@ -395,7 +374,10 @@ describe("WnaHeader", () => {
       );
     });
 
-    const blurContainer = tree!.root.findAllByType("AnimatedView")[2];
+    const blurContainer = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID === "wna-header-blur-container",
+    );
 
     expect(blurContainer.props.style[2].opacity).toBe(0.2);
   });
@@ -409,7 +391,10 @@ describe("WnaHeader", () => {
       );
     });
 
-    const blurContainer = tree!.root.findAllByType("AnimatedView")[2];
+    const blurContainer = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID === "wna-header-blur-container",
+    );
 
     expect(blurContainer.props.style[2].opacity).toBe(0);
   });
@@ -419,11 +404,14 @@ describe("WnaHeader", () => {
 
     act(() => {
       tree = TestRenderer.create(
-        <WnaHeader headerTitle="Project" scrollY={{ value: 1000 } as never} />,
+        <WnaHeader headerTitle="Project" scrollY={1000} />,
       );
     });
 
-    const blurOverlay = tree!.root.findAllByType("AnimatedView")[3];
+    const blurOverlay = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID === "wna-header-blur-overlay",
+    );
 
     expect(blurOverlay.props.style[2].opacity).toBe(0.4);
   });

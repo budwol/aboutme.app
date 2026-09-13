@@ -13,7 +13,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import { FC, ReactNode, memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import { SharedValue } from "react-native-reanimated";
 import WnaImageBackground from "@components/images/WnaImageBackground";
 
 export type WnaBaseScreenProps = {
@@ -33,7 +32,7 @@ export type WnaBaseScreenProps = {
   headerButton1?: ReactNode;
   headerButton2?: ReactNode;
   isRootPage?: boolean;
-  scrollY?: SharedValue<number>;
+  scrollY?: number;
   showHeaderShadow?: boolean;
   showAppStoreButtons?: boolean;
   onTitlePress?: () => void;

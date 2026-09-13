@@ -4,9 +4,8 @@ import WnaContactFooter from "@components/chrome/WnaContactFooter";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
 import { Href } from "expo-router";
-import Animated from "react-native-reanimated";
 import { FC, ReactNode, useMemo } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 export type WnaScrollViewScreenProps = {
   children?: ReactNode;
@@ -69,7 +68,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
       headerButton2={headerButton2}
       showAppStoreButtons={showAppStoreButtons}
     >
-      <Animated.ScrollView
+      <ScrollView
         contentContainerStyle={contentContainerStyle}
         scrollEventThrottle={appLayout.scrollEventThrottle}
         onScroll={onScroll}
@@ -78,7 +77,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
           {children}
           {showContactFooter && <WnaContactFooter />}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
     </WnaBaseScreen>
   );
 };

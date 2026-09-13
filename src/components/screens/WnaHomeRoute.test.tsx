@@ -172,23 +172,25 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
+jest.mock("react-native", () => {
   const ReactModule = require("react") as typeof import("react");
+  const actual = jest.requireActual(
+    "react-native",
+  ) as typeof import("react-native");
 
   return {
-    __esModule: true,
-    default: {
-      ScrollView: ReactModule.forwardRef((props: unknown, ref: unknown) => {
-        if (ref && typeof ref === "object") {
-          (ref as { current?: unknown }).current = { scrollTo: mockScrollTo };
-        }
+    StyleSheet: actual.StyleSheet,
+    View: actual.View,
+    ScrollView: ReactModule.forwardRef((props: unknown, ref: unknown) => {
+      if (ref && typeof ref === "object") {
+        (ref as { current?: unknown }).current = { scrollTo: mockScrollTo };
+      }
 
-        return ReactModule.createElement(
-          "AnimatedScrollView",
-          props as Record<string, unknown>,
-        );
-      }),
-    },
+      return ReactModule.createElement(
+        "ScrollView",
+        props as Record<string, unknown>,
+      );
+    }),
   };
 });
 
