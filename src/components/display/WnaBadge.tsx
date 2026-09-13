@@ -78,6 +78,9 @@ const styles: { container: CSSProperties; text: CSSProperties } = {
   container: {
     display: "flex",
     alignSelf: "flex-start",
+    flexGrow: 0,
+    flexShrink: 0,
+    height: "fit-content",
     minHeight: 24,
     padding: 4,
     borderRadius: 4,
