@@ -253,6 +253,14 @@ describe("WnaExperienceSection", () => {
     expect(companyLink.props.target).toBe("_blank");
     expect(companyLink.props.rel).toBe("noreferrer");
     expect(companyLink.props["aria-label"]).toBe("Linked Employer");
+    expect(companyLink.props.style).toEqual(
+      expect.objectContaining({
+        color: "inherit",
+        cursor: "pointer",
+        display: "block",
+        textDecoration: "none",
+      }),
+    );
     expect(typeof companyLink.props.onMouseEnter).toBe("function");
     expect(typeof companyLink.props.onMouseLeave).toBe("function");
     expect(flattenText(linkText.props.children)).toBe("Linked Employer");
