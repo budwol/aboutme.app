@@ -122,6 +122,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt     | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
 | 2026-09-13 | 1     | DOM-Style-Regression behoben                            | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 1/4   | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
+| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert   | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
