@@ -19,6 +19,7 @@ const positionStyles: Record<WnaTooltipPosition, ViewStyle> = {
     right: 0,
   },
   right: {
+    flexDirection: "row",
     justifyContent: "center",
     left: "100%",
     marginLeft: 4,
@@ -33,6 +34,7 @@ const positionStyles: Record<WnaTooltipPosition, ViewStyle> = {
     top: "100%",
   },
   left: {
+    flexDirection: "row",
     justifyContent: "center",
     marginRight: 4,
     right: "100%",
@@ -52,11 +54,15 @@ const WnaTooltip: FC<WnaTooltipProps> = ({ content, position, visible }) => (
       { opacity: visible ? 1 : 0 },
     ]}
   >
+    {position === "bottom" && <View style={caretStyles[position]} />}
+    {position === "right" && <View style={caretStyles[position]} />}
     <View style={styles.container}>
       <Text numberOfLines={1} style={styles.text}>
         {content}
       </Text>
     </View>
+    {position === "top" && <View style={caretStyles[position]} />}
+    {position === "left" && <View style={caretStyles[position]} />}
   </View>
 );
 
@@ -87,6 +93,49 @@ const styles: {
     fontWeight: "600",
     lineHeight: 16,
     textAlign: "center",
+  },
+};
+
+const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
+  top: {
+    borderLeftColor: "transparent",
+    borderLeftWidth: 6,
+    borderRightColor: "transparent",
+    borderRightWidth: 6,
+    borderTopColor: "#111",
+    borderTopWidth: 6,
+    height: 0,
+    width: 0,
+  },
+  right: {
+    borderBottomColor: "transparent",
+    borderBottomWidth: 6,
+    borderLeftColor: "#111",
+    borderLeftWidth: 6,
+    borderTopColor: "transparent",
+    borderTopWidth: 6,
+    height: 0,
+    width: 0,
+  },
+  bottom: {
+    borderBottomColor: "#111",
+    borderBottomWidth: 6,
+    borderLeftColor: "transparent",
+    borderLeftWidth: 6,
+    borderRightColor: "transparent",
+    borderRightWidth: 6,
+    height: 0,
+    width: 0,
+  },
+  left: {
+    borderBottomColor: "transparent",
+    borderBottomWidth: 6,
+    borderRightColor: "#111",
+    borderRightWidth: 6,
+    borderTopColor: "transparent",
+    borderTopWidth: 6,
+    height: 0,
+    width: 0,
   },
 };
 
