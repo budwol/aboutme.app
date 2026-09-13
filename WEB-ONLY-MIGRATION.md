@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[#################---] 85%` (44 von 52 festen Arbeitspaketen)
+Fortschritt: `[##################--] 87%` (45 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -230,6 +230,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 1     | Background-Image und Navigationstransition mit Fade-, Layer- und Deep-Link-Regressionen abgesichert | 516 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich; E2E-Port-Allocator weiterhin blockiert |
 | 2026-09-13 | 2     | Web-Fokusindikator und globale Reduced-Motion-Regeln in Hydration- und Static-Shell ergänzt         | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
 | 2026-09-13 | 2     | Native Resize-Fallbacks durch einen browserbasierten Viewport-Adapter ersetzt                       | 519 Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich    |
+| 2026-09-13 | 2     | Horizontalen Separator auf semantisches Web-Markup und CSS umgestellt                               | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

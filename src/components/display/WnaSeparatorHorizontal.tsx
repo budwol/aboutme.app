@@ -1,6 +1,5 @@
 import { themePalettes } from "@constants/theme/themePalettes";
 import { appLayoutConstants } from "@constants/layoutConstants";
-import { View } from "react-native";
 
 export interface WnaSeparatorHorizontalProps {
   transparent?: boolean;
@@ -14,18 +13,17 @@ export default function WnaSeparatorHorizontal({
   space = appLayoutConstants.globalListGap,
 }: WnaSeparatorHorizontalProps) {
   return (
-    <View
-      style={[
-        {
-          minHeight: 1,
-          height: transparent ? 1 : 3,
-          margin: space,
-          minWidth: 128,
-          width: 128,
-          alignSelf: "center",
-          backgroundColor: transparent ? "transparent" : color,
-        },
-      ]}
+    <div
+      aria-hidden="true"
+      style={{
+        minHeight: 1,
+        height: transparent ? 1 : 3,
+        margin: space,
+        minWidth: 128,
+        width: 128,
+        alignSelf: "center",
+        backgroundColor: transparent ? "transparent" : color,
+      }}
     />
   );
 }

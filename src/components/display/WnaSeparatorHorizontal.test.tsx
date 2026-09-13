@@ -11,10 +11,13 @@ describe("WnaSeparatorHorizontal", () => {
       tree = TestRenderer.create(<WnaSeparatorHorizontal />);
     });
 
-    expect(tree!.root.findByType("View").props.style[0]).toEqual(
+    expect(tree!.root.findByType("div").props).toEqual(
       expect.objectContaining({
-        backgroundColor: "#b0b0b0",
-        height: 3,
+        style: expect.objectContaining({
+          backgroundColor: "#b0b0b0",
+          height: 3,
+        }),
+        "aria-hidden": "true",
       }),
     );
   });
@@ -28,7 +31,7 @@ describe("WnaSeparatorHorizontal", () => {
       );
     });
 
-    expect(tree!.root.findByType("View").props.style[0]).toEqual(
+    expect(tree!.root.findByType("div").props.style).toEqual(
       expect.objectContaining({
         backgroundColor: "transparent",
         height: 1,
