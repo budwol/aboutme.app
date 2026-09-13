@@ -6,8 +6,7 @@ import WnaPressable from "@components/buttons/WnaPressable";
 import WnaBadge from "@components/display/WnaBadge";
 import WnaCardTextContent from "@components/cards/WnaCardTextContent";
 import { createVerticalCardContainerStyle } from "@components/cards/wnaCardLayoutStyles";
-import { FC, memo, ReactNode } from "react";
-import { Text, View } from "react-native";
+import React, { CSSProperties, FC, memo, ReactNode } from "react";
 
 export type WnaCardVerticalSmallProps = WnaBaseCardProps &
   WnaVerticalTextCardContent & {
@@ -32,60 +31,72 @@ const WnaCardVerticalSmallComponent: FC<WnaCardVerticalSmallProps> = ({
   footerContent,
   onPress,
 }) => {
-  const cardContent = (
-    <View
-      style={{
+  const cardContent = React.createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
         ...createVerticalCardContainerStyle(appColors, opacity),
         padding: 14,
         gap: 6,
-      }}
-    >
-      <View
-        style={{
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
           justifyContent: "space-between",
           gap: 8,
-        }}
-      >
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <WnaCardTextContent
-            appColors={appColors}
-            appStyle={appStyle}
-            title={title}
-            subtitle={subtitle}
-            subtitleContent={subtitleContent}
-          />
-        </View>
-
-        {badgeText ? (
-          <WnaBadge
-            appColors={appColors}
-            appStyle={appStyle}
-            text={badgeText}
-            fontColor={appColors.coolgray8}
-            style={{
-              backgroundColor: appColors.coolgray1,
-              height: 28,
-              paddingHorizontal: 4,
-              paddingVertical: 2,
-              borderRadius: 3,
-              minHeight: 18,
-              opacity: 0.7,
-            }}
-            textStyle={{ lineHeight: appStyle.textMicro.lineHeight }}
-          />
-        ) : null}
-      </View>
-
-      {!!description ? (
-        <Text style={appStyle.textNeutralMicro}>{description}</Text>
-      ) : null}
-
-      {footerContent ? (
-        <View style={{ marginTop: 2 }}>{footerContent}</View>
-      ) : null}
-    </View>
+        } as CSSProperties,
+      },
+      React.createElement(
+        "div",
+        { style: { flex: 1, minWidth: 0 } as CSSProperties },
+        <WnaCardTextContent
+          appColors={appColors}
+          appStyle={appStyle}
+          title={title}
+          subtitle={subtitle}
+          subtitleContent={subtitleContent}
+        />,
+      ),
+      badgeText ? (
+        <WnaBadge
+          appColors={appColors}
+          appStyle={appStyle}
+          text={badgeText}
+          fontColor={appColors.coolgray8}
+          style={{
+            backgroundColor: appColors.coolgray1,
+            height: 28,
+            paddingHorizontal: 4,
+            paddingVertical: 2,
+            borderRadius: 3,
+            minHeight: 18,
+            opacity: 0.7,
+          }}
+          textStyle={{ lineHeight: appStyle.textMicro.lineHeight }}
+        />
+      ) : null,
+    ),
+    !!description
+      ? React.createElement(
+          "span",
+          { style: appStyle.textNeutralMicro as CSSProperties },
+          description,
+        )
+      : null,
+    footerContent
+      ? React.createElement(
+          "div",
+          { style: { marginTop: 2 } as CSSProperties },
+          footerContent,
+        )
+      : null,
   );
 
   return onPress ? (

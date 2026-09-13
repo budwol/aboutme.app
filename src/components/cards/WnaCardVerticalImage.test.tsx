@@ -112,7 +112,7 @@ describe("WnaCardVerticalImage", () => {
       );
     });
 
-    const textWrap = tree!.root.findAllByType("View")[1];
+    const textWrap = tree!.root.findAllByType("div")[1];
 
     expect(textWrap.props.style).toMatchObject({ minHeight: 78 });
   });

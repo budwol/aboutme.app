@@ -4,8 +4,7 @@ import {
 } from "@components/cards/wnaCardStyles";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { FC, memo, ReactNode } from "react";
-import { View, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo, ReactNode } from "react";
 import { WnaBlurView } from "../effects/WnaBlurView";
 
 export type WnaSurfaceCardProps = {
@@ -72,33 +71,40 @@ const WnaSurfaceCardComponent: FC<WnaSurfaceCardProps> = ({
           borderRightWidth: 1,
           minHeight: minHeight ?? "auto",
           overflow: overflow ?? "hidden",
-        } as ViewStyle
+        } as CSSProperties
       }
     >
-      <View
-        style={{
-          flex: 1,
-          ...getGroupedCardRadius(effectiveType),
-          flexDirection: "row",
-          backgroundColor: backgroundColor,
-        }}
-      >
-        <View
-          style={{
+      {React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flex: 1,
+            ...getGroupedCardRadius(effectiveType),
+            flexDirection: "row",
+            backgroundColor: backgroundColor,
+          } as CSSProperties,
+        },
+        React.createElement("div", {
+          style: {
             width: 8,
             backgroundColor: stateColor ?? "transparent",
-          }}
-        />
-        <View
-          style={{
-            padding: 12,
-            marginLeft: -8,
-            width: "100%",
-          }}
-        >
-          {children}
-        </View>
-      </View>
+          } as CSSProperties,
+        }),
+        React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              padding: 12,
+              marginLeft: -8,
+              width: "100%",
+            } as CSSProperties,
+          },
+          children,
+        ),
+      )}
     </WnaBlurView>
   );
 };

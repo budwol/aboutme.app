@@ -27,18 +27,18 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const texts = tree!.root.findAllByType("Text");
+    const spans = tree!.root.findAllByType("span");
 
     expect(
-      texts.map(
-        (text: { props: { children?: unknown } }) => text.props.children,
+      spans.map(
+        (span: { props: { children?: unknown } }) => span.props.children,
       ),
     ).toEqual(["Title", "Subtitle", "Description"]);
-    expect(texts[0].props.style).toEqual(
+    expect(spans[0].props.style).toEqual(
       expect.objectContaining({ textAlign: "center", paddingTop: 2 }),
     );
-    expect(texts[1].props.style).toEqual(
-      expect.objectContaining({ textAlign: "right", paddingHorizontal: 6 }),
+    expect(spans[1].props.style).toEqual(
+      expect.objectContaining({ textAlign: "right", paddingInline: 6 }),
     );
   });
 
@@ -64,13 +64,13 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const wrapper = tree!.root.findByType("div");
 
-    expect(view.props.style).toEqual(
+    expect(wrapper.props.style).toEqual(
       expect.objectContaining({
         alignItems: "center",
         padding: 8,
-        paddingHorizontal: 8,
+        paddingInline: 8,
       }),
     );
     expect(tree!.root.findByType("TextMarker")).toBeTruthy();
@@ -101,21 +101,24 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const texts = tree!.root.findAllByType("Text");
+    const spans = tree!.root.findAllByType("span");
 
-    expect(texts[0].props.numberOfLines).toBe(1);
-    expect(texts[0].props.style[1]).toEqual(
-      expect.objectContaining({ lineHeight: 20 }),
-    );
-    expect(texts[1].props.numberOfLines).toBe(2);
-    expect(texts[1].props.style[1]).toEqual(
+    expect(spans[0].props.style).toEqual(
       expect.objectContaining({
-        lineHeight: 18,
-        paddingHorizontal: 3,
-        textAlign: "right",
+        lineHeight: 20,
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
       }),
     );
-    expect(texts[2].props.style).toEqual({ color: "#555555" });
+    expect(spans[1].props.style).toEqual(
+      expect.objectContaining({
+        lineHeight: 18,
+        paddingInline: 3,
+        textAlign: "right",
+        WebkitLineClamp: 2,
+      }),
+    );
+    expect(spans[2].props.style).toEqual({ color: "#555555" });
   });
 
   it("left-aligns custom subtitle content by default", () => {
@@ -130,7 +133,7 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    expect(tree!.root.findByType("View").props.style).toEqual(
+    expect(tree!.root.findByType("div").props.style).toEqual(
       expect.objectContaining({ alignItems: "flex-start" }),
     );
   });
@@ -144,11 +147,11 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const span = tree!.root.findByType("span");
 
-    expect(text.props.style).toEqual(
+    expect(span.props.style).toEqual(
       expect.objectContaining({
-        paddingHorizontal: 0,
+        paddingInline: 0,
         paddingTop: 0,
         textAlign: "left",
       }),
@@ -168,7 +171,7 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    expect(tree!.root.findByType("View").props.style).toEqual(
+    expect(tree!.root.findByType("div").props.style).toEqual(
       expect.objectContaining({ alignItems: "flex-end" }),
     );
   });
@@ -182,11 +185,11 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const span = tree!.root.findByType("span");
 
-    expect(text.props.style).toEqual(
+    expect(span.props.style).toEqual(
       expect.objectContaining({
-        paddingHorizontal: 0,
+        paddingInline: 0,
         textAlign: "left",
       }),
     );
@@ -209,10 +212,10 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const span = tree!.root.findByType("span");
 
-    expect(text.props.style[1]).toEqual(
-      expect.objectContaining({ padding: 0, paddingHorizontal: 0 }),
+    expect(span.props.style).toEqual(
+      expect.objectContaining({ padding: 0, paddingInline: 0 }),
     );
   });
 
@@ -235,10 +238,10 @@ describe("WnaCardTextContent", () => {
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const span = tree!.root.findByType("span");
 
-    expect(text.props.style[1]).toEqual(
-      expect.objectContaining({ paddingHorizontal: 9 }),
+    expect(span.props.style).toEqual(
+      expect.objectContaining({ paddingInline: 9 }),
     );
   });
 
@@ -249,7 +252,7 @@ describe("WnaCardTextContent", () => {
       tree = TestRenderer.create(<WnaCardTextContent appColors={appColors} />);
     });
 
-    expect(tree!.root.findAllByType("Text")).toHaveLength(0);
+    expect(tree!.root.findAllByType("span")).toHaveLength(0);
   });
 });
 
