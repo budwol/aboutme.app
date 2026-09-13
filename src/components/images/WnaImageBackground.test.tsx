@@ -75,11 +75,11 @@ describe("WnaImageBackground", () => {
       expect.objectContaining({ position: "absolute" }),
     );
     expect(blur.props.forceExperimentalBlur).toBe(true);
-    expect(blur.props.blurTint).toBe("light");
+    expect(blur.props.blurTint).toBe("dark");
     expect(blur.props.blurIntensity).toBe(40);
   });
 
-  it("renders the blur overlay in dark mode", () => {
+  it("keeps the background image overlay dark in dark mode", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
