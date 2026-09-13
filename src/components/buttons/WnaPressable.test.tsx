@@ -75,7 +75,13 @@ describe("WnaPressable", () => {
     const base = tree!.root.findByType("WnaBasePressable");
     let popable = tree!.root.findByType("Popable");
 
-    expect(popable.props.content).toBe("Open");
+    expect(popable.props.content.props.children).toBe("Open");
+    expect(popable.props.content.props.style).toEqual(
+      expect.objectContaining({
+        fontFamily: expect.stringContaining("Manrope"),
+        fontWeight: "600",
+      }),
+    );
     expect(popable.props.position).toBe("top");
     expect(popable.props.visible).toBe(false);
     expect(popable.props.animated).toBe(false);
@@ -123,7 +129,7 @@ describe("WnaPressable", () => {
 
     const popable = tree!.root.findByType("Popable");
 
-    expect(popable.props.content).toBe("Next");
+    expect(popable.props.content.props.children).toBe("Next");
     expect(popable.props.position).toBe("right");
   });
 
@@ -145,7 +151,7 @@ describe("WnaPressable", () => {
 
     const popable = tree!.root.findByType("Popable");
 
-    expect(popable.props.content).toBe("Done");
+    expect(popable.props.content.props.children).toBe("Done");
     expect(popable.props.position).toBe("bottom");
   });
 
@@ -167,7 +173,7 @@ describe("WnaPressable", () => {
 
     const popable = tree!.root.findByType("Popable");
 
-    expect(popable.props.content).toBe("Back");
+    expect(popable.props.content.props.children).toBe("Back");
     expect(popable.props.position).toBe("left");
   });
 

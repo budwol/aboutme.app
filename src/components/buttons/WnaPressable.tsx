@@ -1,8 +1,9 @@
 import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressable";
 import { appLayoutConstants } from "@constants/layoutConstants";
+import { FontFamilies } from "@constants/theme/fontFamilies";
 import { TFunction } from "i18next";
 import { FC, ReactNode, useRef, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { Text, View, ViewStyle } from "react-native";
 import { Popable } from "react-native-popable";
 
 export type WnaPressableState = Readonly<{
@@ -72,6 +73,21 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
   ] as ViewStyle[];
 
   const toolTipStyleBottom = [toolTipStyle] as ViewStyle[];
+  const toolTipContent = (
+    <Text
+      style={{
+        color: "#ffffff",
+        fontFamily: FontFamilies.UI,
+        fontSize: 12,
+        fontWeight: "600",
+        lineHeight: 16,
+        padding: 2,
+        textAlign: "center",
+      }}
+    >
+      {toolTip}
+    </Text>
+  );
   return (
     <>
       {toolTip &&
@@ -80,7 +96,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
         (toolTipPosition === "left" || toolTipPosition === "top") && (
           <Popable
             animated={false}
-            content={toolTip}
+            content={toolTipContent}
             position={toolTipPosition}
             visible={isToolTipVisible}
             style={
@@ -113,7 +129,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
         (toolTipPosition === "bottom" || toolTipPosition === "right") && (
           <Popable
             animated={false}
-            content={toolTip}
+            content={toolTipContent}
             position={props.toolTipPosition}
             visible={isToolTipVisible}
             style={
