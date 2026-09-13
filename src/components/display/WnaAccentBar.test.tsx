@@ -22,6 +22,12 @@ describe("WnaAccentBar", () => {
     const row = tree!.root.findByType("div");
     const bar = tree!.root.findAllByType("div")[1];
 
+    expect(row.props.style).toEqual(
+      expect.objectContaining({
+        marginLeft: "auto",
+        marginRight: "auto",
+      }),
+    );
     expect(row.props.style.width).toBe(180);
     expect(bar.props.style.width).toBe(180);
   });

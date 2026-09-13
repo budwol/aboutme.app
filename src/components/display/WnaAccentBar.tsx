@@ -112,6 +112,8 @@ const styles: { row: CSSProperties; bar: CSSProperties } = {
   row: {
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
   },
   bar: {
     width: 220,
