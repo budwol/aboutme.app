@@ -4,7 +4,7 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
 import React, { ReactNode, useEffect } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
@@ -69,21 +69,21 @@ export default function WnaPrivateRepoModal({
       {React.createElement(
         "div",
         {
-          testID: "private-repo-modal-backdrop",
+          "data-testid": "private-repo-modal-backdrop",
           style: styles.modalBackdrop as React.CSSProperties,
           onClick: onClose,
         },
         React.createElement(
           "div",
           {
-            testID: "private-repo-modal-dialog",
-            style: [
+            "data-testid": "private-repo-modal-dialog",
+            style: StyleSheet.flatten([
               styles.modalDialog,
               {
                 backgroundColor: convertHexToRgba(appColors.background, 0.96),
                 borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
               },
-            ] as unknown as React.CSSProperties,
+            ]) as React.CSSProperties,
             onClick: (event: React.MouseEvent) => event.stopPropagation(),
           },
           <>
@@ -103,10 +103,10 @@ export default function WnaPrivateRepoModal({
                   "button",
                   {
                     type: "button",
-                    testID: "private-repo-modal-close",
+                    "data-testid": "private-repo-modal-close",
                     "aria-label": t(i18nKeys.actionClose),
                     onClick: onClose,
-                    style: [
+                    style: StyleSheet.flatten([
                       styles.modalCloseButton,
                       {
                         backgroundColor: convertHexToRgba(
@@ -118,7 +118,7 @@ export default function WnaPrivateRepoModal({
                           0.72,
                         ),
                       },
-                    ] as unknown as React.CSSProperties,
+                    ]) as React.CSSProperties,
                   },
                   <WnaIcon
                     iconName="close"

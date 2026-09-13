@@ -408,13 +408,13 @@ describe("WnaProjectDetailsRoute", () => {
       .findAllByType("WnaButtonIconText")
       .slice(-2);
     const modalDialog = tree!.root.findByProps({
-      testID: "private-repo-modal-dialog",
+      "data-testid": "private-repo-modal-dialog",
     });
     const modalCloseButton = tree!.root.findByProps({
-      testID: "private-repo-modal-close",
+      "data-testid": "private-repo-modal-close",
     });
     const modalBackdrop = tree!.root.findByProps({
-      testID: "private-repo-modal-backdrop",
+      "data-testid": "private-repo-modal-backdrop",
     });
 
     expect(modal.props["aria-modal"]).toBe(true);
@@ -433,11 +433,11 @@ describe("WnaProjectDetailsRoute", () => {
     expect(modalActions).toHaveLength(2);
     expect(modalActions[0].props.style).toMatchObject({ flexBasis: 208 });
     expect(modalActions[1].props.style).toMatchObject({ flexBasis: 208 });
-    expect(modalDialog.props.style[1]).toMatchObject({
+    expect(modalDialog.props.style).toMatchObject({
       backgroundColor: "rgba(252,252,252,0.96)",
       borderColor: "rgba(214,214,214,0.72)",
     });
-    expect(modalCloseButton.props.style[1]).toMatchObject({
+    expect(modalCloseButton.props.style).toMatchObject({
       backgroundColor: "rgba(252,252,252,0.98)",
       borderColor: "rgba(214,214,214,0.72)",
     });
@@ -500,7 +500,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     await act(async () => {
       tree!.root
-        .findByProps({ testID: "private-repo-modal-close" })
+        .findByProps({ "data-testid": "private-repo-modal-close" })
         .props.onClick();
     });
 
@@ -664,20 +664,20 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     const modalDialog = tree!.root.findByProps({
-      testID: "private-repo-modal-dialog",
+      "data-testid": "private-repo-modal-dialog",
     });
     const modalCloseButton = tree!.root.findByProps({
-      testID: "private-repo-modal-close",
+      "data-testid": "private-repo-modal-close",
     });
     const modalActions = tree!.root
       .findAllByType("WnaButtonIconText")
       .slice(-2);
 
-    expect(modalDialog.props.style[1]).toMatchObject({
+    expect(modalDialog.props.style).toMatchObject({
       backgroundColor: "rgba(24,24,24,0.96)",
       borderColor: "rgba(40,45,55,0.72)",
     });
-    expect(modalCloseButton.props.style[1]).toMatchObject({
+    expect(modalCloseButton.props.style).toMatchObject({
       backgroundColor: "rgba(24,24,24,0.98)",
       borderColor: "rgba(40,45,55,0.72)",
     });
@@ -764,7 +764,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     act(() => {
       tree!.root
-        .findByProps({ testID: "private-repo-modal-backdrop" })
+        .findByProps({ "data-testid": "private-repo-modal-backdrop" })
         .props.onClick();
     });
 
@@ -781,7 +781,7 @@ describe("WnaProjectDetailsRoute", () => {
     ).toBeGreaterThan(0);
 
     const modalCloseButton = tree!.root.findByProps({
-      testID: "private-repo-modal-close",
+      "data-testid": "private-repo-modal-close",
     });
 
     act(() => {
