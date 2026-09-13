@@ -8,19 +8,12 @@ import WnaActivityIndicator from "@components/feedback/WnaActivityIndicator";
 import { WnaFooter } from "@components/chrome/WnaFooter";
 import { WnaHeader } from "@components/chrome/WnaHeader";
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
-import { appMotionConstants } from "@constants/motionConstants";
 import { Href } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { FC, ReactNode, memo, useCallback, useEffect } from "react";
+import { FC, ReactNode, memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import Animated, {
-  Easing,
-  SharedValue,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { SharedValue } from "react-native-reanimated";
 import WnaImageBackground from "@components/images/WnaImageBackground";
 
 export type WnaBaseScreenProps = {
@@ -132,33 +125,20 @@ WnaBaseScreenChrome.displayName = "WnaBaseScreenChrome";
 
 const WnaBusyOverlay = memo(
   ({ appColors, appStyle, isBusy, isBusyText }: WnaBusyOverlayProps) => {
-    const overlayOpacity = useSharedValue(0);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      opacity: withTiming(overlayOpacity.value, {
-        duration: appMotionConstants.defaultAnimationDuration,
-        easing: Easing.bezier(0.5, 0.01, 0, 1),
-      }),
-    }));
-
-    useEffect(() => {
-      overlayOpacity.value = isBusy ? 1 : 0;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isBusy]);
-
     if (!isBusy && !isBusyText) {
       return null;
     }
 
     return (
-      <Animated.View
+      <View
+        nativeID="wna-busy-overlay"
         style={[
           styles.busyOverlay,
           {
+            opacity: isBusy ? 1 : 0,
             backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
             pointerEvents: isBusy ? "auto" : "none",
           },
-          animatedStyle,
         ]}
       >
         <WnaActivityIndicator appColors={appColors} />
@@ -174,7 +154,7 @@ const WnaBusyOverlay = memo(
             {isBusyText}
           </Text>
         )}
-      </Animated.View>
+      </View>
     );
   },
 );

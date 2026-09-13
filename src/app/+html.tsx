@@ -89,6 +89,10 @@ export default function Root({ children }: PropsWithChildren) {
                       transition: opacity 180ms cubic-bezier(.5, .01, 0, 1);
                     }
 
+                    #wna-busy-overlay {
+                      transition: opacity 250ms cubic-bezier(.5, .01, 0, 1);
+                    }
+
                     @media (prefers-reduced-motion: reduce) {
                       [id^="wna-hero-shape-"] {
                         animation: none;
