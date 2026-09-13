@@ -77,6 +77,7 @@ describe("WnaImageBackground", () => {
     expect(blur.props.forceExperimentalBlur).toBe(true);
     expect(blur.props.blurTint).toBe("dark");
     expect(blur.props.blurIntensity).toBe(40);
+    expect(blur.props.backgroundOpacity).toBe(0.55);
   });
 
   it("keeps the background image overlay dark in dark mode", () => {
@@ -97,5 +98,6 @@ describe("WnaImageBackground", () => {
     const blur = tree!.root.findByType("WnaBlurView");
 
     expect(blur.props.blurTint).toBe("dark");
+    expect(blur.props.backgroundOpacity).toBe(0.72);
   });
 });
