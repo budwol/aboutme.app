@@ -15,7 +15,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Dimensions } from "react-native";
+import { getWebViewportDimensions } from "@utils/webViewport";
 
 type WnaLifecycleState = {
   isAppInitialized: boolean;
@@ -55,16 +55,7 @@ type WnaDataState = {
 };
 
 const getInitialDimensions = () => {
-  const screen = Dimensions.get("screen");
-  const window = Dimensions.get("window");
-
-  return {
-    screenWidth: screen.width,
-    screenHeight: screen.height,
-    windowWidth: window.width,
-    windowHeight: window.height,
-    isLandscape: window.width > window.height,
-  };
+  return getWebViewportDimensions();
 };
 
 const WnaLifecycleContext = createContext<WnaLifecycleState | null>(null);

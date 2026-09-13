@@ -47,6 +47,14 @@ describe("WnaAppContext", () => {
   });
 
   it("provides lifecycle, layout, theme and app data state", () => {
+    Object.defineProperty(global, "window", {
+      configurable: true,
+      value: {
+        innerWidth: 1024,
+        innerHeight: 768,
+        screen: { width: 1024, height: 768 },
+      },
+    });
     let captured: {
       lifecycle: ReturnType<typeof useWnaAppLifecycle>;
       layout: ReturnType<typeof useWnaLayout>;

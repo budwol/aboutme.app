@@ -1,7 +1,6 @@
 import Logger from "@/utils/logger";
 import { AppData } from "@/app-data";
 import {
-  Dimensions,
   LayoutChangeEvent,
   Pressable,
   StyleSheet,
@@ -154,9 +153,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       typeof window.addEventListener === "function"
         ? window
         : null;
-    const nativeSubscription = resizeTarget
-      ? null
-      : Dimensions.addEventListener("change", handleChange);
     resizeTarget?.addEventListener("resize", handleChange);
 
     setDimensions();
@@ -166,7 +162,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
         clearTimeout(dimensionTimerRef.current);
       }
       resizeTarget?.removeEventListener("resize", handleChange);
-      nativeSubscription?.remove();
     };
   }, [setDimensions]);
 
