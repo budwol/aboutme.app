@@ -115,6 +115,8 @@ Status: **in Arbeit**
 - [x] `expo-application` und `expo-constants` durch die zentrale
       `package.json`-Versionsquelle ersetzen.
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
+- [x] Direkte `react-native-worklets`-Dependency entfernen; transitiver Bezug
+      bleibt bis zur Navigation-Migration bestehen.
 
 Exit-Kriterium: Relevante Expo-/Native-Dependencies sind aus dem Web-Bundle
 und aus `package.json` entfernt; Motion- und Theme-Tests decken die Browserpfade
@@ -159,6 +161,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt          | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
 | 2026-09-13 | 4     | `react-native-reanimated` aus dem Web-Pfad und package.json entfernt   | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
 | 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                    | Transitiver Bezug über Drawer-Navigation dokumentiert          |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
