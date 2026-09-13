@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { Linking, Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { useDrawerStatus } from "@react-navigation/drawer";
 import { Href, router, useNavigation, useSegments } from "expo-router";
 import { useTranslation } from "react-i18next";

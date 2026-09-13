@@ -5,7 +5,7 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 import { createProjectSlug } from "@utils/projectRoutes";
-import { Linking } from "react-native";
+import { Linking } from "@utils/webLinking";
 
 jest.mock("@/state/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

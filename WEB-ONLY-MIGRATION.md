@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[############----------] 50%` (14 von 28 Arbeitspaketen)
+Fortschritt: `[#############---------] 54%` (15 von 28 Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -101,7 +101,7 @@ Status: **in Arbeit**
 - [x] `expo-blur` durch CSS `backdrop-filter` ersetzen.
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
 - [x] `expo-image` vollständig entfernen.
-- [ ] Linking-Sonderpfade durch Web-APIs oder kleine lokale Adapter ersetzen.
+- [x] Linking-Sonderpfade durch einen getesteten Browser-Adapter ersetzen.
 - [x] `expo-application` und `expo-constants` durch die zentrale
       `package.json`-Versionsquelle ersetzen.
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
@@ -137,6 +137,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert   | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt        | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
 | 2026-09-13 | 4     | Native Versions-Dependencies entfernt                   | 483 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                   | 54 fokussierte Tests, Lint und TypeScript erfolgreich     |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

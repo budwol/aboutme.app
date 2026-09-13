@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { Linking } from "@utils/webLinking";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { styles } from "./wnaExperienceSectionStyles";
