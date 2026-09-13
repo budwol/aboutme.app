@@ -112,6 +112,8 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [showNavigationTransition, setShowNavigationTransition] =
     useState(false);
+  const [isNavigationContentVisible, setIsNavigationContentVisible] =
+    useState(true);
   const [, setNavigationTransitionPhase] = useState<"enter" | "exit">("enter");
   const [hasContentLayout, setHasContentLayout] = useState(false);
   const [isContentReadyForReveal, setIsContentReadyForReveal] = useState(false);
@@ -221,8 +223,11 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       return;
     }
 
+    setIsNavigationContentVisible(false);
+
     navigationRevealFrameRef.current = requestAnimationFrame(() => {
       navigationRevealFrameRef.current = requestAnimationFrame(() => {
+        setIsNavigationContentVisible(true);
         setNavigationTransitionPhase("exit");
         navigationFinishTimerRef.current = setTimeout(() => {
           setShowNavigationTransition(false);
@@ -301,6 +306,10 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
         style={[
           styles.content,
           !isContentReadyForReveal && styles.contentInitial,
+          {
+            opacity: isNavigationContentVisible ? 1 : 0,
+            transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+          } as never,
         ]}
       >
         {children}

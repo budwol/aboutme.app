@@ -445,6 +445,11 @@ describe("WnaApp", () => {
     });
 
     mockPathname = "/next";
+    const queuedFrames: FrameRequestCallback[] = [];
+    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+      queuedFrames.push(callback);
+      return queuedFrames.length;
+    }) as never;
 
     act(() => {
       tree!.update(
@@ -453,6 +458,16 @@ describe("WnaApp", () => {
         </WnaApp>,
       );
     });
+
+    const contentAfterNavigation = tree!.root.find(
+      (node: { props: { onLayout?: unknown } }) =>
+        typeof node.props.onLayout === "function",
+    );
+    expect(contentAfterNavigation.props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ opacity: 0 })]),
+    );
+    act(() => queuedFrames.shift()?.(0));
+    act(() => queuedFrames.shift()?.(0));
 
     act(() => {
       jest.advanceTimersByTime(560);

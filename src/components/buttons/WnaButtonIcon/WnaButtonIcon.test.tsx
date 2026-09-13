@@ -78,6 +78,7 @@ describe("WnaButtonIcon", () => {
       expect.objectContaining({
         appearance: "none",
         borderRadius: 26,
+        borderStyle: "solid",
         cursor: "pointer",
         height: 52,
         width: 52,
