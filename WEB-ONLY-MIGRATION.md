@@ -1,5 +1,10 @@
 # Web-Only PWA Migration
 
+Fortschritt: `[############----------] 50%` (14 von 28 Arbeitspaketen)
+
+Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
+aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
+
 ## Ziel
 
 Die Anwendung wird als statische, installierbare Web-PWA betrieben. Native
@@ -56,7 +61,7 @@ unnötige Avatar-Übertragung.
 
 ### 2. Präsentationsprimitive
 
-Status: **offen**
+Status: **geplant**
 
 - [ ] `View`, `Text`, `Pressable`, `FlatList` und `StyleSheet` in semantische
       Web-Komponenten und CSS überführen.
@@ -69,7 +74,7 @@ Exit-Kriterium: Keine produktiven UI-Imports aus `react-native` oder
 
 ### 3. Navigation und Interaktion
 
-Status: **offen**
+Status: **geplant**
 
 - [ ] Drawer durch Web-Navigation mit `nav`, Links, Dialogzuständen und
       CSS-Animation ersetzen.
@@ -84,7 +89,7 @@ Transition-Background funktionieren in allen unterstützten Viewports.
 
 ### 4. Animationen, Effekte und Plattform-Dependencies
 
-Status: **offen**
+Status: **in Arbeit**
 
 - [ ] Reanimated durch CSS/Web Animations ersetzen.
 - [x] `expo-linear-gradient` durch CSS ersetzen.
@@ -102,7 +107,7 @@ ab.
 
 ### 5. Sanitizing, Bundle und PWA-Finalisierung
 
-Status: **offen**
+Status: **geplant**
 
 - [ ] Prüfen, ob `sanitize-html` durch eine kleinere, gleichwertig sichere
       Web-Lösung ersetzt oder nur auf Inhaltsseiten geladen werden kann.
@@ -119,12 +124,14 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 
 | Datum      | Phase | Änderung                                                | Validierung                                               |
 | ---------- | ----- | ------------------------------------------------------- | --------------------------------------------------------- |
-| 2026-09-13 | 0/1   | Bundle analysiert, 384px-Avatar ergänzt                 | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
+| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                 | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
 | 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt       | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
 | 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt     | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
 | 2026-09-13 | 1     | DOM-Style-Regression behoben                            | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 1/4   | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
+| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
 | 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert   | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt        | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                   | 483 Unit-Tests, Lint und TypeScript erfolgreich           |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
