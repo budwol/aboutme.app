@@ -26,7 +26,11 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
       logger?: (...parts: string[]) => void;
       processLogo?: (rootDir: string, publicDir: string) => void;
       convertBackground?: (sourcePath: string, targetPath: string) => void;
-      createResponsiveAvatar?: (sourcePath: string, targetPath: string) => void;
+      createResponsiveAvatar?: (
+        sourcePath: string,
+        targetPath: string,
+        size: number,
+      ) => void;
     },
   ) => { generated: boolean; migrated: boolean };
 };
@@ -230,8 +234,8 @@ function runInit(fixtureRoot: string, options?: { dryRun?: boolean }): string {
     convertBackground: (_sourcePath, targetPath) => {
       fs.writeFileSync(targetPath, "converted-background", "utf8");
     },
-    createResponsiveAvatar: (_sourcePath, targetPath) => {
-      fs.writeFileSync(targetPath, "responsive-avatar", "utf8");
+    createResponsiveAvatar: (_sourcePath, targetPath, size) => {
+      fs.writeFileSync(targetPath, `responsive-avatar-${size}`, "utf8");
     },
   });
 
@@ -321,6 +325,23 @@ describe("init.sh", () => {
         path.join(fixtureRoot, "public", "images", "default_avatar_300.webp"),
       ),
     ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_512.webp"),
+      ),
+    ).toBe(true);
+    expect(
+      fs.readFileSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_300.webp"),
+        "utf8",
+      ),
+    ).toBe("responsive-avatar-300");
+    expect(
+      fs.readFileSync(
+        path.join(fixtureRoot, "public", "images", "default_avatar_512.webp"),
+        "utf8",
+      ),
+    ).toBe("responsive-avatar-512");
     expect(
       fs.existsSync(
         path.join(fixtureRoot, "public", "images", "default_project.webp"),

@@ -29,6 +29,11 @@ export function getAvatarImageSources(
       webMaxViewportWidth: imageConstants.avatarResponsiveViewportWidth,
     },
     {
+      imageUrl: `images/${withoutExtension(normalizedFileName)}_${imageConstants.avatarIntermediateSize}.webp`,
+      width: imageConstants.avatarIntermediateSize,
+      webMaxViewportWidth: imageConstants.avatarIntermediateViewportWidth,
+    },
+    {
       imageUrl: `images/${normalizedFileName}`,
       width: imageConstants.avatarOriginalSize,
       webMaxViewportWidth: imageConstants.avatarOriginalViewportWidth,

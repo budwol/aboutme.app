@@ -12,10 +12,10 @@ Commit messages were inconsistent and included non-professional review wording a
 
 ## Decision
 
-Use one concise, factual, imperative line with a Gitmoji code selected through WebStorm. Do not add a body, AI attribution, session links, review labels, or quality claims.
+Use one concise, factual, imperative line with a Gitmoji icon selected through WebStorm and mapped to the change type on [gitmoji.dev](https://gitmoji.dev/). Do not add a body, AI attribution, session links, review labels, or quality claims.
 
 ```text
-:bug: preserve the background image during navigation
+🐛 Preserve the background image during navigation
 ```
 
 ## Consequences

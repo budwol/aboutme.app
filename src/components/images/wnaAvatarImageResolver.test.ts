@@ -10,9 +10,14 @@ describe("getAvatarImageSources", () => {
         webMaxViewportWidth: 2048,
       },
       {
+        imageUrl: "images/ava_512.webp",
+        width: 512,
+        webMaxViewportWidth: 4096,
+      },
+      {
         imageUrl: "images/ava.webp",
         width: 1024,
-        webMaxViewportWidth: 4096,
+        webMaxViewportWidth: 8192,
       },
     ]);
   });
