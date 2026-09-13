@@ -79,6 +79,8 @@ Status: **in Arbeit**
 - [ ] Native-only Fallbacks aus produktiven Web-Pfaden entfernen.
 - [x] `SafeAreaView` durch einen Web-Container mit CSS-Safe-Area-Insets ersetzen.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
+- [x] Resize-Events im App-Frame über `window.resize` statt Native-
+      `Dimensions` abonnieren.
 
 Exit-Kriterium: Keine produktiven UI-Imports aus `react-native` oder
 `react-native-web`; Accessibility- und Responsive-E2E-Suite bleibt grün.
@@ -168,6 +170,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                    | Transitiver Bezug über Drawer-Navigation dokumentiert          |
 | 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                      | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
 | 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt              | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                              | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                     | Transitiver Bezug über Expo Router dokumentiert                |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
