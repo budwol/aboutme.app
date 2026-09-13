@@ -73,9 +73,11 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   } as unknown as ViewStyle,
   modalBackdrop: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: "rgba(0, 0, 0, 0.58)",
     backdropFilter: "blur(4px)",
     WebkitBackdropFilter: "blur(4px)",
@@ -87,10 +89,10 @@ export const styles = StyleSheet.create({
   modalDialog: {
     width: "100%",
     maxWidth: 560,
-    padding: appLayoutConstants.contentSectionGap,
+    padding: 32,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
-    gap: 16,
+    gap: appLayoutConstants.contentSectionGap,
     cursor: "auto",
   },
   modalHeader: {
@@ -122,6 +124,7 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-end",
     gap: 16,
+    marginTop: 8,
   },
   modalActionButton: {
     flexGrow: 1,
