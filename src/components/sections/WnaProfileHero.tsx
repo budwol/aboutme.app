@@ -8,19 +8,7 @@ import { sectionConstants } from "@constants/sectionConstants";
 import Colors from "@constants/theme/colors";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Animated, {
-  Easing,
-  SharedValue,
-  interpolate,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 
 type HeroShape = {
   top?: number;
@@ -281,62 +269,46 @@ const heroShapes: HeroShape[] = [
 
 function WnaHeroShape({
   shape,
-  heroMotion,
+  index,
   appColors,
-  shouldAnimate,
 }: {
   shape: HeroShape;
-  heroMotion: SharedValue<number>;
+  index: number;
   appColors: Colors;
-  shouldAnimate: boolean;
 }) {
-  const animatedStyle = useAnimatedStyle(() => {
-    if (!shouldAnimate || !shape.animated) {
-      return {
+  const startScale = shape.swing === 1 ? 0.96 : 1.04;
+  const endScale = shape.swing === 1 ? 1.04 : 0.96;
+  const startOpacity = shape.swing === 1 ? 0.5 : 0.8;
+  const endOpacity = shape.swing === 1 ? 0.82 : 0.52;
+  const startRotate = shape.rotate - 2.5 * shape.swing;
+  const endRotate = shape.rotate + 2.5 * shape.swing;
+  const startTranslateX = -4 * shape.swing;
+  const endTranslateX = 4 * shape.swing;
+  const startTranslateY = 3 * shape.swing;
+  const endTranslateY = -3 * shape.swing;
+
+  const animatedStyle = shape.animated
+    ? ({
+        "--wna-hero-shape-duration": `${sectionConstants.heroFieldMotionDuration}ms`,
+        "--wna-hero-shape-start-scale": startScale,
+        "--wna-hero-shape-end-scale": endScale,
+        "--wna-hero-shape-start-opacity": startOpacity,
+        "--wna-hero-shape-end-opacity": endOpacity,
+        "--wna-hero-shape-start-rotate": `${startRotate}deg`,
+        "--wna-hero-shape-end-rotate": `${endRotate}deg`,
+        "--wna-hero-shape-start-x": `${startTranslateX}px`,
+        "--wna-hero-shape-end-x": `${endTranslateX}px`,
+        "--wna-hero-shape-start-y": `${startTranslateY}px`,
+        "--wna-hero-shape-end-y": `${endTranslateY}px`,
+      } as ViewStyle)
+    : {
         opacity: 1,
         transform: [{ rotate: `${shape.rotate}deg` }],
       };
-    }
-
-    const scale = interpolate(
-      heroMotion.value,
-      [-1, 1],
-      shape.swing === 1 ? [0.96, 1.04] : [1.04, 0.96],
-    );
-    const opacity = interpolate(
-      heroMotion.value,
-      [-1, 1],
-      shape.swing === 1 ? [0.5, 0.82] : [0.8, 0.52],
-    );
-    const rotate = interpolate(
-      heroMotion.value,
-      [-1, 1],
-      [shape.rotate - 2.5 * shape.swing, shape.rotate + 2.5 * shape.swing],
-    );
-    const translateX = interpolate(
-      heroMotion.value,
-      [-1, 1],
-      [-4 * shape.swing, 4 * shape.swing],
-    );
-    const translateY = interpolate(
-      heroMotion.value,
-      [-1, 1],
-      [3 * shape.swing, -3 * shape.swing],
-    );
-
-    return {
-      opacity,
-      transform: [
-        { translateX },
-        { translateY },
-        { rotate: `${rotate}deg` },
-        { scale },
-      ],
-    };
-  });
 
   return (
-    <Animated.View
+    <View
+      nativeID={shape.animated ? `wna-hero-shape-${index}` : undefined}
       style={[
         {
           position: "absolute",
@@ -379,41 +351,14 @@ export function WnaHeroField({
   appColors,
   compact = false,
 }: Pick<WnaSectionProps, "appColors"> & { compact?: boolean }) {
-  const heroMotion = useSharedValue(0);
-  const reduceMotion = useReducedMotion();
-  const shouldAnimate = !reduceMotion;
-
-  useEffect(() => {
-    if (!shouldAnimate) {
-      heroMotion.value = 0;
-      return;
-    }
-
-    heroMotion.value = withRepeat(
-      withSequence(
-        withTiming(1, {
-          duration: sectionConstants.heroFieldMotionDuration,
-          easing: Easing.inOut(Easing.sin),
-        }),
-        withTiming(-1, {
-          duration: sectionConstants.heroFieldMotionDuration,
-          easing: Easing.inOut(Easing.sin),
-        }),
-      ),
-      -1,
-      true,
-    );
-  }, [heroMotion, shouldAnimate]);
-
   return (
     <View style={[styles.shapeField, compact && styles.shapeFieldCompact]}>
       {heroShapes.map((shape, index) => (
         <WnaHeroShape
           key={`hero-shape-${index}`}
           shape={shape}
-          heroMotion={heroMotion}
+          index={index}
           appColors={appColors}
-          shouldAnimate={shouldAnimate}
         />
       ))}
     </View>
