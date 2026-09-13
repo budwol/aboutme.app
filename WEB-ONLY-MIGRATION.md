@@ -217,6 +217,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Firmenlink auf Web-`<a>` mit `href` und neuem Tab umgestellt                  | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Footer-Aktion auf Web-`button` mit `type="button"` umgestellt                 | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Sidebar-, Header- und Aktionsbuttons auf Web-`button` umgestellt              | 507 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Unbenutzte direkte `expo-constants`- und `expo-linking`-Dependencies entfernt | Typecheck, Lint und Dependency-Tree erfolgreich                |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
