@@ -25,6 +25,10 @@ export default function WnaExperienceCompanyLink({
 
   const linkStyle = {
     ...styles.companyLinkPressable,
+    color: "inherit",
+    cursor: "pointer",
+    display: "block",
+    textDecoration: "none",
     ...(isHovered && {
       backgroundColor: convertHexToRgba(appColors.accent5, 0.08),
     }),
