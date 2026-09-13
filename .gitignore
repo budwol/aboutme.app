@@ -81,4 +81,5 @@ nginx/site.conf
 
 # local review artifacts
 /*-issue-*.png
+/*-issue.png
 /*-issue-*.App
