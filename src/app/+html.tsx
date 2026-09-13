@@ -128,6 +128,14 @@ export default function Root({ children }: PropsWithChildren) {
                       transition: opacity 250ms cubic-bezier(.5, .01, 0, 1);
                     }
 
+                    @keyframes wna-activity-indicator-spin {
+                      to { transform: rotate(360deg); }
+                    }
+
+                    .wna-activity-indicator > div {
+                      animation: wna-activity-indicator-spin 900ms linear infinite;
+                    }
+
                     @keyframes wna-content-reveal {
                       from { opacity: .92; transform: translateY(10px); }
                       to { opacity: 1; transform: translateY(0); }
@@ -166,7 +174,8 @@ export default function Root({ children }: PropsWithChildren) {
 
                     @media (prefers-reduced-motion: reduce) {
                       .wna-hero-shape-swing-positive,
-                      .wna-hero-shape-swing-negative {
+                      .wna-hero-shape-swing-negative,
+                      .wna-activity-indicator > div {
                         animation: none;
                       }
                     }
