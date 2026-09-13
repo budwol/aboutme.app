@@ -81,4 +81,36 @@ describe("WnaTooltip", () => {
       ]),
     );
   });
+
+  it.each([
+    ["top", "borderTopColor"],
+    ["right", "borderLeftColor"],
+    ["bottom", "borderBottomColor"],
+    ["left", "borderRightColor"],
+  ])("renders a caret pointing from %s to the anchor", (...args) => {
+    const [position, border] = args as [
+      WnaTooltipPosition,
+      (
+        | "borderBottomColor"
+        | "borderLeftColor"
+        | "borderRightColor"
+        | "borderTopColor"
+      ),
+    ];
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaTooltip content="E-Mail" position={position} visible />,
+      );
+    });
+
+    const caret = tree!.root
+      .findAllByType(View)
+      .find(
+        (view: { props: { style?: Record<string, string> } }) =>
+          view.props.style?.[border] === "#111",
+      );
+    expect(caret).toBeDefined();
+  });
 });
