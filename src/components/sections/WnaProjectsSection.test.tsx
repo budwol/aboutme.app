@@ -181,11 +181,11 @@ describe("WnaProjectsSection", () => {
       (node: {
         type: unknown;
         props: {
-          onPress?: (() => void) | undefined;
+          onClick?: (() => void) | undefined;
           children?: React.ReactNode;
         };
       }) =>
-        typeof node.props.onPress === "function" &&
+        typeof node.props.onClick === "function" &&
         node.type !== "WnaPressable" &&
         node.props.children !== undefined,
     );
@@ -194,7 +194,7 @@ describe("WnaProjectsSection", () => {
     expect(textValues).toContainEqual(["actionShowMore", " →"]);
 
     act(() => {
-      actionNode?.props.onPress();
+      actionNode?.props.onClick();
     });
 
     expect(onShowMorePress).toHaveBeenCalledTimes(1);

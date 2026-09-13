@@ -19,34 +19,31 @@ describe("WnaFooterActionLink", () => {
       );
     });
 
-    const pressable = tree!.root.find(
+    const button = tree!.root.find(
       (node: {
         props: {
-          onPress?: (() => void) | undefined;
-          onHoverIn?: (() => void) | undefined;
-          onHoverOut?: (() => void) | undefined;
+          onClick?: (() => void) | undefined;
+          onMouseEnter?: (() => void) | undefined;
+          onMouseLeave?: (() => void) | undefined;
         };
       }) =>
-        typeof node.props.onPress === "function" &&
-        typeof node.props.onHoverIn === "function" &&
-        typeof node.props.onHoverOut === "function",
+        typeof node.props.onClick === "function" &&
+        typeof node.props.onMouseEnter === "function" &&
+        typeof node.props.onMouseLeave === "function",
     );
 
-    expect(pressable.props.style[1].backgroundColor).toBe(
-      "rgba(0,170,204,0.08)",
-    );
+    expect(button.props.type).toBe("button");
+    expect(button.props.style.backgroundColor).toBe("rgba(0,170,204,0.08)");
 
     act(() => {
-      pressable.props.onHoverIn();
+      button.props.onMouseEnter();
     });
 
-    expect(pressable.props.style[1].backgroundColor).toBe(
-      "rgba(0,170,204,0.14)",
-    );
+    expect(button.props.style.backgroundColor).toBe("rgba(0,170,204,0.14)");
 
     act(() => {
-      pressable.props.onHoverOut();
-      pressable.props.onPress();
+      button.props.onMouseLeave();
+      button.props.onClick();
     });
 
     expect(onPress).toHaveBeenCalledTimes(1);
