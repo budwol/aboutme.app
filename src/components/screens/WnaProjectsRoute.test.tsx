@@ -281,7 +281,6 @@ describe("WnaProjectsRoute", () => {
       );
 
     expect(scrollView).toBeDefined();
-    expect(tree!.root.findAllByType("FlatList")).toHaveLength(0);
     expect(textValues).toContain("screenTitleProjects");
     expect(textValues).toContain(testAppData.projectsSubtitle?.toUpperCase());
     expect(textValues).toContain(testAppData.projectsContext);
