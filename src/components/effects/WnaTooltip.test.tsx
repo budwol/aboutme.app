@@ -47,4 +47,19 @@ describe("WnaTooltip", () => {
     );
     expect(text.props.numberOfLines).toBe(1);
   });
+
+  it("uses a compact four pixel gap from the anchor", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaTooltip content="E-Mail" position="bottom" visible />,
+      );
+    });
+
+    const positioner = tree!.root.findAllByType(View)[0];
+    expect(positioner.props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ marginTop: 4 })]),
+    );
+  });
 });

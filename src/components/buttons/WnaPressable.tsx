@@ -54,7 +54,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
           visible={isToolTipVisible}
         />
       )}
-      <View style={{ overflow: "hidden" }}>
+      <View style={{ flex: 1, overflow: "hidden" }}>
         <WnaBasePressable
           accessibilityLabel={props.accessibilityLabel}
           ripple={props.ripple}
