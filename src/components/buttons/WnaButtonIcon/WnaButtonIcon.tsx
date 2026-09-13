@@ -1,5 +1,4 @@
 import WnaButtonIconBadge from "@components/buttons/WnaButtonIcon/WnaButtonIconBadge";
-import WnaPressable from "@components/buttons/WnaPressable";
 import { createRoundIconButtonStyle } from "@components/buttons/wnaButtonStyles";
 import {
   WnaButtonActionProps,
@@ -7,7 +6,8 @@ import {
 } from "@components/buttons/wnaButtonTypes";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { createShadowStyle } from "@components/effects/wnaShadowStyle";
-import { FC, memo } from "react";
+import WnaTooltip from "@components/effects/WnaTooltip";
+import React, { FC, memo, useState } from "react";
 import { View, ViewStyle } from "react-native";
 
 export type WnaButtonIconProps = WnaButtonThemeProps &
@@ -27,32 +27,62 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
   appStyle,
   iconName,
   onPress,
-  t,
   toolTip,
   accessibilityLabel,
   color,
   style,
   toolTipPosition,
-}) => (
-  <View style={[createShadowStyle(), style as ViewStyle]}>
-    <WnaPressable
-      ripple={"light"}
-      toolTip={toolTip}
-      accessibilityLabel={accessibilityLabel ?? toolTip}
-      toolTipPosition={toolTipPosition}
-      style={createRoundIconButtonStyle(appColors)}
-      t={t}
-      onPress={onPress}
-    >
-      <WnaButtonIconBadge
-        appStyle={appStyle}
-        appColors={appColors}
-        color={color}
-        iconName={iconName}
-      />
-    </WnaPressable>
-  </View>
-);
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const buttonStyle = createRoundIconButtonStyle(appColors);
+  const interactionColor = isPressed
+    ? "rgba(255,255,255,0.14)"
+    : isHovered
+      ? "rgba(255,255,255,0.08)"
+      : buttonStyle.backgroundColor;
+
+  return (
+    <View style={[createShadowStyle(), style as ViewStyle]}>
+      {toolTip && toolTipPosition ? (
+        <WnaTooltip
+          content={toolTip}
+          position={toolTipPosition}
+          visible={isHovered}
+        />
+      ) : null}
+      {React.createElement(
+        "button",
+        {
+          type: "button",
+          "aria-label": accessibilityLabel ?? toolTip,
+          onClick: onPress,
+          onMouseDown: () => setIsPressed(true),
+          onMouseUp: () => setIsPressed(false),
+          onMouseEnter: () => setIsHovered(true),
+          onMouseLeave: () => {
+            setIsHovered(false);
+            setIsPressed(false);
+          },
+          style: {
+            ...buttonStyle,
+            appearance: "none",
+            backgroundColor: interactionColor,
+            boxSizing: "border-box",
+            cursor: "pointer",
+            padding: 0,
+          } as React.CSSProperties,
+        },
+        <WnaButtonIconBadge
+          appStyle={appStyle}
+          appColors={appColors}
+          color={color}
+          iconName={iconName}
+        />,
+      )}
+    </View>
+  );
+};
 
 const WnaButtonIcon = memo(WnaButtonIconComponent);
 
