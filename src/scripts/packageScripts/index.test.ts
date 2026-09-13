@@ -155,5 +155,6 @@ describe("package scripts", () => {
 
     expect(expoConfig.version).toBe(packageJson.version);
     expect(expoConfig.extra?.appVersion).toBe(packageJson.version);
+    expect(expoConfig.plugins).toEqual(["expo-font", "expo-router"]);
   });
 });
