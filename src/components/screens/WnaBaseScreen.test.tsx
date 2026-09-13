@@ -107,30 +107,6 @@ jest.mock("@components/images/WnaImageBackground", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-    },
-    Easing: {
-      bezier: () => "bezier",
-    },
-    useAnimatedStyle: (callback: () => Record<string, unknown>) => callback(),
-    useSharedValue: (initialValue: number) => ({ value: initialValue }),
-    withTiming: (value: unknown) => value,
-  };
-});
-
 describe("WnaBaseScreen", () => {
   beforeEach(() => {
     mockIsAppInitialized = true;
@@ -315,8 +291,13 @@ describe("WnaBaseScreen", () => {
 
     expect(textValues).toContain("Loading data");
 
-    const animatedView = tree!.root.findByType("AnimatedView");
-    expect(animatedView.props.style[1].pointerEvents).toBe("auto");
+    const busyOverlay = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID === "wna-busy-overlay",
+    );
+    expect(busyOverlay.props.style[1]).toEqual(
+      expect.objectContaining({ opacity: 1, pointerEvents: "auto" }),
+    );
   });
 
   it("disables pointer events on the busy overlay when not busy", () => {
@@ -330,7 +311,12 @@ describe("WnaBaseScreen", () => {
       );
     });
 
-    const animatedView = tree!.root.findByType("AnimatedView");
-    expect(animatedView.props.style[1].pointerEvents).toBe("none");
+    const busyOverlay = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID === "wna-busy-overlay",
+    );
+    expect(busyOverlay.props.style[1]).toEqual(
+      expect.objectContaining({ opacity: 0, pointerEvents: "none" }),
+    );
   });
 });
