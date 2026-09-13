@@ -77,6 +77,7 @@ function flattenStyles(
 const styles: { container: CSSProperties; text: CSSProperties } = {
   container: {
     display: "flex",
+    minHeight: 24,
     padding: 4,
     borderRadius: 4,
     flexDirection: "row",

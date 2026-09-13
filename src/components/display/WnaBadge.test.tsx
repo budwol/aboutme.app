@@ -62,7 +62,7 @@ describe("WnaBadge", () => {
     expect(tree!.root.findByType("div").props).toEqual(
       expect.objectContaining({
         "aria-label": "Profile",
-        style: expect.objectContaining({ display: "flex" }),
+        style: expect.objectContaining({ display: "flex", minHeight: 24 }),
       }),
     );
   });
