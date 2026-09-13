@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[###################-] 96%` (27 von 28 Arbeitspaketen)
+Fortschritt: `[##################--] 93%` (28 von 30 priorisierten Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -132,6 +132,8 @@ Status: **in Arbeit**
       bleibt bis zur Navigation-Migration bestehen.
 - [x] Direkte `react-native-screens`-Dependency entfernen; transitiver Bezug
       bleibt bis zur Expo-Router-Migration bestehen.
+- [x] Theme-Persistenz von `AsyncStorage` auf den SSR-sicheren Browser-
+      `localStorage`-Adapter umstellen.
 
 Exit-Kriterium: Relevante Expo-/Native-Dependencies sind aus dem Web-Bundle
 und aus `package.json` entfernt; Motion- und Theme-Tests decken die Browserpfade
@@ -154,39 +156,40 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 
 ## Umsetzungsstand
 
-| Datum      | Phase | Änderung                                                               | Validierung                                                    |
-| ---------- | ----- | ---------------------------------------------------------------------- | -------------------------------------------------------------- |
-| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                                | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich      |
-| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                      | E2E-Artefakt analysiert; fehlendes `convert` behoben           |
-| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                    | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz      |
-| 2026-09-13 | 1     | DOM-Style-Regression behoben                                           | 470 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt                | 18 Tooltip-Tests, Lint und TypeScript erfolgreich              |
-| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert                  | 484 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                       | 484 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                                  | 483 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                                  | 54 fokussierte Tests, Lint und TypeScript erfolgreich          |
-| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt    | 491 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                     | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests      |
-| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt             | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                       | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt               | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt                 | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                     | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt                | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt          | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | `react-native-reanimated` aus dem Web-Pfad und package.json entfernt   | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                    | Transitiver Bezug über Drawer-Navigation dokumentiert          |
-| 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                      | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt              | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
-| 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                              | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 3     | Native Dependencies auf direkte und transitive Nutzung geprüft         | Router/Drawer als verbleibende transitive Grenze dokumentiert  |
-| 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                     | Transitiver Bezug über Expo Router dokumentiert                |
-| 2026-09-13 | 2     | Statische Navigationsliste von `FlatList` auf `ScrollView` umgestellt  | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt       | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 2     | Verwaiste `FlatList`-Test-Assertion entfernt                           | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                  | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
-| 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt   | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| Datum      | Phase | Änderung                                                                      | Validierung                                                    |
+| ---------- | ----- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                                       | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich      |
+| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                             | E2E-Artefakt analysiert; fehlendes `convert` behoben           |
+| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                           | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz      |
+| 2026-09-13 | 1     | DOM-Style-Regression behoben                                                  | 470 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt                       | 18 Tooltip-Tests, Lint und TypeScript erfolgreich              |
+| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert                         | 484 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                              | 484 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                                         | 483 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                                         | 54 fokussierte Tests, Lint und TypeScript erfolgreich          |
+| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt           | 491 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                            | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests      |
+| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt                    | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                              | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt                      | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt                        | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                            | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt                       | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt                 | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | `react-native-reanimated` aus dem Web-Pfad und package.json entfernt          | 497 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Hero-Kreisbewegung und Profil-Bar mit festen Web-Keyframes abgesichert        | 500 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                           | Transitiver Bezug über Drawer-Navigation dokumentiert          |
+| 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                             | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt                     | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 2     | App-Resize auf `window.resize` umgestellt                                     | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 3     | Native Dependencies auf direkte und transitive Nutzung geprüft                | Router/Drawer als verbleibende transitive Grenze dokumentiert  |
+| 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                            | Transitiver Bezug über Expo Router dokumentiert                |
+| 2026-09-13 | 2     | Statische Navigationsliste von `FlatList` auf `ScrollView` umgestellt         | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt              | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Verwaiste `FlatList`-Test-Assertion entfernt                                  | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                         | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt          | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 4     | Theme-Persistenz auf Browser-`localStorage` umgestellt; AsyncStorage entfernt | 503 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
