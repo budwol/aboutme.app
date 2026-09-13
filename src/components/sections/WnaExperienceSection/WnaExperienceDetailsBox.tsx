@@ -1,10 +1,5 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { LayoutChangeEvent, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import React, { ReactNode, useId, useState } from "react";
+import { LayoutChangeEvent, View, ViewStyle } from "react-native";
 import {
   detailsHeightBuffer,
   detailsTopSpacing,
@@ -25,16 +20,10 @@ export default function WnaExperienceDetailsBox({
   children,
 }: WnaExperienceDetailsBoxProps) {
   const [contentHeight, setContentHeight] = useState(0);
-  const animatedHeight = useSharedValue(0);
-
-  useEffect(() => {
-    animatedHeight.value = withTiming(
-      isExpanded ? contentHeight + detailsTopSpacing + detailsHeightBuffer : 0,
-      {
-        duration: 220,
-      },
-    );
-  }, [animatedHeight, contentHeight, isExpanded]);
+  const detailsId = useId();
+  const targetHeight = isExpanded
+    ? contentHeight + detailsTopSpacing + detailsHeightBuffer
+    : 0;
 
   function handleLayout(event: LayoutChangeEvent) {
     const nextHeight = event.nativeEvent.layout.height;
@@ -44,12 +33,11 @@ export default function WnaExperienceDetailsBox({
     }
   }
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: animatedHeight.value,
-  }));
-
   return (
-    <Animated.View style={[styles.detailsClip, animatedStyle]}>
+    <View
+      nativeID={`wna-experience-details-${detailsId}`}
+      style={[styles.detailsClip, { height: targetHeight } as ViewStyle]}
+    >
       <View
         onLayout={handleLayout}
         style={[
@@ -62,6 +50,6 @@ export default function WnaExperienceDetailsBox({
       >
         {children}
       </View>
-    </Animated.View>
+    </View>
   );
 }

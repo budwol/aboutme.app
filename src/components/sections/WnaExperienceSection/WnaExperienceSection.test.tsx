@@ -71,26 +71,6 @@ jest.mock("@components/display/WnaBadge", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ReactModule = require("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-    },
-    useAnimatedStyle: (factory: () => unknown) => factory(),
-    useSharedValue: (value: unknown) => ({ value }),
-    withTiming: (value: unknown) => value,
-  };
-});
-
 describe("WnaExperienceSection", () => {
   const openURL = jest.spyOn(WebLinking.Linking, "openURL");
 
@@ -637,7 +617,10 @@ describe("WnaExperienceSection", () => {
     const textValues = tree!.root
       .findAllByType("Text")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
-    const detailsClip = tree!.root.findByType("AnimatedView");
+    const detailsClip = tree!.root.find(
+      (node: { props: { nativeID?: string } }) =>
+        node.props.nativeID?.startsWith("wna-experience-details-") === true,
+    );
     const detailsClipStyle = Array.isArray(detailsClip.props.style)
       ? detailsClip.props.style
       : [detailsClip.props.style];
@@ -774,7 +757,12 @@ describe("WnaExperienceSection", () => {
       });
     });
 
-    expect(tree!.root.findAllByType("AnimatedView")).toHaveLength(1);
+    expect(
+      tree!.root.findAll(
+        (node: { props: { nativeID?: string } }) =>
+          node.props.nativeID?.startsWith("wna-experience-details-") === true,
+      ),
+    ).not.toHaveLength(0);
   });
 
   it("falls back to an empty subtitle when experienceSubtitle is missing", () => {

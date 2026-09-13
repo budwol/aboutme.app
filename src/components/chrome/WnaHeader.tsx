@@ -3,17 +3,13 @@ import { getNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
-import { appMotionConstants } from "@constants/motionConstants";
 import { Href, useRouter } from "expo-router";
-import { FC, memo, ReactNode, useCallback, useEffect } from "react";
+import { FC, memo, ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, useColorScheme, View, ViewStyle } from "react-native";
 import Animated, {
-  Easing,
   SharedValue,
   useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
@@ -64,19 +60,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       Platform.OS === "web" &&
       typeof window !== "undefined" &&
       window.history.length > 1;
-
-    const lazyOpacity = useSharedValue(1);
-
-    useEffect(() => {
-      lazyOpacity.value = withTiming(isBusy ? 0 : 1, {
-        duration: appMotionConstants.defaultAnimationDuration,
-        easing: Easing.bezier(0.5, 0.01, 0, 1),
-      });
-    }, [isBusy, lazyOpacity]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      opacity: lazyOpacity.value,
-    }));
 
     const headerShadowStyle = useAnimatedStyle(() => {
       const scrollValue = scrollY?.value ?? 0;
@@ -245,9 +228,10 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               )}
             </View>
 
-            <Animated.View
+            <View
+              nativeID="wna-header-actions"
               style={[
-                animatedStyle,
+                { opacity: isBusy ? 0 : 1 },
                 { flexDirection: "row", paddingRight: 16 },
               ]}
             >
@@ -270,7 +254,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
               {headerButton0}
               {headerButton1}
               {headerButton2}
-            </Animated.View>
+            </View>
           </View>
         </Animated.View>
       </Animated.View>

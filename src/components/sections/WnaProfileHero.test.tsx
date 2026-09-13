@@ -1,12 +1,10 @@
-import { afterEach, describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaProfileHero, {
   WnaHeroField,
 } from "@components/sections/WnaProfileHero";
 import { testAppData } from "@/app-data/testAppData";
-
-let mockReduceMotion = true;
 
 jest.mock("@components/images/WnaImage", () => {
   const { createElement } = jest.requireActual(
@@ -32,48 +30,7 @@ jest.mock("@components/display/WnaAccentBar", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
-  const ReactModule = jest.requireActual("react") as typeof import("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-    },
-    Easing: {
-      inOut: (value: unknown) => value,
-      sin: "sin",
-    },
-    interpolate: (
-      value: number,
-      inputRange: [number, number],
-      outputRange: [number, number],
-    ) => {
-      const [inputStart, inputEnd] = inputRange;
-      const [outputStart, outputEnd] = outputRange;
-      const ratio = (value - inputStart) / (inputEnd - inputStart);
-
-      return outputStart + ratio * (outputEnd - outputStart);
-    },
-    useReducedMotion: () => mockReduceMotion,
-    useAnimatedStyle: (callback: () => Record<string, unknown>) => callback(),
-    useSharedValue: (initialValue: number) => ({ value: initialValue }),
-    withRepeat: (value: unknown) => value,
-    withSequence: (...values: unknown[]) => values[0],
-    withTiming: (value: unknown) => value,
-  };
-});
-
 describe("WnaProfileHero", () => {
-  afterEach(() => {
-    mockReduceMotion = true;
-  });
-
   const appColors = {
     white: "#ffffff",
     black: "#000000",
@@ -145,8 +102,7 @@ describe("WnaProfileHero", () => {
     expect(accentBars[0].props.pulseDuration).toBe(30000);
   });
 
-  it("animates hero shapes when reduced motion is disabled", () => {
-    mockReduceMotion = false;
+  it("exposes the hero shape motion as CSS animation variables", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -165,19 +121,19 @@ describe("WnaProfileHero", () => {
     });
 
     const animatedShape = tree!.root
-      .findAllByType("AnimatedView")
+      .findAllByType("View")
       .find(
-        (node: { props: { style?: unknown[] } }) =>
-          Array.isArray(node.props.style) &&
-          (node.props.style[1] as { opacity?: number })?.opacity !== 1,
+        (node: { props: { nativeID?: string } }) =>
+          node.props.nativeID === "wna-hero-shape-0",
       );
 
     expect(animatedShape?.props.style[1]).toEqual(
       expect.objectContaining({
-        opacity: expect.any(Number),
-        transform: expect.arrayContaining([
-          expect.objectContaining({ scale: expect.any(Number) }),
-        ]),
+        "--wna-hero-shape-duration": "13000ms",
+        "--wna-hero-shape-start-scale": expect.any(Number),
+        "--wna-hero-shape-end-scale": expect.any(Number),
+        "--wna-hero-shape-start-opacity": expect.any(Number),
+        "--wna-hero-shape-end-opacity": expect.any(Number),
       }),
     );
   });

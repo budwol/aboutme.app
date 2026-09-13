@@ -57,6 +57,44 @@ export default function Root({ children }: PropsWithChildren) {
                       to { transform: scaleX(var(--wna-accent-bar-pulse-scale)); }
                     }
 
+                    @keyframes wna-hero-shape-swing {
+                      from {
+                        opacity: var(--wna-hero-shape-start-opacity);
+                        transform:
+                          translateX(var(--wna-hero-shape-start-x))
+                          translateY(var(--wna-hero-shape-start-y))
+                          rotate(var(--wna-hero-shape-start-rotate))
+                          scale(var(--wna-hero-shape-start-scale));
+                      }
+                      to {
+                        opacity: var(--wna-hero-shape-end-opacity);
+                        transform:
+                          translateX(var(--wna-hero-shape-end-x))
+                          translateY(var(--wna-hero-shape-end-y))
+                          rotate(var(--wna-hero-shape-end-rotate))
+                          scale(var(--wna-hero-shape-end-scale));
+                      }
+                    }
+
+                    [id^="wna-hero-shape-"] {
+                      animation: wna-hero-shape-swing var(--wna-hero-shape-duration) ease-in-out infinite alternate;
+                    }
+
+                    [id^="wna-experience-details-"] {
+                      overflow: hidden;
+                      transition: height 220ms ease-in-out;
+                    }
+
+                    #wna-header-actions {
+                      transition: opacity 180ms cubic-bezier(.5, .01, 0, 1);
+                    }
+
+                    @media (prefers-reduced-motion: reduce) {
+                      [id^="wna-hero-shape-"] {
+                        animation: none;
+                      }
+                    }
+
                     /* firefox and brave */
                     * {
                         scrollbar-width: thin;
