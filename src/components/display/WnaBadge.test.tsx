@@ -64,11 +64,12 @@ describe("WnaBadge", () => {
         "aria-label": "Profile",
         style: expect.objectContaining({
           alignSelf: "flex-start",
+          alignItems: "center",
           boxSizing: "border-box",
           display: "flex",
           flexGrow: 0,
           flexShrink: 0,
-          minHeight: 24,
+          height: 28,
         }),
       }),
     );

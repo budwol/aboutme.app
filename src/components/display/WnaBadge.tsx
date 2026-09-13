@@ -81,7 +81,7 @@ const styles: { container: CSSProperties; text: CSSProperties } = {
     flexGrow: 0,
     flexShrink: 0,
     boxSizing: "border-box",
-    minHeight: 24,
+    height: 28,
     padding: 4,
     borderRadius: 4,
     flexDirection: "row",
