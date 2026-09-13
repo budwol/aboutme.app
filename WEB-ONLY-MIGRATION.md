@@ -119,6 +119,8 @@ Status: **in Arbeit**
 - [x] `expo-localization` durch Browser-Locale-APIs ersetzen.
 - [x] Direkte `react-native-worklets`-Dependency entfernen; transitiver Bezug
       bleibt bis zur Navigation-Migration bestehen.
+- [x] Direkte `react-native-screens`-Dependency entfernen; transitiver Bezug
+      bleibt bis zur Expo-Router-Migration bestehen.
 
 Exit-Kriterium: Relevante Expo-/Native-Dependencies sind aus dem Web-Bundle
 und aus `package.json` entfernt; Motion- und Theme-Tests decken die Browserpfade
@@ -166,6 +168,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 4     | Direkte `react-native-worklets`-Dependency entfernt                    | Transitiver Bezug über Drawer-Navigation dokumentiert          |
 | 2026-09-13 | 2     | `SafeAreaView` durch CSS-Safe-Area-Insets ersetzt                      | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
 | 2026-09-13 | 2     | `GestureHandlerRootView` aus dem Web-Root-Layout entfernt              | 500 Unit-Tests, Lint und TypeScript erfolgreich                |
+| 2026-09-13 | 4     | Direkte `react-native-screens`-Dependency entfernt                     | Transitiver Bezug über Expo Router dokumentiert                |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
