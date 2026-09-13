@@ -144,8 +144,8 @@ describe("WnaDrawerMenu integration", () => {
     const footerLink = tree.root.find(
       (node: {
         type: unknown;
-        props: { onPress?: () => void; children?: React.ReactNode };
-      }) => node.type === "Text" && typeof node.props.onPress === "function",
+        props: { onClick?: () => void; href?: string };
+      }) => node.type === "a" && typeof node.props.href === "string",
     );
 
     await act(async () => {
@@ -175,7 +175,7 @@ describe("WnaDrawerMenu integration", () => {
     expect(mockToggleWnaTheme).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      footerLink.props.onPress();
+      footerLink.props.onClick!({ preventDefault: () => {} } as never);
       jest.advanceTimersByTime(appMotionConstants.navigationTransitionDelay);
     });
 

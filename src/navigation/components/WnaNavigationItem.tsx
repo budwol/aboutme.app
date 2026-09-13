@@ -5,9 +5,9 @@ import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { convertHexToRgba } from "@utils/colorConverter";
+import { lineClampStyle } from "@utils/lineClampStyle";
 import { TFunction } from "i18next";
-import React, { FC, memo, useMemo, useState } from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo, useMemo, useState } from "react";
 
 export type WnaNavigationItemProps = {
   appColors: Colors;
@@ -17,7 +17,7 @@ export type WnaNavigationItemProps = {
   onPress: (text: string) => void;
   iconRightName?: keyof typeof iconMap | null;
   t: TFunction<string[], undefined>;
-  style?: ViewStyle;
+  style?: CSSProperties;
   type?: "first" | "last" | "middle" | "standalone" | undefined;
 };
 
@@ -54,7 +54,7 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
           effectiveType === "last" || effectiveType === "standalone"
             ? appLayoutConstants.globalCornerRadius
             : 0,
-      }) as ViewStyle,
+      }) as CSSProperties,
     [effectiveType],
   );
 
@@ -99,30 +99,42 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
       style: buttonStyle as React.CSSProperties,
     },
     <WnaSurfaceCard appColors={appColors} type={type}>
-      <View style={styles.row}>
-        <View style={styles.iconWrapper}>
-          <WnaIcon iconName={iconName} size={24} color={leftIconColor} />
-        </View>
-        <View style={styles.content}>
-          <Text
-            style={[appStyle.textNeutralMedium, styles.text, textColorStyle]}
-            textBreakStrategy={"highQuality"}
-            numberOfLines={1}
-            ellipsizeMode={"tail"}
-          >
-            {text}
-          </Text>
-        </View>
-        {effectiveIconRightName ? (
-          <View style={styles.trailingIcon}>
-            <WnaIcon
-              iconName={effectiveIconRightName}
-              size={24}
-              color={rightIconColor}
-            />
-          </View>
-        ) : null}
-      </View>
+      {React.createElement(
+        "div",
+        { style: styles.row },
+        React.createElement(
+          "div",
+          { style: styles.iconWrapper },
+          <WnaIcon iconName={iconName} size={24} color={leftIconColor} />,
+        ),
+        React.createElement(
+          "div",
+          { style: styles.content },
+          React.createElement(
+            "span",
+            {
+              style: {
+                ...appStyle.textNeutralMedium,
+                ...styles.text,
+                ...textColorStyle,
+                ...lineClampStyle(1),
+              } as CSSProperties,
+            },
+            text,
+          ),
+        ),
+        effectiveIconRightName
+          ? React.createElement(
+              "div",
+              { style: styles.trailingIcon },
+              <WnaIcon
+                iconName={effectiveIconRightName}
+                size={24}
+                color={rightIconColor}
+              />,
+            )
+          : null,
+      )}
     </WnaSurfaceCard>,
   );
 };
@@ -133,13 +145,15 @@ WnaNavigationItem.displayName = "WnaNavigationItem";
 
 export default WnaNavigationItem;
 
-const styles = StyleSheet.create({
+const styles: Record<string, CSSProperties> = {
   row: {
+    display: "flex",
     flex: 1,
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
     alignContent: "center",
+    position: "relative",
   },
   iconWrapper: {
     width: 24,
@@ -158,4 +172,4 @@ const styles = StyleSheet.create({
     marginRight: 8,
     alignSelf: "center",
   },
-});
+};

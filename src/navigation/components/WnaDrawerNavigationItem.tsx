@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import React, { CSSProperties, useMemo, useState } from "react";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
@@ -82,32 +81,37 @@ export default function WnaDrawerNavigationItem({
       style: buttonStyle as React.CSSProperties,
       "data-testid": `drawer-navigation-item-${text}`,
     },
-    isActive ? (
-      <View style={[styles.accentBar, { backgroundColor: accent }]} />
-    ) : null,
+    isActive
+      ? React.createElement("div", {
+          style: {
+            ...styles.accentBar,
+            backgroundColor: accent,
+          } as CSSProperties,
+        })
+      : null,
     <WnaIcon
       iconName={iconName}
       size={isActive ? 21 : 20}
       color={iconColor}
       style={{ width: 28, opacity }}
     />,
-    <Text
-      style={[
-        appStyle.textNeutralMedium,
-        styles.text,
-        {
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...appStyle.textNeutralMedium,
+          ...styles.text,
           color: textColor,
           opacity,
           fontWeight: isActive ? "600" : "400",
-        },
-      ]}
-    >
-      {text}
-    </Text>,
+        } as CSSProperties,
+      },
+      text,
+    ),
   );
 }
 
-const styles = StyleSheet.create({
+const styles: Record<string, CSSProperties> = {
   accentBar: {
     position: "absolute",
     left: 0,
@@ -118,4 +122,4 @@ const styles = StyleSheet.create({
   text: {
     marginLeft: 12,
   },
-});
+};

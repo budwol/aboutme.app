@@ -1,8 +1,13 @@
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { AppLayout } from "@constants/layoutConstants";
 import AppStyle from "@/theme/appStyle";
-import { Fragment, ReactNode, useCallback, useMemo } from "react";
-import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
+import React, {
+  CSSProperties,
+  Fragment,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 
 export interface WnaMenuItem {
   route?: string;
@@ -18,7 +23,7 @@ export type WnaNavigationListProps = {
   renderItem: (item: WnaMenuItem) => ReactNode;
   overrideGap?: number;
   overridePaddingTop?: number;
-  style?: ViewStyle;
+  style?: CSSProperties;
 };
 
 export default function WnaNavigationList(props: WnaNavigationListProps) {
@@ -32,14 +37,15 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
     style,
   } = props;
 
-  const listStyle = useMemo(
-    () => [
-      {
-        paddingTop: overridePaddingTop ?? appLayout.contentListPaddingTop,
-        paddingBottom: appLayout.contentPaddingBottom,
-      },
-      style ?? null,
-    ],
+  const listStyle: CSSProperties = useMemo(
+    () => ({
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
+      paddingTop: overridePaddingTop ?? appLayout.contentListPaddingTop,
+      paddingBottom: appLayout.contentPaddingBottom,
+      ...style,
+    }),
     [
       appLayout.contentListPaddingTop,
       appLayout.contentPaddingBottom,
@@ -51,34 +57,37 @@ export default function WnaNavigationList(props: WnaNavigationListProps) {
   const separatorHeight = overrideGap ?? appLayout.globalListGap;
 
   const renderMenuItem = useCallback(
-    ({ item }: { item: WnaMenuItem }) => (
-      <View style={appStyle.containerCenterMaxWidth}>{renderItem(item)}</View>
-    ),
+    ({ item }: { item: WnaMenuItem }) =>
+      React.createElement(
+        "div",
+        { style: appStyle.containerCenterMaxWidth as CSSProperties },
+        renderItem(item),
+      ),
     [appStyle.containerCenterMaxWidth, renderItem],
   );
 
   const renderSeparator = useCallback(
-    () => <View style={[styles.separator, { height: separatorHeight }]} />,
+    () =>
+      React.createElement("div", {
+        style: { ...styles.separator, height: separatorHeight },
+      }),
     [separatorHeight],
   );
 
-  return (
-    <ScrollView
-      style={listStyle}
-      scrollEventThrottle={appLayout.scrollEventThrottle}
-    >
-      {items.map((item, index) => (
-        <Fragment key={item.route ?? `${item.text}-${index}`}>
-          {renderMenuItem({ item })}
-          {index < items.length - 1 ? renderSeparator() : null}
-        </Fragment>
-      ))}
-    </ScrollView>
+  return React.createElement(
+    "div",
+    { style: listStyle },
+    items.map((item, index) => (
+      <Fragment key={item.route ?? `${item.text}-${index}`}>
+        {renderMenuItem({ item })}
+        {index < items.length - 1 ? renderSeparator() : null}
+      </Fragment>
+    )),
   );
 }
 
-const styles = StyleSheet.create({
+const styles: Record<string, CSSProperties> = {
   separator: {
     width: "100%",
   },
-});
+};

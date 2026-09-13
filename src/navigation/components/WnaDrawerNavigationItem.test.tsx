@@ -94,7 +94,7 @@ describe("WnaDrawerNavigationItem", () => {
     expect(icon.props.size).toBe(20);
     expect(icon.props.color).toBe("#111111");
     expect(icon.props.style.opacity).toBe(0.7);
-    expect(text.props.style[2]).toEqual(
+    expect(text.props.style).toEqual(
       expect.objectContaining({ opacity: 0.7, fontWeight: "400" }),
     );
 
@@ -141,9 +141,7 @@ describe("WnaDrawerNavigationItem", () => {
     );
     const icon = tree!.root.findByType("WnaIcon");
     const accentBar = tree!.root.find(
-      (node: TestNode) =>
-        Array.isArray(node.props.style) &&
-        node.props.style.some((style: { width?: number }) => style.width === 4),
+      (node: TestNode) => node.props.style?.width === 4,
     );
 
     expect(button.props["aria-label"]).toBe("Projects");
@@ -164,23 +162,21 @@ describe("WnaDrawerNavigationItem", () => {
     expect(icon.props.size).toBe(21);
     expect(icon.props.color).toBe("#00aa99");
     expect(accentBar.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 4,
-          position: "absolute",
-        }),
-        { backgroundColor: "#00aa99" },
-      ]),
+      expect.objectContaining({
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 4,
+        position: "absolute",
+        backgroundColor: "#00aa99",
+      }),
     );
     expect(icon.props.style).toEqual(
       expect.objectContaining({ width: 28, opacity: 1 }),
     );
     expect(
       tree!.root.find((node: TestNode) => node.props.children === "Projects")
-        .props.style[1],
+        .props.style,
     ).toEqual(expect.objectContaining({ marginLeft: 12 }));
   });
 

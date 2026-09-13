@@ -1,13 +1,12 @@
 import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { ScrollView } from "react-native";
 import WnaNavigationList, {
   WnaMenuItem,
 } from "@/navigation/components/WnaNavigationList";
 
 describe("WnaNavigationList", () => {
-  it("renders menu items and separators in a web-compatible scroll view", () => {
+  it("renders menu items and separators in a web-compatible scroll container", () => {
     const items: WnaMenuItem[] = [
       { route: "/one", text: "One", type: "nav" },
       { text: "Two", type: "secondary" },
@@ -37,13 +36,16 @@ describe("WnaNavigationList", () => {
       );
     });
 
-    const list = tree!.root.findByType(ScrollView);
+    const list = tree!.root.findAllByType("div")[0];
 
-    expect(list.props.scrollEventThrottle).toBe(16);
-    expect(list.props.style).toEqual([
-      { paddingTop: 6, paddingBottom: 24 },
-      { backgroundColor: "#fff" },
-    ]);
+    expect(list.props.style).toEqual(
+      expect.objectContaining({
+        overflowY: "auto",
+        paddingTop: 6,
+        paddingBottom: 24,
+        backgroundColor: "#fff",
+      }),
+    );
     const children = list.props.children;
     expect(children).toHaveLength(2);
     expect(children[0].key).toBe("/one");
@@ -53,10 +55,9 @@ describe("WnaNavigationList", () => {
     });
     expect(children[0].props.children[0].props.children.props.text).toBe("One");
     expect(children[1].props.children[0].props.children.props.text).toBe("Two");
-    expect(children[0].props.children[1].props.style).toEqual([
-      expect.objectContaining({ width: "100%" }),
-      { height: 10 },
-    ]);
+    expect(children[0].props.children[1].props.style).toEqual(
+      expect.objectContaining({ width: "100%", height: 10 }),
+    );
     expect(children[1].props.children[1]).toBeNull();
   });
 
@@ -81,12 +82,11 @@ describe("WnaNavigationList", () => {
       );
     });
 
-    const list = tree!.root.findByType(ScrollView);
+    const list = tree!.root.findAllByType("div")[0];
 
-    expect(list.props.style).toEqual([
-      { paddingTop: 12, paddingBottom: 24 },
-      null,
-    ]);
+    expect(list.props.style).toEqual(
+      expect.objectContaining({ paddingTop: 12, paddingBottom: 24 }),
+    );
     expect(list.props.children).toEqual([]);
   });
 });

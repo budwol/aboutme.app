@@ -4,8 +4,7 @@ import Colors from "@constants/theme/colors";
 import { DrawerActions } from "@react-navigation/native";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { TFunction } from "i18next";
-import { memo } from "react";
-import { View } from "react-native";
+import React, { CSSProperties, memo } from "react";
 
 type DrawerNavigationDispatcher = {
   dispatch: (action: ReturnType<typeof DrawerActions.openDrawer>) => void;
@@ -24,18 +23,24 @@ function WnaMenuToggleButton({
   navigation,
   t,
 }: WnaMenuToggleButtonProps) {
-  return (
-    <View style={{ alignItems: "center" }}>
-      <WnaButtonHeader
-        appStyle={appStyle}
-        appColors={appColors}
-        text={t(i18nKeys.screenTitleMenu)}
-        iconName="menu"
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-        t={t}
-        checkInternetConnection={false}
-      />
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      } as CSSProperties,
+    },
+    <WnaButtonHeader
+      appStyle={appStyle}
+      appColors={appColors}
+      text={t(i18nKeys.screenTitleMenu)}
+      iconName="menu"
+      onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+      t={t}
+      checkInternetConnection={false}
+    />,
   );
 }
 

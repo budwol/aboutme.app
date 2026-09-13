@@ -34,8 +34,8 @@ type ButtonNode = {
 
 type FooterLinkNode = {
   props: {
-    accessibilityRole?: string;
-    children?: string[];
+    href?: string;
+    children?: string;
   };
 };
 
@@ -271,7 +271,7 @@ describe("WnaDrawerMenu", () => {
     });
 
     const headerTexts = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: { props: { children?: unknown } }) => node.props.children);
 
     expect(headerTexts).toContain("John Doe");
@@ -293,7 +293,7 @@ describe("WnaDrawerMenu", () => {
     );
     expect(navigationList.props.overrideGap).toBe(appSpacingConstants.xs);
     expect(navigationList.props.style).toEqual({
-      paddingHorizontal: appSpacingConstants.xs,
+      paddingInline: appSpacingConstants.xs,
       paddingBottom: appSpacingConstants.xs,
     });
 
@@ -355,10 +355,10 @@ describe("WnaDrawerMenu", () => {
     });
 
     const footerLink = tree!.root.find(
-      (node: FooterLinkNode) => node.props.accessibilityRole === "link",
+      (node: FooterLinkNode) => typeof node.props.href === "string",
     );
 
-    expect(footerLink.props.children.join("")).toBe("© John Doe");
+    expect(footerLink.props.children).toBe("© John Doe");
   });
 
   it("navigates to the disclaimer route from the footer link", async () => {
@@ -369,11 +369,13 @@ describe("WnaDrawerMenu", () => {
     });
 
     const footerLink = tree!.root.find(
-      (node: FooterLinkNode) => node.props.accessibilityRole === "link",
-    );
+      (node: FooterLinkNode) => typeof node.props.href === "string",
+    ) as unknown as {
+      props: { onClick: (event: { preventDefault: () => void }) => void };
+    };
 
     act(() => {
-      footerLink.props.onPress();
+      footerLink.props.onClick({ preventDefault: () => {} });
     });
 
     expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/menu/impressum");
@@ -395,7 +397,7 @@ describe("WnaDrawerMenu", () => {
     expect(themeButton).toBeDefined();
     expect(themeButton!.props.style).toEqual(
       expect.objectContaining({
-        marginHorizontal: 0,
+        marginInline: 0,
         height: appLayoutConstants.textInputHeight,
         borderRadius: appLayoutConstants.globalCornerRadius,
       }),
@@ -514,11 +516,9 @@ describe("WnaDrawerMenu", () => {
       tree = TestRenderer.create(<WnaDrawerMenu />);
     });
 
-    const container = tree!.root.findAllByType("View")[0];
+    const container = tree!.root.findAllByType("div")[0];
     expect(container.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "#111" }),
-      ]),
+      expect.objectContaining({ backgroundColor: "#111" }),
     );
 
     const buttons = tree!.root.findAllByType("WnaButtonIconText");
