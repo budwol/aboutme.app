@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { Pressable, Text, View, StyleSheet } from "react-native";
+import React, { useMemo, useState } from "react";
+import { Text, View, StyleSheet } from "react-native";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
@@ -24,6 +24,7 @@ export default function WnaDrawerNavigationItem({
   isSecondary = false,
   isActive = false,
 }: Props) {
+  const [isPressed, setIsPressed] = useState(false);
   const accent = appColors.staticAccent5;
 
   const backgroundColorActive = useMemo(() => {
@@ -40,21 +41,32 @@ export default function WnaDrawerNavigationItem({
   const textColor = iconColor;
   const opacity = isSecondary && !isActive ? 0.7 : 1;
 
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={text}
-      accessibilityState={{ selected: isActive }}
-      aria-current={isActive ? "page" : undefined}
-      style={({ pressed }) => [
-        styles.container,
-        {
-          paddingLeft: isSecondary ? 32 : 16,
-          backgroundColor: getBackgroundColor(pressed),
-        },
-      ]}
-    >
+  const buttonStyle = {
+    ...styles.container,
+    appearance: "none" as const,
+    border: "none",
+    fontFamily: "inherit",
+    fontSize: "inherit",
+    paddingLeft: isSecondary ? 32 : 16,
+    backgroundColor: getBackgroundColor(isPressed),
+    textAlign: "left" as const,
+    width: "100%",
+  };
+
+  return React.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: onPress,
+      onMouseDown: () => setIsPressed(true),
+      onMouseUp: () => setIsPressed(false),
+      onMouseLeave: () => setIsPressed(false),
+      "aria-label": text,
+      "aria-current": isActive ? "page" : undefined,
+      style: buttonStyle as React.CSSProperties,
+      testID: `drawer-navigation-item-${text}`,
+    },
+    <View>
       {isActive && (
         <View style={[styles.accentBar, { backgroundColor: accent }]} />
       )}
@@ -79,7 +91,7 @@ export default function WnaDrawerNavigationItem({
       >
         {text}
       </Text>
-    </Pressable>
+    </View>,
   );
 }
 

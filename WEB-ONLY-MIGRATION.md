@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[##################--] 94%` (30 von 32 priorisierten Arbeitspaketen)
+Fortschritt: `[##################--] 94%` (31 von 33 priorisierten Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -91,12 +91,20 @@ Status: **in Arbeit**
       und sicherem `rel`-Attribut rendern.
 - [x] Lokale Footer-Aktionen als Web-`button` mit `type="button"` und
       Browser-Hover-Events rendern.
+- [x] Drawer-Navigationseinträge als Web-`button` mit `aria-current` und
+      browsergerechtem Pressed-State rendern.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
 - [x] Resize-Events im App-Frame über `window.resize` statt Native-
       `Dimensions` abonnieren.
 
 Exit-Kriterium: Keine produktiven UI-Imports aus `react-native` oder
 `react-native-web`; Accessibility- und Responsive-E2E-Suite bleibt grün.
+
+Letzter Validierungsstand: Unit- und Integrationstests grün (503 Unit-Tests,
+31 Integrationstests, Coverage 100%). Die E2E-Ausführung ist aktuell durch den
+Expo-Port-Allocator blockiert, der trotz gültigem Playwright-Port bis Port
+`65536` weiterläuft; dies ist ein Test-Infrastrukturproblem und kein grüner
+E2E-Nachweis.
 
 ### 3. Navigation und Interaktion
 

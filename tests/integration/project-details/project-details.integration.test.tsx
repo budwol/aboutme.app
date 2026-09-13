@@ -150,7 +150,15 @@ describe("WnaProjectDetailsRoute integration", () => {
     });
 
     expect(mockOpenURL).not.toHaveBeenCalled();
-    expect(tree.root.findByType("Modal").props.visible).toBe(true);
+    expect(
+      tree.root.findByProps({ testID: "private-repo-modal" }).props,
+    ).toEqual(
+      expect.objectContaining({
+        accessibilityLabel: "private-repo-modal",
+        role: "dialog",
+        "aria-modal": true,
+      }),
+    );
     const modalTexts = tree.root
       .findAllByType("Text")
       .map(
