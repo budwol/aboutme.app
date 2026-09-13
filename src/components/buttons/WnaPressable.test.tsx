@@ -17,18 +17,13 @@ jest.mock("@components/buttons/WnaBasePressable/WnaBasePressable", () => {
   };
 });
 
-jest.mock("react-native-popable", () => {
+jest.mock("@components/effects/WnaTooltip", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return {
-    Popable: (props: unknown) =>
-      createElement(
-        "Popable",
-        props as Record<string, unknown>,
-        (props as { children?: React.ReactNode }).children,
-      ),
+  return function MockWnaTooltip(props: unknown) {
+    return createElement("WnaTooltip", props as Record<string, unknown>);
   };
 });
 
@@ -73,25 +68,18 @@ describe("WnaPressable", () => {
     });
 
     const base = tree!.root.findByType("WnaBasePressable");
-    let popable = tree!.root.findByType("Popable");
+    let tooltip = tree!.root.findByType("WnaTooltip");
 
-    expect(popable.props.content.props.children).toBe("Open");
-    expect(popable.props.content.props.style).toEqual(
-      expect.objectContaining({
-        fontFamily: expect.stringContaining("Manrope"),
-        fontWeight: "600",
-      }),
-    );
-    expect(popable.props.position).toBe("top");
-    expect(popable.props.visible).toBe(false);
-    expect(popable.props.animated).toBe(false);
+    expect(tooltip.props.content).toBe("Open");
+    expect(tooltip.props.position).toBe("top");
+    expect(tooltip.props.visible).toBe(false);
 
     act(() => {
       base.props.onHoverIn();
     });
 
-    popable = tree!.root.findByType("Popable");
-    expect(popable.props.visible).toBe(true);
+    tooltip = tree!.root.findByType("WnaTooltip");
+    expect(tooltip.props.visible).toBe(true);
 
     act(() => {
       base.props.onPress();
@@ -107,7 +95,7 @@ describe("WnaPressable", () => {
     });
 
     expect(onPress).toHaveBeenCalledTimes(2);
-    expect(tree!.root.findByType("Popable").props.visible).toBe(false);
+    expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(false);
     jest.useRealTimers();
   });
 
@@ -127,10 +115,10 @@ describe("WnaPressable", () => {
       );
     });
 
-    const popable = tree!.root.findByType("Popable");
+    const tooltip = tree!.root.findByType("WnaTooltip");
 
-    expect(popable.props.content.props.children).toBe("Next");
-    expect(popable.props.position).toBe("right");
+    expect(tooltip.props.content).toBe("Next");
+    expect(tooltip.props.position).toBe("right");
   });
 
   it("renders bottom-positioned tooltip after the pressable", () => {
@@ -149,10 +137,10 @@ describe("WnaPressable", () => {
       );
     });
 
-    const popable = tree!.root.findByType("Popable");
+    const tooltip = tree!.root.findByType("WnaTooltip");
 
-    expect(popable.props.content.props.children).toBe("Done");
-    expect(popable.props.position).toBe("bottom");
+    expect(tooltip.props.content).toBe("Done");
+    expect(tooltip.props.position).toBe("bottom");
   });
 
   it("renders a left-positioned tooltip before the pressable", () => {
@@ -171,10 +159,10 @@ describe("WnaPressable", () => {
       );
     });
 
-    const popable = tree!.root.findByType("Popable");
+    const tooltip = tree!.root.findByType("WnaTooltip");
 
-    expect(popable.props.content.props.children).toBe("Back");
-    expect(popable.props.position).toBe("left");
+    expect(tooltip.props.content).toBe("Back");
+    expect(tooltip.props.position).toBe("left");
   });
 
   it("omits tooltip wrappers when tooltip text is missing", () => {
@@ -188,6 +176,6 @@ describe("WnaPressable", () => {
       );
     });
 
-    expect(tree!.root.findAllByType("Popable")).toHaveLength(0);
+    expect(tree!.root.findAllByType("WnaTooltip")).toHaveLength(0);
   });
 });

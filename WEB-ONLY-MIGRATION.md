@@ -43,9 +43,11 @@ Status: **in Arbeit**
       `fetchpriority` einführen.
 - [x] `expo-image` aus dem produktiven Bildpfad und den Dependencies entfernen.
 - [x] Verschachtelte React-Native-Styles vor dem DOM-Rendern rekursiv flatten.
+- [x] Tooltip-Positionierung und Typografie in eine getestete Web-kompatible
+      Komponente überführen.
 - [ ] Background-Image und Navigationstransition in der neuen Asset-Grenze
       regressionssicher abdecken.
-- [ ] Web-Shell ohne React-Native-Image- und Gradient-Abhängigkeiten ausliefern.
+- [x] Web-Shell ohne React-Native-Image- und Gradient-Abhängigkeiten ausliefern.
 
 Exit-Kriterium: Kein initialer Bild- oder Font-Fehler, unverändertes weiches
 Ein-/Ausfaden, alle lokalen Requests erfolgreich, Lighthouse-Image-Audit ohne
@@ -84,7 +86,9 @@ Transition-Background funktionieren in allen unterstützten Viewports.
 Status: **offen**
 
 - [ ] Reanimated durch CSS/Web Animations ersetzen.
-- [ ] `expo-linear-gradient` und `expo-blur` durch CSS ersetzen.
+- [x] `expo-linear-gradient` durch CSS ersetzen.
+- [ ] `expo-blur` durch CSS ersetzen.
+- [x] `react-native-popable` aus dem Web-Pfad entfernen.
 - [x] `expo-image` vollständig entfernen.
 - [ ] `expo-application`, `expo-constants`, `expo-localization` und Linking-
       Sonderpfade durch Web-APIs oder kleine lokale Adapter ersetzen.
@@ -116,6 +120,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt   | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
 | 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
 | 2026-09-13 | 1     | DOM-Style-Regression behoben                        | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 1/4   | CSS-Tooltip mit stabiler Ausrichtung eingeführt     | 11 Tooltip-Tests, Lint und TypeScript erfolgreich         |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
