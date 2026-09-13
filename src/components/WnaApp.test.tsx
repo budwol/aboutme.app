@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 import React from "react";
-import { Dimensions, Text } from "react-native";
+import { Text } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 
@@ -285,17 +285,18 @@ describe("WnaApp", () => {
     ).toBe(true);
   });
 
-  it("wires resize events through the debounced layout updater", () => {
+  it("wires browser resize events through the debounced layout updater", () => {
     jest.useFakeTimers();
-    const remove = jest.fn();
     let onChange: (() => void) | undefined;
-    const addEventListenerSpy = jest
-      .spyOn(Dimensions, "addEventListener")
-      .mockImplementation((_type, listener) => {
-        onChange = listener as () => void;
-
-        return { remove } as never;
-      });
+    const originalWindow = global.window;
+    const addEventListener = jest.fn((type: string, listener: () => void) => {
+      if (type === "resize") onChange = listener;
+    });
+    const removeEventListener = jest.fn();
+    Object.defineProperty(global, "window", {
+      configurable: true,
+      value: { addEventListener, removeEventListener },
+    });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -320,8 +321,11 @@ describe("WnaApp", () => {
       tree!.unmount();
     });
 
-    expect(remove).toHaveBeenCalledTimes(1);
-    addEventListenerSpy.mockRestore();
+    expect(removeEventListener).toHaveBeenCalledWith("resize", onChange);
+    Object.defineProperty(global, "window", {
+      configurable: true,
+      value: originalWindow,
+    });
     jest.useRealTimers();
   });
 

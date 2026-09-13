@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[#################---] 83%` (43 von 52 festen Arbeitspaketen)
+Fortschritt: `[#################---] 85%` (44 von 52 festen Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -80,7 +80,7 @@ Status: **in Arbeit**
       Web-Komponenten und CSS überführen.
 - [x] Fokusführung, Tastaturbedienung, ARIA-Zustände und reduzierte Bewegung
       erhalten beziehungsweise vervollständigen.
-- [ ] Native-only Fallbacks aus produktiven Web-Pfaden entfernen.
+- [x] Native-only Fallbacks aus produktiven Web-Pfaden entfernen.
 - [x] `SafeAreaView` durch einen Web-Container mit CSS-Safe-Area-Insets ersetzen.
 - [x] Statische Navigationslisten von `FlatList` auf `ScrollView` mit stabilen
       Keys und Separatoren umstellen.
@@ -114,7 +114,7 @@ Status: **in Arbeit**
 Exit-Kriterium: Keine produktiven UI-Imports aus `react-native` oder
 `react-native-web`; Accessibility- und Responsive-E2E-Suite bleibt grün.
 
-Letzter Validierungsstand: Unit- und Integrationstests grün (516 Unit-Tests,
+Letzter Validierungsstand: Unit- und Integrationstests grün (519 Unit-Tests,
 31 Integrationstests, Coverage 100%). Die E2E-Ausführung ist aktuell durch den
 Expo-Port-Allocator blockiert, der trotz gültigem Playwright-Port bis Port
 `65536` weiterläuft; dies ist ein Test-Infrastrukturproblem und kein grüner
@@ -229,6 +229,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Zusammengesetzte Icon-Text-Aktionen auf Web-`button` umgestellt                                     | 507 Unit-Tests, Lint und TypeScript erfolgreich                                                        |
 | 2026-09-13 | 1     | Background-Image und Navigationstransition mit Fade-, Layer- und Deep-Link-Regressionen abgesichert | 516 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich; E2E-Port-Allocator weiterhin blockiert |
 | 2026-09-13 | 2     | Web-Fokusindikator und globale Reduced-Motion-Regeln in Hydration- und Static-Shell ergänzt         | Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich        |
+| 2026-09-13 | 2     | Native Resize-Fallbacks durch einen browserbasierten Viewport-Adapter ersetzt                       | 519 Unit-Tests, 100% Coverage, Lint, Prettier, TypeScript und Circular-Dependency-Check erfolgreich    |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

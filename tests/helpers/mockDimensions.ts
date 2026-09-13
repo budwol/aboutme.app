@@ -1,17 +1,27 @@
-import { jest } from "@jest/globals";
-import { Dimensions, ScaledSize } from "react-native";
-
-function createScaledSize(width: number, height: number): ScaledSize {
-  return {
-    width,
-    height,
-    scale: 1,
-    fontScale: 1,
-  };
+function setViewportDimensions(width: number, height: number) {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    value: width,
+  });
+  Object.defineProperty(window, "innerHeight", {
+    configurable: true,
+    value: height,
+  });
 }
 
-export function mockDimensions(width: number, height: number) {
-  return jest
-    .spyOn(Dimensions, "get")
-    .mockImplementation(() => createScaledSize(width, height));
+type ViewportMock = {
+  mockImplementation: (
+    factory: () => { width: number; height: number },
+  ) => void;
+};
+
+export function mockDimensions(width: number, height: number): ViewportMock {
+  setViewportDimensions(width, height);
+
+  return {
+    mockImplementation: (factory) => {
+      const nextDimensions = factory();
+      setViewportDimensions(nextDimensions.width, nextDimensions.height);
+    },
+  };
 }
