@@ -3,13 +3,13 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 
-jest.mock("@components/buttons/WnaPressable", () => {
+jest.mock("@components/effects/WnaTooltip", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaPressable(props: unknown) {
-    return createElement("WnaPressable", props as Record<string, unknown>);
+  return function MockWnaTooltip(props: unknown) {
+    return createElement("WnaTooltip", props as Record<string, unknown>);
   };
 });
 
@@ -51,11 +51,18 @@ describe("WnaButtonHeader", () => {
       );
     });
 
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
     const icon = tree!.root.findByType("WnaIcon");
 
-    expect(pressable.props.toolTip).toBe("Home");
-    expect(pressable.props.accessibilityLabel).toBe("Home");
+    expect(button.props.type).toBe("button");
+    expect(button.props["aria-label"]).toBe("Home");
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        appearance: "none",
+        borderRadius: 28,
+        cursor: "pointer",
+      }),
+    );
     expect(icon.props.iconName).toBe("home");
   });
 
@@ -73,10 +80,9 @@ describe("WnaButtonHeader", () => {
       );
     });
 
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
 
-    expect(pressable.props.toolTip).toBe("");
-    expect(pressable.props.accessibilityLabel).toBe("menu");
+    expect(button.props["aria-label"]).toBe("menu");
     expect(
       tree!.root.findAll(
         (node: { props: { style?: unknown } }) =>
@@ -86,6 +92,38 @@ describe("WnaButtonHeader", () => {
           ),
       ),
     ).toHaveLength(0);
+  });
+
+  it("shows the tooltip and hover ripple without changing the circular button", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonHeader
+          appColors={{ staticWhite: "#fff" } as never}
+          appStyle={{ containerCenterCenter: {} } as never}
+          iconName="menu"
+          text="Menu"
+          onPress={jest.fn()}
+        />,
+      );
+    });
+
+    const button = tree!.root.findByType("button");
+    expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(false);
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.08)");
+    expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(true);
+
+    act(() => {
+      button.props.onMouseLeave();
+    });
+
+    expect(button.props.style.backgroundColor).toBe("transparent");
   });
 
   it("shows the badge and uses an explicit color when provided", () => {

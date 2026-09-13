@@ -1,4 +1,4 @@
-import React, { FC, memo, useMemo } from "react";
+import React, { FC, memo, useMemo, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { TFunction } from "i18next";
 
@@ -9,7 +9,7 @@ import { navigationLayoutConstants } from "@constants/navigationLayoutConstants"
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import WnaPressable from "@components/buttons/WnaPressable";
+import WnaTooltip from "@components/effects/WnaTooltip";
 
 export type WnaButtonHeaderProps = {
   appColors: Colors;
@@ -30,10 +30,10 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
   text = "",
   color,
   onPress,
-  checkInternetConnection = false,
-  t,
   badgeVisible = false,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const size = appLayoutConstants.headerButtonHeight;
   const iconSize = navigationLayoutConstants.headerIconSize;
 
@@ -43,27 +43,44 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
     () => convertHexToRgba(appColors.staticWhite, 0.5),
     [appColors.staticWhite],
   );
+  const interactionColor = isPressed
+    ? "rgba(255,255,255,0.14)"
+    : isHovered
+      ? "rgba(255,255,255,0.08)"
+      : "transparent";
 
   return (
     <View style={styles.wrapper}>
-      <WnaPressable
-        toolTip={text}
-        toolTipPosition="bottom"
-        style={[
-          styles.pressable,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            outlineColor,
+      {text ? (
+        <WnaTooltip content={text} position="bottom" visible={isHovered} />
+      ) : null}
+      {React.createElement(
+        "button",
+        {
+          type: "button",
+          "aria-label": text || iconName,
+          onClick: onPress,
+          onMouseDown: () => setIsPressed(true),
+          onMouseUp: () => setIsPressed(false),
+          onMouseEnter: () => setIsHovered(true),
+          onMouseLeave: () => {
+            setIsHovered(false);
+            setIsPressed(false);
           },
-        ]}
-        accessibilityLabel={text || iconName}
-        onPress={onPress}
-        checkInternetConnection={checkInternetConnection}
-        t={t}
-        ripple="light"
-      >
+          style: {
+            ...styles.pressable,
+            appearance: "none",
+            backgroundColor: interactionColor,
+            border: "none",
+            borderRadius: size / 2,
+            boxSizing: "border-box",
+            cursor: "pointer",
+            height: size,
+            outlineColor,
+            padding: 0,
+            width: size,
+          } as React.CSSProperties,
+        },
         <View
           style={[
             appStyle.containerCenterCenter,
@@ -76,8 +93,8 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
           {badgeVisible && (
             <View style={[styles.badge, { backgroundColor: appColors.red3 }]} />
           )}
-        </View>
-      </WnaPressable>
+        </View>,
+      )}
     </View>
   );
 };
