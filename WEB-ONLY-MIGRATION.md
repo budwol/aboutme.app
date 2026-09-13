@@ -1,6 +1,6 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[###################-] 93%` (26 von 28 Arbeitspaketen)
+Fortschritt: `[###################-] 96%` (27 von 28 Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
@@ -85,6 +85,8 @@ Status: **in Arbeit**
 - [x] Verwaiste `FlatList`-Test-Assertions nach der Listenmigration entfernen.
 - [x] `ActivityIndicator` durch einen zugänglichen CSS-Spinner mit Reduced-
       Motion-Regel ersetzen.
+- [x] Den privaten Repository-Dialog durch einen Web-Modal mit ARIA-Semantik
+      und Escape-Close ersetzen.
 - [x] `GestureHandlerRootView` aus dem Web-Root-Layout entfernen.
 - [x] Resize-Events im App-Frame über `window.resize` statt Native-
       `Dimensions` abonnieren.
@@ -184,6 +186,7 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 | 2026-09-13 | 2     | Portrait-Projektliste von `FlatList` auf `ScrollView` umgestellt       | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Verwaiste `FlatList`-Test-Assertion entfernt                           | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 | 2026-09-13 | 2     | Nativen `ActivityIndicator` durch CSS-Spinner ersetzt                  | 501 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
+| 2026-09-13 | 2     | Privaten Repository-Dialog auf Web-Modal mit Escape-Close umgestellt   | 502 Unit-Tests, 100% Coverage, Lint und TypeScript erfolgreich |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

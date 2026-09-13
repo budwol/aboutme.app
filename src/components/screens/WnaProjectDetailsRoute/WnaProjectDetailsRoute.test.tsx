@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+import { WnaWebModal } from "./WnaPrivateRepoModal";
 import { createProjectSlug } from "@utils/projectRoutes";
 import { Linking } from "@utils/webLinking";
 
@@ -158,6 +159,59 @@ jest.mock("expo-router", () => {
 });
 
 describe("WnaProjectDetailsRoute", () => {
+  it("closes the web modal on Escape and removes its listener", () => {
+    const addEventListener = jest.fn();
+    const removeEventListener = jest.fn();
+    const close = jest.fn();
+    const originalDocument = globalThis.document;
+
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: { addEventListener, removeEventListener },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    try {
+      act(() => {
+        tree = TestRenderer.create(
+          <WnaWebModal visible onRequestClose={close}>
+            <React.Fragment />
+          </WnaWebModal>,
+        );
+      });
+
+      expect(addEventListener).toHaveBeenCalledWith(
+        "keydown",
+        expect.any(Function),
+      );
+      const handleKeyDown = addEventListener.mock.calls[0][1] as (
+        event: KeyboardEvent,
+      ) => void;
+
+      act(() => handleKeyDown({ key: "Enter" } as KeyboardEvent));
+      expect(close).not.toHaveBeenCalled();
+
+      act(() => handleKeyDown({ key: "Escape" } as KeyboardEvent));
+      expect(close).toHaveBeenCalledTimes(1);
+
+      act(() => tree!.unmount());
+      expect(removeEventListener).toHaveBeenCalledWith(
+        "keydown",
+        handleKeyDown,
+      );
+    } finally {
+      if (originalDocument === undefined) {
+        delete (globalThis as { document?: Document }).document;
+      } else {
+        Object.defineProperty(globalThis, "document", {
+          configurable: true,
+          value: originalDocument,
+        });
+      }
+    }
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
@@ -345,7 +399,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(Linking.openURL).not.toHaveBeenCalled();
 
-    const modal = tree!.root.findByType("Modal");
+    const modal = tree!.root.findByProps({ role: "dialog" });
     const texts = tree!.root.findAllByType("Text");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
@@ -360,7 +414,7 @@ describe("WnaProjectDetailsRoute", () => {
       testID: "private-repo-modal-close",
     });
 
-    expect(modal.props.visible).toBe(true);
+    expect(modal.props["aria-modal"]).toBe(true);
     expect(textValues).toContain(i18nKeys.titlePrivateRepo);
     expect(textValues).toContainEqual([
       i18nKeys.infoPrivateRepoHint,
@@ -436,10 +490,14 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     await act(async () => {
-      tree!.root.findByType("Modal").props.onRequestClose();
+      tree!.root
+        .findByProps({ testID: "private-repo-modal-close" })
+        .props.onPress();
     });
 
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+    ).toHaveLength(0);
   });
 
   it("renders bullet lines in project descriptions as separate bullet rows", async () => {
@@ -691,7 +749,9 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(Linking.openURL).not.toHaveBeenCalled();
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(1);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }).length,
+    ).toBeGreaterThan(0);
 
     const findPressables = () =>
       tree!.root.findAll(
@@ -703,13 +763,17 @@ describe("WnaProjectDetailsRoute", () => {
       (findPressables()[0].props as { onPress: () => void }).onPress();
     });
 
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+    ).toHaveLength(0);
 
     act(() => {
       githubButton?.props.onPress();
     });
 
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(1);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }).length,
+    ).toBeGreaterThan(0);
 
     const modalCloseButton = tree!.root.findByProps({
       testID: "private-repo-modal-close",
@@ -719,14 +783,18 @@ describe("WnaProjectDetailsRoute", () => {
       modalCloseButton.props.onPress();
     });
 
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+    ).toHaveLength(0);
 
     act(() => {
       webButton?.props.onPress();
     });
 
     expect(Linking.openURL).toHaveBeenCalledWith("https://app.example.com");
-    expect(tree!.root.findAllByType("Modal")).toHaveLength(0);
+    expect(
+      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+    ).toHaveLength(0);
   });
 
   it("hides the compact portrait action row when the project has no links", async () => {
