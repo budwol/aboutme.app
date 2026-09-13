@@ -1,4 +1,3 @@
-import WnaPressable from "@components/buttons/WnaPressable";
 import WnaSurfaceCard from "@components/cards/WnaSurfaceCard";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
@@ -7,7 +6,7 @@ import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { TFunction } from "i18next";
-import { FC, memo, useMemo } from "react";
+import React, { FC, memo, useMemo, useState } from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 
 export type WnaNavigationItemProps = {
@@ -29,9 +28,10 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
   iconName,
   onPress,
   iconRightName,
-  t,
   type,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const effectiveIconRightName =
     iconRightName === undefined ? "chevron-right" : iconRightName;
   const effectiveType = type ?? "standalone";
@@ -67,43 +67,64 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
 
   const leftIconColor = appColors.accent5;
   const rightIconColor = appColors.coolgray4;
+  const interactionColor = appColors.isDark
+    ? "rgba(255,255,255,0.06)"
+    : "rgba(0,0,0,0.06)";
+  const buttonStyle = {
+    ...borderStyle,
+    appearance: "none" as const,
+    backgroundColor: isPressed || isHovered ? interactionColor : "transparent",
+    border: "none",
+    boxSizing: "border-box" as const,
+    borderRadius: appLayoutConstants.globalCornerRadius,
+    cursor: "pointer" as const,
+    display: "block" as const,
+    padding: 0,
+    textAlign: "left" as const,
+    width: "100%",
+  };
 
-  return (
-    <WnaPressable
-      ripple={appColors.isDark ? "light" : "dark"}
-      toolTip=""
-      style={borderStyle}
-      onPress={() => onPress(text)}
-      t={t}
-      checkInternetConnection={false}
-    >
-      <WnaSurfaceCard appColors={appColors} type={type}>
-        <View style={styles.row}>
-          <View style={styles.iconWrapper}>
-            <WnaIcon iconName={iconName} size={24} color={leftIconColor} />
-          </View>
-          <View style={styles.content}>
-            <Text
-              style={[appStyle.textNeutralMedium, styles.text, textColorStyle]}
-              textBreakStrategy={"highQuality"}
-              numberOfLines={1}
-              ellipsizeMode={"tail"}
-            >
-              {text}
-            </Text>
-          </View>
-          {effectiveIconRightName ? (
-            <View style={styles.trailingIcon}>
-              <WnaIcon
-                iconName={effectiveIconRightName}
-                size={24}
-                color={rightIconColor}
-              />
-            </View>
-          ) : null}
+  return React.createElement(
+    "button",
+    {
+      type: "button",
+      "aria-label": text,
+      onClick: () => onPress(text),
+      onMouseDown: () => setIsPressed(true),
+      onMouseUp: () => setIsPressed(false),
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => {
+        setIsHovered(false);
+        setIsPressed(false);
+      },
+      style: buttonStyle as React.CSSProperties,
+    },
+    <WnaSurfaceCard appColors={appColors} type={type}>
+      <View style={styles.row}>
+        <View style={styles.iconWrapper}>
+          <WnaIcon iconName={iconName} size={24} color={leftIconColor} />
         </View>
-      </WnaSurfaceCard>
-    </WnaPressable>
+        <View style={styles.content}>
+          <Text
+            style={[appStyle.textNeutralMedium, styles.text, textColorStyle]}
+            textBreakStrategy={"highQuality"}
+            numberOfLines={1}
+            ellipsizeMode={"tail"}
+          >
+            {text}
+          </Text>
+        </View>
+        {effectiveIconRightName ? (
+          <View style={styles.trailingIcon}>
+            <WnaIcon
+              iconName={effectiveIconRightName}
+              size={24}
+              color={rightIconColor}
+            />
+          </View>
+        ) : null}
+      </View>
+    </WnaSurfaceCard>,
   );
 };
 

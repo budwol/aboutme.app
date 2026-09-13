@@ -3,20 +3,6 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaNavigationItem from "@/navigation/components/WnaNavigationItem";
 
-jest.mock("@components/buttons/WnaPressable", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return function MockWnaPressable(props: unknown) {
-    return createElement(
-      "WnaPressable",
-      props as Record<string, unknown>,
-      (props as { children?: React.ReactNode }).children,
-    );
-  };
-});
-
 jest.mock("@components/cards/WnaSurfaceCard", () => {
   const { createElement } = jest.requireActual(
     "react",
@@ -88,12 +74,12 @@ describe("WnaNavigationItem", () => {
     });
 
     const icons = tree!.root.findAllByType("WnaIcon");
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
 
     expect(icons[0].props.iconName).toBe("shield-account");
 
     act(() => {
-      pressable.props.onPress();
+      button.props.onClick();
     });
 
     expect(onPressA).not.toHaveBeenCalled();
@@ -125,14 +111,27 @@ describe("WnaNavigationItem", () => {
       );
     });
 
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
 
-    expect(pressable.props.style).toEqual({
-      borderTopLeftRadius: 0,
-      borderTopRightRadius: 0,
-      borderBottomLeftRadius: 0,
-      borderBottomRightRadius: 0,
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        cursor: "pointer",
+      }),
+    );
+
+    act(() => {
+      button.props.onMouseEnter();
     });
+    expect(button.props.style.backgroundColor).toBe("rgba(0,0,0,0.06)");
+
+    act(() => {
+      button.props.onMouseLeave();
+    });
+    expect(button.props.style.backgroundColor).toBe("transparent");
   });
 
   it("hides the trailing icon when iconRightName is explicitly null", () => {
