@@ -3,13 +3,13 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
 
-jest.mock("@components/buttons/WnaPressable", () => {
+jest.mock("@components/effects/WnaTooltip", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return function MockWnaPressable(props: unknown) {
-    return createElement("WnaPressable", props as Record<string, unknown>);
+  return function MockWnaTooltip(props: unknown) {
+    return createElement("WnaTooltip", props as Record<string, unknown>);
   };
 });
 
@@ -31,7 +31,7 @@ jest.mock("@components/effects/wnaShadowStyle", () => ({
 }));
 
 describe("WnaButtonIcon", () => {
-  it("passes icon and tooltip props into the pressable button", () => {
+  it("passes icon and tooltip props into the web button", () => {
     const onPress = jest.fn();
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -61,7 +61,7 @@ describe("WnaButtonIcon", () => {
     });
 
     const view = tree!.root.findByType("View");
-    const pressable = tree!.root.findByType("WnaPressable");
+    const button = tree!.root.findByType("button");
     const icon = tree!.root.findByType("WnaButtonIconBadge");
 
     expect(view.props.style).toEqual(
@@ -72,11 +72,54 @@ describe("WnaButtonIcon", () => {
         expect.objectContaining({ marginTop: 12 }),
       ]),
     );
-    expect(pressable.props.ripple).toBe("light");
-    expect(pressable.props.toolTip).toBe("Open profile");
-    expect(pressable.props.toolTipPosition).toBe("right");
-    expect(pressable.props.onPress).toBe(onPress);
+    expect(button.props.type).toBe("button");
+    expect(button.props["aria-label"]).toBe("Open profile");
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        appearance: "none",
+        borderRadius: 26,
+        cursor: "pointer",
+        height: 52,
+        width: 52,
+      }),
+    );
+    expect(button.props.onClick).toBe(onPress);
+    expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(false);
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.08)");
+    expect(tree!.root.findByType("WnaTooltip").props.visible).toBe(true);
+    act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.14)");
     expect(icon.props.iconName).toBe("account");
     expect(icon.props.color).toBe("#ff0000");
+  });
+
+  it("omits the tooltip when no tooltip content is provided", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonIcon
+          appColors={
+            {
+              isDark: false,
+              staticWhite: "#ffffff",
+              coolgray2: "#cccccc",
+              staticBlack: "#000000",
+              background: "#111111",
+            } as never
+          }
+          appStyle={{} as never}
+          iconName="account"
+          onPress={jest.fn()}
+        />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("WnaTooltip")).toHaveLength(0);
   });
 });
