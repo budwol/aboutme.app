@@ -1008,17 +1008,15 @@ describe("WnaExperienceSection", () => {
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const footerAction = tree!.root.find(
       (node: {
+        type: unknown;
         props: {
-          label?: string;
-          onPress?: () => void;
+          onClick?: () => void;
         };
-      }) =>
-        node.props.label === "actionShowMore" &&
-        typeof node.props.onPress === "function",
+      }) => node.type === "button" && typeof node.props.onClick === "function",
     );
 
     act(() => {
-      footerAction.props.onPress?.();
+      footerAction.props.onClick?.();
     });
 
     expect(cards).toHaveLength(4);
@@ -1070,17 +1068,15 @@ describe("WnaExperienceSection", () => {
 
     const footerAction = tree!.root.find(
       (node: {
+        type: unknown;
         props: {
-          label?: string;
-          onPress?: () => void;
+          onClick?: () => void;
         };
-      }) =>
-        node.props.label === "actionShowMore" &&
-        typeof node.props.onPress === "function",
+      }) => node.type === "button" && typeof node.props.onClick === "function",
     );
 
     act(() => {
-      footerAction.props.onPress?.();
+      footerAction.props.onClick?.();
     });
 
     expect(onFooterActionPress).toHaveBeenCalledTimes(1);

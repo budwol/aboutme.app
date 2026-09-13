@@ -1,8 +1,8 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { sectionConstants } from "@constants/sectionConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { FC, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { FC, useMemo, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { WnaSectionProps } from "@components/sections/wnaSectionProps";
 
 type WnaFooterActionLinkProps = Pick<
@@ -48,22 +48,25 @@ const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
     [appColors.accent5],
   );
 
+  const buttonStyle = {
+    ...styles.footerActionButton,
+    borderColor: isHovered ? hoverBorderColor : borderColor,
+    backgroundColor: isHovered
+      ? convertHexToRgba(appColors.accent5, 0.14)
+      : surfaceColor,
+  };
+
   return (
     <View style={styles.footerActionRow}>
-      <Pressable
-        onPress={onPress}
-        onHoverIn={() => setIsHovered(true)}
-        onHoverOut={() => setIsHovered(false)}
-        style={[
-          styles.footerActionButton,
-          {
-            borderColor: isHovered ? hoverBorderColor : borderColor,
-            backgroundColor: isHovered
-              ? convertHexToRgba(appColors.accent5, 0.14)
-              : surfaceColor,
-          },
-        ]}
-      >
+      {React.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: onPress,
+          onMouseEnter: () => setIsHovered(true),
+          onMouseLeave: () => setIsHovered(false),
+          style: buttonStyle as React.CSSProperties,
+        },
         <Text
           style={[
             appStyle.textMicro,
@@ -72,8 +75,8 @@ const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
           ]}
         >
           {label} →
-        </Text>
-      </Pressable>
+        </Text>,
+      )}
     </View>
   );
 };
