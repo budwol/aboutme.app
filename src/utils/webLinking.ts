@@ -25,7 +25,7 @@ async function openURL(url: string): Promise<void> {
 
   const parsedUrl = new URL(url, window.location.href);
   if (parsedUrl.protocol === "mailto:" || parsedUrl.protocol === "tel:") {
-    window.location.assign(parsedUrl.href);
+    window.open(parsedUrl.href, "_self");
     return;
   }
 

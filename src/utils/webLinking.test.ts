@@ -59,19 +59,21 @@ describe("web linking adapter", () => {
   });
 
   it("uses browser navigation for mail and telephone URLs", async () => {
-    const assign = jest.fn();
     const open = jest.fn();
     Object.defineProperty(globalThis, "window", {
       configurable: true,
-      value: { location: { href: "https://app.example.com/", assign }, open },
+      value: { location: { href: "https://app.example.com/" }, open },
     });
 
     await Linking.openURL("mailto:hello@example.com");
     await Linking.openURL("tel:+4912345");
 
-    expect(assign).toHaveBeenNthCalledWith(1, "mailto:hello@example.com");
-    expect(assign).toHaveBeenNthCalledWith(2, "tel:+4912345");
-    expect(open).not.toHaveBeenCalled();
+    expect(open).toHaveBeenNthCalledWith(
+      1,
+      "mailto:hello@example.com",
+      "_self",
+    );
+    expect(open).toHaveBeenNthCalledWith(2, "tel:+4912345", "_self");
   });
 
   it("does not navigate the active tab when a new tab is blocked", async () => {

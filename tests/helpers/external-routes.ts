@@ -116,9 +116,6 @@ export async function installExternalUrlCapture(page: Page) {
     ) {
       const originalOpen = window.open.bind(window);
       const originalAnchorClick = HTMLAnchorElement.prototype.click;
-      const locationPrototype = Object.getPrototypeOf(window.location) as {
-        assign: (url: string | URL) => void;
-      };
 
       window.open = (url?: string | URL, target?: string) => {
         (
@@ -140,17 +137,6 @@ export async function installExternalUrlCapture(page: Page) {
 
         return originalAnchorClick.call(this);
       };
-
-      Object.defineProperty(locationPrototype, "assign", {
-        configurable: true,
-        value: (url: string | URL) => {
-          (
-            window as Window & {
-              __wnaLastOpenedUrl?: string | null;
-            }
-          ).__wnaLastOpenedUrl = String(url);
-        },
-      });
 
       (
         window as Window & { __wnaExternalCaptureInstalled?: boolean }
