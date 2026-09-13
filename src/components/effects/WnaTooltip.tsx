@@ -48,6 +48,7 @@ const WnaTooltip: FC<WnaTooltipProps> = ({ content, position, visible }) => (
     style={[
       positionStyles[position],
       styles.positioner,
+      styles.fade,
       { opacity: visible ? 1 : 0 },
     ]}
   >
@@ -61,6 +62,7 @@ const WnaTooltip: FC<WnaTooltipProps> = ({ content, position, visible }) => (
 
 const styles: {
   container: ViewStyle;
+  fade: ViewStyle;
   positioner: ViewStyle;
   text: TextStyle;
 } = {
@@ -75,6 +77,9 @@ const styles: {
     position: "absolute",
     zIndex: 1000,
   },
+  fade: {
+    transition: "opacity 140ms ease-in-out",
+  } as ViewStyle,
   text: {
     color: "#fff",
     fontFamily: FontFamilies.UI,

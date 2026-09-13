@@ -62,4 +62,23 @@ describe("WnaTooltip", () => {
       expect.arrayContaining([expect.objectContaining({ marginTop: 4 })]),
     );
   });
+
+  it("fades visibility changes instead of changing opacity abruptly", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaTooltip content="E-Mail" position="bottom" visible />,
+      );
+    });
+
+    const positioner = tree!.root.findAllByType(View)[0];
+    expect(positioner.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          transition: "opacity 140ms ease-in-out",
+        }),
+      ]),
+    );
+  });
 });
