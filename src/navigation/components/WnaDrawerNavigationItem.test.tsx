@@ -79,6 +79,7 @@ describe("WnaDrawerNavigationItem", () => {
         position: "relative",
         display: "flex",
         alignItems: "center",
+        cursor: "pointer",
       }),
     );
     const content = tree!.root.find(
@@ -95,6 +96,11 @@ describe("WnaDrawerNavigationItem", () => {
     expect(text.props.style[2]).toEqual(
       expect.objectContaining({ opacity: 0.7, fontWeight: "400" }),
     );
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.backgroundColor).toBe("#eeeeee");
 
     act(() => {
       button.props.onMouseDown();
@@ -148,6 +154,7 @@ describe("WnaDrawerNavigationItem", () => {
       }),
     );
     act(() => {
+      button.props.onMouseEnter();
       button.props.onMouseDown();
       button.props.onMouseLeave();
     });

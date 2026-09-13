@@ -24,6 +24,7 @@ export default function WnaDrawerNavigationItem({
   isSecondary = false,
   isActive = false,
 }: Props) {
+  const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const accent = appColors.staticAccent5;
 
@@ -31,9 +32,9 @@ export default function WnaDrawerNavigationItem({
     return appColors.isDark ? appColors.coolgray2 : appColors.coolgray1;
   }, [appColors]);
 
-  const getBackgroundColor = (pressed: boolean) => {
+  const getBackgroundColor = (pressed: boolean, hovered: boolean) => {
     if (isActive) return backgroundColorActive;
-    if (pressed) return appColors.coolgray1;
+    if (pressed || hovered) return appColors.coolgray1;
     return "transparent";
   };
 
@@ -53,8 +54,9 @@ export default function WnaDrawerNavigationItem({
     paddingLeft: isSecondary ? 32 : 16,
     paddingRight: 16,
     paddingTop: 14,
-    backgroundColor: getBackgroundColor(isPressed),
+    backgroundColor: getBackgroundColor(isPressed, isHovered),
     borderRadius: 4,
+    cursor: "pointer" as const,
     position: "relative" as const,
     textAlign: "left" as const,
     width: "100%",
@@ -67,7 +69,11 @@ export default function WnaDrawerNavigationItem({
       onClick: onPress,
       onMouseDown: () => setIsPressed(true),
       onMouseUp: () => setIsPressed(false),
-      onMouseLeave: () => setIsPressed(false),
+      onMouseEnter: () => setIsHovered(true),
+      onMouseLeave: () => {
+        setIsHovered(false);
+        setIsPressed(false);
+      },
       "aria-label": text,
       "aria-current": isActive ? "page" : undefined,
       style: buttonStyle as React.CSSProperties,
