@@ -65,6 +65,9 @@ describe("WnaBadge", () => {
         style: expect.objectContaining({
           alignSelf: "flex-start",
           display: "flex",
+          flexGrow: 0,
+          flexShrink: 0,
+          height: "fit-content",
           minHeight: 24,
         }),
       }),

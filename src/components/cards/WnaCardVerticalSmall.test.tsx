@@ -90,6 +90,12 @@ describe("WnaCardVerticalSmall", () => {
     expect(content.props.subtitle).toBe("Example Inc.");
     expect(content.props.description).toBeUndefined();
     expect(badge.props.text).toBe("3 yrs 5 mos");
+    expect(badge.props.style).toEqual(
+      expect.objectContaining({
+        minHeight: 18,
+        paddingVertical: 2,
+      }),
+    );
     expect(container?.props.style.opacity).toBe(0.7);
   });
 
