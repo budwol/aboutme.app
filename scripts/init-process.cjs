@@ -25,7 +25,7 @@ const DEFAULT_ASSETS = [
     label: ".aboutme/images/default_project.webp",
   },
 ];
-const RESPONSIVE_AVATAR_SIZES = [300, 512];
+const RESPONSIVE_AVATAR_SIZES = [300, 384, 512];
 
 function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
