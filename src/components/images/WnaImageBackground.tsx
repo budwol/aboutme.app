@@ -13,7 +13,13 @@ export type WnaImageBackgroundProps = {
 };
 
 const WnaImageBackground = React.memo(
-  ({ imageUri, appColors, children, testID }: WnaImageBackgroundProps) => {
+  ({
+    imageUri,
+    appColors,
+    children,
+    isDarkMode,
+    testID,
+  }: WnaImageBackgroundProps) => {
     const resolvedUri = useMemo(() => {
       return imageUri && imageUri.trim() !== ""
         ? getVersionedLocalAssetUrl(imageUri)
@@ -54,6 +60,7 @@ const WnaImageBackground = React.memo(
           style={styles.backgroundLayer}
           blurTint="dark"
           blurIntensity={40}
+          backgroundOpacity={isDarkMode ? 0.72 : 0.55}
         >
           {children}
         </WnaBlurView>
