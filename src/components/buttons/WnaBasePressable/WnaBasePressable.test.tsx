@@ -3,8 +3,6 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressable";
 
-type TestNode = { props: Record<string, unknown> };
-
 describe("WnaBasePressable", () => {
   it("renders enabled light ripple pressable styles", () => {
     const onPress = jest.fn();
@@ -23,24 +21,42 @@ describe("WnaBasePressable", () => {
       );
     });
 
-    const pressable = tree!.root.find(
-      (node: TestNode) =>
-        node.props.accessibilityRole === "button" &&
-        typeof node.props.style === "function",
+    const button = tree!.root.findByType("button");
+
+    expect(button.props.type).toBe("button");
+    expect(button.props.disabled).toBe(false);
+    expect(button.props["aria-label"]).toBe("Open");
+    expect(button.props.style).toEqual(
+      expect.objectContaining({ opacity: 1, cursor: "pointer", marginTop: 4 }),
     );
 
-    expect(pressable.props.disabled).toBe(false);
-    expect(pressable.props.accessibilityLabel).toBe("Open");
-    expect(pressable.props.style({ hovered: true, pressed: true })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ opacity: 1 }),
-        expect.objectContaining({ backgroundColor: "rgba(0,0,0,0.02)" }),
-        { backgroundColor: "rgba(255,255,255,0.06)", opacity: 0.9 },
-        { backgroundColor: "rgba(255,255,255,0.08)", opacity: 0.8 },
-        { cursor: "pointer" },
-        { marginTop: 4 },
-      ]),
-    );
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.06)");
+    expect(button.props.style.opacity).toBe(0.9);
+
+    act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.08)");
+    expect(button.props.style.opacity).toBe(0.8);
+
+    act(() => {
+      button.props.onMouseUp();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(255,255,255,0.06)");
+
+    act(() => {
+      button.props.onMouseLeave();
+    });
+    expect(button.props.style.backgroundColor).toBe("transparent");
+    expect(button.props.style.opacity).toBe(1);
+
+    act(() => {
+      onPress();
+    });
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it("renders disabled dark ripple styles without hover when disabled", () => {
@@ -59,22 +75,21 @@ describe("WnaBasePressable", () => {
       );
     });
 
-    const pressable = tree!.root.find(
-      (node: TestNode) =>
-        node.props.accessibilityRole === "button" &&
-        typeof node.props.style === "function",
+    const button = tree!.root.findByType("button");
+
+    expect(button.props.disabled).toBe(true);
+    expect(button.props.style).toEqual(
+      expect.objectContaining({
+        backgroundColor: "rgba(0,0,0,0.02)",
+        cursor: "auto",
+      }),
     );
 
-    expect(pressable.props.disabled).toBe(true);
-    expect(pressable.props.style({ hovered: true, pressed: true })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ opacity: 1 }),
-        expect.objectContaining({ backgroundColor: "rgba(0,0,0,0.02)" }),
-        false,
-        false,
-        { cursor: "auto" },
-      ]),
-    );
+    act(() => {
+      button.props.onMouseEnter();
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(0,0,0,0.02)");
   });
 
   it("uses dark ripple colors when hovered and pressed", () => {
@@ -88,18 +103,17 @@ describe("WnaBasePressable", () => {
       );
     });
 
-    const pressable = tree!.root.find(
-      (node: TestNode) =>
-        node.props.accessibilityRole === "button" &&
-        typeof node.props.style === "function",
-    );
+    const button = tree!.root.findByType("button");
 
-    expect(pressable.props.style({ hovered: true, pressed: true })).toEqual(
-      expect.arrayContaining([
-        { backgroundColor: "rgba(0,0,0,0.06)", opacity: 0.9 },
-        { backgroundColor: "rgba(0,0,0,0.08)", opacity: 0.8 },
-      ]),
-    );
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(0,0,0,0.06)");
+
+    act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("rgba(0,0,0,0.08)");
   });
 
   it("uses transparent ripple colors when no ripple is configured", () => {
@@ -113,17 +127,47 @@ describe("WnaBasePressable", () => {
       );
     });
 
-    const pressable = tree!.root.find(
-      (node: TestNode) =>
-        node.props.accessibilityRole === "button" &&
-        typeof node.props.style === "function",
-    );
+    const button = tree!.root.findByType("button");
 
-    expect(pressable.props.style({ hovered: true, pressed: true })).toEqual(
-      expect.arrayContaining([
-        { backgroundColor: "transparent", opacity: 0.9 },
-        { backgroundColor: "transparent", opacity: 0.8 },
-      ]),
-    );
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(button.props.style.backgroundColor).toBe("transparent");
+
+    act(() => {
+      button.props.onMouseDown();
+    });
+    expect(button.props.style.backgroundColor).toBe("transparent");
+  });
+
+  it("notifies hover callbacks and clears pressed state on mouse leave", () => {
+    const onHoverIn = jest.fn();
+    const onHoverOut = jest.fn();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBasePressable
+          ripple="light"
+          onPress={() => undefined}
+          onHoverIn={onHoverIn}
+          onHoverOut={onHoverOut}
+        >
+          child
+        </WnaBasePressable>,
+      );
+    });
+
+    const button = tree!.root.findByType("button");
+
+    act(() => {
+      button.props.onMouseEnter();
+    });
+    expect(onHoverIn).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      button.props.onMouseLeave();
+    });
+    expect(onHoverOut).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,12 +4,12 @@ import {
 } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
 export function createButtonTextContainerStyle(
   appColors: Colors,
   backgroundColor: string,
-): ViewStyle {
+): CSSProperties {
   return {
     backgroundColor,
     borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
@@ -21,14 +21,14 @@ export function createButtonTextContainerStyle(
   };
 }
 
-export function createButtonOutlineStyle(appColors: Colors): ViewStyle {
+export function createButtonOutlineStyle(appColors: Colors): CSSProperties {
   return {
     outlineColor: convertHexToRgba(appColors.background, 0.5),
     outlineOffset: 2,
   };
 }
 
-export function createRoundIconButtonStyle(appColors: Colors): ViewStyle {
+export function createRoundIconButtonStyle(appColors: Colors): CSSProperties {
   const size = actionButtonRightConstants.size;
 
   return {

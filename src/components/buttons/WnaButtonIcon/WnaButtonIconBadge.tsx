@@ -3,8 +3,8 @@ import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { actionButtonRightConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
-import { FC, memo } from "react";
-import { View, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo } from "react";
+import { StyleSheet } from "react-native";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
 export type WnaButtonIconBadgeProps = {
@@ -12,7 +12,7 @@ export type WnaButtonIconBadgeProps = {
   appStyle: AppStyle;
   iconName?: keyof typeof iconMap;
   color?: string;
-  style?: ViewStyle;
+  style?: CSSProperties;
   size?: number;
 };
 
@@ -29,9 +29,10 @@ const WnaButtonIconBadgeComponent: FC<WnaButtonIconBadgeProps> = ({
   const defaultColor = convertHexToRgba(appColors.staticBlack, 0.6);
   const effectiveSize = size ?? actionButtonRightConstants.size;
 
-  return (
-    <View
-      style={[
+  return React.createElement(
+    "div",
+    {
+      style: StyleSheet.flatten([
         appStyle.containerCenterCenter,
         {
           width: effectiveSize,
@@ -41,14 +42,13 @@ const WnaButtonIconBadgeComponent: FC<WnaButtonIconBadgeProps> = ({
           backgroundColor: defaultColor,
           borderRadius: _borderRadius,
         },
-      ]}
-    >
-      <WnaIcon
-        iconName={iconName ?? "cube"}
-        size={_iconSize}
-        color={color ?? appColors.staticWhite}
-      />
-    </View>
+      ]) as CSSProperties,
+    },
+    <WnaIcon
+      iconName={iconName ?? "cube"}
+      size={_iconSize}
+      color={color ?? appColors.staticWhite}
+    />,
   );
 };
 

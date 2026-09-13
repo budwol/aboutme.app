@@ -1,8 +1,8 @@
 import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressable";
 import WnaTooltip from "@components/effects/WnaTooltip";
 import { TFunction } from "i18next";
-import { FC, ReactNode, useRef, useState } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, ReactNode, useRef, useState } from "react";
+import { StyleSheet } from "react-native";
 
 export type WnaPressableState = Readonly<{
   pressed: boolean;
@@ -18,8 +18,8 @@ export type WnaPressableProps = {
   t?: TFunction<string[], undefined>;
   toolTip?: string;
   toolTipPosition?: "top" | "right" | "bottom" | "left" | undefined;
-  style?: ViewStyle | ViewStyle[];
-  baseStyle?: ViewStyle | ViewStyle[];
+  style?: CSSProperties | CSSProperties[];
+  baseStyle?: CSSProperties | CSSProperties[];
   ripple: "light" | "dark" | undefined;
   disableHover?: boolean;
   disabled?: boolean;
@@ -46,37 +46,47 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
   };
   const hasTooltip = Boolean(toolTip && toolTipPosition);
   const flattenedStyle = StyleSheet.flatten(props.style);
-  return (
-    <View style={[{ overflow: "visible", position: "relative" }, props.style]}>
-      {hasTooltip && (
-        <WnaTooltip
-          content={toolTip}
-          position={toolTipPosition!}
-          visible={isToolTipVisible}
-        />
-      )}
-      <View
-        style={{
+  return React.createElement(
+    "div",
+    {
+      style: StyleSheet.flatten([
+        { display: "flex", flexDirection: "column" },
+        { overflow: "visible", position: "relative" },
+        props.style,
+      ]) as React.CSSProperties,
+    },
+    hasTooltip && (
+      <WnaTooltip
+        content={toolTip}
+        position={toolTipPosition!}
+        visible={isToolTipVisible}
+      />
+    ),
+    React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          flexDirection: "column",
           borderRadius: flattenedStyle?.borderRadius,
           flex: 1,
           overflow: "hidden",
-        }}
+        } as React.CSSProperties,
+      },
+      <WnaBasePressable
+        accessibilityLabel={props.accessibilityLabel}
+        ripple={props.ripple}
+        baseStyle={props.baseStyle}
+        onPress={onPress}
+        isEnabled={isEnabled && !props.disabled}
+        onHoverIn={() => setIsToolTipVisible(true)}
+        onHoverOut={() => setIsToolTipVisible(false)}
+        disableHover={props.disableHover}
+        checkInternetConnection={props.checkInternetConnection}
       >
-        <WnaBasePressable
-          accessibilityLabel={props.accessibilityLabel}
-          ripple={props.ripple}
-          baseStyle={props.baseStyle}
-          onPress={onPress}
-          isEnabled={isEnabled && !props.disabled}
-          onHoverIn={() => setIsToolTipVisible(true)}
-          onHoverOut={() => setIsToolTipVisible(false)}
-          disableHover={props.disableHover}
-          checkInternetConnection={props.checkInternetConnection}
-        >
-          {props.children}
-        </WnaBasePressable>
-      </View>
-    </View>
+        {props.children}
+      </WnaBasePressable>,
+    ),
   );
 };
 export default WnaPressable;

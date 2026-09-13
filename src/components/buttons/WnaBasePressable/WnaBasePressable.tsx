@@ -1,9 +1,14 @@
-import { FC } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import React, { FC, useState } from "react";
+import { StyleSheet } from "react-native";
 import { WnaBasePressableProps } from "./wnaBasePressableProps";
 import { WnaBasePressableState } from "./wnaBasePressableState";
 
 const WnaBasePressable: FC<WnaBasePressableProps> = (props) => {
+  const [state, setState] = useState<WnaBasePressableState>({
+    pressed: false,
+    hovered: false,
+  });
+
   const getHoverColor = (ripple: "light" | "dark" | undefined) =>
     ripple === "dark"
       ? "rgba(0,0,0,0.06)"
@@ -19,37 +24,59 @@ const WnaBasePressable: FC<WnaBasePressableProps> = (props) => {
         : "transparent";
 
   const isEnabled = props.isEnabled ?? true;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={props.accessibilityLabel}
-      accessibilityState={{ disabled: !isEnabled }}
-      disabled={!isEnabled}
-      onPress={props.onPress}
-      onHoverIn={props.onHoverIn}
-      onHoverOut={props.onHoverOut}
-      style={({ pressed, hovered }: WnaBasePressableState) => [
-        styles.base,
-        !props.isEnabled && styles.disabled,
-        hovered &&
-          !props.disableHover && {
-            backgroundColor: getHoverColor(props.ripple),
-            opacity: 0.9,
-          },
-        pressed &&
-          !props.disableHover && {
-            backgroundColor: getPressedColor(props.ripple),
-            opacity: 0.8,
-          },
-        {
-          cursor: isEnabled ? "pointer" : "auto",
-        },
-        props.baseStyle,
-      ]}
-    >
-      {props.children}
-    </Pressable>
+  const { hovered, pressed } = state;
+
+  const style = StyleSheet.flatten([
+    resetStyle,
+    styles.base,
+    !isEnabled && styles.disabled,
+    hovered &&
+      !props.disableHover && {
+        backgroundColor: getHoverColor(props.ripple),
+        opacity: 0.9,
+      },
+    pressed &&
+      !props.disableHover && {
+        backgroundColor: getPressedColor(props.ripple),
+        opacity: 0.8,
+      },
+    {
+      cursor: isEnabled ? "pointer" : "auto",
+    },
+    props.baseStyle,
+  ]) as React.CSSProperties;
+
+  return React.createElement(
+    "button",
+    {
+      type: "button",
+      "aria-label": props.accessibilityLabel,
+      disabled: !isEnabled,
+      onClick: props.onPress,
+      onMouseEnter: () => {
+        setState((current) => ({ ...current, hovered: true }));
+        props.onHoverIn?.();
+      },
+      onMouseLeave: () => {
+        setState({ hovered: false, pressed: false });
+        props.onHoverOut?.();
+      },
+      onMouseDown: () => setState((current) => ({ ...current, pressed: true })),
+      onMouseUp: () => setState((current) => ({ ...current, pressed: false })),
+      style,
+    },
+    props.children,
   );
+};
+
+const resetStyle: React.CSSProperties = {
+  backgroundColor: "transparent",
+  borderWidth: 0,
+  padding: 0,
+  margin: 0,
+  textAlign: "inherit",
+  display: "flex",
+  flexDirection: "column",
 };
 
 const styles = StyleSheet.create({
