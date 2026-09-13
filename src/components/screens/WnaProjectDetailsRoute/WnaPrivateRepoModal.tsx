@@ -3,8 +3,8 @@ import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
-import { ReactNode } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { ReactNode, useEffect } from "react";
+import { Pressable, Text, View } from "react-native";
 import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
@@ -20,6 +20,41 @@ type WnaPrivateRepoModalProps = WnaProjectDetailsThemeProps & {
   onClose: () => void;
 };
 
+type WnaWebModalProps = {
+  children: ReactNode;
+  onRequestClose: () => void;
+  visible: boolean;
+};
+
+export function WnaWebModal({
+  children,
+  onRequestClose,
+  visible,
+}: WnaWebModalProps): ReactNode {
+  useEffect(() => {
+    if (!visible || typeof document === "undefined") return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onRequestClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onRequestClose, visible]);
+
+  if (!visible) return null;
+
+  return (
+    <View
+      testID="private-repo-modal"
+      accessibilityLabel="private-repo-modal"
+      {...{ role: "dialog", "aria-modal": true }}
+    >
+      {children}
+    </View>
+  );
+}
+
 export default function WnaPrivateRepoModal({
   appColors,
   appStyle,
@@ -30,12 +65,7 @@ export default function WnaPrivateRepoModal({
   visible,
 }: WnaPrivateRepoModalProps): ReactNode {
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <WnaWebModal visible={visible} onRequestClose={onClose}>
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <View
           testID="private-repo-modal-dialog"
@@ -135,6 +165,6 @@ export default function WnaPrivateRepoModal({
           </View>
         </View>
       </Pressable>
-    </Modal>
+    </WnaWebModal>
   );
 }
