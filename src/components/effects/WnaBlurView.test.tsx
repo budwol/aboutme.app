@@ -15,13 +15,38 @@ describe("WnaBlurView", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const view = tree!.root.findByType("div");
 
     expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        { padding: 4 },
-        expect.objectContaining({ backgroundColor: "rgba(17,17,17,0.5)" }),
-      ]),
+      expect.objectContaining({
+        display: "flex",
+        flexDirection: "column",
+        padding: 4,
+        backgroundColor: "rgba(17,17,17,0.5)",
+      }),
+    );
+  });
+
+  it("flattens web and native-compatible style arrays", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBlurView
+          blurTint="dark"
+          style={[null, { padding: 4 }, undefined, { opacity: 0.8 }]}
+        >
+          child
+        </WnaBlurView>,
+      );
+    });
+
+    expect(tree!.root.findByType("div").props.style).toEqual(
+      expect.objectContaining({
+        padding: 4,
+        opacity: 0.8,
+        backgroundColor: "rgba(17,17,17,0.5)",
+      }),
     );
   });
 
@@ -43,22 +68,24 @@ describe("WnaBlurView", () => {
       );
     });
 
-    const views = tree!.root.findAllByType("View");
+    const views = tree!.root.findAllByType("div");
     const blur = views[0];
     const view = views[1];
 
     expect(blur.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-        }),
-      ]),
+      expect.objectContaining({
+        display: "flex",
+        flexDirection: "column",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+      }),
     );
     expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "rgba(18,52,86,0.25)" }),
-      ]),
+      expect.objectContaining({
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "rgba(18,52,86,0.25)",
+      }),
     );
   });
 
@@ -73,12 +100,10 @@ describe("WnaBlurView", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const view = tree!.root.findByType("div");
 
     expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "rgba(17,17,17,0.5)" }),
-      ]),
+      expect.objectContaining({ backgroundColor: "rgba(17,17,17,0.5)" }),
     );
   });
 
@@ -91,12 +116,10 @@ describe("WnaBlurView", () => {
       );
     });
 
-    const view = tree!.root.findByType("View");
+    const view = tree!.root.findByType("div");
 
     expect(view.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "rgba(255,255,255,0.8)" }),
-      ]),
+      expect.objectContaining({ backgroundColor: "rgba(255,255,255,0.8)" }),
     );
   });
 });

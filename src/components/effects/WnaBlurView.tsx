@@ -1,7 +1,7 @@
 import { StaticColors } from "@constants/theme/staticColors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ReactNode } from "react";
-import { View, ViewStyle } from "react-native";
+import type { CSSProperties, ReactNode } from "react";
+import type { ViewStyle } from "react-native";
 
 export type BlurTint =
   | "dark"
@@ -11,7 +11,12 @@ export type BlurTint =
   | "systemThickMaterial";
 
 export type WnaBlurViewProps = {
-  style?: ViewStyle | ViewStyle[] | null | undefined;
+  style?:
+    | CSSProperties
+    | ViewStyle
+    | (CSSProperties | ViewStyle | null | undefined)[]
+    | null
+    | undefined;
   blurIntensity?: number;
   blurTint: BlurTint;
   backgroundColor?: string;
@@ -43,19 +48,15 @@ export function WnaBlurView(props: WnaBlurViewProps) {
 
   const renderInnerView = (props: WnaBlurViewProps) => {
     return (
-      <View
-        style={[
-          props.style ?? null,
-          {
-            backgroundColor: convertHexToRgba(
-              backgroundColor,
-              backgroundOpacity,
-            ),
-          },
-        ]}
+      <div
+        style={{
+          ...webViewStyle,
+          ...flattenStyle(props.style),
+          backgroundColor: convertHexToRgba(backgroundColor, backgroundOpacity),
+        }}
       >
         {props.children}
-      </View>
+      </div>
     );
   };
 
@@ -65,14 +66,29 @@ export function WnaBlurView(props: WnaBlurViewProps) {
     ? ({
         backdropFilter: `blur(${cssBlurRadius}px)`,
         WebkitBackdropFilter: `blur(${cssBlurRadius}px)`,
-      } as ViewStyle)
+      } as CSSProperties)
     : null;
 
   return props.forceExperimentalBlur ? (
-    <View style={[props.style ?? null, blurStyle]}>
+    <div
+      style={{ ...webViewStyle, ...flattenStyle(props.style), ...blurStyle }}
+    >
       {renderInnerView(props)}
-    </View>
+    </div>
   ) : (
     renderInnerView(props)
+  );
+}
+
+const webViewStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+};
+
+function flattenStyle(style: WnaBlurViewProps["style"]): CSSProperties {
+  if (!Array.isArray(style)) return (style ?? {}) as CSSProperties;
+  return style.reduce<CSSProperties>(
+    (result, entry) => Object.assign(result, flattenStyle(entry)),
+    {},
   );
 }
