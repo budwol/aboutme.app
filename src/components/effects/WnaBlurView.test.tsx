@@ -1,22 +1,7 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
-
-jest.mock("expo-blur", () => {
-  const { createElement } = jest.requireActual(
-    "react",
-  ) as typeof import("react");
-
-  return {
-    BlurView: (props: unknown) =>
-      createElement(
-        "BlurView",
-        props as Record<string, unknown>,
-        (props as { children?: React.ReactNode }).children,
-      ),
-  };
-});
 
 describe("WnaBlurView", () => {
   it("renders a fallback view with dark tint defaults", () => {
@@ -58,11 +43,18 @@ describe("WnaBlurView", () => {
       );
     });
 
-    const blur = tree!.root.findByType("BlurView");
-    const view = tree!.root.findByType("View");
+    const views = tree!.root.findAllByType("View");
+    const blur = views[0];
+    const view = views[1];
 
-    expect(blur.props.experimentalBlurMethod).toBe("dimezisBlurView");
-    expect(blur.props.intensity).toBe(64);
+    expect(blur.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          backdropFilter: "blur(64px)",
+          WebkitBackdropFilter: "blur(64px)",
+        }),
+      ]),
+    );
     expect(view.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ backgroundColor: "rgba(18,52,86,0.25)" }),

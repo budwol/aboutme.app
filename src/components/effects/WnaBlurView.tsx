@@ -1,8 +1,14 @@
 import { StaticColors } from "@constants/theme/staticColors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { BlurTint, BlurView } from "expo-blur";
 import { ReactNode } from "react";
 import { View, ViewStyle } from "react-native";
+
+export type BlurTint =
+  | "dark"
+  | "light"
+  | "default"
+  | "extraLight"
+  | "systemThickMaterial";
 
 export type WnaBlurViewProps = {
   style?: ViewStyle | ViewStyle[] | null | undefined;
@@ -53,21 +59,18 @@ export function WnaBlurView(props: WnaBlurViewProps) {
     );
   };
 
-  return (
-    <>
-      {props.forceExperimentalBlur ? (
-        <BlurView
-          key={tint}
-          style={[props.style ?? null]}
-          experimentalBlurMethod={"dimezisBlurView"}
-          tint={tint}
-          intensity={intensity}
-        >
-          {renderInnerView(props)}
-        </BlurView>
-      ) : (
-        renderInnerView(props)
-      )}
-    </>
+  const blurStyle = props.forceExperimentalBlur
+    ? ({
+        backdropFilter: `blur(${intensity}px)`,
+        WebkitBackdropFilter: `blur(${intensity}px)`,
+      } as ViewStyle)
+    : null;
+
+  return props.forceExperimentalBlur ? (
+    <View style={[props.style ?? null, blurStyle]}>
+      {renderInnerView(props)}
+    </View>
+  ) : (
+    renderInnerView(props)
   );
 }

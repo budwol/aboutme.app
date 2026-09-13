@@ -45,6 +45,7 @@ Status: **in Arbeit**
 - [x] Verschachtelte React-Native-Styles vor dem DOM-Rendern rekursiv flatten.
 - [x] Tooltip-Positionierung und Typografie in eine getestete Web-kompatible
       Komponente überführen.
+- [x] Tooltip-Fade und Sprechblasen-Spitze ohne Layout-Regression ergänzen.
 - [ ] Background-Image und Navigationstransition in der neuen Asset-Grenze
       regressionssicher abdecken.
 - [x] Web-Shell ohne React-Native-Image- und Gradient-Abhängigkeiten ausliefern.
@@ -87,7 +88,7 @@ Status: **offen**
 
 - [ ] Reanimated durch CSS/Web Animations ersetzen.
 - [x] `expo-linear-gradient` durch CSS ersetzen.
-- [ ] `expo-blur` durch CSS ersetzen.
+- [x] `expo-blur` durch CSS `backdrop-filter` ersetzen.
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
 - [x] `expo-image` vollständig entfernen.
 - [ ] `expo-application`, `expo-constants`, `expo-localization` und Linking-
@@ -114,13 +115,13 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 
 ## Umsetzungsstand
 
-| Datum      | Phase | Änderung                                            | Validierung                                               |
-| ---------- | ----- | --------------------------------------------------- | --------------------------------------------------------- |
-| 2026-09-13 | 0/1   | Bundle analysiert, 384px-Avatar ergänzt             | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
-| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt   | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
-| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
-| 2026-09-13 | 1     | DOM-Style-Regression behoben                        | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 1/4   | CSS-Tooltip mit stabiler Ausrichtung eingeführt     | 11 Tooltip-Tests, Lint und TypeScript erfolgreich         |
+| Datum      | Phase | Änderung                                                | Validierung                                               |
+| ---------- | ----- | ------------------------------------------------------- | --------------------------------------------------------- |
+| 2026-09-13 | 0/1   | Bundle analysiert, 384px-Avatar ergänzt                 | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
+| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt       | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
+| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt     | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
+| 2026-09-13 | 1     | DOM-Style-Regression behoben                            | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 1/4   | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.
