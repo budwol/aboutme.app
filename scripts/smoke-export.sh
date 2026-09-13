@@ -77,6 +77,7 @@ echo "$EXPO_CONFIG_JSON" | grep -q "\"version\":\"$APP_VERSION\""
 echo "$EXPO_CONFIG_JSON" | grep -q "\"appVersion\":\"$APP_VERSION\""
 
 npx expo export -p web
+node ./scripts/assert-web-bundle.cjs dist
 
 test -f dist/index.html
 test -f public/app-data.json
