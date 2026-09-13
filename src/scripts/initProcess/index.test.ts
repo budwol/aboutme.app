@@ -119,6 +119,11 @@ describe("init process security", () => {
     );
     expect(generated.manifest).toContain('"scope": "/"');
     expect(generated.manifest).toContain('"start_url": "/"');
+    expect(
+      fs.existsSync(
+        path.resolve(process.cwd(), "scripts/web-service-worker.js"),
+      ),
+    ).toBe(true);
   });
 
   it("selects the first available background source", () => {
@@ -275,6 +280,18 @@ describe("init.sh", () => {
     expect(
       fs.existsSync(path.join(fixtureRoot, "public", "site.webmanifest")),
     ).toBe(true);
+    expect(fs.existsSync(path.join(fixtureRoot, "public", "sw.js"))).toBe(true);
+    expect(
+      fs.readFileSync(path.join(fixtureRoot, "public", "sw.js"), "utf8"),
+    ).toContain('const CACHE_NAME = "aboutme-shell-v1"');
+    const serviceWorker = fs.readFileSync(
+      path.join(fixtureRoot, "public", "sw.js"),
+      "utf8",
+    );
+    expect(serviceWorker).toContain('request.mode === "navigate"');
+    expect(serviceWorker).toContain('caches.match("/")');
+    expect(serviceWorker).toContain("cache.put(request, response)");
+    expect(serviceWorker).toContain("self.clients.claim()");
   });
 
   it("builds the public files when the source data is there", () => {

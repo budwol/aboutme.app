@@ -42,6 +42,11 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo_180.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if ("serviceWorker" in navigator) { window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js", { scope: "/" }); }); }`,
+          }}
+        />
 
         <style>{`
                     @font-face {
