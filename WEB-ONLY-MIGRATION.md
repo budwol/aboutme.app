@@ -1,13 +1,13 @@
 # Web-Only PWA Migration
 
-Fortschritt: `[################----] 71%` (20 von 28 Arbeitspaketen)
+Fortschritt: `[###############-----] 75%` (21 von 28 Arbeitspaketen)
 
 Statuswerte: **abgeschlossen** = Exit-Kriterien erfüllt, **in Arbeit** = Phase
 aktiv mit offenen Arbeitspaketen, **geplant** = noch nicht begonnen.
 
 Aktueller Fokus: Phase 1 abschließen (Background-Image und Navigationstransition
-als Browser-Regression), danach die verbleibende Reanimated-Nutzung in Phase 4
-beenden.
+als Browser-Regression), danach Phase 4 mit Dependency-Cleanup und Bundle-
+Validierung abschließen.
 Neue Phasen werden erst begonnen, wenn die jeweils aktiven Exit-Kriterien erfüllt
 sind.
 
@@ -100,12 +100,13 @@ Transition-Background funktionieren in allen unterstützten Viewports.
 
 Status: **in Arbeit**
 
-- [ ] Reanimated vollständig durch CSS/Web Animations ersetzen.
+- [x] Reanimated vollständig durch CSS/Web Animations ersetzen.
 - [x] Hero-Shape-Bewegung durch CSS-Keyframes mit Reduced-Motion-Regel ersetzen.
 - [x] Experience-Detailbox durch CSS-Höhen-Transition ersetzen.
 - [x] Header-Busy-Fade durch CSS-Opacity-Transition ersetzen.
 - [x] Busy-Overlay der Base-Screens durch CSS-Opacity-Transition ersetzen.
 - [x] Scroll-State, Header-Shadow und Header-Blur auf Web-State umstellen.
+- [x] Intro-, Content- und Navigationstransition in `WnaApp` auf CSS umstellen.
 - [x] `expo-linear-gradient` durch CSS ersetzen.
 - [x] `expo-blur` durch CSS `backdrop-filter` ersetzen.
 - [x] `react-native-popable` aus dem Web-Pfad entfernen.
@@ -136,25 +137,27 @@ keine Browser-/Request-Fehler und dokumentierte Bundle-/Lighthouse-Werte.
 
 ## Umsetzungsstand
 
-| Datum      | Phase | Änderung                                                            | Validierung                                               |
-| ---------- | ----- | ------------------------------------------------------------------- | --------------------------------------------------------- |
-| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                             | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
-| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                   | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
-| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                 | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
-| 2026-09-13 | 1     | DOM-Style-Regression behoben                                        | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt             | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
-| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert               | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                    | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                               | 483 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                               | 54 fokussierte Tests, Lint und TypeScript erfolgreich     |
-| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt | 491 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                  | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests |
-| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt          | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                    | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt            | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt              | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                  | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
-| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt             | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| Datum      | Phase | Änderung                                                             | Validierung                                               |
+| ---------- | ----- | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| 2026-09-13 | 0     | Bundle analysiert, 384px-Avatar ergänzt                              | 469 Unit-Tests, Lint, TypeScript und Prettier erfolgreich |
+| 2026-09-13 | 1     | ImageMagick als explizite CI-Abhängigkeit ergänzt                    | E2E-Artefakt analysiert; fehlendes `convert` behoben      |
+| 2026-09-13 | 1     | `expo-image` durch Web-`<img>` mit `srcset` ersetzt                  | Web-Export erfolgreich; Bundle ohne `expo-image`-Referenz |
+| 2026-09-13 | 1     | DOM-Style-Regression behoben                                         | 470 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 1     | CSS-Tooltip mit Fade und Sprechblasen-Spitze eingeführt              | 18 Tooltip-Tests, Lint und TypeScript erfolgreich         |
+| 2026-09-13 | 4     | CSS-Blur auf 8px begrenzt und Dark-Overlay korrigiert                | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | `expo-localization` durch Browser-Locale ersetzt                     | 484 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Native Versions-Dependencies entfernt                                | 483 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Linking durch Browser-Adapter ersetzt                                | 54 fokussierte Tests, Lint und TypeScript erfolgreich     |
+| 2026-09-13 | 4     | Verwaistes `expo-web-browser` und alte Localization-Config entfernt  | 491 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Neuer Lighthouse-Messpunkt nach Dependency-Cleanup                   | Performance 95, LCP 882 ms, 705.9 kB Transfer, 7 Requests |
+| 2026-09-13 | 4     | `WnaAccentBar` von Reanimated auf CSS-Animation umgestellt           | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Hero-Shape-Bewegung auf CSS-Keyframes umgestellt                     | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Experience-Detailbox auf CSS-Höhen-Transition umgestellt             | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Header-Busy-Fade auf CSS-Opacity-Transition umgestellt               | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Busy-Overlay auf CSS-Opacity-Transition umgestellt                   | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Scroll-State und Header-Styles auf Web-State umgestellt              | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | Intro-, Content- und Navigationstransition auf CSS umgestellt        | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
+| 2026-09-13 | 4     | `react-native-reanimated` aus dem Web-Pfad und package.json entfernt | 497 Unit-Tests, Lint und TypeScript erfolgreich           |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

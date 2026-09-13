@@ -52,44 +52,6 @@ jest.mock("@components/sections/WnaProfileHero", () => {
   };
 });
 
-jest.mock("react-native-reanimated", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ReactModule = require("react");
-
-  return {
-    __esModule: true,
-    default: {
-      View: (props: unknown) =>
-        ReactModule.createElement(
-          "AnimatedView",
-          props as Record<string, unknown>,
-          (props as { children?: React.ReactNode }).children,
-        ),
-    },
-    Easing: {
-      inOut: (value: unknown) => value,
-      sin: "sin",
-    },
-    interpolate: (
-      value: number,
-      inputRange: [number, number],
-      outputRange: [number, number],
-    ) => {
-      const [inputStart, inputEnd] = inputRange;
-      const [outputStart, outputEnd] = outputRange;
-      const ratio = (value - inputStart) / (inputEnd - inputStart);
-
-      return outputStart + ratio * (outputEnd - outputStart);
-    },
-    useReducedMotion: () => true,
-    useAnimatedStyle: (callback: () => Record<string, unknown>) => callback(),
-    useSharedValue: (initialValue: number) => ({ value: initialValue }),
-    withRepeat: (value: unknown) => value,
-    withSequence: (...values: unknown[]) => values[0],
-    withTiming: (value: unknown) => value,
-  };
-});
-
 describe("WnaProfileSection", () => {
   it("renders the profile text as separate paragraphs from a multiline string", () => {
     const appData = {

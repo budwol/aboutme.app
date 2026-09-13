@@ -12,14 +12,6 @@ import {
 import { ErrorBoundaryProps, usePathname } from "expo-router";
 import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
-} from "react-native-reanimated";
 import {
   useWnaAppData,
   useWnaAppLifecycle,
@@ -111,20 +103,21 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealFrameRef = useRef<number | null>(null);
   const navigationRevealFrameRef = useRef<number | null>(null);
+  const navigationFinishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const introFinishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const previousPathnameRef = useRef(pathname);
   const [showIntro, setShowIntro] = useState(true);
   const [showNavigationTransition, setShowNavigationTransition] =
     useState(false);
+  const [navigationTransitionPhase, setNavigationTransitionPhase] = useState<
+    "enter" | "exit"
+  >("enter");
   const [hasContentLayout, setHasContentLayout] = useState(false);
   const [isContentReadyForReveal, setIsContentReadyForReveal] = useState(false);
-  const introOpacity = useSharedValue(1);
-  const introTranslateY = useSharedValue(0);
-  const introScale = useSharedValue(1);
-  const navigationTransitionOpacity = useSharedValue(0);
-  const navigationTransitionScale = useSharedValue(1);
-  const contentOpacity = useSharedValue(0.92);
-  const contentTranslateY = useSharedValue(10);
-
   const {
     finishNavigationTransition,
     isAppInitialized,
@@ -207,19 +200,8 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     }
 
     setShowNavigationTransition(true);
-    navigationTransitionOpacity.value = 0;
-    navigationTransitionScale.value = 1;
-
-    navigationTransitionOpacity.value = withTiming(1, {
-      duration: appMotionConstants.navigationTransitionDurationIn,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [
-    isNavigationTransitionActive,
-    navigationTransitionOpacity,
-    navigationTransitionScale,
-    showIntro,
-  ]);
+    setNavigationTransitionPhase("enter");
+  }, [isNavigationTransitionActive, showIntro]);
 
   useEffect(() => {
     const previousPathname = previousPathnameRef.current;
@@ -235,21 +217,11 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 
     navigationRevealFrameRef.current = requestAnimationFrame(() => {
       navigationRevealFrameRef.current = requestAnimationFrame(() => {
-        navigationTransitionOpacity.value = withTiming(
-          0,
-          {
-            duration: appMotionConstants.navigationTransitionDurationOut,
-            easing: Easing.out(Easing.cubic),
-          },
-          (finished) => {
-            if (!finished) {
-              return;
-            }
-
-            runOnJS(setShowNavigationTransition)(false);
-            runOnJS(finishNavigationTransition)();
-          },
-        );
+        setNavigationTransitionPhase("exit");
+        navigationFinishTimerRef.current = setTimeout(() => {
+          setShowNavigationTransition(false);
+          finishNavigationTransition();
+        }, appMotionConstants.navigationTransitionDurationOut);
       });
     });
 
@@ -258,12 +230,14 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       if (navigationRevealFrameRef.current !== null) {
         cancelAnimationFrame(navigationRevealFrameRef.current);
       }
+      /* istanbul ignore else -- the timer is assigned after the exit phase state update and may not exist when React cleans up this effect */
+      if (navigationFinishTimerRef.current !== null) {
+        clearTimeout(navigationFinishTimerRef.current);
+      }
     };
   }, [
     finishNavigationTransition,
     isNavigationTransitionActive,
-    navigationTransitionOpacity,
-    navigationTransitionScale,
     pathname,
     showIntro,
   ]);
@@ -277,74 +251,19 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       return;
     }
 
-    contentOpacity.value = withDelay(
-      appMotionConstants.introDelay,
-      withTiming(1, {
-        duration: appMotionConstants.introDuration,
-        easing: Easing.out(Easing.cubic),
-      }),
+    introFinishTimerRef.current = setTimeout(
+      () => setShowIntro(false),
+      appMotionConstants.introDelay + appMotionConstants.introDuration,
     );
-    contentTranslateY.value = withDelay(
-      appMotionConstants.introDelay,
-      withTiming(0, {
-        duration: appMotionConstants.introDuration,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-    introOpacity.value = withDelay(
-      appMotionConstants.introDelay,
-      withTiming(0, {
-        duration: appMotionConstants.introDuration,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-    introTranslateY.value = withDelay(
-      appMotionConstants.introDelay,
-      withTiming(-18, {
-        duration: appMotionConstants.introDuration,
-        easing: Easing.out(Easing.cubic),
-      }),
-    );
-    introScale.value = withDelay(
-      appMotionConstants.introDelay,
-      withTiming(
-        1.03,
-        {
-          duration: appMotionConstants.introDuration,
-          easing: Easing.out(Easing.cubic),
-        },
-        () => {
-          runOnJS(setShowIntro)(false);
-        },
-      ),
-    );
-  }, [
-    contentOpacity,
-    contentTranslateY,
-    introOpacity,
-    introScale,
-    introTranslateY,
-    isAppInitialized,
-    isContentReadyForReveal,
-    showIntro,
-  ]);
 
-  const introAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: introOpacity.value,
-    transform: [
-      { translateY: introTranslateY.value },
-      { scale: introScale.value },
-    ],
-  }));
+    return () => {
+      /* istanbul ignore else -- the timer can be cleared by the effect cleanup before its delayed callback runs */
+      if (introFinishTimerRef.current !== null) {
+        clearTimeout(introFinishTimerRef.current);
+      }
+    };
+  }, [isAppInitialized, isContentReadyForReveal, showIntro]);
 
-  const contentAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: contentOpacity.value,
-    transform: [{ translateY: contentTranslateY.value }],
-  }));
-  const navigationTransitionAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: navigationTransitionOpacity.value,
-    transform: [{ scale: navigationTransitionScale.value }],
-  }));
   const navigationTransitionBackgroundImageUri =
     navigationTransitionBackgroundImageUrl &&
     navigationTransitionBackgroundImageUrl.trim() !== ""
@@ -373,15 +292,20 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       style={{ flex: 1, overflow: "hidden" }}
       edges={["left", "right", "bottom"]}
     >
-      <Animated.View
+      <View
+        nativeID={isContentReadyForReveal ? "wna-content-reveal" : undefined}
         onLayout={handleContentLayout}
-        style={[styles.content, contentAnimatedStyle]}
+        style={[
+          styles.content,
+          !isContentReadyForReveal && styles.contentInitial,
+        ]}
       >
         {children}
-      </Animated.View>
+      </View>
 
       {showIntro ? (
-        <Animated.View
+        <View
+          nativeID="wna-intro-overlay"
           style={[
             styles.fullScreenOverlay,
             styles.introOverlay,
@@ -389,19 +313,18 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
               pointerEvents: "none",
             },
-            introAnimatedStyle,
           ]}
         >
           <View style={styles.introContent}>
             <WnaHeroField appColors={appColors} compact />
             <WnaLoadingCopy appColors={appColors} appData={appData} />
           </View>
-        </Animated.View>
+        </View>
       ) : null}
 
       {showNavigationTransition ? (
-        <Animated.View
-          nativeID="navigation-transition-overlay"
+        <View
+          nativeID={`navigation-transition-overlay-${navigationTransitionPhase}`}
           testID="navigation-transition-overlay"
           style={[
             styles.fullScreenOverlay,
@@ -410,7 +333,6 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
               pointerEvents: "auto",
             },
-            navigationTransitionAnimatedStyle,
           ]}
         >
           <WnaImageBackground
@@ -421,7 +343,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
           >
             <WnaNavigationTransitionOverlay appColors={appColors} />
           </WnaImageBackground>
-        </Animated.View>
+        </View>
       ) : null}
 
       <WnaToastHost appColors={appColors} />
@@ -432,6 +354,10 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
+  },
+  contentInitial: {
+    opacity: 0.92,
+    transform: [{ translateY: 10 }],
   },
   fullScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
