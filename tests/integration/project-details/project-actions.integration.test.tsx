@@ -193,7 +193,7 @@ describe("WnaProjectDetailsRoute action integration", () => {
     });
 
     expect(
-      tree.root.findByProps({ testID: "private-repo-modal" }).props,
+      tree.root.findByProps({ nativeID: "private-repo-modal" }).props,
     ).toEqual(
       expect.objectContaining({
         accessibilityLabel: "private-repo-modal",

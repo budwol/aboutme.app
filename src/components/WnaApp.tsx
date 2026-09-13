@@ -112,9 +112,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const [showIntro, setShowIntro] = useState(true);
   const [showNavigationTransition, setShowNavigationTransition] =
     useState(false);
-  const [navigationTransitionPhase, setNavigationTransitionPhase] = useState<
-    "enter" | "exit"
-  >("enter");
+  const [, setNavigationTransitionPhase] = useState<"enter" | "exit">("enter");
   const [hasContentLayout, setHasContentLayout] = useState(false);
   const [isContentReadyForReveal, setIsContentReadyForReveal] = useState(false);
   const {
@@ -329,8 +327,7 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
 
       {showNavigationTransition ? (
         <View
-          nativeID={`navigation-transition-overlay-${navigationTransitionPhase}`}
-          testID="navigation-transition-overlay"
+          nativeID="navigation-transition-overlay"
           style={[
             styles.fullScreenOverlay,
             styles.navigationTransitionOverlay,

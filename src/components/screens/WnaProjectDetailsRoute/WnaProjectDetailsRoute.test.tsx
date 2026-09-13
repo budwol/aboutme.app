@@ -505,7 +505,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
     ).toHaveLength(0);
   });
 
@@ -759,7 +759,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(Linking.openURL).not.toHaveBeenCalled();
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }).length,
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }).length,
     ).toBeGreaterThan(0);
 
     act(() => {
@@ -769,7 +769,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
     ).toHaveLength(0);
 
     act(() => {
@@ -777,7 +777,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }).length,
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }).length,
     ).toBeGreaterThan(0);
 
     const modalCloseButton = tree!.root.findByProps({
@@ -789,7 +789,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
     ).toHaveLength(0);
 
     act(() => {
@@ -798,7 +798,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(Linking.openURL).toHaveBeenCalledWith("https://app.example.com");
     expect(
-      tree!.root.findAllByProps({ testID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
     ).toHaveLength(0);
   });
 

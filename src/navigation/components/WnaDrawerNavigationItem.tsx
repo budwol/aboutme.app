@@ -80,7 +80,7 @@ export default function WnaDrawerNavigationItem({
       "aria-label": text,
       "aria-current": isActive ? "page" : undefined,
       style: buttonStyle as React.CSSProperties,
-      testID: `drawer-navigation-item-${text}`,
+      "data-testid": `drawer-navigation-item-${text}`,
     },
     isActive ? (
       <View style={[styles.accentBar, { backgroundColor: accent }]} />
