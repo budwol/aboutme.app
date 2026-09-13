@@ -9,6 +9,7 @@ docs/
 # Tests
 coverage/
 playwright-report/
+playwright-artifacts.zip
 tests/playwright/results
 test-results/
 *-20??????T??????.json

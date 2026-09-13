@@ -16,7 +16,7 @@ Use this skill when the repository needs a complete review focused on correctnes
 4. **Performance**: measure the current build and analyze Lighthouse, bundle, asset, caching, and runtime evidence without weakening intentional policies.
 5. **Test engineering**: map findings to unit, integration, smoke, and E2E coverage; add regression and edge-case tests; verify the promised coverage scope and thresholds.
 6. **Documentation**: reconcile README, ADRs, scripts, configuration, test commands, and quality claims with the resulting implementation.
-7. **CI/CD**: verify stage ordering, deterministic installs, artifacts, environment handling, failure propagation, credentials, and dry-run behavior.
+7. **CI/CD**: verify stage ordering, deterministic installs, artifacts, environment handling, failure propagation, credentials, dry-run behavior, and every OS-level/runtime prerequisite invoked by pipeline or test bootstrap scripts.
 8. **Release readiness**: validate the final build, container metadata, runtime assets, deployment configuration, rollback information, and authorization boundary. Do not publish or deploy without explicit authorization.
 
 ## Consistency Rules
@@ -26,6 +26,7 @@ Use this skill when the repository needs a complete review focused on correctnes
 - Re-run affected earlier phases after a change invalidates their assumptions.
 - Every implemented finding needs a focused regression test or an explicit reason why testing is not meaningful.
 - Every documented guarantee must be enforced by configuration or tests, not merely described.
+- For every CI command that invokes a script, trace its transitive tool dependencies and verify a clean runner provisions them before use. A locally available binary is not evidence of CI readiness.
 - Distinguish defects, risks, improvements, and intentional behavior. Do not turn preferences into mandatory findings.
 
 ## Completion
