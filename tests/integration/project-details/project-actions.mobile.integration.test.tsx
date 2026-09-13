@@ -10,7 +10,7 @@ import {
   jest,
 } from "@jest/globals";
 import React from "react";
-import { Linking } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { act } from "react-test-renderer";
 import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
