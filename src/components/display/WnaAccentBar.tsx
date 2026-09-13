@@ -1,7 +1,6 @@
 import Colors from "@constants/theme/colors";
 import { createShadowStyle } from "@components/effects/wnaShadowStyle";
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 
 type WebStyleTarget = {
   style?: {
@@ -47,7 +46,7 @@ function useWnaAccentBarAnimation(
       animation: `wna-accent-bar-pulse${
         width === 112 && pulseToWidth === 24 ? "-hero" : ""
       } ${pulseDuration * 2}ms ease-in-out infinite alternate`,
-    } as ViewStyle;
+    } as CSSProperties;
   }
 
   return {
@@ -55,7 +54,7 @@ function useWnaAccentBarAnimation(
     transition: animated
       ? "width 820ms cubic-bezier(0.33, 1, 0.68, 1)"
       : undefined,
-  } as ViewStyle;
+  } as CSSProperties;
 }
 
 export default function WnaAccentBar({
@@ -65,7 +64,7 @@ export default function WnaAccentBar({
   pulseToWidth,
   pulseDuration = 3600,
 }: WnaAccentBarProps) {
-  const barRef = useRef<View>(null);
+  const barRef = useRef<HTMLDivElement>(null);
   const barAnimatedStyle = useWnaAccentBarAnimation(
     width,
     animated,
@@ -85,8 +84,8 @@ export default function WnaAccentBar({
   }, [pulseDuration, pulseToWidth, width]);
 
   return (
-    <View style={[styles.row, { width }]}>
-      <View
+    <div style={{ ...styles.row, width }}>
+      <div
         ref={barRef}
         {...(pulseToWidth !== undefined
           ? {
@@ -96,20 +95,20 @@ export default function WnaAccentBar({
                   : "wna-accent-bar-pulse",
             }
           : {})}
-        style={[
-          styles.bar,
+        style={
           {
-            backgroundColor: appColors.accent5,
-            ...createShadowStyle(2.25, appColors.accent5),
-          },
-          barAnimatedStyle,
-        ]}
+            ...styles.bar,
+            backgroundColor: String(appColors.accent5),
+            ...createShadowStyle(2.25, String(appColors.accent5)),
+            ...barAnimatedStyle,
+          } as CSSProperties
+        }
       />
-    </View>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
+const styles: { row: CSSProperties; bar: CSSProperties } = {
   row: {
     alignItems: "center",
     justifyContent: "center",
@@ -119,4 +118,4 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 999,
   },
-});
+};
