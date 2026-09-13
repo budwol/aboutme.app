@@ -18,6 +18,7 @@ Use this skill when the task is to improve test confidence, investigate coverage
 7. Keep test data representative of the current application schema. When an example fixture is used by integration or E2E tests, add a schema/fixture consistency test so it cannot silently become stale.
 8. Preserve production behavior while improving tests. Do not weaken assertions, delete branches, add coverage ignores, or lower thresholds merely to make the pipeline green.
 9. Run formatting, linting, type checks, the focused tests, and the full validation pipeline as appropriate. Report failures separately when a test exposes an unrelated existing defect.
+10. Audit every test bootstrap and web-server command for external runtime tools it invokes. Add a deterministic preflight check or CI installation step for each required binary, and keep the local and CI prerequisites aligned.
 
 ## Coverage Rules
 
@@ -34,6 +35,7 @@ Use this skill when the task is to improve test confidence, investigate coverage
 - For filesystem and process code, use isolated temporary fixtures and clean them in `afterEach`/`finally` blocks.
 - For browser tests, assert readiness, background/media loading, URL state, console/page errors, failed requests, and responsive behavior when those are part of the contract.
 - Keep tests deterministic: control time, randomness, network boundaries, and external commands rather than relying on incidental machine state.
+- Treat missing OS tools, generated assets, fonts, browsers, and other runner prerequisites as test failures. Verify them explicitly before the suite starts and make the first error name the missing dependency and remediation.
 
 ## Completion
 
