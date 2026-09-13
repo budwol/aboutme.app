@@ -152,7 +152,9 @@ describe("WnaImage", () => {
       "imageUrl is empty",
     );
     expect(tree!.root.findAllByType("WnaImageElement")).toHaveLength(0);
-    expect(tree!.root.findByType("ActivityIndicator")).toBeTruthy();
+    expect(
+      tree!.root.findByProps({ accessibilityRole: "progressbar" }),
+    ).toBeTruthy();
   });
 
   it("keeps remote sources loading against a local placeholder", () => {
