@@ -6,8 +6,7 @@ import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
 import { Router } from "expo-router";
 import { TFunction } from "i18next";
-import { memo } from "react";
-import { View } from "react-native";
+import React, { CSSProperties, memo } from "react";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 
 export type WnaHeaderRouteButtonProps = {
@@ -54,18 +53,24 @@ function WnaHeaderRouteButton({
   const config = getHeaderButtonConfig(route, t);
   const navigationRouter = useWnaNavigationTransition(router);
 
-  return (
-    <View style={{ alignItems: "center" }}>
-      <WnaButtonHeader
-        appStyle={appStyle}
-        appColors={appColors}
-        text={config.title}
-        iconName={config.icon}
-        onPress={() => navigationRouter.push(config.route)}
-        t={t}
-        checkInternetConnection={false}
-      />
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      } as CSSProperties,
+    },
+    <WnaButtonHeader
+      appStyle={appStyle}
+      appColors={appColors}
+      text={config.title}
+      iconName={config.icon}
+      onPress={() => navigationRouter.push(config.route)}
+      t={t}
+      checkInternetConnection={false}
+    />,
   );
 }
 

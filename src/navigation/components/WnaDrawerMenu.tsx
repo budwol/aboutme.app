@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import React, { CSSProperties, useCallback, useEffect, useMemo } from "react";
 import { Linking } from "@utils/webLinking";
 import { useDrawerStatus } from "@react-navigation/drawer";
 import { Href, router, useNavigation, useSegments } from "expo-router";
@@ -52,6 +51,7 @@ export default function WnaDrawerMenu() {
   const lastSegment = segments.at(-1);
 
   const rootRoute = getDrawerNavigationPath("root", langCode);
+  const disclaimerRoute = getDrawerNavigationPath("disclaimer", langCode);
 
   const isStartActive =
     !lastSegment || ["(tabs)", "(tabs-de)", "(tabs-en)"].includes(lastSegment);
@@ -160,151 +160,178 @@ export default function WnaDrawerMenu() {
     ],
   );
 
-  return (
-    <View
-      style={[styles.container, { backgroundColor: drawerBackgroundColor }]}
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.container,
+        backgroundColor: drawerBackgroundColor,
+      } as CSSProperties,
+    },
+    <WnaPressable
+      ripple={undefined}
+      disableHover
+      t={t}
+      checkInternetConnection={false}
+      style={styles.headerPressable}
+      onPress={handleHeaderPress}
     >
-      <WnaPressable
-        ripple={undefined}
-        disableHover
-        t={t}
-        checkInternetConnection={false}
-        style={styles.headerPressable}
-        onPress={handleHeaderPress}
-      >
-        <View
-          style={[
-            styles.headerContent,
-            { paddingTop: appLayoutConstants.headerHeightWeb },
-          ]}
-        >
-          <View
-            style={[
-              styles.logoWrapper,
-              { backgroundColor: headerSurfaceColor },
-            ]}
-          >
-            <WnaImage
-              imageUrl="/logo_96.webp"
-              appColors={appColors}
-              imageTitle={t(i18nKeys.appBrand)}
-              style={styles.logo}
-            />
-          </View>
-
-          <View style={styles.centered}>
-            <Text
-              style={[
-                appStyle.textTitleLarge,
-                styles.centeredText,
-                { color: appColors.black },
-              ]}
-            >
-              {appData.profile.name}
-            </Text>
-            <Text
-              style={[
-                appStyle.textSmall,
-                styles.centeredText,
-                { opacity: 0.7 },
-              ]}
-            >
-              {appData.profile.title.toUpperCase()}
-            </Text>
-          </View>
-        </View>
-      </WnaPressable>
-
-      <View style={styles.navWrapper}>
-        <WnaNavigationList
-          appStyle={appStyle}
-          appLayout={appLayout}
-          items={items}
-          overridePaddingTop={appSpacingConstants.xs}
-          overrideGap={appSpacingConstants.xs}
-          style={styles.navList}
-          renderItem={renderItem}
-        />
-      </View>
-
-      <View style={styles.footer}>
-        <WnaButtonIconText
-          appColors={appColors}
-          appStyle={appStyle}
-          text={t(i18nKeys.actionDownloadResume)}
-          iconName={"file-pdf-box"}
-          backgroundColor={
-            appColors.isDark ? appColors.coolgray2 : appColors.white
-          }
-          textColor={appColors.black}
-          borderWidth={1}
-          onPress={() =>
-            Linking.openURL(getResumePdfUrl(langCode, appData.profile.name))
-          }
-          style={{
-            ...styles.themeButton,
-            height: compactButtonHeight,
-            borderRadius:
-              appLayout.globalCornerRadius ??
-              appLayoutConstants.globalCornerRadius,
-          }}
-        />
-
-        <WnaButtonIconText
-          appColors={appColors}
-          appStyle={appStyle}
-          text={themeLabel}
-          iconName={getThemeIcon(theme)}
-          backgroundColor={
-            appColors.isDark ? appColors.coolgray2 : appColors.white
-          }
-          textColor={appColors.black}
-          borderWidth={1}
-          onPress={() =>
-            void toggleWnaTheme({
-              colorScheme,
-              theme,
-              setTheme,
-              setAppColors,
-            })
-          }
-          style={{
-            ...styles.themeButton,
-            height: compactButtonHeight,
-            borderRadius:
-              appLayout.globalCornerRadius ??
-              appLayoutConstants.globalCornerRadius,
-          }}
-        />
-
-        <Text
-          onPress={() =>
-            navigationRouter.push(
-              getDrawerNavigationPath("disclaimer", langCode) as Href,
-            )
-          }
-          accessibilityRole="link"
-          style={[appStyle.textNeutralSmall, styles.footerLink]}
-        >
-          © {appData.profile.name}
-        </Text>
-
-        <Text style={[appStyle.textNeutralSmall, styles.version]}>
-          v {currentAppVersion()}
-        </Text>
-      </View>
-    </View>
+      {React.createElement(
+        "div",
+        {
+          style: {
+            ...styles.headerContent,
+            paddingTop: appLayoutConstants.headerHeightWeb,
+          } as CSSProperties,
+        },
+        React.createElement(
+          "div",
+          {
+            style: {
+              ...styles.logoWrapper,
+              backgroundColor: headerSurfaceColor,
+            } as CSSProperties,
+          },
+          <WnaImage
+            imageUrl="/logo_96.webp"
+            appColors={appColors}
+            imageTitle={t(i18nKeys.appBrand)}
+            style={styles.logo}
+          />,
+        ),
+        React.createElement(
+          "div",
+          { style: styles.centered },
+          React.createElement(
+            "span",
+            {
+              style: {
+                ...appStyle.textTitleLarge,
+                ...styles.centeredText,
+                color: appColors.black,
+              } as CSSProperties,
+            },
+            appData.profile.name,
+          ),
+          React.createElement(
+            "span",
+            {
+              style: {
+                ...appStyle.textSmall,
+                ...styles.centeredText,
+                opacity: 0.7,
+              } as CSSProperties,
+            },
+            appData.profile.title.toUpperCase(),
+          ),
+        ),
+      )}
+    </WnaPressable>,
+    React.createElement(
+      "div",
+      { style: styles.navWrapper },
+      <WnaNavigationList
+        appStyle={appStyle}
+        appLayout={appLayout}
+        items={items}
+        overridePaddingTop={appSpacingConstants.xs}
+        overrideGap={appSpacingConstants.xs}
+        style={styles.navList}
+        renderItem={renderItem}
+      />,
+    ),
+    React.createElement(
+      "div",
+      { style: styles.footer },
+      <WnaButtonIconText
+        appColors={appColors}
+        appStyle={appStyle}
+        text={t(i18nKeys.actionDownloadResume)}
+        iconName={"file-pdf-box"}
+        backgroundColor={
+          appColors.isDark ? appColors.coolgray2 : appColors.white
+        }
+        textColor={appColors.black}
+        borderWidth={1}
+        onPress={() =>
+          Linking.openURL(getResumePdfUrl(langCode, appData.profile.name))
+        }
+        style={{
+          ...styles.themeButton,
+          height: compactButtonHeight,
+          borderRadius:
+            appLayout.globalCornerRadius ??
+            appLayoutConstants.globalCornerRadius,
+        }}
+      />,
+      <WnaButtonIconText
+        appColors={appColors}
+        appStyle={appStyle}
+        text={themeLabel}
+        iconName={getThemeIcon(theme)}
+        backgroundColor={
+          appColors.isDark ? appColors.coolgray2 : appColors.white
+        }
+        textColor={appColors.black}
+        borderWidth={1}
+        onPress={() =>
+          void toggleWnaTheme({
+            colorScheme,
+            theme,
+            setTheme,
+            setAppColors,
+          })
+        }
+        style={{
+          ...styles.themeButton,
+          height: compactButtonHeight,
+          borderRadius:
+            appLayout.globalCornerRadius ??
+            appLayoutConstants.globalCornerRadius,
+        }}
+      />,
+      React.createElement(
+        "a",
+        {
+          href: disclaimerRoute,
+          onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
+            event.preventDefault();
+            navigationRouter.push(disclaimerRoute as Href);
+          },
+          style: {
+            ...appStyle.textNeutralSmall,
+            ...styles.footerLink,
+          } as CSSProperties,
+        },
+        `© ${appData.profile.name}`,
+      ),
+      React.createElement(
+        "span",
+        {
+          style: {
+            ...appStyle.textNeutralSmall,
+            ...styles.version,
+          } as CSSProperties,
+        },
+        `v ${currentAppVersion()}`,
+      ),
+    ),
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
+    display: "flex",
+    flexDirection: "column",
+    position: "relative",
     flex: 1,
   },
   headerPressable: {
     height: headerHeight,
   },
   headerContent: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
   },
   logoWrapper: {
@@ -319,31 +346,37 @@ const styles = StyleSheet.create({
     height: logoSize,
   },
   centered: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     // Without an explicit width, this column shrinks to its content's
     // natural (unwrapped) size — a long profile title then overflows the
     // drawer's fixed width instead of wrapping onto a second line.
     width: "100%",
-    paddingHorizontal: 24,
+    paddingInline: 24,
   },
   centeredText: {
     textAlign: "center",
   },
   navWrapper: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     justifyContent: "center",
     marginTop: appSpacingConstants.sm,
   },
   navList: {
-    paddingHorizontal: appSpacingConstants.xs,
+    paddingInline: appSpacingConstants.xs,
     paddingBottom: appSpacingConstants.xs,
   },
   footer: {
+    display: "flex",
+    flexDirection: "column",
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 24,
+    paddingInline: 24,
     paddingBottom: 8,
     alignItems: "center",
     gap: 4,
@@ -351,13 +384,14 @@ const styles = StyleSheet.create({
   themeButton: {
     width: "100%",
     marginBottom: 8,
-    marginHorizontal: 0,
+    marginInline: 0,
   },
   footerLink: {
-    textDecorationLine: "underline",
+    textDecoration: "underline",
     opacity: 0.9,
+    color: "inherit",
   },
   version: {
     opacity: 0.7,
   },
-});
+};
