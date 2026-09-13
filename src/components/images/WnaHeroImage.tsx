@@ -1,14 +1,17 @@
 import { FC } from "react";
 import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { ImageProps } from "expo-image";
 
-import WnaImage, { WnaImageStyleProps } from "@components/images/WnaImage";
+import WnaImage, { WnaImageProps } from "@components/images/WnaImage";
+import { WnaImageStyle } from "@components/images/WnaImageElement/wnaImageElementTypes";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
 
-interface WnaHeroImageProps extends ImageProps {
+interface WnaHeroImageProps extends Pick<
+  WnaImageProps,
+  "priority" | "responsivePolicy" | "style"
+> {
   appColors: Colors;
   imageUrl: string;
   imageTitle: string;
@@ -26,10 +29,7 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
   borderRadius = appLayoutConstants.globalCornerRadius,
   ...imageProps
 }) => {
-  const imageStyle = imageProps.style as
-    | WnaImageStyleProps
-    | WnaImageStyleProps[]
-    | undefined;
+  const imageStyle = imageProps.style as WnaImageStyle | undefined;
 
   return (
     <View
@@ -49,7 +49,7 @@ const WnaHeroImage: FC<WnaHeroImageProps> = ({
         imageTitle={imageTitle}
         contentFit="cover"
         grayScale={grayScale}
-        style={[styles.image, imageStyle] as WnaImageStyleProps[]}
+        style={[styles.image, imageStyle] as WnaImageStyle[]}
       />
 
       {showGradient && (

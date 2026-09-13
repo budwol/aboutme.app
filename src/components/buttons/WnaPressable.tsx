@@ -79,6 +79,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
         toolTipPosition &&
         (toolTipPosition === "left" || toolTipPosition === "top") && (
           <Popable
+            animated={false}
             content={toolTip}
             position={toolTipPosition}
             visible={isToolTipVisible}
@@ -111,6 +112,7 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
         toolTipPosition &&
         (toolTipPosition === "bottom" || toolTipPosition === "right") && (
           <Popable
+            animated={false}
             content={toolTip}
             position={props.toolTipPosition}
             visible={isToolTipVisible}
