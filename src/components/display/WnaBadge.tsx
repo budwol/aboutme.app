@@ -1,15 +1,19 @@
-import React, { memo } from "react";
-import { Text, View, StyleSheet, TextStyle, ViewStyle } from "react-native";
+import React, { CSSProperties, memo } from "react";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import WnaIcon from "../icon/WnaIcon/WnaIcon";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
 
+type BadgeStyle = CSSProperties & {
+  paddingHorizontal?: number;
+  paddingVertical?: number;
+};
+
 export type WnaBadgeProps = {
   appColors: Colors;
   appStyle: AppStyle;
-  style?: ViewStyle;
-  textStyle?: TextStyle | TextStyle[];
+  style?: BadgeStyle | BadgeStyle[];
+  textStyle?: BadgeStyle | BadgeStyle[];
   fontColor?: string;
   icon?: keyof typeof iconMap;
   text?: string;
@@ -26,44 +30,51 @@ const WnaBadge = ({
 }: WnaBadgeProps) => {
   if (!icon && !text) return null;
 
+  const containerStyle = flattenStyles([
+    styles.container,
+    { backgroundColor: appColors.warmgray6 },
+    style,
+  ]);
+  const labelStyle = flattenStyles([
+    appStyle.textMicro as CSSProperties,
+    styles.text,
+    { color: fontColor ?? appColors.white },
+    textStyle,
+  ]);
+
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: appColors.warmgray6 },
-        style,
-      ]}
-    >
+    <div aria-label={text} style={containerStyle}>
       {icon && (
         <WnaIcon iconName={icon} size={13} color={appColors.coolgray8} />
       )}
 
-      {text && (
-        <Text
-          style={
-            Array.isArray(textStyle)
-              ? [
-                  appStyle.textMicro,
-                  styles.text,
-                  { color: fontColor ?? appColors.white },
-                  ...textStyle,
-                ]
-              : [
-                  appStyle.textMicro,
-                  styles.text,
-                  { color: fontColor ?? appColors.white },
-                  textStyle ?? {},
-                ]
-          }
-        >
-          {text}
-        </Text>
-      )}
-    </View>
+      {text && <span style={labelStyle}>{text}</span>}
+    </div>
   );
 };
 
-const styles = StyleSheet.create({
+function flattenStyles(
+  styles: (BadgeStyle | BadgeStyle[] | undefined)[],
+): CSSProperties {
+  return styles.reduce<CSSProperties>((result, style) => {
+    if (Array.isArray(style)) return { ...result, ...flattenStyles(style) };
+    const { paddingHorizontal, paddingVertical, ...cssStyle } = style ?? {};
+    return {
+      ...result,
+      ...cssStyle,
+      ...(paddingHorizontal !== undefined && {
+        paddingLeft: paddingHorizontal,
+        paddingRight: paddingHorizontal,
+      }),
+      ...(paddingVertical !== undefined && {
+        paddingTop: paddingVertical,
+        paddingBottom: paddingVertical,
+      }),
+    };
+  }, {});
+}
+
+const styles: { container: CSSProperties; text: CSSProperties } = {
   container: {
     padding: 4,
     borderRadius: 4,
@@ -73,9 +84,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   text: {
-    includeFontPadding: false,
-    textAlignVertical: "center",
+    textAlign: "center",
   },
-});
+};
 
 export default memo(WnaBadge);
