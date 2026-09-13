@@ -23,7 +23,8 @@ import {
   useRouter,
 } from "expo-router";
 import { ReactNode, useMemo, useState } from "react";
-import { Linking, View } from "react-native";
+import { View } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { useTranslation } from "react-i18next";
 import WnaPrivateRepoModal from "./WnaPrivateRepoModal";
 import WnaProjectDescription from "./WnaProjectDescription";

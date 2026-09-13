@@ -3,7 +3,7 @@ import WnaExperienceSection from "@components/sections/WnaExperienceSection";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
-import * as ReactNative from "react-native";
+import * as WebLinking from "@utils/webLinking";
 
 type RenderedTextNode = {
   props: {
@@ -92,10 +92,10 @@ jest.mock("react-native-reanimated", () => {
 });
 
 describe("WnaExperienceSection", () => {
-  const openURL = jest.spyOn(ReactNative.Linking, "openURL");
+  const openURL = jest.spyOn(WebLinking.Linking, "openURL");
 
   beforeEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
     openURL.mockResolvedValue(undefined);
   });
 

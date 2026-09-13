@@ -1,12 +1,13 @@
 import Logger from "wna-logger";
 import React, { useCallback } from "react";
-import { Linking, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { WnaSectionProps } from "@components/sections/wnaSectionProps";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { useTranslation } from "react-i18next";
 import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
 import { getResumePdfUrl } from "@utils/resumePdfUrl";
 import { useWnaLayout } from "@/state/WnaAppContext";
+import { Linking } from "@utils/webLinking";
 
 const buttonSize = 52;
 const buttonGap = 16;

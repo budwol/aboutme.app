@@ -4,7 +4,8 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
 import { ReactNode } from "react";
-import { Linking, Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, Text, View } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
   WnaProjectDetailsProject,

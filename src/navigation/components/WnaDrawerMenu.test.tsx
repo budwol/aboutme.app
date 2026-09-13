@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
-import { Linking } from "react-native";
+import { Linking } from "@utils/webLinking";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 import { appLayoutConstants } from "@constants/layoutConstants";
