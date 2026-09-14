@@ -711,8 +711,7 @@ describe("WnaApp", () => {
     // ancestor chain. Flex items default to `min-height: auto`, which stops
     // them shrinking below their content's intrinsic height even with
     // `flex: 1` — the exact bug that broke page scrolling (content grew to
-    // fill its full height instead of being clipped by the viewport). See
-    // WEB-ONLY-MIGRATION.md fix.
+    // fill its full height instead of being clipped by the viewport).
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {

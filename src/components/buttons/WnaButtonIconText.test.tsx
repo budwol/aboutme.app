@@ -78,8 +78,7 @@ describe("WnaButtonIconText", () => {
     // Regression test: `appStyle` was accepted as a prop type but never
     // destructured or forwarded, so this button's visible label silently
     // fell back to a font-family-less style object and rendered in the
-    // browser's default sans-serif instead of Manrope. See
-    // WEB-ONLY-MIGRATION.md fix.
+    // browser's default sans-serif instead of Manrope.
     expect(content.props.appStyle).toBe(appStyle);
   });
 
