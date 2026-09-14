@@ -136,4 +136,30 @@ describe("WnaSurfaceCard", () => {
         .backgroundColor,
     ).toBe("rgba(0,0,0,0.1)");
   });
+
+  it("keeps the padded content column within the card's width using border-box sizing", () => {
+    // Regression test: this column combines `width: "100%"` with
+    // `padding: 12` on a real DOM div. Content-box (the browser default)
+    // would add the padding on top of the 100%-of-parent width, making
+    // the column 24px wider than its parent card.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaSurfaceCard appColors={lightColors}>child</WnaSurfaceCard>,
+      );
+    });
+
+    const views = tree!.root.findAllByType("div");
+    const contentColumn = views[2];
+
+    expect(contentColumn.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      boxSizing: "border-box",
+      padding: 12,
+      marginLeft: -8,
+      width: "100%",
+    });
+  });
 });
