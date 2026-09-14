@@ -8,28 +8,30 @@ import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaContactSection from "@components/sections/WnaContactSection";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { useNavigation, useRouter } from "expo-router";
-import { ReactNode } from "react";
+import { useRouter } from "expo-router";
+import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 
-const styles = StyleSheet.create({
+const styles = {
   cardContent: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     gap: 24,
   },
   detailGroup: {
+    display: "flex",
+    flexDirection: "column",
     gap: 16,
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default function WnaContactRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
   const { t } = useTranslation(["common"]);
   const router = useRouter();
-  const navigation = useNavigation();
 
   return (
     <WnaScrollViewScreen
@@ -48,57 +50,68 @@ export default function WnaContactRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          t={t}
-          navigation={navigation}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
       <WnaSurfaceCard appColors={appColors}>
-        <View style={styles.cardContent}>
+        {React.createElement(
+          "div",
+          { style: styles.cardContent },
           <WnaHeroImage
             appColors={appColors}
             imageUrl="bg.webp"
             imageTitle={t(i18nKeys.screenTitleContact)}
-          />
-
+          />,
           <WnaSectionTitle
             appColors={appColors}
             appStyle={appStyle}
             title={t(i18nKeys.screenTitleContact)}
             subtitle={t(i18nKeys.contactSubtitle).toUpperCase()}
-          />
-
-          <WnaSeparatorHorizontal transparent={true} space={8} />
-
-          <View style={styles.detailGroup}>
-            <View>
-              <Text style={appStyle.textNeutralMedium}>
-                {appData.profile.name}
-              </Text>
-              <Text style={appStyle.textNeutralMedium}>
-                {appData.contact.addressStreet}
-              </Text>
-              <Text style={appStyle.textNeutralMedium}>
-                {appData.contact.addressZipCode} {appData.contact.addressCity}
-              </Text>
-              <Text style={appStyle.textNeutralMedium}>
-                {appData.contact.addressCountry}
-              </Text>
-            </View>
-
-            <WnaSeparatorHorizontal transparent={true} space={16} />
-
+          />,
+          <WnaSeparatorHorizontal transparent={true} space={8} />,
+          React.createElement(
+            "div",
+            { style: styles.detailGroup },
+            React.createElement(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  flexDirection: "column",
+                } as CSSProperties,
+              },
+              React.createElement(
+                "span",
+                { style: appStyle.textNeutralMedium as CSSProperties },
+                appData.profile.name,
+              ),
+              React.createElement(
+                "span",
+                { style: appStyle.textNeutralMedium as CSSProperties },
+                appData.contact.addressStreet,
+              ),
+              React.createElement(
+                "span",
+                { style: appStyle.textNeutralMedium as CSSProperties },
+                appData.contact.addressZipCode,
+                " ",
+                appData.contact.addressCity,
+              ),
+              React.createElement(
+                "span",
+                { style: appStyle.textNeutralMedium as CSSProperties },
+                appData.contact.addressCountry,
+              ),
+            ),
+            <WnaSeparatorHorizontal transparent={true} space={16} />,
             <WnaContactSection
               appColors={appColors}
               appData={appData}
               appStyle={appStyle}
               t={t}
-            />
-          </View>
-        </View>
+            />,
+          ),
+        )}
       </WnaSurfaceCard>
     </WnaScrollViewScreen>
   );

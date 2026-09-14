@@ -1,6 +1,6 @@
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { addToLineHeight } from "@utils/addToLineHeight";
+import React, { CSSProperties, ReactNode } from "react";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type { WnaProjectDetailsThemeProps } from "./wnaProjectDetailsRouteTypes";
 
@@ -13,7 +13,7 @@ function renderProjectDescription(
   appStyle: WnaProjectDetailsThemeProps["appStyle"],
 ) {
   const bodyTextStyle = {
-    lineHeight: (appStyle.textNeutralMedium.lineHeight ?? 20) + 4,
+    lineHeight: addToLineHeight(appStyle.textNeutralMedium.lineHeight, 4, 20),
   };
   const lines = description
     .split("\n")
@@ -28,33 +28,44 @@ function renderProjectDescription(
     }
 
     nodes.push(
-      <View
-        key={`description-bullets-${nodes.length}`}
-        style={styles.bulletGroup}
-      >
-        {bulletLines.map((line, index) => (
-          <View key={`description-bullet-${index}`} style={styles.bulletRow}>
-            <Text
-              style={[
-                appStyle.textNeutralMedium,
-                bodyTextStyle,
-                styles.bulletMarker,
-              ]}
-            >
-              •
-            </Text>
-            <Text
-              style={[
-                appStyle.textNeutralMedium,
-                bodyTextStyle,
-                styles.bulletText,
-              ]}
-            >
-              {line}
-            </Text>
-          </View>
-        ))}
-      </View>,
+      React.createElement(
+        "div",
+        {
+          key: `description-bullets-${nodes.length}`,
+          style: styles.bulletGroup as CSSProperties,
+        },
+        bulletLines.map((line, index) =>
+          React.createElement(
+            "div",
+            {
+              key: `description-bullet-${index}`,
+              style: styles.bulletRow as CSSProperties,
+            },
+            React.createElement(
+              "span",
+              {
+                style: {
+                  ...appStyle.textNeutralMedium,
+                  ...bodyTextStyle,
+                  ...styles.bulletMarker,
+                } as CSSProperties,
+              },
+              "•",
+            ),
+            React.createElement(
+              "span",
+              {
+                style: {
+                  ...appStyle.textNeutralMedium,
+                  ...bodyTextStyle,
+                  ...styles.bulletText,
+                } as CSSProperties,
+              },
+              line,
+            ),
+          ),
+        ),
+      ),
     );
 
     bulletLines = [];
@@ -68,12 +79,17 @@ function renderProjectDescription(
 
     flushBulletLines();
     nodes.push(
-      <Text
-        key={`description-paragraph-${nodes.length}`}
-        style={[appStyle.textNeutralMedium, bodyTextStyle]}
-      >
-        {line}
-      </Text>,
+      React.createElement(
+        "span",
+        {
+          key: `description-paragraph-${nodes.length}`,
+          style: {
+            ...appStyle.textNeutralMedium,
+            ...bodyTextStyle,
+          } as CSSProperties,
+        },
+        line,
+      ),
     );
   }
 
@@ -87,19 +103,19 @@ export default function WnaProjectDescription({
   appStyle,
   description,
 }: WnaProjectDescriptionProps): ReactNode {
-  return (
-    <View
-      style={[
-        styles.descriptionSection,
-        {
-          backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
-          borderColor: convertHexToRgba(appColors.coolgray2, 0.9),
-        },
-      ]}
-    >
-      <View style={styles.descriptionGroup}>
-        {renderProjectDescription(description, appStyle)}
-      </View>
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.descriptionSection,
+        backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
+        borderColor: convertHexToRgba(appColors.coolgray2, 0.9),
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      { style: styles.descriptionGroup as CSSProperties },
+      renderProjectDescription(description, appStyle),
+    ),
   );
 }

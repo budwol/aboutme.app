@@ -4,9 +4,9 @@ import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationT
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { Href, useRouter } from "expo-router";
-import { FC, memo, ReactNode, useCallback } from "react";
+import React, { CSSProperties, FC, memo, ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, useColorScheme, View, ViewStyle } from "react-native";
+import { Platform, useColorScheme } from "react-native";
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
 import WnaMultilineHeader from "@components/chrome/WnaMultilineHeader";
@@ -122,7 +122,9 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       !isRootPage &&
       (Boolean(backHref) || canUseBrowserBack || router.canGoBack());
 
-    const headerStyle: ViewStyle = {
+    const headerStyle: CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
       position: "absolute",
       top: 0,
       left: 0,
@@ -131,7 +133,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       justifyContent: isLandscape ? "center" : "flex-end",
     };
 
-    const headerContentStyle: ViewStyle = {
+    const headerContentStyle: CSSProperties = {
+      display: "flex",
+      // A real browser only honors z-index on a positioned element
+      // (position !== static); React Native applies it regardless. Without
+      // this, the header content would render behind the blur container.
+      position: "relative",
       top: 0,
       height: appLayout.headerButtonHeight,
       flexDirection: "row",
@@ -141,44 +148,60 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
 
     const headerPointerEvents = isBusy ? "none" : "auto";
 
-    return (
-      <View style={[headerStyle, headerShadowStyle]}>
-        <View
-          style={[
-            headerStyle,
-            {
-              pointerEvents: headerPointerEvents as ViewStyle["pointerEvents"],
-            },
-          ]}
-        >
-          <View
-            nativeID="wna-header-blur-container"
-            style={[headerStyle, { zIndex: 1 }, blurContainerStyle]}
-          >
-            <WnaBlurView
-              forceExperimentalBlur
-              blurIntensity={30}
-              blurTint="systemThickMaterial"
-              style={headerStyle}
-            />
-            <View
-              nativeID="wna-header-blur-overlay"
-              style={[
-                headerStyle,
-                {
-                  position: "absolute",
-                  backgroundColor: appColors.staticWarmgray8,
-                  pointerEvents: "none",
-                },
-                blurOverlayStyle,
-              ]}
-            />
-          </View>
-
-          <View style={headerContentStyle}>
-            <View>
-              {backButtonVisible ? (
-                <View style={{ paddingLeft: isLandscape ? 8 : 0 }}>
+    return React.createElement(
+      "div",
+      { style: { ...headerStyle, ...headerShadowStyle } as CSSProperties },
+      React.createElement(
+        "div",
+        {
+          style: {
+            ...headerStyle,
+            pointerEvents: headerPointerEvents,
+          } as CSSProperties,
+        },
+        React.createElement(
+          "div",
+          {
+            id: "wna-header-blur-container",
+            style: {
+              ...headerStyle,
+              zIndex: 1,
+              ...blurContainerStyle,
+            } as CSSProperties,
+          },
+          <WnaBlurView
+            forceExperimentalBlur
+            blurIntensity={30}
+            blurTint="systemThickMaterial"
+            style={headerStyle}
+          />,
+          React.createElement("div", {
+            id: "wna-header-blur-overlay",
+            style: {
+              ...headerStyle,
+              position: "absolute",
+              backgroundColor: appColors.staticWarmgray8,
+              pointerEvents: "none",
+              ...blurOverlayStyle,
+            } as CSSProperties,
+          }),
+        ),
+        React.createElement(
+          "div",
+          { style: headerContentStyle },
+          React.createElement(
+            "div",
+            { style: { display: "flex", flexDirection: "column" } },
+            backButtonVisible
+              ? React.createElement(
+                  "div",
+                  {
+                    style: {
+                      display: "flex",
+                      flexDirection: "column",
+                      paddingLeft: isLandscape ? 8 : 0,
+                    } as CSSProperties,
+                  },
                   <WnaButtonHeader
                     text={t(i18nKeys.actionGoBack)}
                     appStyle={appStyle}
@@ -186,63 +209,68 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
                     iconName="arrow-left"
                     onPress={handleBack}
                     checkInternetConnection={false}
-                  />
-                </View>
-              ) : (
-                <View style={{ width: isLandscape ? 0 : 8 }} />
-              )}
-            </View>
-
-            <View
-              style={{
+                  />,
+                )
+              : React.createElement("div", {
+                  style: { width: isLandscape ? 0 : 8 },
+                }),
+          ),
+          React.createElement(
+            "div",
+            {
+              style: {
+                display: "flex",
+                flexDirection: "column",
                 flex: 1,
                 marginRight: isLandscape ? 8 : 0,
                 marginLeft: isRootPage ? 8 : 0,
                 overflow: "hidden",
                 justifyContent: "center",
-              }}
-            >
-              {WnaMultilineHeader(
-                appColors,
-                appStyle,
-                appLayout,
-                isRootPage,
-                isLandscape,
-                headerTitle,
-                handleTitlePress,
-              )}
-            </View>
-
-            <View
-              nativeID="wna-header-actions"
-              style={[
-                { opacity: isBusy ? 0 : 1 },
-                { flexDirection: "row", paddingRight: 16 },
-              ]}
-            >
-              {isLandscape ? (
-                <WnaButtonHeader
-                  appStyle={appStyle}
-                  appColors={appColors}
-                  text={"Theme"}
-                  iconName={themeIcon}
-                  onPress={() =>
-                    toggleWnaTheme({
-                      colorScheme,
-                      theme,
-                      setTheme,
-                      setAppColors,
-                    })
-                  }
-                />
-              ) : null}
-              {headerButton0}
-              {headerButton1}
-              {headerButton2}
-            </View>
-          </View>
-        </View>
-      </View>
+              } as CSSProperties,
+            },
+            WnaMultilineHeader(
+              appColors,
+              appStyle,
+              appLayout,
+              isRootPage,
+              isLandscape,
+              headerTitle,
+              handleTitlePress,
+            ),
+          ),
+          React.createElement(
+            "div",
+            {
+              id: "wna-header-actions",
+              style: {
+                display: "flex",
+                flexDirection: "row",
+                opacity: isBusy ? 0 : 1,
+                paddingRight: 16,
+              } as CSSProperties,
+            },
+            isLandscape ? (
+              <WnaButtonHeader
+                appStyle={appStyle}
+                appColors={appColors}
+                text={"Theme"}
+                iconName={themeIcon}
+                onPress={() =>
+                  toggleWnaTheme({
+                    colorScheme,
+                    theme,
+                    setTheme,
+                    setAppColors,
+                  })
+                }
+              />
+            ) : null,
+            headerButton0,
+            headerButton1,
+            headerButton2,
+          ),
+        ),
+      ),
     );
   },
 );

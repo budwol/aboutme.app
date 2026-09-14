@@ -1,8 +1,7 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { sectionConstants } from "@constants/sectionConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
-import React, { FC, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { CSSProperties, FC, useMemo, useState } from "react";
 import { WnaSectionProps } from "@components/sections/wnaSectionProps";
 
 type WnaFooterActionLinkProps = Pick<
@@ -13,14 +12,16 @@ type WnaFooterActionLinkProps = Pick<
   onPress: () => void;
 };
 
-const styles = StyleSheet.create({
+const styles = {
   footerActionRow: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
   },
   footerActionButtonText: {
     fontWeight: "600",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
   appColors,
@@ -64,28 +65,30 @@ const WnaFooterActionLink: FC<WnaFooterActionLinkProps> = ({
     paddingTop: sectionConstants.sectionFooterActionPaddingVertical,
   };
 
-  return (
-    <View style={styles.footerActionRow}>
-      {React.createElement(
-        "button",
+  return React.createElement(
+    "div",
+    { style: styles.footerActionRow },
+    React.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: onPress,
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => setIsHovered(false),
+        style: buttonStyle as React.CSSProperties,
+      },
+      React.createElement(
+        "span",
         {
-          type: "button",
-          onClick: onPress,
-          onMouseEnter: () => setIsHovered(true),
-          onMouseLeave: () => setIsHovered(false),
-          style: buttonStyle as React.CSSProperties,
+          style: {
+            ...appStyle.textMicro,
+            ...styles.footerActionButtonText,
+            color: appColors.accent5,
+          } as CSSProperties,
         },
-        <Text
-          style={[
-            appStyle.textMicro,
-            styles.footerActionButtonText,
-            { color: appColors.accent5 },
-          ]}
-        >
-          {label} →
-        </Text>,
-      )}
-    </View>
+        `${label} →`,
+      ),
+    ),
   );
 };
 

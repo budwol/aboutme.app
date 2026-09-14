@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import {
   exampleAppData,
   exampleAppDataDe,
@@ -6,6 +6,8 @@ import {
 import { BasePage } from "./base.page";
 
 export class ExperiencePage extends BasePage {
+  private openedCompanyPopup: Page | undefined;
+
   async navigateToPage() {
     await this.page.goto("/experience");
   }
@@ -49,7 +51,9 @@ export class ExperiencePage extends BasePage {
   }
 
   async openFirstCompanyLink() {
+    const popupPromise = this.page.waitForEvent("popup");
     await this.page.getByTestId("experience-company-link-0").last().click();
+    this.openedCompanyPopup = await popupPromise;
   }
 
   async assertFirstCompanyUrlOpened() {
@@ -58,19 +62,9 @@ export class ExperiencePage extends BasePage {
       "",
     );
 
-    await expect
-      .poll(async () =>
-        this.page
-          .evaluate(
-            () =>
-              (
-                window as Window & {
-                  __wnaLastOpenedUrl?: string | null;
-                }
-              ).__wnaLastOpenedUrl ?? "",
-          )
-          .then((url) => url.replace(/\/$/, "")),
-      )
-      .toBe(expectedUrl);
+    await this.openedCompanyPopup?.waitForLoadState("domcontentloaded");
+    const actualUrl = (this.openedCompanyPopup?.url() ?? "").replace(/\/$/, "");
+
+    expect(actualUrl).toBe(expectedUrl);
   }
 }

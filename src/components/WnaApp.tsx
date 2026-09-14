@@ -1,15 +1,15 @@
 import Logger from "@/utils/logger";
 import { AppData } from "@/app-data";
-import {
-  LayoutChangeEvent,
-  Pressable,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
+import { useColorScheme } from "react-native";
 import { ErrorBoundaryProps, usePathname } from "expo-router";
-import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  FC,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   useWnaAppData,
   useWnaAppLifecycle,
@@ -39,25 +39,39 @@ type WnaLoadingCopyProps = {
 // can't import this component, so the font sizes/weights/spacing and the
 // accent-bar size/color are hand-duplicated there on purpose.
 function WnaLoadingCopy({ appColors, appData }: WnaLoadingCopyProps) {
-  return (
-    <View style={styles.introCopy}>
-      <Text style={[styles.introBrand, { color: appColors.coolgray8 }]}>
-        {appData.profile.name}
-      </Text>
-      <WnaAccentBar appColors={appColors} width={48} />
-      <Text style={[styles.introName, { color: appColors.coolgray6 }]}>
-        {appData.profile.title.toUpperCase()}
-      </Text>
-    </View>
+  return React.createElement(
+    "div",
+    { style: styles.introCopy },
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...styles.introBrand,
+          color: appColors.coolgray8,
+        } as CSSProperties,
+      },
+      appData.profile.name,
+    ),
+    <WnaAccentBar appColors={appColors} width={48} />,
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...styles.introName,
+          color: appColors.coolgray6,
+        } as CSSProperties,
+      },
+      appData.profile.title.toUpperCase(),
+    ),
   );
 }
 
 function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
-  return (
-    <View style={styles.transitionContent}>
-      <WnaHeroField appColors={appColors} compact />
-      <WnaAccentBar appColors={appColors} animated />
-    </View>
+  return React.createElement(
+    "div",
+    { style: styles.transitionContent },
+    <WnaHeroField appColors={appColors} compact />,
+    <WnaAccentBar appColors={appColors} animated />,
   );
 }
 
@@ -68,25 +82,37 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
     Logger.error(ErrorBoundary.name, error);
   }, [error]);
 
-  return (
-    <View
-      style={{
+  return React.createElement(
+    "div",
+    {
+      style: {
         flex: 1,
+        display: "flex",
+        flexDirection: "column",
         backgroundColor: "red",
         justifyContent: "center",
         alignItems: "center",
-      }}
-    >
-      <Text style={{ color: "white", marginBottom: 12 }}>{error.message}</Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t(i18nKeys.actionRetry)}
-        onPress={retry}
-        style={styles.retryButton}
-      >
-        <Text style={styles.retryButtonText}>{t(i18nKeys.actionRetry)}</Text>
-      </Pressable>
-    </View>
+      } as CSSProperties,
+    },
+    React.createElement(
+      "span",
+      { style: { color: "white", marginBottom: 12 } as CSSProperties },
+      error.message,
+    ),
+    React.createElement(
+      "button",
+      {
+        type: "button",
+        "aria-label": t(i18nKeys.actionRetry),
+        onClick: retry,
+        style: styles.retryButton as CSSProperties,
+      },
+      React.createElement(
+        "span",
+        { style: styles.retryButtonText as CSSProperties },
+        t(i18nKeys.actionRetry),
+      ),
+    ),
   );
 }
 
@@ -179,6 +205,10 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
     setTheme,
     theme,
   ]);
+
+  useEffect(() => {
+    setHasContentLayout(true);
+  }, []);
 
   useEffect(() => {
     if (!hasContentLayout || isContentReadyForReveal) {
@@ -277,73 +307,74 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
       ? navigationTransitionBackgroundImageUrl
       : appLayout.backgroundImageUrl;
 
-  function handleContentLayout(_event: LayoutChangeEvent) {
-    if (!hasContentLayout) {
-      setHasContentLayout(true);
-    }
-  }
-
   if (!isAppInitialized) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colorScheme === "dark" ? "#111" : "#fff",
-        }}
-      />
-    );
+    return React.createElement("div", {
+      style: {
+        flex: 1,
+        backgroundColor: colorScheme === "dark" ? "#111" : "#fff",
+      } as CSSProperties,
+    });
   }
 
-  return (
-    <View nativeID="wna-safe-area" style={{ flex: 1, overflow: "hidden" }}>
-      <View
-        nativeID={isContentReadyForReveal ? "wna-content-reveal" : undefined}
-        onLayout={handleContentLayout}
-        style={[
-          styles.content,
-          !isContentReadyForReveal && styles.contentInitial,
+  return React.createElement(
+    "div",
+    {
+      id: "wna-safe-area",
+      style: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        overflow: "hidden",
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      {
+        id: isContentReadyForReveal ? "wna-content-reveal" : undefined,
+        style: {
+          ...styles.content,
+          ...(!isContentReadyForReveal ? styles.contentInitial : {}),
+          opacity: isNavigationContentVisible ? 1 : 0,
+          transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+        } as CSSProperties,
+      },
+      children,
+    ),
+    showIntro
+      ? React.createElement(
+          "div",
           {
-            opacity: isNavigationContentVisible ? 1 : 0,
-            transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
-          } as never,
-        ]}
-      >
-        {children}
-      </View>
-
-      {showIntro ? (
-        <View
-          nativeID="wna-intro-overlay"
-          style={[
-            styles.fullScreenOverlay,
-            styles.introOverlay,
-            {
+            id: "wna-intro-overlay",
+            style: {
+              ...styles.fullScreenOverlay,
+              ...styles.introOverlay,
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
               pointerEvents: "none",
-            },
-          ]}
-        >
-          <View style={styles.introContent}>
-            <WnaHeroField appColors={appColors} compact />
-            <WnaLoadingCopy appColors={appColors} appData={appData} />
-          </View>
-        </View>
-      ) : null}
-
-      {showNavigationTransition ? (
-        <View
-          nativeID="navigation-transition-overlay"
-          style={[
-            styles.fullScreenOverlay,
-            styles.navigationTransitionOverlay,
-            {
+            } as CSSProperties,
+          },
+          React.createElement(
+            "div",
+            { style: styles.introContent as CSSProperties },
+            <WnaHeroField appColors={appColors} compact />,
+            <WnaLoadingCopy appColors={appColors} appData={appData} />,
+          ),
+        )
+      : null,
+    showNavigationTransition
+      ? React.createElement(
+          "div",
+          {
+            id: "navigation-transition-overlay",
+            style: {
+              ...styles.fullScreenOverlay,
+              ...styles.navigationTransitionOverlay,
               backgroundColor: appColors.isDark ? "#111111" : "#f8f7f3",
               pointerEvents: "auto",
               opacity: navigationTransitionPhase === "exit" ? 0 : 1,
               transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
-            } as never,
-          ]}
-        >
+            } as CSSProperties,
+          },
           <WnaImageBackground
             testID="navigation-transition-background"
             imageUri={navigationTransitionBackgroundImageUri}
@@ -351,53 +382,71 @@ const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
             isDarkMode={appColors.isDark}
           >
             <WnaNavigationTransitionOverlay appColors={appColors} />
-          </WnaImageBackground>
-        </View>
-      ) : null}
-
-      <WnaToastHost appColors={appColors} />
-    </View>
+          </WnaImageBackground>,
+        )
+      : null,
+    <WnaToastHost appColors={appColors} />,
   );
 };
 
-const styles = StyleSheet.create({
+const absoluteFillObject: CSSProperties = {
+  position: "absolute",
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
+
+const styles = {
   content: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
   },
   contentInitial: {
     opacity: 0.92,
-    transform: [{ translateY: 10 }],
+    transform: "translateY(10px)",
   },
   fullScreenOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...absoluteFillObject,
     zIndex: 20,
   },
   introOverlay: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   navigationTransitionOverlay: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   introContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...absoluteFillObject,
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
+    paddingInline: 24,
   },
   transitionContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...absoluteFillObject,
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     gap: 22,
-    paddingHorizontal: 24,
+    paddingInline: 24,
   },
   introCopy: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    paddingHorizontal: 24,
+    paddingInline: 24,
   },
   introBrand: {
     fontFamily: FontFamilies.UI,
@@ -414,9 +463,11 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   retryButton: {
+    display: "flex",
+    flexDirection: "column",
     minWidth: 140,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingInline: 20,
+    paddingBlock: 12,
     borderRadius: 4,
     backgroundColor: "white",
     alignItems: "center",
@@ -425,6 +476,6 @@ const styles = StyleSheet.create({
     color: "#991b1b",
     fontWeight: "700",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default WnaApp;

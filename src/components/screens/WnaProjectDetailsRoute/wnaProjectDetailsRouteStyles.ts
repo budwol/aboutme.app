@@ -1,12 +1,15 @@
 import { appLayoutConstants } from "@constants/layoutConstants";
-import { StyleSheet, ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
-export const styles = StyleSheet.create({
+export const styles = {
   cardContent: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     gap: appLayoutConstants.contentSectionGap,
   },
   heroSection: {
+    position: "relative",
     width: "100%",
   },
   heroBadgeContainer: {
@@ -16,6 +19,8 @@ export const styles = StyleSheet.create({
     zIndex: 1,
   },
   heroBottomLeftStack: {
+    display: "flex",
+    flexDirection: "column",
     position: "absolute",
     bottom: 16,
     left: 16,
@@ -30,26 +35,38 @@ export const styles = StyleSheet.create({
     zIndex: 1,
   },
   heroBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    display: "flex",
+    flexDirection: "column",
+    paddingInline: 12,
+    paddingBlock: 8,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
     alignSelf: "flex-start",
   },
   contentBody: {
+    display: "flex",
+    flexDirection: "column",
     gap: appLayoutConstants.contentSectionGap,
   },
   contentSection: {
+    display: "flex",
+    flexDirection: "column",
     gap: appLayoutConstants.contentSectionGap - 4,
   },
   stackGroup: {
+    display: "flex",
+    flexDirection: "column",
     gap: 12,
   },
   actionSection: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "flex-end",
     gap: 12,
   },
   actionLinks: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-end",
@@ -57,7 +74,7 @@ export const styles = StyleSheet.create({
   },
   actionButton: {
     minWidth: 160,
-    marginHorizontal: 0,
+    marginInline: 0,
     height: appLayoutConstants.textInputHeight,
     borderRadius: appLayoutConstants.globalCornerRadius,
   },
@@ -71,7 +88,7 @@ export const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-  } as unknown as ViewStyle,
+  },
   modalBackdrop: {
     position: "absolute",
     top: 0,
@@ -81,45 +98,59 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.58)",
     backdropFilter: "blur(4px)",
     WebkitBackdropFilter: "blur(4px)",
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: appLayoutConstants.contentSectionGap,
+    paddingInline: appLayoutConstants.contentSectionGap,
     cursor: "auto",
-  } as unknown as ViewStyle,
+  },
   modalDialog: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     maxWidth: 560,
     padding: 32,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: appLayoutConstants.contentSectionGap,
     cursor: "auto",
   },
   modalHeader: {
+    display: "flex",
+    flexDirection: "column",
     gap: 8,
   },
   modalHeaderTop: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 16,
   },
   modalHeaderCopy: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     gap: 8,
   },
   modalCloseButton: {
+    display: "flex",
     width: 32,
     height: 32,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
+    borderStyle: "solid",
   },
   modalBody: {
+    display: "flex",
+    flexDirection: "column",
     gap: 8,
   },
   modalActions: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-end",
@@ -132,15 +163,21 @@ export const styles = StyleSheet.create({
     minWidth: 208,
   },
   descriptionSection: {
+    display: "flex",
+    flexDirection: "column",
     gap: 16,
     padding: appLayoutConstants.contentSectionPaddingVertical + 4,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
   },
   contextSection: {
+    display: "flex",
+    flexDirection: "column",
     padding: 16,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: 8,
   },
   projectContextText: {
@@ -148,14 +185,19 @@ export const styles = StyleSheet.create({
     fontWeight: "400",
   },
   descriptionGroup: {
+    display: "flex",
+    flexDirection: "column",
     gap: 20,
   },
   bulletRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 8,
   },
   bulletGroup: {
+    display: "flex",
+    flexDirection: "column",
     gap: 12,
     paddingTop: 4,
   },
@@ -165,4 +207,4 @@ export const styles = StyleSheet.create({
   bulletText: {
     flex: 1,
   },
-});
+} satisfies Record<string, CSSProperties>;

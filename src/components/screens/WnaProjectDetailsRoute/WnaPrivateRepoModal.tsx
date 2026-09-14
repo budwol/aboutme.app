@@ -5,7 +5,7 @@ import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
 import React, { ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
@@ -84,7 +84,6 @@ export function WnaWebModal({
     "div",
     {
       id: "private-repo-modal",
-      nativeID: "private-repo-modal",
       "aria-label": "private-repo-modal",
       role: "dialog",
       "aria-modal": true,
@@ -160,19 +159,28 @@ export default function WnaPrivateRepoModal({
             onClick: (event: React.MouseEvent) => event.stopPropagation(),
           },
           <>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderTop}>
-                <View style={styles.modalHeaderCopy}>
-                  <Text
-                    style={[
-                      appStyle.textNeutralMedium,
-                      { color: appColors.black, fontWeight: "700" },
-                    ]}
-                  >
-                    {t(i18nKeys.titlePrivateRepo)}
-                  </Text>
-                </View>
-                {React.createElement(
+            {React.createElement(
+              "div",
+              { style: styles.modalHeader as React.CSSProperties },
+              React.createElement(
+                "div",
+                { style: styles.modalHeaderTop as React.CSSProperties },
+                React.createElement(
+                  "div",
+                  { style: styles.modalHeaderCopy as React.CSSProperties },
+                  React.createElement(
+                    "span",
+                    {
+                      style: {
+                        ...appStyle.textNeutralMedium,
+                        color: appColors.black,
+                        fontWeight: "700",
+                      } as React.CSSProperties,
+                    },
+                    t(i18nKeys.titlePrivateRepo),
+                  ),
+                ),
+                React.createElement(
                   "button",
                   {
                     type: "button",
@@ -202,23 +210,31 @@ export default function WnaPrivateRepoModal({
                     size={18}
                     color={appColors.black}
                   />,
-                )}
-              </View>
-            </View>
+                ),
+              ),
+            )}
 
-            <View style={styles.modalBody}>
-              <Text
-                style={[
-                  appStyle.textNeutralMedium,
-                  { color: appColors.black, opacity: 0.86 },
-                ]}
-              >
-                {t(i18nKeys.infoPrivateRepoHint)}{" "}
-                {t(i18nKeys.infoPrivateRepoBody)}
-              </Text>
-            </View>
+            {React.createElement(
+              "div",
+              { style: styles.modalBody as React.CSSProperties },
+              React.createElement(
+                "span",
+                {
+                  style: {
+                    ...appStyle.textNeutralMedium,
+                    color: appColors.black,
+                    opacity: 0.86,
+                  } as React.CSSProperties,
+                },
+                t(i18nKeys.infoPrivateRepoHint),
+                " ",
+                t(i18nKeys.infoPrivateRepoBody),
+              ),
+            )}
 
-            <View style={styles.modalActions}>
+            {React.createElement(
+              "div",
+              { style: styles.modalActions as React.CSSProperties },
               <WnaButtonIconText
                 appColors={appColors}
                 appStyle={appStyle}
@@ -236,7 +252,7 @@ export default function WnaPrivateRepoModal({
                   onClose();
                   Linking.openURL(privateRepoMailToUrl);
                 }}
-              />
+              />,
               <WnaButtonIconText
                 appColors={appColors}
                 appStyle={appStyle}
@@ -255,8 +271,8 @@ export default function WnaPrivateRepoModal({
                   /* istanbul ignore next -- this modal only opens via the github projectLinks entry, which is filtered out whenever repoUrl is falsy, so repoUrl is always truthy here */
                   Linking.openURL(project.repoUrl ?? "");
                 }}
-              />
-            </View>
+              />,
+            )}
           </>,
         ),
       )}

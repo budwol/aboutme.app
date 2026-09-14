@@ -4,8 +4,7 @@ import WnaContactFooter from "@components/chrome/WnaContactFooter";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
 import { Href } from "expo-router";
-import { FC, ReactNode, useMemo } from "react";
-import { ScrollView, View } from "react-native";
+import React, { CSSProperties, FC, ReactNode, useMemo } from "react";
 
 export type WnaScrollViewScreenProps = {
   children?: ReactNode;
@@ -46,8 +45,11 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
   const { appLayout } = useWnaLayout();
   const { scrollY, onScroll } = useWnaScrollY();
 
-  const contentContainerStyle = useMemo(
+  const scrollContainerStyle: CSSProperties = useMemo(
     () => ({
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
       paddingTop: appLayout.contentListPaddingTop,
       paddingBottom: appLayout.contentPaddingBottom,
     }),
@@ -68,16 +70,35 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
       headerButton2={headerButton2}
       showAppStoreButtons={showAppStoreButtons}
     >
-      <ScrollView
-        contentContainerStyle={contentContainerStyle}
-        scrollEventThrottle={appLayout.scrollEventThrottle}
-        onScroll={onScroll}
-      >
-        <View style={appStyle.containerCenterMaxWidth}>
-          {children}
-          {showContactFooter && <WnaContactFooter />}
-        </View>
-      </ScrollView>
+      {React.createElement(
+        "div",
+        {
+          style: scrollContainerStyle,
+          // useWnaScrollY is shared with still-RN screens (e.g.
+          // WnaHomeRoute/WnaProjectsRoute) that pass its onScroll straight
+          // to a native ScrollView, so its signature stays
+          // NativeSyntheticEvent-shaped; adapt the real DOM event here
+          // instead of widening the shared hook.
+          onScroll: (event: React.UIEvent<HTMLDivElement>) =>
+            onScroll({
+              nativeEvent: {
+                contentOffset: { y: event.currentTarget.scrollTop },
+              },
+            } as never),
+        },
+        React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              ...appStyle.containerCenterMaxWidth,
+            } as CSSProperties,
+          },
+          children,
+          showContactFooter && <WnaContactFooter />,
+        ),
+      )}
     </WnaBaseScreen>
   );
 };

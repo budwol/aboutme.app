@@ -1,5 +1,4 @@
-import React, { memo, useMemo } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import React, { CSSProperties, memo, useMemo } from "react";
 
 import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
 import AppStyle from "@/theme/appStyle";
@@ -30,11 +29,12 @@ const WnaSectionTitle = ({
   accentBarPulseDuration,
 }: WnaSectionTitleProps) => {
   const titleStyle = useMemo(
-    () => [
-      appStyle.textExtraLarge,
-      styles.title,
-      { color: titleTextColor ?? appColors.black },
-    ],
+    () =>
+      ({
+        ...appStyle.textExtraLarge,
+        ...styles.title,
+        color: titleTextColor ?? appColors.black,
+      }) as CSSProperties,
     [appStyle, titleTextColor, appColors.black],
   );
 
@@ -55,7 +55,11 @@ const WnaSectionTitle = ({
         {showAccentBar ? (
           <WnaSeparatorHorizontal transparent space={10} />
         ) : null}
-        <Text style={appStyle.textNeutralSubtitle}>{subtitle}</Text>
+        {React.createElement(
+          "span",
+          { style: appStyle.textNeutralSubtitle as CSSProperties },
+          subtitle,
+        )}
         <WnaSeparatorHorizontal transparent space={8} />
       </>
     );
@@ -69,16 +73,18 @@ const WnaSectionTitle = ({
     subtitle,
   ]);
 
-  return (
-    <View style={styles.container}>
-      <Text style={titleStyle}>{title}</Text>
-      {subtitleComponent}
-    </View>
+  return React.createElement(
+    "div",
+    { style: styles.container },
+    React.createElement("span", { style: titleStyle }, title),
+    subtitleComponent,
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     width: "100%",
   },
@@ -86,6 +92,6 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textAlign: "center",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default memo(WnaSectionTitle);

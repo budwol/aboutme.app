@@ -1,7 +1,6 @@
 import Colors from "@constants/theme/colors";
 import { getVersionedLocalAssetUrl } from "@utils/versionedAssetUrl";
-import React, { ReactNode, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { CSSProperties, ReactNode, useMemo } from "react";
 import { WnaBlurView } from "../effects/WnaBlurView";
 
 export type WnaImageBackgroundProps = {
@@ -27,49 +26,54 @@ const WnaImageBackground = React.memo(
     }, [imageUri]);
 
     if (!resolvedUri) {
-      return (
-        <View
-          nativeID={testID}
-          style={[styles.container, { backgroundColor: appColors.white }]}
-        >
-          {children}
-        </View>
+      return React.createElement(
+        "div",
+        {
+          id: testID,
+          style: {
+            ...styles.container,
+            backgroundColor: appColors.white,
+          } as CSSProperties,
+        },
+        children,
       );
     }
 
-    return (
-      <View
-        nativeID={testID}
-        style={[styles.container, { backgroundColor: appColors.white }]}
+    return React.createElement(
+      "div",
+      {
+        id: testID,
+        style: {
+          ...styles.container,
+          backgroundColor: appColors.white,
+        } as CSSProperties,
+      },
+      <img
+        src={resolvedUri}
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        fetchPriority="high"
+        loading="eager"
+        style={styles.webImage}
+      />,
+      <WnaBlurView
+        forceExperimentalBlur
+        isBackground
+        style={styles.backgroundLayer}
+        blurTint="dark"
+        blurIntensity={40}
+        backgroundOpacity={isDarkMode ? 0.72 : 0.55}
       >
-        <img
-          src={resolvedUri}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          fetchPriority="high"
-          loading="eager"
-          style={styles.webImage}
-        />
-
-        <WnaBlurView
-          forceExperimentalBlur
-          isBackground
-          style={styles.backgroundLayer}
-          blurTint="dark"
-          blurIntensity={40}
-          backgroundOpacity={isDarkMode ? 0.72 : 0.55}
-        >
-          {children}
-        </WnaBlurView>
-      </View>
+        {children}
+      </WnaBlurView>,
     );
   },
 );
 
 WnaImageBackground.displayName = "WnaImageBackground";
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     position: "absolute",
     top: 0,
@@ -79,7 +83,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   backgroundLayer: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     overflow: "hidden",
   },
   webImage: {
@@ -90,6 +98,6 @@ const styles = StyleSheet.create({
     height: "100%",
     objectFit: "cover",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default WnaImageBackground;

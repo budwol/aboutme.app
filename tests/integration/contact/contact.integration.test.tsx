@@ -89,7 +89,7 @@ describe("WnaContactRoute integration", () => {
     const scrollViewScreen = tree.root.findByType("WnaScrollViewScreen");
     const contactCard = tree.root.findByType("WnaContactSection");
     const texts = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

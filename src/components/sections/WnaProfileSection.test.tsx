@@ -92,7 +92,7 @@ describe("WnaProfileSection", () => {
     const hero = tree!.root.findByType("WnaProfileHero");
     const techstack = tree!.root.findByType("WnaTechStackSection");
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

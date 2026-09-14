@@ -49,7 +49,7 @@ describe("WnaSectionTitle", () => {
       );
     });
 
-    expect(tree!.root.findByType("Text").props.children).toBe("Title only");
+    expect(tree!.root.findByType("span").props.children).toBe("Title only");
     expect(tree!.root.findAllByType("WnaSeparatorHorizontal")).toHaveLength(0);
     expect(tree!.root.findAllByType("WnaAccentBar")).toHaveLength(0);
   });
@@ -76,7 +76,7 @@ describe("WnaSectionTitle", () => {
     expect(tree!.root.findAllByType("WnaAccentBar")).toHaveLength(0);
     expect(
       tree!.root
-        .findAllByType("Text")
+        .findAllByType("span")
         .find(
           (node: { props: { children?: unknown } }) =>
             node.props.children === "Subtitle",
@@ -129,10 +129,10 @@ describe("WnaSectionTitle", () => {
       );
     });
 
-    const titleText = tree!.root.findByType("Text");
+    const titleText = tree!.root.findByType("span");
 
     expect(titleText.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ color: "#ff0000" })]),
+      expect.objectContaining({ color: "#ff0000" }),
     );
   });
 });

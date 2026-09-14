@@ -283,7 +283,7 @@ describe("WnaBaseScreen", () => {
 
     expect(tree!.root.findAllByType("WnaActivityIndicator")).toHaveLength(1);
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -292,10 +292,10 @@ describe("WnaBaseScreen", () => {
     expect(textValues).toContain("Loading data");
 
     const busyOverlay = tree!.root.find(
-      (node: { props: { nativeID?: string } }) =>
-        node.props.nativeID === "wna-busy-overlay",
+      (node: { props: { id?: string } }) =>
+        node.props.id === "wna-busy-overlay",
     );
-    expect(busyOverlay.props.style[1]).toEqual(
+    expect(busyOverlay.props.style).toEqual(
       expect.objectContaining({
         opacity: 1,
         pointerEvents: "auto",
@@ -316,10 +316,10 @@ describe("WnaBaseScreen", () => {
     });
 
     const busyOverlay = tree!.root.find(
-      (node: { props: { nativeID?: string } }) =>
-        node.props.nativeID === "wna-busy-overlay",
+      (node: { props: { id?: string } }) =>
+        node.props.id === "wna-busy-overlay",
     );
-    expect(busyOverlay.props.style[1]).toEqual(
+    expect(busyOverlay.props.style).toEqual(
       expect.objectContaining({ opacity: 0, pointerEvents: "none" }),
     );
   });

@@ -133,7 +133,7 @@ describe("WnaProjectDetailsRoute integration", () => {
     const scrollViewScreen = tree.root.findByType("WnaScrollViewScreen");
     const title = tree.root.findByType("WnaSectionTitle");
     const texts = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -150,17 +150,12 @@ describe("WnaProjectDetailsRoute integration", () => {
     });
 
     expect(mockOpenURL).not.toHaveBeenCalled();
-    expect(
-      tree.root.findByProps({ nativeID: "private-repo-modal" }).props,
-    ).toEqual(
-      expect.objectContaining({
-        accessibilityLabel: "private-repo-modal",
-        role: "dialog",
-        "aria-modal": true,
-      }),
-    );
+    const modal = tree.root.findByProps({ id: "private-repo-modal" });
+    expect(modal.props["aria-label"]).toBe("private-repo-modal");
+    expect(modal.props.role).toBe("dialog");
+    expect(modal.props["aria-modal"]).toBe(true);
     const modalTexts = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

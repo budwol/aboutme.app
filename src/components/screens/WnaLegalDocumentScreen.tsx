@@ -13,9 +13,8 @@ import {
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { getLangCode } from "@/i18n/i18n";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { Redirect, useNavigation, useRouter } from "expo-router";
-import { ReactNode } from "react";
-import { View } from "react-native";
+import { Redirect, useRouter } from "expo-router";
+import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 
@@ -31,7 +30,6 @@ export default function WnaLegalDocumentScreen({
   const { isAppInitialized } = useWnaAppLifecycle();
   const { appColors, appStyle } = useWnaTheme();
   const { currentWindowWidth } = useWnaLayout();
-  const navigation = useNavigation();
   const router = useRouter();
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
@@ -54,30 +52,28 @@ export default function WnaLegalDocumentScreen({
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          navigation={navigation}
-          t={t}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
-      <View
-        style={{
-          backgroundColor: appColors.white,
-          borderRadius: appLayoutConstants.globalCornerRadius,
-          borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
-          borderWidth: 1,
-        }}
-      >
+      {React.createElement(
+        "div",
+        {
+          style: {
+            backgroundColor: appColors.white,
+            borderRadius: appLayoutConstants.globalCornerRadius,
+            borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
+            borderWidth: 1,
+            borderStyle: "solid",
+          } as CSSProperties,
+        },
         <WnaHtmlRenderer
           appStyle={appStyle}
           appColors={appColors}
           width={currentWindowWidth}
           html={htmlContent}
           padding={24}
-        />
-      </View>
+        />,
+      )}
     </WnaScrollViewScreen>
   );
 }

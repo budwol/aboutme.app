@@ -1,6 +1,6 @@
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { addToLineHeight } from "@utils/addToLineHeight";
+import React, { CSSProperties, ReactNode } from "react";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type { WnaProjectDetailsThemeProps } from "./wnaProjectDetailsRouteTypes";
 
@@ -13,28 +13,26 @@ export default function WnaProjectDetailsContext({
   appStyle,
   context,
 }: WnaProjectDetailsContextProps): ReactNode {
-  return (
-    <View
-      style={[
-        styles.contextSection,
-        {
-          backgroundColor: convertHexToRgba(appColors.warmgray6, 0.16),
-          borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
-        },
-      ]}
-    >
-      <Text
-        style={[
-          appStyle.textSmall,
-          {
-            ...styles.projectContextText,
-            lineHeight: (appStyle.textSmall.lineHeight ?? 16) + 4,
-            opacity: 0.78,
-          },
-        ]}
-      >
-        {context}
-      </Text>
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.contextSection,
+        backgroundColor: convertHexToRgba(appColors.warmgray6, 0.16),
+        borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+      } as CSSProperties,
+    },
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...appStyle.textSmall,
+          ...styles.projectContextText,
+          lineHeight: addToLineHeight(appStyle.textSmall.lineHeight, 4, 16),
+          opacity: 0.78,
+        } as CSSProperties,
+      },
+      context,
+    ),
   );
 }

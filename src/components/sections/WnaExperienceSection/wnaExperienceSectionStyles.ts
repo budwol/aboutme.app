@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { CSSProperties } from "react";
 import { appLayoutConstants } from "@constants/layoutConstants";
 
 export const periodWidth = appLayoutConstants.experiencePeriodWidth;
@@ -12,21 +12,27 @@ export const detailsTopSpacing = appLayoutConstants.experienceDetailsTopSpacing;
 export const detailsHeightBuffer =
   appLayoutConstants.experienceDetailsHeightBuffer;
 
-export const styles = StyleSheet.create({
+export const styles = {
   container: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     gap: appLayoutConstants.contentSectionGap,
-    paddingVertical: appLayoutConstants.contentSectionPaddingVertical,
+    paddingBlock: appLayoutConstants.contentSectionPaddingVertical,
   },
   centerWrapper: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingInline: 16,
   },
   centerWrapperCompact: {
     alignItems: "stretch",
-    paddingHorizontal: 0,
+    paddingInline: 0,
   },
   timelineWrapper: {
+    display: "flex",
+    flexDirection: "column",
     position: "relative",
     gap: 20,
   },
@@ -44,6 +50,7 @@ export const styles = StyleSheet.create({
     opacity: 0.4,
   },
   row: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
     gap: appLayoutConstants.globalListGap,
@@ -56,14 +63,16 @@ export const styles = StyleSheet.create({
     width: periodWidth,
   },
   periodText: {
-    paddingVertical: 12,
+    paddingBlock: 12,
   },
   periodTextCompact: {
     paddingTop: 0,
     paddingBottom: 10,
-    lineHeight: 18,
+    lineHeight: "18px",
   },
   dotColumn: {
+    display: "flex",
+    flexDirection: "column",
     width: dotColumnWidth,
     alignItems: "center",
     paddingTop: 15,
@@ -76,9 +85,12 @@ export const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     borderWidth: 2,
+    borderStyle: "solid",
     marginLeft: 2,
   },
   cardColumn: {
+    display: "flex",
+    flexDirection: "column",
     width: minCardWidth,
   },
   cardColumnCompact: {
@@ -87,6 +99,7 @@ export const styles = StyleSheet.create({
     width: undefined,
   },
   companyLinkRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
@@ -96,10 +109,10 @@ export const styles = StyleSheet.create({
     position: "relative",
     zIndex: 2,
     borderRadius: 8,
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-    marginHorizontal: -4,
-    marginVertical: 0,
+    paddingInline: 4,
+    paddingBlock: 4,
+    marginInline: -4,
+    marginBlock: 0,
   },
   companyLinkText: {
     textDecorationLine: "underline",
@@ -108,29 +121,37 @@ export const styles = StyleSheet.create({
     opacity: 0.9,
   },
   actionRow: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     alignItems: "flex-end",
   },
   footerActionRow: {
+    display: "flex",
+    flexDirection: "column",
     marginTop: 24,
     width: "100%",
     alignItems: "center",
   },
   expandButton: {
     marginTop: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingInline: 10,
+    paddingBlock: 6,
     borderRadius: 999,
     borderWidth: 1,
+    borderStyle: "solid",
   },
   expandButtonText: {
     letterSpacing: 0.2,
   },
   detailsBox: {
+    display: "flex",
+    flexDirection: "column",
     marginTop: detailsTopSpacing,
     padding: 12,
     gap: 10,
     borderWidth: 1,
+    borderStyle: "solid",
     borderRadius: appLayoutConstants.globalCornerRadius,
     minWidth: 0,
   },
@@ -138,6 +159,7 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
   },
   detailCard: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 10,
@@ -155,9 +177,11 @@ export const styles = StyleSheet.create({
   detailText: {
     flex: 1,
     minWidth: 0,
-    lineHeight: 18,
+    lineHeight: "18px",
   },
   techSection: {
+    display: "flex",
+    flexDirection: "column",
     marginTop: 2,
     gap: 8,
   },
@@ -165,9 +189,10 @@ export const styles = StyleSheet.create({
     opacity: 0.9,
   },
   techList: {
+    display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
     minWidth: 0,
   },
-});
+} satisfies Record<string, CSSProperties>;

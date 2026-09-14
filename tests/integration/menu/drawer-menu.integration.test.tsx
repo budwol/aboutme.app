@@ -15,7 +15,6 @@ import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockPush = jest.fn();
-const mockSetOptions = jest.fn();
 const mockToggleWnaTheme = jest.fn(async (_params?: unknown) => undefined);
 
 type DrawerItemElement = React.ReactElement<{
@@ -53,15 +52,8 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("@react-navigation/drawer", () => ({
-  useDrawerStatus: () => "open",
-}));
-
 jest.mock("expo-router", () => ({
   router: {},
-  useNavigation: () => ({
-    setOptions: mockSetOptions,
-  }),
   useSegments: () => ["(drawer)", "(tabs-de)", "kontakt"],
 }));
 
@@ -111,7 +103,6 @@ describe("WnaDrawerMenu integration", () => {
     jest.useFakeTimers();
     mockDimensions(1280, 800);
     mockPush.mockClear();
-    mockSetOptions.mockClear();
     mockToggleWnaTheme.mockClear();
   });
 
@@ -124,7 +115,6 @@ describe("WnaDrawerMenu integration", () => {
     const tree = await renderWithAppContext(<WnaDrawerMenu />);
     const { navigationList, renderedItems } = getRenderedDrawerItems(tree);
 
-    expect(mockSetOptions).toHaveBeenCalledWith({ animationEnabled: false });
     expect(navigationList.props.items).toHaveLength(5);
     expect(renderedItems).toHaveLength(5);
     expect(renderedItems[2].props.text).toBe("screenTitleContact");

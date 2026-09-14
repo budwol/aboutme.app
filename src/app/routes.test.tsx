@@ -112,6 +112,10 @@ jest.mock("@/state/WnaAppContext", () => ({
       white: "#ffffff",
     },
   })),
+  useWnaAppLifecycle: jest.fn(() => ({
+    isDrawerOpen: false,
+    closeDrawer: jest.fn(),
+  })),
 }));
 
 jest.mock("@components/WnaApp", () => ({
@@ -160,18 +164,6 @@ jest.mock("expo-router/html", () => ({
   ScrollViewStyleReset: () =>
     require("react").createElement("ScrollViewStyleReset"),
 }));
-
-jest.mock("expo-router/drawer", () => {
-  const Drawer = ({ children, ...props }: { children?: React.ReactNode }) =>
-    require("react").createElement("Drawer", props, children);
-  Drawer.Screen = (props: unknown) =>
-    require("react").createElement(
-      "DrawerScreen",
-      props as Record<string, unknown>,
-    );
-
-  return { Drawer };
-});
 
 jest.mock(
   "@/navigation/components/WnaDrawerMenu",
@@ -337,7 +329,12 @@ describe("app routes", () => {
     });
   });
 
-  it("renders the drawer layout with the shared drawer menu", () => {
+  it("renders the routed content and the shared drawer menu when open", () => {
+    const { useWnaAppLifecycle } = require("@/state/WnaAppContext");
+    useWnaAppLifecycle.mockReturnValueOnce({
+      isDrawerOpen: true,
+      closeDrawer: jest.fn(),
+    });
     const DrawerLayout = require("./(drawer)/_layout").default;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -345,21 +342,18 @@ describe("app routes", () => {
       tree = TestRenderer.create(<DrawerLayout />);
     });
 
-    const drawer = tree!.root.findByType("Drawer");
+    expect(tree!.root.findByType("Slot")).toBeTruthy();
+    expect(tree!.root.findByType("WnaDrawerMenu")).toBeTruthy();
 
-    expect(drawer.props.screenOptions.drawerPosition).toBe("right");
-    expect(drawer.props.screenOptions.drawerStyle.backgroundColor).toBe(
-      "#ffffff",
-    );
-    expect(drawer.props.screenOptions.sceneStyle.backgroundColor).toBe(
-      "transparent",
-    );
-    expect(drawer.props.drawerContent().type.name).toBe("WnaDrawerMenu");
-    expect(tree!.root.findAllByType("DrawerScreen")).toHaveLength(2);
+    const panel = tree!.root.findByProps({ "data-testid": "wna-drawer-panel" });
+    expect(panel.props.style.backgroundColor).toBe("#ffffff");
   });
 
   it("uses the dark drawer background in dark mode", () => {
-    const { useWnaTheme } = require("@/state/WnaAppContext");
+    const {
+      useWnaTheme,
+      useWnaAppLifecycle,
+    } = require("@/state/WnaAppContext");
     useWnaTheme.mockReturnValueOnce({
       appColors: {
         isDark: true,
@@ -367,6 +361,10 @@ describe("app routes", () => {
         white: "#ffffff",
       },
     });
+    useWnaAppLifecycle.mockReturnValueOnce({
+      isDrawerOpen: true,
+      closeDrawer: jest.fn(),
+    });
     const DrawerLayout = require("./(drawer)/_layout").default;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -374,10 +372,142 @@ describe("app routes", () => {
       tree = TestRenderer.create(<DrawerLayout />);
     });
 
+    const panel = tree!.root.findByProps({ "data-testid": "wna-drawer-panel" });
+    expect(panel.props.style.backgroundColor).toBe("#222222");
+  });
+
+  it("keeps the drawer panel in the DOM but non-interactive when closed", () => {
+    const DrawerLayout = require("./(drawer)/_layout").default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<DrawerLayout />);
+    });
+
+    expect(tree!.root.findByType("Slot")).toBeTruthy();
     expect(
-      tree!.root.findByType("Drawer").props.screenOptions.drawerStyle
-        .backgroundColor,
-    ).toBe("#222222");
+      tree!.root.findAllByProps({ "data-testid": "wna-drawer-panel" }),
+    ).toHaveLength(1);
+    const overlay = tree!.root.findByProps({ id: "wna-drawer-overlay" });
+    expect(overlay.props.style.pointerEvents).toBe("none");
+  });
+
+  it("activates the drawer panel transition on the next frame after opening", () => {
+    jest.useFakeTimers();
+    const originalDocument = global.document;
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: {
+        body: {},
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      },
+    });
+    const { useWnaAppLifecycle } = require("@/state/WnaAppContext");
+    useWnaAppLifecycle.mockImplementation(() => ({
+      isDrawerOpen: true,
+      closeDrawer: jest.fn(),
+    }));
+    const DrawerLayout = require("./(drawer)/_layout").default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<DrawerLayout />);
+    });
+
+    const backdropBefore = tree!.root.findByProps({
+      "data-testid": "wna-drawer-backdrop",
+    });
+    expect(backdropBefore.props.style.opacity).toBe(0);
+
+    act(() => {
+      jest.advanceTimersByTime(16);
+    });
+
+    const backdropAfter = tree!.root.findByProps({
+      "data-testid": "wna-drawer-backdrop",
+    });
+    expect(backdropAfter.props.style.opacity).toBe(1);
+
+    useWnaAppLifecycle.mockImplementation(() => ({
+      isDrawerOpen: false,
+      closeDrawer: jest.fn(),
+    }));
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: originalDocument,
+    });
+    jest.useRealTimers();
+  });
+
+  it("closes on Escape and disables pointer events on the overlay", () => {
+    jest.useFakeTimers();
+    const originalDocument = global.document;
+    const escapeHandlers: ((event: { key: string }) => void)[] = [];
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: {
+        body: {},
+        addEventListener: jest.fn((type: string, listener: unknown) => {
+          if (type === "keydown") {
+            escapeHandlers.push(listener as (event: { key: string }) => void);
+          }
+        }),
+        removeEventListener: jest.fn(),
+      },
+    });
+    const { useWnaAppLifecycle } = require("@/state/WnaAppContext");
+    const mockCloseDrawer = jest.fn();
+    let isOpen = true;
+    useWnaAppLifecycle.mockImplementation(() => ({
+      isDrawerOpen: isOpen,
+      closeDrawer: mockCloseDrawer,
+    }));
+    const DrawerLayout = require("./(drawer)/_layout").default;
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<DrawerLayout />);
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(16);
+    });
+
+    act(() => {
+      escapeHandlers.forEach((handler) => handler({ key: "Enter" }));
+    });
+
+    expect(mockCloseDrawer).not.toHaveBeenCalled();
+
+    act(() => {
+      escapeHandlers.forEach((handler) => handler({ key: "Escape" }));
+    });
+
+    expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
+
+    isOpen = false;
+
+    act(() => {
+      tree!.update(<DrawerLayout />);
+    });
+
+    const overlay = tree!.root.findByProps({ id: "wna-drawer-overlay" });
+    expect(overlay.props.style.pointerEvents).toBe("none");
+    const panel = tree!.root.findByProps({
+      "data-testid": "wna-drawer-panel",
+    });
+    expect(panel.props.style.transform).toBe("translateX(100%)");
+
+    Object.defineProperty(global, "document", {
+      configurable: true,
+      value: originalDocument,
+    });
+    jest.useRealTimers();
+    useWnaAppLifecycle.mockImplementation(() => ({
+      isDrawerOpen: false,
+      closeDrawer: jest.fn(),
+    }));
   });
 
   it("initializes app data and theme before rendering the root layout content", async () => {

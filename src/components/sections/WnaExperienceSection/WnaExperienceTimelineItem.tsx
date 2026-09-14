@@ -1,5 +1,4 @@
-import React, { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React, { CSSProperties, ReactNode } from "react";
 import WnaBadge from "@components/display/WnaBadge";
 import WnaCardVerticalSmall from "@components/cards/WnaCardVerticalSmall";
 import { i18nKeys } from "@/i18n/i18nKeys";
@@ -33,20 +32,30 @@ function ExperienceDetailCard({
   backgroundColor: string;
   text: string;
 }) {
-  return (
-    <View
-      style={[
-        styles.detailCard,
-        {
-          backgroundColor,
-        },
-      ]}
-    >
-      <View
-        style={[styles.detailMarker, { backgroundColor: appColors.accent5 }]}
-      />
-      <Text style={[appStyle.textNeutralMicro, styles.detailText]}>{text}</Text>
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.detailCard,
+        backgroundColor,
+      } as CSSProperties,
+    },
+    React.createElement("div", {
+      style: {
+        ...styles.detailMarker,
+        backgroundColor: appColors.accent5,
+      } as CSSProperties,
+    }),
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...appStyle.textNeutralMicro,
+          ...styles.detailText,
+        } as CSSProperties,
+      },
+      text,
+    ),
   );
 }
 
@@ -94,34 +103,38 @@ export default function WnaExperienceTimelineItem({
       appStyle={appStyle}
     />
   ));
-  const detailsToggle = showDetails ? (
-    <View style={styles.actionRow}>
-      <View
-        style={[
-          styles.expandButton,
+  const detailsToggle = showDetails
+    ? React.createElement(
+        "div",
+        { style: styles.actionRow as CSSProperties },
+        React.createElement(
+          "div",
           {
-            backgroundColor: accentSurfaceColor,
-            borderColor: accentBorderColor,
+            style: {
+              ...styles.expandButton,
+              backgroundColor: accentSurfaceColor,
+              borderColor: accentBorderColor,
+            } as CSSProperties,
           },
-        ]}
-      >
-        <Text
-          style={[
-            appStyle.textMicro,
-            styles.expandButtonText,
-            { color: appColors.accent5 },
-          ]}
-        >
-          {t(
-            isExpanded
-              ? i18nKeys.actionHideDetails
-              : i18nKeys.actionShowDetails,
-          )}
-          {isExpanded ? " ↑" : " ↓"}
-        </Text>
-      </View>
-    </View>
-  ) : null;
+          React.createElement(
+            "span",
+            {
+              style: {
+                ...appStyle.textMicro,
+                ...styles.expandButtonText,
+                color: appColors.accent5,
+              } as CSSProperties,
+            },
+            t(
+              isExpanded
+                ? i18nKeys.actionHideDetails
+                : i18nKeys.actionShowDetails,
+            ),
+            isExpanded ? " ↑" : " ↓",
+          ),
+        ),
+      )
+    : null;
 
   function renderCompanySubtitle(): ReactNode | undefined {
     if (!item.companyUrl) {
@@ -139,84 +152,112 @@ export default function WnaExperienceTimelineItem({
     );
   }
 
-  return (
-    <View style={[styles.row, isCompactLayout && styles.rowCompact]}>
-      {!isCompactLayout ? (
-        <View style={styles.periodColumn}>
-          <Text style={[appStyle.textNeutralSmall, styles.periodText]}>
-            {item.period}
-          </Text>
-        </View>
-      ) : null}
-
-      <View
-        style={[styles.dotColumn, isCompactLayout && styles.dotColumnCompact]}
-      >
-        <View
-          style={[
-            styles.dot,
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.row,
+        ...(isCompactLayout ? styles.rowCompact : null),
+      } as CSSProperties,
+    },
+    !isCompactLayout
+      ? React.createElement(
+          "div",
+          { style: styles.periodColumn as CSSProperties },
+          React.createElement(
+            "span",
             {
-              backgroundColor: appColors.accent5,
-              borderColor: appColors.accent5,
+              style: {
+                ...appStyle.textNeutralSmall,
+                ...styles.periodText,
+              } as CSSProperties,
             },
-          ]}
-        />
-      </View>
-
-      <View
-        style={[
-          styles.cardColumn,
-          effectiveCardWidth ? { width: effectiveCardWidth } : undefined,
-          isCompactLayout && styles.cardColumnCompact,
-        ]}
-      >
-        {isCompactLayout ? (
-          <Text
-            style={[
-              appStyle.textNeutralSmall,
-              styles.periodText,
-              styles.periodTextCompact,
-              {
+            item.period,
+          ),
+        )
+      : null,
+    React.createElement(
+      "div",
+      {
+        style: {
+          ...styles.dotColumn,
+          ...(isCompactLayout ? styles.dotColumnCompact : null),
+        } as CSSProperties,
+      },
+      React.createElement("div", {
+        style: {
+          ...styles.dot,
+          backgroundColor: appColors.accent5,
+          borderColor: appColors.accent5,
+        } as CSSProperties,
+      }),
+    ),
+    React.createElement(
+      "div",
+      {
+        style: {
+          ...styles.cardColumn,
+          ...(effectiveCardWidth ? { width: effectiveCardWidth } : null),
+          ...(isCompactLayout ? styles.cardColumnCompact : null),
+        } as CSSProperties,
+      },
+      isCompactLayout
+        ? React.createElement(
+            "span",
+            {
+              style: {
+                ...appStyle.textNeutralSmall,
+                ...styles.periodText,
+                ...styles.periodTextCompact,
                 color: appColors.coolgray6,
-              },
-            ]}
-          >
-            {item.period}
-          </Text>
-        ) : null}
-        <WnaCardVerticalSmall
-          appStyle={appStyle}
-          appColors={appColors}
-          title={item.role}
-          subtitle={item.company}
-          subtitleContent={renderCompanySubtitle()}
-          description={item.description}
-          badgeText={item.duration || "..."}
-          opacity={item.opacity ?? 1}
-          footerContent={detailsToggle}
-          onPress={showDetails ? () => onToggleDetails(index) : undefined}
-        />
-
-        {showDetails && hasDetails ? (
-          <WnaExperienceDetailsBox
-            isExpanded={isExpanded}
-            borderColor={appColors.coolgray2}
-            backgroundColor={convertHexToRgba(appColors.coolgray1, 0.85)}
-          >
-            {descriptionDetail}
-            {detailItems.length > 0 ? detailItems : null}
-
-            {techBadges.length > 0 ? (
-              <View style={styles.techSection}>
-                <Text style={[appStyle.textNeutralLabel, styles.techLabel]}>
-                  {t(i18nKeys.titleProjectTechstack)}
-                </Text>
-                <View style={styles.techList}>{techBadges}</View>
-              </View>
-            ) : null}
-          </WnaExperienceDetailsBox>
-        ) : null}
-      </View>
-    </View>
+              } as CSSProperties,
+            },
+            item.period,
+          )
+        : null,
+      <WnaCardVerticalSmall
+        appStyle={appStyle}
+        appColors={appColors}
+        title={item.role}
+        subtitle={item.company}
+        subtitleContent={renderCompanySubtitle()}
+        description={item.description}
+        badgeText={item.duration || "..."}
+        opacity={item.opacity ?? 1}
+        footerContent={detailsToggle}
+        onPress={showDetails ? () => onToggleDetails(index) : undefined}
+      />,
+      showDetails && hasDetails ? (
+        <WnaExperienceDetailsBox
+          isExpanded={isExpanded}
+          borderColor={appColors.coolgray2}
+          backgroundColor={convertHexToRgba(appColors.coolgray1, 0.85)}
+        >
+          {descriptionDetail}
+          {detailItems.length > 0 ? detailItems : null}
+          {techBadges.length > 0
+            ? React.createElement(
+                "div",
+                { style: styles.techSection as CSSProperties },
+                React.createElement(
+                  "span",
+                  {
+                    style: {
+                      ...appStyle.textNeutralLabel,
+                      ...styles.techLabel,
+                    } as CSSProperties,
+                  },
+                  t(i18nKeys.titleProjectTechstack),
+                ),
+                React.createElement(
+                  "div",
+                  { style: styles.techList as CSSProperties },
+                  techBadges,
+                ),
+              )
+            : null}
+        </WnaExperienceDetailsBox>
+      ) : null,
+    ),
   );
 }

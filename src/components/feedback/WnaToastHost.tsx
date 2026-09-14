@@ -1,7 +1,6 @@
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { subscribeWnaToast, WnaToast } from "@components/feedback/wnaToast";
 
 const toastDuration = 2400;
@@ -18,93 +17,110 @@ export function renderWnaToastCard(
     ? convertHexToRgba(appColors.accent5, 0.28)
     : convertHexToRgba(appColors.accent5, 0.18);
 
-  return (
-    <View
-      style={{
+  return React.createElement(
+    "div",
+    {
+      style: {
         width: "100%",
         maxWidth: 328,
         minHeight: 78,
         borderRadius: 18,
         borderWidth: 1,
+        borderStyle: "solid",
         borderColor: appColors.isDark
           ? convertHexToRgba(appColors.coolgray4, 0.3)
           : convertHexToRgba(appColors.coolgray2, 0.78),
         backgroundColor: appColors.isDark
           ? convertHexToRgba(appColors.background, 0.98)
           : convertHexToRgba(appColors.white, 0.98),
-        paddingHorizontal: 18,
-        paddingVertical: 16,
+        paddingInline: 18,
+        paddingBlock: 16,
         boxShadow: `0px 12px 22px ${toastShadowColor}`,
         overflow: "hidden",
-      }}
-    >
-      <View
-        style={{
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
           flexDirection: "row",
           alignItems: "stretch",
           gap: 14,
           flex: 1,
-        }}
-      >
-        <View
-          style={{
+        } as CSSProperties,
+      },
+      React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flexDirection: "column",
             width: 10,
             justifyContent: "center",
             alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: 4,
-              alignSelf: "stretch",
-              minHeight: 42,
-              borderRadius: 999,
-              backgroundColor: appColors.accent5,
-              boxShadow: `0px 0px 8px ${accentShadowColor}`,
-            }}
-          />
-        </View>
-
-        <View
-          style={{
+          } as CSSProperties,
+        },
+        React.createElement("div", {
+          style: {
+            width: 4,
+            alignSelf: "stretch",
+            minHeight: 42,
+            borderRadius: 999,
+            backgroundColor: appColors.accent5,
+            boxShadow: `0px 0px 8px ${accentShadowColor}`,
+          } as CSSProperties,
+        }),
+      ),
+      React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flexDirection: "column",
             flex: 1,
             minWidth: 0,
             justifyContent: "center",
-            paddingVertical: 2,
-          }}
-        >
-          {text1 ? (
-            <Text
-              style={{
-                fontSize: 11,
-                fontWeight: "700",
-                letterSpacing: 1.1,
-                textTransform: "uppercase",
-                color: appColors.isDark
-                  ? convertHexToRgba(appColors.coolgray8, 0.64)
-                  : appColors.coolgray6,
-              }}
-            >
-              {text1}
-            </Text>
-          ) : null}
-          {text2 ? (
-            <Text
-              style={{
-                marginTop: text1 ? 7 : 0,
-                fontSize: 17,
-                lineHeight: 23,
-                fontWeight: "700",
-                letterSpacing: 0.15,
-                color: appColors.isDark ? appColors.coolgray8 : appColors.black,
-              }}
-            >
-              {text2}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-    </View>
+            paddingBlock: 2,
+          } as CSSProperties,
+        },
+        text1
+          ? React.createElement(
+              "span",
+              {
+                style: {
+                  fontSize: 11,
+                  fontWeight: "700",
+                  letterSpacing: 1.1,
+                  textTransform: "uppercase",
+                  color: appColors.isDark
+                    ? convertHexToRgba(appColors.coolgray8, 0.64)
+                    : appColors.coolgray6,
+                } as CSSProperties,
+              },
+              text1,
+            )
+          : null,
+        text2
+          ? React.createElement(
+              "span",
+              {
+                style: {
+                  marginTop: text1 ? 7 : 0,
+                  fontSize: 17,
+                  lineHeight: "23px",
+                  fontWeight: "700",
+                  letterSpacing: 0.15,
+                  color: appColors.isDark
+                    ? appColors.coolgray8
+                    : appColors.black,
+                } as CSSProperties,
+              },
+              text2,
+            )
+          : null,
+      ),
+    ),
   );
 }
 
@@ -141,19 +157,23 @@ export default function WnaToastHost({ appColors }: WnaToastHostProps) {
     return null;
   }
 
-  return (
-    <View style={[styles.host, { pointerEvents: "none" }]}>
-      {renderWnaToastCard(
-        toast.props?.appColors ?? appColors,
-        toast.text1,
-        toast.text2,
-      )}
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: { ...styles.host, pointerEvents: "none" } as CSSProperties,
+    },
+    renderWnaToastCard(
+      toast.props?.appColors ?? appColors,
+      toast.text1,
+      toast.text2,
+    ),
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   host: {
+    display: "flex",
+    flexDirection: "column",
     position: "absolute",
     top: 18,
     left: 16,
@@ -161,4 +181,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1000,
   },
-});
+} satisfies Record<string, CSSProperties>;

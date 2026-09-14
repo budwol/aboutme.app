@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { Text, View } from "react-native";
 import WnaTooltip, { WnaTooltipPosition } from "@components/effects/WnaTooltip";
 
 describe("WnaTooltip", () => {
@@ -24,9 +23,9 @@ describe("WnaTooltip", () => {
       );
     });
 
-    const positioner = tree!.root.findAllByType(View)[0];
+    const positioner = tree!.root.findAllByType("div")[0];
     expect(positioner.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ [axis]: value })]),
+      expect.objectContaining({ [axis]: value }),
     );
   });
 
@@ -39,13 +38,15 @@ describe("WnaTooltip", () => {
       );
     });
 
-    const positioner = tree!.root.findAllByType(View)[0];
-    const text = tree!.root.findByType(Text);
+    const positioner = tree!.root.findAllByType("div")[0];
+    const text = tree!.root.findByType("span");
 
     expect(positioner.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ opacity: 0 })]),
+      expect.objectContaining({ opacity: 0 }),
     );
-    expect(text.props.numberOfLines).toBe(1);
+    expect(text.props.style).toEqual(
+      expect.objectContaining({ whiteSpace: "nowrap" }),
+    );
   });
 
   it("uses a compact four pixel gap from the anchor", () => {
@@ -57,9 +58,9 @@ describe("WnaTooltip", () => {
       );
     });
 
-    const positioner = tree!.root.findAllByType(View)[0];
+    const positioner = tree!.root.findAllByType("div")[0];
     expect(positioner.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ marginTop: 4 })]),
+      expect.objectContaining({ marginTop: 4 }),
     );
   });
 
@@ -72,13 +73,11 @@ describe("WnaTooltip", () => {
       );
     });
 
-    const positioner = tree!.root.findAllByType(View)[0];
+    const positioner = tree!.root.findAllByType("div")[0];
     expect(positioner.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          transition: "opacity 140ms ease-in-out",
-        }),
-      ]),
+      expect.objectContaining({
+        transition: "opacity 140ms ease-in-out",
+      }),
     );
   });
 
@@ -106,7 +105,7 @@ describe("WnaTooltip", () => {
     });
 
     const caret = tree!.root
-      .findAllByType(View)
+      .findAllByType("div")
       .find(
         (view: { props: { style?: Record<string, string> } }) =>
           view.props.style?.[border] === "#111",

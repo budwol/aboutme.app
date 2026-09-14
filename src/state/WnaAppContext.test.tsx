@@ -72,6 +72,7 @@ describe("WnaAppContext", () => {
 
     expect(captured!.lifecycle.isAppInitialized).toBe(false);
     expect(captured!.lifecycle.isStatusBarVisible).toBe(true);
+    expect(captured!.lifecycle.isDrawerOpen).toBe(false);
     expect(captured!.layout.appLayout).toBeDefined();
     expect(
       captured!.lifecycle.navigationTransitionBackgroundImageUrl,
@@ -84,6 +85,7 @@ describe("WnaAppContext", () => {
     act(() => {
       captured!.lifecycle.setIsAppInitialized(true);
       captured!.lifecycle.setIsStatusBarVisible(false);
+      captured!.lifecycle.openDrawer();
       captured!.theme.setTheme("dark");
       captured!.theme.setAppColors(themePalettes.dark);
       captured!.data.setAppData({ profile: { name: "WNA" } } as never);
@@ -95,6 +97,13 @@ describe("WnaAppContext", () => {
 
     expect(captured!.lifecycle.isAppInitialized).toBe(true);
     expect(captured!.lifecycle.isStatusBarVisible).toBe(false);
+    expect(captured!.lifecycle.isDrawerOpen).toBe(true);
+
+    act(() => {
+      captured!.lifecycle.closeDrawer();
+    });
+
+    expect(captured!.lifecycle.isDrawerOpen).toBe(false);
     expect(captured!.theme.theme).toBe("dark");
     expect(captured!.theme.appColors).toBe(themePalettes.dark);
     expect(captured!.data.appData).toEqual({ profile: { name: "WNA" } });

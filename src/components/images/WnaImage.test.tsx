@@ -152,9 +152,7 @@ describe("WnaImage", () => {
       "imageUrl is empty",
     );
     expect(tree!.root.findAllByType("WnaImageElement")).toHaveLength(0);
-    expect(
-      tree!.root.findByProps({ accessibilityRole: "progressbar" }),
-    ).toBeTruthy();
+    expect(tree!.root.findByProps({ role: "progressbar" })).toBeTruthy();
   });
 
   it("keeps remote sources loading against a local placeholder", () => {
@@ -172,12 +170,33 @@ describe("WnaImage", () => {
       );
     });
 
-    const wrapper = tree!.root.findByType("View");
+    const wrapper = tree!.root.findByType("div");
 
     expect(tree!.root.findByType("WnaImageElement").props.source).toBe(
       "https://cdn.example.com/full.webp",
     );
-    expect(wrapper.props.style[1].backgroundColor).toBe("transparent");
+    expect(wrapper.props.style.backgroundColor).toBe("transparent");
+  });
+
+  it("flattens an array style into a single merged wrapper style", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImage
+          appColors={appColors}
+          imageUrl="images/project.webp"
+          imageTitle="Project"
+          style={[{ width: 100 }, { height: 200 }]}
+        />,
+      );
+    });
+
+    const wrapper = tree!.root.findByType("div");
+
+    expect(wrapper.props.style).toEqual(
+      expect.objectContaining({ width: 100, height: 200 }),
+    );
   });
 
   it("falls back to empty state and logs when resolving the image throws", () => {

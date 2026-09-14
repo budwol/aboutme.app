@@ -22,12 +22,19 @@ import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { createProjectSlug } from "@utils/projectRoutes";
-import { useNavigation, useRouter } from "expo-router";
-import { Fragment, ReactNode, useCallback, useMemo } from "react";
+import { useRouter } from "expo-router";
+import React, {
+  CSSProperties,
+  Fragment,
+  ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import { addToLineHeight } from "@utils/addToLineHeight";
 
-const styles = StyleSheet.create({
+const styles = {
   itemSeparator: {
     height: 16,
   },
@@ -35,21 +42,26 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   landscapeScrollContent: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     alignItems: "center",
   },
   landscapeShell: {
     width: "100%",
     maxWidth: 1480,
-    paddingHorizontal: 28,
+    paddingInline: 28,
   },
   landscapeLayout: {
+    display: "flex",
     width: "100%",
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 32,
   },
   landscapeIntro: {
+    display: "flex",
+    flexDirection: "column",
     width: 324,
     flexShrink: 0,
     alignSelf: "stretch",
@@ -57,6 +69,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   landscapeIntroTop: {
+    display: "flex",
+    flexDirection: "column",
     gap: 18,
   },
   landscapeIntroLine: {
@@ -70,78 +84,97 @@ const styles = StyleSheet.create({
     opacity: 0.78,
   },
   landscapeTitle: {
-    lineHeight: 50,
+    lineHeight: "50px",
     letterSpacing: 0.2,
   },
   landscapeIntroBox: {
-    paddingHorizontal: 24,
-    paddingVertical: 22,
+    display: "flex",
+    flexDirection: "column",
+    paddingInline: 24,
+    paddingBlock: 22,
     borderRadius: 22,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: 12,
   },
   landscapeFeatureBox: {
-    paddingHorizontal: 22,
-    paddingVertical: 20,
+    display: "flex",
+    flexDirection: "column",
+    paddingInline: 22,
+    paddingBlock: 20,
     borderRadius: 18,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: 14,
   },
   landscapeFeatureItem: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
   landscapeFeatureIconWrap: {
+    display: "flex",
     width: 34,
     height: 34,
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
+    borderStyle: "solid",
     flexShrink: 0,
   },
   landscapeFeatureText: {
     flex: 1,
-    lineHeight: 20,
+    lineHeight: "20px",
   },
   landscapeContext: {
-    lineHeight: 24,
+    lineHeight: "24px",
   },
   portraitIntro: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
     gap: 16,
     marginBottom: 20,
   },
   portraitContextBox: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingInline: 18,
+    paddingBlock: 16,
     borderRadius: 16,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: 10,
   },
   portraitFeatureBox: {
+    display: "flex",
     width: "100%",
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingInline: 18,
+    paddingBlock: 16,
     borderRadius: 16,
     borderWidth: 1,
+    borderStyle: "solid",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 10,
   },
   portraitFeatureItem: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
+    paddingInline: 12,
+    paddingBlock: 9,
     borderRadius: 999,
     borderWidth: 1,
+    borderStyle: "solid",
   },
   portraitFeatureIconWrap: {
+    display: "flex",
     width: 24,
     height: 24,
     borderRadius: 12,
@@ -150,18 +183,23 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   portraitFeatureText: {
-    lineHeight: 18,
+    lineHeight: "18px",
   },
   landscapeProjects: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     minWidth: 0,
     gap: 22,
   },
   landscapeGrid: {
+    display: "flex",
     flexDirection: "row",
     gap: 18,
   },
   landscapeGridColumn: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     gap: 18,
   },
@@ -169,10 +207,12 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   projectCard: {
+    position: "relative",
     width: "100%",
     overflow: "hidden",
     borderRadius: 12,
     borderWidth: 1,
+    borderStyle: "solid",
   },
   projectCardPortrait: {
     borderRadius: 12,
@@ -194,6 +234,8 @@ const styles = StyleSheet.create({
     height: 360,
   },
   projectOverlay: {
+    display: "flex",
+    flexDirection: "column",
     position: "absolute",
     right: 0,
     bottom: 0,
@@ -205,18 +247,21 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   projectMetaPanel: {
+    display: "flex",
+    flexDirection: "column",
     maxWidth: 380,
     alignSelf: "flex-start",
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    paddingInline: 18,
+    paddingBlock: 16,
     borderRadius: 12,
     borderWidth: 1,
+    borderStyle: "solid",
     gap: 8,
   },
   projectMetaPanelFeatured: {
     maxWidth: 500,
-    paddingHorizontal: 22,
-    paddingVertical: 20,
+    paddingInline: 22,
+    paddingBlock: 20,
     gap: 10,
   },
   projectSubtitle: {
@@ -225,32 +270,37 @@ const styles = StyleSheet.create({
     opacity: 0.84,
   },
   projectTitle: {
-    lineHeight: 31,
+    lineHeight: "31px",
     letterSpacing: 0.2,
     flexShrink: 1,
   },
   projectTitleFeatured: {
     fontSize: 34,
-    lineHeight: 40,
+    lineHeight: "40px",
   },
   projectContext: {
-    lineHeight: 19,
+    lineHeight: "19px",
   },
   projectContextFeatured: {
-    lineHeight: 22,
+    lineHeight: "22px",
   },
   footerWrap: {
     width: "100%",
     marginTop: 22,
   },
-});
+} satisfies Record<string, CSSProperties>;
+
+function mergeStyles(
+  ...parts: (object | false | null | undefined)[]
+): CSSProperties {
+  return Object.assign({}, ...parts.filter(Boolean)) as CSSProperties;
+}
 
 export default function WnaProjectsRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
   const { appLayout, currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
-  const navigation = useNavigation();
   const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const { scrollY, onScroll } = useWnaScrollY();
@@ -279,21 +329,27 @@ export default function WnaProjectsRoute(): ReactNode {
   }, [currentWindowWidth, isLandscape]);
 
   const itemSeparator = useCallback(
-    () => <View style={styles.itemSeparator} />,
+    () => React.createElement("div", { style: styles.itemSeparator }),
     [],
   );
 
-  const contentContainerStyle = useMemo(
+  const scrollContainerStyle: CSSProperties = useMemo(
     () => ({
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
       paddingBottom: appLayout.contentPaddingBottom,
       paddingTop: appLayout.contentListPaddingTop,
-      paddingHorizontal: 16,
+      paddingInline: 16,
     }),
     [appLayout.contentListPaddingTop, appLayout.contentPaddingBottom],
   );
 
-  const landscapeContentContainerStyle = useMemo(
+  const landscapeScrollContainerStyle: CSSProperties = useMemo(
     () => ({
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
       paddingBottom: appLayout.contentPaddingBottom,
       paddingTop: appLayout.contentListPaddingTop,
     }),
@@ -305,88 +361,88 @@ export default function WnaProjectsRoute(): ReactNode {
       return null;
     }
 
-    return (
-      <View style={styles.portraitIntro}>
-        {appData.projectsContext ? (
-          <View
-            style={[
-              styles.portraitContextBox,
-              {
+    return React.createElement(
+      "div",
+      { style: styles.portraitIntro },
+      appData.projectsContext
+        ? React.createElement(
+            "div",
+            {
+              style: mergeStyles(styles.portraitContextBox, {
                 backgroundColor: convertHexToRgba(appColors.staticWhite, 0.2),
                 borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.64),
-              },
-            ]}
-          >
-            <Text
-              style={[
-                appStyle.textSmall,
-                {
-                  color: appColors.staticWhite,
-                  lineHeight: (appStyle.textSmall?.lineHeight ?? 16) + 4,
-                  opacity: 0.82,
-                },
-              ]}
-            >
-              {appData.projectsContext}
-            </Text>
-          </View>
-        ) : null}
-
-        {appData.projectsHighlights.length > 0 ? (
-          <View
-            style={[
-              styles.portraitFeatureBox,
+              }),
+            },
+            React.createElement(
+              "span",
               {
+                style: mergeStyles(appStyle.textSmall, {
+                  color: appColors.staticWhite,
+                  lineHeight: addToLineHeight(
+                    appStyle.textSmall?.lineHeight,
+                    4,
+                    16,
+                  ),
+                  opacity: 0.82,
+                }),
+              },
+              appData.projectsContext,
+            ),
+          )
+        : null,
+      appData.projectsHighlights.length > 0
+        ? React.createElement(
+            "div",
+            {
+              style: mergeStyles(styles.portraitFeatureBox, {
                 backgroundColor: convertHexToRgba(appColors.staticWhite, 0.14),
                 borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.56),
-              },
-            ]}
-          >
-            {appData.projectsHighlights.map((item, index) => (
-              <View
-                key={`portrait-project-highlight-${item.icon}-${item.text}-${index}`}
-                style={[
-                  styles.portraitFeatureItem,
-                  {
+              }),
+            },
+            appData.projectsHighlights.map((item, index) =>
+              React.createElement(
+                "div",
+                {
+                  key: `portrait-project-highlight-${item.icon}-${item.text}-${index}`,
+                  style: mergeStyles(styles.portraitFeatureItem, {
                     backgroundColor: convertHexToRgba(
                       appColors.staticCoolgray8,
                       0.42,
                     ),
                     borderColor: convertHexToRgba(appColors.staticWhite, 0.16),
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.portraitFeatureIconWrap,
-                    {
+                  }),
+                },
+                React.createElement(
+                  "div",
+                  {
+                    style: mergeStyles(styles.portraitFeatureIconWrap, {
                       backgroundColor: convertHexToRgba(
                         appColors.staticWhite,
                         0.08,
                       ),
-                    },
-                  ]}
-                >
+                    }),
+                  },
                   <WnaIcon
                     iconName={item.icon as never}
                     size={18}
                     color={appColors.staticWhite}
-                  />
-                </View>
-                <Text
-                  style={[
-                    appStyle.textSmall,
-                    styles.portraitFeatureText,
-                    { color: appColors.staticWhite, opacity: 0.9 },
-                  ]}
-                >
-                  {item.text}
-                </Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-      </View>
+                  />,
+                ),
+                React.createElement(
+                  "span",
+                  {
+                    style: mergeStyles(
+                      appStyle.textSmall,
+                      styles.portraitFeatureText,
+                      { color: appColors.staticWhite, opacity: 0.9 },
+                    ),
+                  },
+                  item.text,
+                ),
+              ),
+            ),
+          )
+        : null,
     );
   }, [
     appColors,
@@ -419,18 +475,26 @@ export default function WnaProjectsRoute(): ReactNode {
             )
           }
         >
-          <View
-            style={[
-              styles.projectCard,
-              !landscapeVariant && styles.projectCardPortrait,
-              landscapeVariant && styles.projectCardLandscape,
-              featured && styles.projectCardFeatured,
-              {
-                backgroundColor: convertHexToRgba(appColors.staticWhite, 0.14),
-                borderColor: convertHexToRgba(appColors.staticCoolgray8, 0.56),
-              },
-            ]}
-          >
+          {React.createElement(
+            "div",
+            {
+              style: mergeStyles(
+                styles.projectCard,
+                !landscapeVariant && styles.projectCardPortrait,
+                landscapeVariant && styles.projectCardLandscape,
+                featured && styles.projectCardFeatured,
+                {
+                  backgroundColor: convertHexToRgba(
+                    appColors.staticWhite,
+                    0.14,
+                  ),
+                  borderColor: convertHexToRgba(
+                    appColors.staticCoolgray8,
+                    0.56,
+                  ),
+                },
+              ),
+            },
             <WnaHeroImage
               appColors={appColors}
               imageUrl={`images/${getProjectImageForWidth(item, projectImageWidth)}`}
@@ -442,54 +506,63 @@ export default function WnaProjectsRoute(): ReactNode {
                 landscapeVariant && styles.projectImageLandscape,
                 featured && styles.projectImageFeatured,
               ]}
-            />
-
-            <View
-              style={[
-                styles.projectOverlay,
-                featured && styles.projectOverlayFeatured,
-              ]}
-            >
-              <View
-                style={[
-                  styles.projectMetaPanel,
-                  featured && styles.projectMetaPanelFeatured,
+            />,
+            React.createElement(
+              "div",
+              {
+                style: mergeStyles(
+                  styles.projectOverlay,
+                  featured && styles.projectOverlayFeatured,
+                ),
+              },
+              React.createElement(
+                "div",
+                {
+                  style: mergeStyles(
+                    styles.projectMetaPanel,
+                    featured && styles.projectMetaPanelFeatured,
+                    {
+                      backgroundColor: convertHexToRgba(
+                        appColors.staticCoolgray8,
+                        featured ? 0.72 : 0.8,
+                      ),
+                      borderColor: convertHexToRgba(
+                        appColors.staticWhite,
+                        0.16,
+                      ),
+                    },
+                  ),
+                },
+                item.subtitle
+                  ? React.createElement(
+                      "span",
+                      {
+                        style: mergeStyles(
+                          appStyle.textSmall,
+                          styles.projectSubtitle,
+                          { color: appColors.staticWhite },
+                          lineClampStyle(2),
+                        ),
+                      },
+                      item.subtitle,
+                    )
+                  : null,
+                React.createElement(
+                  "span",
                   {
-                    backgroundColor: convertHexToRgba(
-                      appColors.staticCoolgray8,
-                      featured ? 0.72 : 0.8,
-                    ),
-                    borderColor: convertHexToRgba(appColors.staticWhite, 0.16),
-                  },
-                ]}
-              >
-                {item.subtitle ? (
-                  <Text
-                    style={[
-                      appStyle.textSmall,
-                      styles.projectSubtitle,
+                    style: mergeStyles(
+                      appStyle.textExtraLarge,
+                      styles.projectTitle,
+                      featured && styles.projectTitleFeatured,
                       { color: appColors.staticWhite },
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {item.subtitle}
-                  </Text>
-                ) : null}
-
-                <Text
-                  style={[
-                    appStyle.textExtraLarge,
-                    styles.projectTitle,
-                    featured && styles.projectTitleFeatured,
-                    { color: appColors.staticWhite },
-                  ]}
-                  numberOfLines={featured ? 3 : 2}
-                >
-                  {item.title}
-                </Text>
-              </View>
-            </View>
-          </View>
+                      lineClampStyle(featured ? 3 : 2),
+                    ),
+                  },
+                  item.title,
+                ),
+              ),
+            ),
+          )}
         </WnaPressable>
       );
 
@@ -497,56 +570,75 @@ export default function WnaProjectsRoute(): ReactNode {
         return card;
       }
 
-      return <View style={styles.portraitCardWrap}>{card}</View>;
+      return React.createElement(
+        "div",
+        { style: styles.portraitCardWrap },
+        card,
+      );
     },
     [appColors, appStyle, lang, navigationRouter, projectImageWidth, t],
   );
 
   const renderLandscapeLayout = useMemo(() => {
-    return (
-      <ScrollView
-        scrollEventThrottle={appLayout.scrollEventThrottle}
-        onScroll={onScroll}
-        contentContainerStyle={landscapeContentContainerStyle}
-      >
-        <View style={styles.landscapeScrollContent}>
-          <View style={styles.landscapeShell}>
-            <View style={styles.landscapeLayout}>
-              <View style={styles.landscapeIntro}>
-                <View style={styles.landscapeIntroTop}>
-                  <View
-                    style={[
-                      styles.landscapeIntroLine,
-                      { backgroundColor: appColors.staticAccent5 },
-                    ]}
-                  />
-
-                  <Text
-                    style={[
+    return React.createElement(
+      "div",
+      {
+        style: landscapeScrollContainerStyle,
+        onScroll: (event: React.UIEvent<HTMLDivElement>) =>
+          onScroll({
+            nativeEvent: {
+              contentOffset: { y: event.currentTarget.scrollTop },
+            },
+          } as never),
+      },
+      React.createElement(
+        "div",
+        { style: styles.landscapeScrollContent },
+        React.createElement(
+          "div",
+          { style: styles.landscapeShell },
+          React.createElement(
+            "div",
+            { style: styles.landscapeLayout },
+            React.createElement(
+              "div",
+              { style: styles.landscapeIntro },
+              React.createElement(
+                "div",
+                { style: styles.landscapeIntroTop },
+                React.createElement("div", {
+                  style: mergeStyles(styles.landscapeIntroLine, {
+                    backgroundColor: appColors.staticAccent5,
+                  }),
+                }),
+                React.createElement(
+                  "span",
+                  {
+                    style: mergeStyles(
                       appStyle.textSmall,
                       styles.landscapeEyebrow,
                       { color: appColors.staticCoolgray2 },
-                    ]}
-                  >
-                    {(appData.projectsSubtitle ?? "").toUpperCase()}
-                  </Text>
-
-                  <Text
-                    style={[
+                    ),
+                  },
+                  (appData.projectsSubtitle ?? "").toUpperCase(),
+                ),
+                React.createElement(
+                  "span",
+                  {
+                    style: mergeStyles(
                       appStyle.textExtraLarge,
                       styles.landscapeTitle,
                       { color: appColors.staticWhite },
-                    ]}
-                  >
-                    {t(i18nKeys.screenTitleProjects)}
-                  </Text>
-                </View>
-
-                {appData.projectsContext ? (
-                  <View
-                    style={[
-                      styles.landscapeIntroBox,
-                      {
+                    ),
+                  },
+                  t(i18nKeys.screenTitleProjects),
+                ),
+              ),
+              appData.projectsContext
+                ? React.createElement(
+                    "div",
+                    {
+                      style: mergeStyles(styles.landscapeIntroBox, {
                         backgroundColor: convertHexToRgba(
                           appColors.staticWhite,
                           0.2,
@@ -555,26 +647,26 @@ export default function WnaProjectsRoute(): ReactNode {
                           appColors.staticCoolgray8,
                           0.64,
                         ),
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        appStyle.textSmall,
-                        styles.landscapeContext,
-                        { color: appColors.staticWhite, opacity: 0.82 },
-                      ]}
-                    >
-                      {appData.projectsContext}
-                    </Text>
-                  </View>
-                ) : null}
-
-                {appData.projectsHighlights.length > 0 ? (
-                  <View
-                    style={[
-                      styles.landscapeFeatureBox,
+                      }),
+                    },
+                    React.createElement(
+                      "span",
                       {
+                        style: mergeStyles(
+                          appStyle.textSmall,
+                          styles.landscapeContext,
+                          { color: appColors.staticWhite, opacity: 0.82 },
+                        ),
+                      },
+                      appData.projectsContext,
+                    ),
+                  )
+                : null,
+              appData.projectsHighlights.length > 0
+                ? React.createElement(
+                    "div",
+                    {
+                      style: mergeStyles(styles.landscapeFeatureBox, {
                         backgroundColor: convertHexToRgba(
                           appColors.staticWhite,
                           0.14,
@@ -583,107 +675,120 @@ export default function WnaProjectsRoute(): ReactNode {
                           appColors.staticCoolgray8,
                           0.56,
                         ),
-                      },
-                    ]}
-                  >
-                    {appData.projectsHighlights.map((item, index) => (
-                      <View
-                        key={`${item.icon}-${item.text}-${index}`}
-                        style={styles.landscapeFeatureItem}
-                      >
-                        <View
-                          style={[
-                            styles.landscapeFeatureIconWrap,
-                            {
-                              backgroundColor: convertHexToRgba(
-                                appColors.staticCoolgray8,
-                                0.42,
-                              ),
-                              borderColor: convertHexToRgba(
-                                appColors.staticWhite,
-                                0.16,
-                              ),
-                            },
-                          ]}
-                        >
+                      }),
+                    },
+                    appData.projectsHighlights.map((item, index) =>
+                      React.createElement(
+                        "div",
+                        {
+                          key: `${item.icon}-${item.text}-${index}`,
+                          style: styles.landscapeFeatureItem,
+                        },
+                        React.createElement(
+                          "div",
+                          {
+                            style: mergeStyles(
+                              styles.landscapeFeatureIconWrap,
+                              {
+                                backgroundColor: convertHexToRgba(
+                                  appColors.staticCoolgray8,
+                                  0.42,
+                                ),
+                                borderColor: convertHexToRgba(
+                                  appColors.staticWhite,
+                                  0.16,
+                                ),
+                              },
+                            ),
+                          },
                           <WnaIcon
                             iconName={item.icon as never}
                             size={18}
                             color={appColors.staticWhite}
-                          />
-                        </View>
-                        <Text
-                          style={[
-                            appStyle.textSmall,
-                            styles.landscapeFeatureText,
-                            { color: appColors.staticWhite, opacity: 0.9 },
-                          ]}
-                        >
-                          {item.text}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
-              </View>
-
-              <View style={styles.landscapeProjects}>
-                {featuredProject
-                  ? renderProjectCard(featuredProject, 0, {
-                      featured: true,
-                      landscapeVariant: true,
-                    })
-                  : null}
-
-                {gridProjects.length > 0 ? (
-                  <View style={styles.landscapeGrid}>
-                    {gridProjectColumns.map((column, columnIndex) => (
-                      <View
-                        key={`projects-column-${columnIndex}`}
-                        style={styles.landscapeGridColumn}
-                      >
-                        {column.map((item) => {
+                          />,
+                        ),
+                        React.createElement(
+                          "span",
+                          {
+                            style: mergeStyles(
+                              appStyle.textSmall,
+                              styles.landscapeFeatureText,
+                              { color: appColors.staticWhite, opacity: 0.9 },
+                            ),
+                          },
+                          item.text,
+                        ),
+                      ),
+                    ),
+                  )
+                : null,
+            ),
+            React.createElement(
+              "div",
+              { style: styles.landscapeProjects },
+              featuredProject
+                ? renderProjectCard(featuredProject, 0, {
+                    featured: true,
+                    landscapeVariant: true,
+                  })
+                : null,
+              gridProjects.length > 0
+                ? React.createElement(
+                    "div",
+                    { style: styles.landscapeGrid },
+                    gridProjectColumns.map((column, columnIndex) =>
+                      React.createElement(
+                        "div",
+                        {
+                          key: `projects-column-${columnIndex}`,
+                          style: styles.landscapeGridColumn,
+                        },
+                        column.map((item) => {
                           const projectIndex = projects.findIndex(
                             (project) => project.title === item.title,
                           );
 
-                          return (
-                            <View
-                              key={`${item.title}-${projectIndex}`}
-                              style={styles.landscapeGridItem}
-                            >
-                              {renderProjectCard(item, projectIndex, {
-                                landscapeVariant: true,
-                              })}
-                            </View>
+                          return React.createElement(
+                            "div",
+                            {
+                              key: `${item.title}-${projectIndex}`,
+                              style: styles.landscapeGridItem,
+                            },
+                            renderProjectCard(item, projectIndex, {
+                              landscapeVariant: true,
+                            }),
                           );
-                        })}
-                      </View>
-                    ))}
-                  </View>
-                ) : null}
-              </View>
-            </View>
-
-            <View style={[appStyle.containerCenterMaxWidth, styles.footerWrap]}>
-              <WnaContactFooter />
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+                        }),
+                      ),
+                    ),
+                  )
+                : null,
+            ),
+          ),
+          React.createElement(
+            "div",
+            {
+              style: mergeStyles(
+                appStyle.containerCenterMaxWidth,
+                styles.footerWrap,
+              ),
+            },
+            <WnaContactFooter />,
+          ),
+        ),
+      ),
     );
   }, [
     appColors,
     appData.projectsHighlights,
     appData.projectsContext,
     appData.projectsSubtitle,
-    appLayout.scrollEventThrottle,
+    landscapeScrollContainerStyle,
+    onScroll,
     appStyle,
     featuredProject,
     gridProjectColumns,
     gridProjects.length,
-    landscapeContentContainerStyle,
-    onScroll,
     projects,
     renderProjectCard,
     t,
@@ -705,32 +810,31 @@ export default function WnaProjectsRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          t={t}
-          navigation={navigation}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
-      {isLandscape ? (
-        renderLandscapeLayout
-      ) : (
-        <ScrollView
-          scrollEventThrottle={appLayout.scrollEventThrottle}
-          onScroll={onScroll}
-          contentContainerStyle={contentContainerStyle}
-        >
-          {renderPortraitIntro}
-          {projects.map((item, index) => (
-            <Fragment key={`${item.title}-${index}`}>
-              {renderProjectCard(item, index)}
-              {index < projects.length - 1 ? itemSeparator() : null}
-            </Fragment>
-          ))}
-          <WnaContactFooter />
-        </ScrollView>
-      )}
+      {isLandscape
+        ? renderLandscapeLayout
+        : React.createElement(
+            "div",
+            {
+              style: scrollContainerStyle,
+              onScroll: (event: React.UIEvent<HTMLDivElement>) =>
+                onScroll({
+                  nativeEvent: {
+                    contentOffset: { y: event.currentTarget.scrollTop },
+                  },
+                } as never),
+            },
+            renderPortraitIntro,
+            projects.map((item, index) => (
+              <Fragment key={`${item.title}-${index}`}>
+                {renderProjectCard(item, index)}
+                {index < projects.length - 1 ? itemSeparator() : null}
+              </Fragment>
+            )),
+            <WnaContactFooter />,
+          )}
     </WnaBaseScreen>
   );
 }

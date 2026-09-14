@@ -44,17 +44,38 @@ describe("WnaHeroImage", () => {
       );
     });
 
-    const wrapper = tree!.root.findByType("View");
+    const wrapper = tree!.root.findByType("div");
     const image = tree!.root.findByType("WnaImage");
 
     expect(wrapper.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ height: 420 })]),
+      expect.objectContaining({ height: 420 }),
     );
     expect(image.props.style).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ height: 256 }),
         expect.objectContaining({ height: 420 }),
       ]),
+    );
+  });
+
+  it("flattens an array style into a single merged wrapper style", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaHeroImage
+          appColors={{ staticBlack: "#000" } as never}
+          imageUrl="images/project.webp"
+          imageTitle="Project"
+          style={[{ height: 300 }, { borderRadius: 12 }]}
+        />,
+      );
+    });
+
+    const wrapper = tree!.root.findByType("div");
+
+    expect(wrapper.props.style).toEqual(
+      expect.objectContaining({ height: 300, borderRadius: 12 }),
     );
   });
 

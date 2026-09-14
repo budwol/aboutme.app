@@ -1,6 +1,7 @@
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { lineClampStyle } from "@utils/lineClampStyle";
+import { addToLineHeight } from "@utils/addToLineHeight";
 import React, { CSSProperties, FC, memo, ReactNode } from "react";
 
 export type WnaCardTextContentProps = {
@@ -52,13 +53,13 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
                     color: appColors.black,
                     fontSize: 14,
                     fontWeight: "600",
-                    lineHeight: 18,
+                    lineHeight: "18px",
                   }),
               paddingInline: titlePaddingHorizontal ?? 0,
               paddingTop: titlePaddingTop ?? 0,
               lineHeight: appStyle
-                ? (appStyle.textNeutralMedium?.lineHeight ?? 18) + 2
-                : 18,
+                ? addToLineHeight(appStyle.textNeutralMedium?.lineHeight, 2, 18)
+                : "18px",
               minHeight: titleMinHeight,
               textAlign: titleAlign ?? "left",
               ...(titleNumberOfLines
@@ -99,15 +100,18 @@ const WnaCardTextContent: FC<WnaCardTextContentProps> = ({
                   ? {
                       ...appStyle.textNeutralSmall,
                       padding: bodyPadding ?? 0,
-                      lineHeight:
-                        (appStyle.textNeutralSmall?.lineHeight ?? 16) + 2,
+                      lineHeight: addToLineHeight(
+                        appStyle.textNeutralSmall?.lineHeight,
+                        2,
+                        16,
+                      ),
                       paddingInline:
                         subtitlePaddingHorizontal ?? bodyPadding ?? 0,
                     }
                   : {
                       color: appColors.black,
                       fontSize: 13,
-                      lineHeight: 16,
+                      lineHeight: "16px",
                       paddingInline: subtitlePaddingHorizontal ?? 0,
                     }),
                 minHeight: subtitleMinHeight,

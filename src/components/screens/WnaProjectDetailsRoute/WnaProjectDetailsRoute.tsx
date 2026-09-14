@@ -16,14 +16,8 @@ import WnaTechStackSection from "@components/sections/WnaTechStackSection";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { findProjectBySlug } from "@utils/projectRoutes";
-import {
-  Redirect,
-  useLocalSearchParams,
-  useNavigation,
-  useRouter,
-} from "expo-router";
-import { ReactNode, useMemo, useState } from "react";
-import { View } from "react-native";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import React, { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { Linking } from "@utils/webLinking";
 import { useTranslation } from "react-i18next";
 import WnaPrivateRepoModal from "./WnaPrivateRepoModal";
@@ -38,7 +32,6 @@ export default function WnaProjectDetailsRoute(): ReactNode {
   const { appData } = useWnaAppData();
   const { currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
-  const navigation = useNavigation();
   const router = useRouter();
   const params = useLocalSearchParams<{ slug?: string | string[] }>();
   const [isPrivateRepoModalVisible, setIsPrivateRepoModalVisible] =
@@ -108,16 +101,13 @@ export default function WnaProjectDetailsRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          t={t}
-          navigation={navigation}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
       <WnaSurfaceCard appColors={appColors}>
-        <View style={styles.cardContent}>
+        {React.createElement(
+          "div",
+          { style: styles.cardContent as CSSProperties },
           <WnaProjectHero
             appColors={appColors}
             appStyle={appStyle}
@@ -127,18 +117,20 @@ export default function WnaProjectDetailsRoute(): ReactNode {
             projectLinks={projectLinks}
             t={t}
             onProjectLinkPress={handleProjectLinkPress}
-          />
-
+          />,
           <WnaSectionTitle
             appColors={appColors}
             appStyle={appStyle}
             title={project.title}
             subtitle={project.context}
-          />
-
-          <View style={styles.contentBody}>
-            <View style={styles.stackGroup}>
-              {project.techstack.length > 0 ? (
+          />,
+          React.createElement(
+            "div",
+            { style: styles.contentBody as CSSProperties },
+            React.createElement(
+              "div",
+              { style: styles.stackGroup as CSSProperties },
+              project.techstack.length > 0 ? (
                 <WnaTechStackSection
                   appColors={appColors}
                   appData={appData}
@@ -152,28 +144,28 @@ export default function WnaProjectDetailsRoute(): ReactNode {
                     },
                   ]}
                 />
-              ) : null}
-            </View>
-
-            <View style={styles.contentSection}>
-              {appData.projectDetailsContext ? (
+              ) : null,
+            ),
+            React.createElement(
+              "div",
+              { style: styles.contentSection as CSSProperties },
+              appData.projectDetailsContext ? (
                 <WnaProjectDetailsContext
                   appColors={appColors}
                   appStyle={appStyle}
                   context={appData.projectDetailsContext}
                 />
-              ) : null}
-
-              {project.description ? (
+              ) : null,
+              project.description ? (
                 <WnaProjectDescription
                   appColors={appColors}
                   appStyle={appStyle}
                   description={project.description}
                 />
-              ) : null}
-            </View>
-          </View>
-        </View>
+              ) : null,
+            ),
+          ),
+        )}
         <WnaPrivateRepoModal
           appColors={appColors}
           appStyle={appStyle}

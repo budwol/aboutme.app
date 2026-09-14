@@ -187,14 +187,9 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
     });
 
     expect(mockOpenURL).not.toHaveBeenCalled();
-    expect(
-      tree.root.findByProps({ nativeID: "private-repo-modal" }).props,
-    ).toEqual(
-      expect.objectContaining({
-        accessibilityLabel: "private-repo-modal",
-        role: "dialog",
-        "aria-modal": true,
-      }),
-    );
+    const modal = tree.root.findByProps({ id: "private-repo-modal" });
+    expect(modal.props["aria-label"]).toBe("private-repo-modal");
+    expect(modal.props.role).toBe("dialog");
+    expect(modal.props["aria-modal"]).toBe(true);
   });
 });

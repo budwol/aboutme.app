@@ -12,10 +12,10 @@ import {
 import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { useNavigation, useRouter } from "expo-router";
-import { ReactNode } from "react";
+import { useRouter } from "expo-router";
+import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Text, useColorScheme, ViewStyle } from "react-native";
+import { useColorScheme } from "react-native";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 
 export default function WnaMenuRoute(): ReactNode {
@@ -23,17 +23,14 @@ export default function WnaMenuRoute(): ReactNode {
   const { appColors, appStyle, theme, setTheme, setAppColors } = useWnaTheme();
   const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
-  const navigation = useNavigation();
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
   const colorScheme = useColorScheme();
-  const styleSectionHeadline = [
-    appStyle.textNeutralMedium,
-    {
-      textTransform: "uppercase",
-      color: appColors.coolgray5,
-    },
-  ] as ViewStyle[];
+  const styleSectionHeadline: CSSProperties = {
+    ...(appStyle.textNeutralMedium as CSSProperties),
+    textTransform: "uppercase",
+    color: appColors.coolgray5,
+  };
 
   if (!isAppInitialized) return null;
 
@@ -54,16 +51,15 @@ export default function WnaMenuRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          navigation={navigation}
-          t={t}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
       <WnaSurfaceCard appColors={appColors}>
-        <Text style={styleSectionHeadline}>{t(i18nKeys.settingsTheme)}</Text>
+        {React.createElement(
+          "span",
+          { style: styleSectionHeadline },
+          t(i18nKeys.settingsTheme),
+        )}
         <WnaSeparatorHorizontal space={4} transparent={true} />
         <WnaNavigationItem
           appStyle={appStyle}
@@ -85,7 +81,11 @@ export default function WnaMenuRoute(): ReactNode {
       </WnaSurfaceCard>
       <WnaSeparatorHorizontal space={12} transparent={true} />
       <WnaSurfaceCard appColors={appColors}>
-        <Text style={styleSectionHeadline}>{t(i18nKeys.wordLegal)}</Text>
+        {React.createElement(
+          "span",
+          { style: styleSectionHeadline },
+          t(i18nKeys.wordLegal),
+        )}
         <WnaSeparatorHorizontal space={4} transparent={true} />
         <WnaNavigationItem
           appStyle={appStyle}

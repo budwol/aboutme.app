@@ -1,5 +1,11 @@
-import React, { ReactNode, useId, useState } from "react";
-import { LayoutChangeEvent, View, ViewStyle } from "react-native";
+import React, {
+  CSSProperties,
+  ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import {
   detailsHeightBuffer,
   detailsTopSpacing,
@@ -20,36 +26,47 @@ export default function WnaExperienceDetailsBox({
   children,
 }: WnaExperienceDetailsBoxProps) {
   const [contentHeight, setContentHeight] = useState(0);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const detailsId = useId();
   const targetHeight = isExpanded
     ? contentHeight + detailsTopSpacing + detailsHeightBuffer
     : 0;
 
-  function handleLayout(event: LayoutChangeEvent) {
-    const nextHeight = event.nativeEvent.layout.height;
+  useEffect(() => {
+    const node = contentRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
 
-    if (nextHeight !== contentHeight) {
-      setContentHeight(nextHeight);
-    }
-  }
+    const observer = new ResizeObserver((entries) => {
+      const nextHeight = entries[0].contentRect.height;
+      setContentHeight((current) =>
+        nextHeight !== current ? nextHeight : current,
+      );
+    });
 
-  return (
-    <View
-      nativeID={`wna-experience-details-${detailsId}`}
-      style={[styles.detailsClip, { height: targetHeight } as ViewStyle]}
-    >
-      <View
-        onLayout={handleLayout}
-        style={[
-          styles.detailsBox,
-          {
-            borderColor,
-            backgroundColor,
-          },
-        ]}
-      >
-        {children}
-      </View>
-    </View>
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return React.createElement(
+    "div",
+    {
+      id: `wna-experience-details-${detailsId}`,
+      style: {
+        ...styles.detailsClip,
+        height: targetHeight,
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      {
+        ref: contentRef,
+        style: {
+          ...styles.detailsBox,
+          borderColor,
+          backgroundColor,
+        } as CSSProperties,
+      },
+      children,
+    ),
   );
 }

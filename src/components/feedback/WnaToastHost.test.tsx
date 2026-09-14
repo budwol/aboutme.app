@@ -46,13 +46,13 @@ describe("WnaToastHost", () => {
 
     expect(
       fallbackCard.root
-        .findAllByType("Text")
+        .findAllByType("span")
         .map((node: RenderedTextNode) => node.props.children),
     ).toEqual(["Saved", "Done"]);
-    expect(fallbackCard.root.findAllByType("View")[0].props.style).toEqual(
+    expect(fallbackCard.root.findAllByType("div")[0].props.style).toEqual(
       expect.objectContaining({ backgroundColor: "rgba(255,255,255,0.98)" }),
     );
-    expect(darkCard.root.findAllByType("View")[0].props.style).toEqual(
+    expect(darkCard.root.findAllByType("div")[0].props.style).toEqual(
       expect.objectContaining({ backgroundColor: "rgba(16,16,16,0.98)" }),
     );
 
@@ -73,8 +73,8 @@ describe("WnaToastHost", () => {
       );
     });
 
-    expect(titleOnly!.root.findAllByType("Text")).toHaveLength(1);
-    expect(bodyOnly!.root.findAllByType("Text")).toHaveLength(1);
+    expect(titleOnly!.root.findAllByType("span")).toHaveLength(1);
+    expect(bodyOnly!.root.findAllByType("span")).toHaveLength(1);
 
     act(() => {
       titleOnly!.unmount();
@@ -94,13 +94,13 @@ describe("WnaToastHost", () => {
       showWnaToast({ type: "info", text1: "Updated", text2: "Again" });
     });
 
-    expect(tree!.root.findAllByType("Text")).toHaveLength(2);
+    expect(tree!.root.findAllByType("span")).toHaveLength(2);
 
     act(() => {
       jest.advanceTimersByTime(2400);
     });
 
-    expect(tree!.root.findAllByType("Text")).toHaveLength(0);
+    expect(tree!.root.findAllByType("span")).toHaveLength(0);
 
     act(() => {
       showWnaToast({ type: "success", text2: "Cleanup" });

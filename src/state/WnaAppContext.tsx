@@ -22,6 +22,9 @@ type WnaLifecycleState = {
   setIsAppInitialized: (value: boolean) => void;
   isStatusBarVisible: boolean;
   setIsStatusBarVisible: (value: boolean) => void;
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
   isNavigationTransitionActive: boolean;
   navigationTransitionBackgroundImageUrl?: string;
   registerNavigationTransitionBackgroundImageUrl: (
@@ -103,6 +106,7 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
 
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isStatusBarVisible, setIsStatusBarVisible] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isNavigationTransitionActive, setIsNavigationTransitionActive] =
     useState(false);
   const [appData, setAppData] = useState<AppData>(defaultAppData);
@@ -142,6 +146,9 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
     setCurrentWindowHeight(nextDimensions.windowHeight);
     setIsLandscape(nextDimensions.isLandscape);
   }, []);
+
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
 
   const appStyle = useMemo(() => setAppStyle(appColors), [appColors]);
   const appLayout = useMemo(() => getAppLayout(isLandscape), [isLandscape]);
@@ -219,6 +226,9 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
       setIsAppInitialized,
       isStatusBarVisible,
       setIsStatusBarVisible,
+      isDrawerOpen,
+      openDrawer,
+      closeDrawer,
       isNavigationTransitionActive,
       navigationTransitionBackgroundImageUrl,
       registerNavigationTransitionBackgroundImageUrl,
@@ -226,11 +236,14 @@ export const WnaAppContextProvider = ({ children }: PropsWithChildren) => {
       finishNavigationTransition,
     }),
     [
+      closeDrawer,
       finishNavigationTransition,
       isAppInitialized,
+      isDrawerOpen,
       isNavigationTransitionActive,
       isStatusBarVisible,
       navigationTransitionBackgroundImageUrl,
+      openDrawer,
       registerNavigationTransitionBackgroundImageUrl,
       startNavigationTransition,
     ],

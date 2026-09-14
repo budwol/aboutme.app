@@ -40,12 +40,12 @@ describe("WnaTechStackSection", () => {
       );
     });
 
-    const wrapper = tree!.root.findAllByType("View")[0];
+    const wrapper = tree!.root.findAllByType("div")[0];
 
     expect(wrapper.props.style.gap).toBe(appLayoutConstants.globalListGap / 2);
     expect(
       tree!.root
-        .findAllByType("View")
+        .findAllByType("div")
         .some(
           (view: { props: { style?: Record<string, unknown> } }) =>
             view.props.style?.flexWrap === "wrap" &&

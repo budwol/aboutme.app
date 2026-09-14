@@ -1,6 +1,6 @@
 import { FontFamilies } from "@constants/theme/fontFamilies";
-import { FC } from "react";
-import { Text, TextStyle, View, ViewStyle } from "react-native";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import React, { CSSProperties, FC } from "react";
 
 export type WnaTooltipPosition = "top" | "right" | "bottom" | "left";
 
@@ -10,7 +10,7 @@ export type WnaTooltipProps = {
   visible: boolean;
 };
 
-const positionStyles: Record<WnaTooltipPosition, ViewStyle> = {
+const positionStyles: Record<WnaTooltipPosition, CSSProperties> = {
   top: {
     alignItems: "center",
     bottom: "100%",
@@ -43,40 +43,47 @@ const positionStyles: Record<WnaTooltipPosition, ViewStyle> = {
   },
 };
 
-const WnaTooltip: FC<WnaTooltipProps> = ({ content, position, visible }) => (
-  <View
-    accessibilityRole="text"
-    pointerEvents="none"
-    style={[
-      positionStyles[position],
-      styles.positioner,
-      styles.fade,
-      { opacity: visible ? 1 : 0 },
-    ]}
-  >
-    {position === "bottom" && <View style={caretStyles[position]} />}
-    {position === "right" && <View style={caretStyles[position]} />}
-    <View style={styles.container}>
-      <Text numberOfLines={1} style={styles.text}>
-        {content}
-      </Text>
-    </View>
-    {position === "top" && <View style={caretStyles[position]} />}
-    {position === "left" && <View style={caretStyles[position]} />}
-  </View>
-);
+const WnaTooltip: FC<WnaTooltipProps> = ({ content, position, visible }) =>
+  React.createElement(
+    "div",
+    {
+      role: "tooltip",
+      style: {
+        display: "flex",
+        ...positionStyles[position],
+        ...styles.positioner,
+        ...styles.fade,
+        pointerEvents: "none",
+        opacity: visible ? 1 : 0,
+      } as CSSProperties,
+    },
+    (position === "bottom" || position === "right") &&
+      React.createElement("div", { style: caretStyles[position] }),
+    React.createElement(
+      "div",
+      { style: styles.container },
+      React.createElement(
+        "span",
+        { style: { ...styles.text, ...lineClampStyle(1) } as CSSProperties },
+        content,
+      ),
+    ),
+    (position === "top" || position === "left") &&
+      React.createElement("div", { style: caretStyles[position] }),
+  );
 
 const styles: {
-  container: ViewStyle;
-  fade: ViewStyle;
-  positioner: ViewStyle;
-  text: TextStyle;
+  container: CSSProperties;
+  fade: CSSProperties;
+  positioner: CSSProperties;
+  text: CSSProperties;
 } = {
   container: {
+    position: "relative",
     backgroundColor: "#111",
     borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingInline: 8,
+    paddingBlock: 6,
     zIndex: 1000,
   },
   positioner: {
@@ -85,18 +92,18 @@ const styles: {
   },
   fade: {
     transition: "opacity 140ms ease-in-out",
-  } as ViewStyle,
+  },
   text: {
     color: "#fff",
     fontFamily: FontFamilies.UI,
     fontSize: 12,
     fontWeight: "600",
-    lineHeight: 16,
+    lineHeight: "16px",
     textAlign: "center",
   },
 };
 
-const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
+const caretStyles: Record<WnaTooltipPosition, CSSProperties> = {
   top: {
     borderLeftColor: "transparent",
     borderLeftWidth: 6,
@@ -104,6 +111,7 @@ const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
     borderRightWidth: 6,
     borderTopColor: "#111",
     borderTopWidth: 6,
+    borderStyle: "solid",
     height: 0,
     width: 0,
   },
@@ -114,6 +122,7 @@ const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
     borderLeftWidth: 6,
     borderTopColor: "transparent",
     borderTopWidth: 6,
+    borderStyle: "solid",
     height: 0,
     width: 0,
   },
@@ -124,6 +133,7 @@ const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
     borderLeftWidth: 6,
     borderRightColor: "transparent",
     borderRightWidth: 6,
+    borderStyle: "solid",
     height: 0,
     width: 0,
   },
@@ -134,6 +144,7 @@ const caretStyles: Record<WnaTooltipPosition, ViewStyle> = {
     borderRightWidth: 6,
     borderTopColor: "transparent",
     borderTopWidth: 6,
+    borderStyle: "solid",
     height: 0,
     width: 0,
   },

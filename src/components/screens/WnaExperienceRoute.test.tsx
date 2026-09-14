@@ -6,7 +6,6 @@ import WnaExperienceRoute from "@components/screens/WnaExperienceRoute";
 const mockAppColors = { black: "#111111" };
 const mockAppStyle = { textNeutralSmall: {} };
 const mockAppData = { experience: [] };
-const mockNavigation = { openDrawer: jest.fn() };
 const mockRouter = { push: jest.fn() };
 
 jest.mock("@/state/WnaAppContext", () => ({
@@ -25,7 +24,6 @@ jest.mock("@/i18n/i18n", () => ({
 }));
 
 jest.mock("expo-router", () => ({
-  useNavigation: () => mockNavigation,
   useRouter: () => mockRouter,
 }));
 
@@ -114,7 +112,7 @@ describe("WnaExperienceRoute", () => {
     expect(screen.props.titleHref).toBe("/(drawer)/(tabs-de)");
     expect(homeButton.props.route).toBe("home");
     expect(homeButton.props.router).toBe(mockRouter);
-    expect(menuButton.props.navigation).toBe(mockNavigation);
+    expect(menuButton.type).toBeDefined();
     expect(card.props.appData).toBe(mockAppData);
   });
 });

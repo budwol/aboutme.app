@@ -3,7 +3,8 @@ import { AppLayout } from "@constants/layoutConstants";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { StyleSheet, Text, View } from "react-native";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import React, { CSSProperties } from "react";
 import WnaPressable from "@components/buttons/WnaPressable";
 import WnaImage from "@components/images/WnaImage";
 
@@ -38,125 +39,143 @@ export default function WnaMultilineHeader(
   const logoSize = 32;
   const altText = "logo";
   let logoCornerRadius = logoSize / 2;
+  const textStyle = styles(appColors).text;
 
-  return (
-    <View
-      style={{
+  return React.createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
         flexShrink: 1,
         minWidth: 0,
         height: appLayout.headerHeight,
         justifyContent: "center",
-      }}
-    >
-      <View
-        style={{
+      } as CSSProperties,
+    },
+    React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
           alignSelf: "stretch",
           flexDirection: "row",
           alignItems: "center",
           flexShrink: 1,
           minWidth: 0,
           minHeight: 64,
+        } as CSSProperties,
+      },
+      <WnaPressable
+        ripple={"light"}
+        onPress={onPress}
+        style={{
+          borderRadius: appLayout.globalCornerRadius,
+          overflow: "hidden",
+          outlineColor: convertHexToRgba(appColors.staticWhite, 0.5),
+          outlineOffset: 2,
+          height: appLayout.headerButtonHeight,
         }}
       >
-        <WnaPressable
-          ripple={"light"}
-          onPress={onPress}
-          style={{
-            borderRadius: appLayout.globalCornerRadius,
-            overflow: "hidden",
-            outlineColor: convertHexToRgba(appColors.staticWhite, 0.5),
-            outlineOffset: 2,
-            height: appLayout.headerButtonHeight,
-          }}
-        >
-          <View
-            style={{
+        {React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
               alignSelf: "stretch",
               flexDirection: "row",
               alignItems: "center",
               flexShrink: 1,
               minWidth: 0,
-              paddingHorizontal: 8,
-            }}
-          >
-            {showLogo ? (
-              <WnaImage
-                imageUrl={"/logo_96.webp"}
-                imageTitle={altText}
-                appColors={appColors}
-                style={{
-                  width: logoSize,
-                  height: logoSize,
-                  borderRadius: logoCornerRadius,
-                }}
-                hideBackground
-                contentFit="contain"
-              />
-            ) : null}
-            {subTitle === "" ? (
-              <View
-                style={{
-                  height: 64,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: 8,
-                  paddingLeft: showLogo ? 16 : 8,
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={[
-                    appStyle.textTitleLarge,
-                    styles(appColors).text,
-                    {
+              paddingInline: 8,
+            } as CSSProperties,
+          },
+          showLogo ? (
+            <WnaImage
+              imageUrl={"/logo_96.webp"}
+              imageTitle={altText}
+              appColors={appColors}
+              style={{
+                width: logoSize,
+                height: logoSize,
+                borderRadius: logoCornerRadius,
+              }}
+              hideBackground
+              contentFit="contain"
+            />
+          ) : null,
+          subTitle === ""
+            ? React.createElement(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 64,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 8,
+                    paddingLeft: showLogo ? 16 : 8,
+                  } as CSSProperties,
+                },
+                React.createElement(
+                  "span",
+                  {
+                    style: {
+                      ...appStyle.textTitleLarge,
+                      ...textStyle,
                       fontSize: isLandscape ? 20 : 16,
-                    },
-                  ]}
-                >
-                  {mainTitle}
-                </Text>
-              </View>
-            ) : (
-              <View
-                style={{
-                  padding: 8,
-                  flexShrink: 1,
-                  minWidth: 0,
-                  height: appLayout.headerButtonHeight,
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={[appStyle.textSmall, styles(appColors).text]}
-                >
-                  {mainTitle}
-                </Text>
-
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={[appStyle.textSmall, styles(appColors).text]}
-                >
-                  {subTitle}
-                </Text>
-              </View>
-            )}
-          </View>
-        </WnaPressable>
-      </View>
-    </View>
+                      ...lineClampStyle(1),
+                    } as CSSProperties,
+                  },
+                  mainTitle,
+                ),
+              )
+            : React.createElement(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: 8,
+                    flexShrink: 1,
+                    minWidth: 0,
+                    height: appLayout.headerButtonHeight,
+                    justifyContent: "center",
+                  } as CSSProperties,
+                },
+                React.createElement(
+                  "span",
+                  {
+                    style: {
+                      ...appStyle.textSmall,
+                      ...textStyle,
+                      ...lineClampStyle(1),
+                    } as CSSProperties,
+                  },
+                  mainTitle,
+                ),
+                React.createElement(
+                  "span",
+                  {
+                    style: {
+                      ...appStyle.textSmall,
+                      ...textStyle,
+                      ...lineClampStyle(1),
+                    } as CSSProperties,
+                  },
+                  subTitle,
+                ),
+              ),
+        )}
+      </WnaPressable>,
+    ),
   );
 }
 
-const styles = (appColors: Colors) =>
-  StyleSheet.create({
-    text: {
-      flexShrink: 1,
-      color: appColors.staticWhite,
-      includeFontPadding: false,
-      textAlignVertical: "center",
-    },
-  });
+const styles = (appColors: Colors) => ({
+  text: {
+    flexShrink: 1,
+    color: appColors.staticWhite,
+  } satisfies CSSProperties,
+});
