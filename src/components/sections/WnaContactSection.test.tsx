@@ -304,4 +304,38 @@ describe("WnaContactSection", () => {
       (actionContainer!.props.style as { maxWidth?: number }).maxWidth,
     ).toBe(320);
   });
+
+  it("keeps the outer container within its parent's width by using border-box sizing", async () => {
+    // Regression test: this container combines `width: "100%"` with
+    // `padding: 12` on a real DOM div. The browser default box-sizing is
+    // content-box, which adds padding ON TOP of the 100%-of-parent
+    // content width, making the element exactly 24px (2 * padding) wider
+    // than its parent — a silent horizontal overflow that only became
+    // visible once the page's scroll container started clipping/
+    // scrolling correctly. `boxSizing: "border-box"` is required so the
+    // 100% width already includes the padding.
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactSection
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const container = testRenderer!.root.findAllByType("div")[0];
+
+    expect(container.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      boxSizing: "border-box",
+      padding: 12,
+      backgroundColor: "transparent",
+    });
+  });
 });

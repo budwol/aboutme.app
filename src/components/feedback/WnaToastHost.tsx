@@ -22,6 +22,7 @@ export function renderWnaToastCard(
     {
       style: {
         width: "100%",
+        boxSizing: "border-box",
         maxWidth: 328,
         minHeight: 78,
         borderRadius: 18,

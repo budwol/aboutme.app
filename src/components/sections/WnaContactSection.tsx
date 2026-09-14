@@ -17,6 +17,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
+    boxSizing: "border-box",
     padding: 12,
     backgroundColor: "transparent",
   },

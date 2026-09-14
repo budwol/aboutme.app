@@ -97,6 +97,7 @@ const WnaSurfaceCardComponent: FC<WnaSurfaceCardProps> = ({
             style: {
               display: "flex",
               flexDirection: "column",
+              boxSizing: "border-box",
               padding: 12,
               marginLeft: -8,
               width: "100%",

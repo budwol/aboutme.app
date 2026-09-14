@@ -108,6 +108,7 @@ export const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
+    boxSizing: "border-box",
     maxWidth: 560,
     padding: 32,
     borderRadius: appLayoutConstants.globalCornerRadius,
