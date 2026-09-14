@@ -254,6 +254,7 @@ const setAppStyle = (colors: Colors) => {
       letterSpacing: 0.5,
       textAlign: "center",
       lineHeight: "22px",
+      fontFamily: FontFamilies.UI,
       color: colors.isDark ? colors.coolgray7 : colors.coolgray5,
     },
 

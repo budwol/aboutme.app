@@ -2,6 +2,7 @@ import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonTextContent from "@components/buttons/WnaButtonTextContent";
+import { FontFamilies } from "@constants/theme/fontFamilies";
 
 describe("WnaButtonTextContent", () => {
   it("renders text and optional left content", () => {
@@ -31,6 +32,10 @@ describe("WnaButtonTextContent", () => {
   });
 
   it("falls back to the default text style when no app style is given", () => {
+    // Regression test: the fallback style previously had no `fontFamily`,
+    // so a caller that forgot to forward `appStyle` (as WnaButtonIconText
+    // did) silently rendered its button label in the browser's default
+    // font instead of Manrope. See WEB-ONLY-MIGRATION.md fix.
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -40,7 +45,11 @@ describe("WnaButtonTextContent", () => {
     });
 
     expect(tree!.root.findByType("span").props.style).toEqual(
-      expect.objectContaining({ fontSize: 16, fontWeight: "500" }),
+      expect.objectContaining({
+        fontSize: 16,
+        fontWeight: "500",
+        fontFamily: FontFamilies.UI,
+      }),
     );
   });
 });

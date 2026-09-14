@@ -705,6 +705,41 @@ describe("WnaApp", () => {
 
     expect(mockFinishNavigationTransition).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the routed content container able to shrink below its content height so the page can scroll", () => {
+    // Regression test: this container sits inside a `flex-direction: column`
+    // ancestor chain. Flex items default to `min-height: auto`, which stops
+    // them shrinking below their content's intrinsic height even with
+    // `flex: 1` — the exact bug that broke page scrolling (content grew to
+    // fill its full height instead of being clipped by the viewport). See
+    // WEB-ONLY-MIGRATION.md fix.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = createTrackedTree(
+        <WnaApp appData={testAppData} theme="system">
+          {React.createElement("div", {
+            "data-testid": "app-content-marker",
+          })}
+        </WnaApp>,
+      );
+    });
+
+    const marker = tree!.root.findByProps({
+      "data-testid": "app-content-marker",
+    });
+    const contentContainer = marker.parent!;
+
+    expect(contentContainer.type).toBe("div");
+    expect(contentContainer.props.style).toEqual(
+      expect.objectContaining({
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }),
+    );
+  });
 });
 
 describe("ErrorBoundary", () => {

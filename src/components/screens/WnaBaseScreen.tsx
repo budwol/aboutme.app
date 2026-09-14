@@ -263,6 +263,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     flex: 1,
+    minHeight: 0,
     alignContent: "stretch",
   },
   busyOverlay: {
