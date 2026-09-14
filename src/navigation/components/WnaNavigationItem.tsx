@@ -162,7 +162,9 @@ const styles: Record<string, CSSProperties> = {
     flex: 1,
   },
   text: {
-    width: "100%",
+    // `width: "100%"` has no effect here — this style applies to a plain
+    // inline `<span>`, and `width` does not apply to non-replaced inline
+    // elements per the CSS spec. Only `paddingRight` actually renders.
     paddingRight: 24,
     alignSelf: "center",
   },

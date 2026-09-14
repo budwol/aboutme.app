@@ -348,6 +348,7 @@ const styles = {
     // natural (unwrapped) size — a long profile title then overflows the
     // drawer's fixed width instead of wrapping onto a second line.
     width: "100%",
+    boxSizing: "border-box",
     paddingInline: 24,
   },
   centeredText: {

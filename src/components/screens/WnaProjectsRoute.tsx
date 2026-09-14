@@ -49,6 +49,7 @@ const styles = {
   },
   landscapeShell: {
     width: "100%",
+    boxSizing: "border-box",
     maxWidth: 1480,
     paddingInline: 28,
   },
@@ -142,6 +143,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     width: "100%",
+    boxSizing: "border-box",
     paddingInline: 18,
     paddingBlock: 16,
     borderRadius: 16,
@@ -152,6 +154,7 @@ const styles = {
   portraitFeatureBox: {
     display: "flex",
     width: "100%",
+    boxSizing: "border-box",
     paddingInline: 18,
     paddingBlock: 16,
     borderRadius: 16,
@@ -209,6 +212,7 @@ const styles = {
   projectCard: {
     position: "relative",
     width: "100%",
+    boxSizing: "border-box",
     overflow: "hidden",
     borderRadius: 12,
     borderWidth: 1,

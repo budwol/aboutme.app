@@ -7,13 +7,21 @@ describe("appStyle", () => {
   it("builds the shared app style object from a color palette", () => {
     const style = setAppStyle(themePalettes.light);
 
-    expect(style.containerCenterMaxWidth).toEqual(
-      expect.objectContaining({
-        width: "100%",
-        alignSelf: "center",
-        paddingHorizontal: 16,
-      }),
-    );
+    // Regression test: this style used the React-Native-only
+    // `paddingHorizontal` property. Consumers spread this object directly
+    // onto a plain DOM `style` prop, and React silently drops properties
+    // it doesn't recognize as real CSS — so the intended 16px horizontal
+    // margin around the home page's centered content rendered as 0px in
+    // every browser. `paddingInline` is the real CSS equivalent.
+    // `boxSizing: "border-box"` is required alongside it so the 100%
+    // width already includes that padding instead of adding to it.
+    expect(style.containerCenterMaxWidth).toEqual({
+      maxWidth: 1120,
+      width: "100%",
+      boxSizing: "border-box",
+      alignSelf: "center",
+      paddingInline: 16,
+    });
     expect(style.tabBarStyle).toEqual(
       expect.objectContaining({ backgroundColor: themePalettes.light.white }),
     );

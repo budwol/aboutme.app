@@ -51,8 +51,9 @@ const setAppStyle = (colors: Colors) => {
     containerCenterMaxWidth: {
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
+      boxSizing: "border-box",
       alignSelf: "center",
-      paddingHorizontal: 16,
+      paddingInline: 16,
     },
     containerCenter: {
       display: "flex",
@@ -78,6 +79,7 @@ const setAppStyle = (colors: Colors) => {
       display: "flex",
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
+      boxSizing: "border-box",
       alignSelf: "stretch",
       alignItems: "center",
       padding: 16,
@@ -135,7 +137,7 @@ const setAppStyle = (colors: Colors) => {
       overflow: "hidden",
     },
     separator: {
-      marginVertical: 30,
+      marginBlock: 30,
       height: 1,
       width: "80%",
     },

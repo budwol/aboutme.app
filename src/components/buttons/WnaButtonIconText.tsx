@@ -94,7 +94,7 @@ const componentStyle = StyleSheet.create({
     height: actionButtonRightConstants.size,
     borderRadius: appLayoutConstants.globalCornerRadius,
     overflow: "hidden",
-    marginHorizontal: 16,
+    marginInline: 16,
   },
 });
 
