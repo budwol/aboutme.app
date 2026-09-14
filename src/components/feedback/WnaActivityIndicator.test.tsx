@@ -16,15 +16,19 @@ describe("WnaActivityIndicator", () => {
       );
     });
 
-    const indicator = tree!.root.findByType("View");
+    const indicator = tree!.root.findByType("div");
 
-    expect(indicator.props.accessibilityRole).toBe("progressbar");
-    expect(indicator.props.accessibilityLabel).toBe("activity-indicator");
+    expect(indicator.props.role).toBe("progressbar");
+    expect(indicator.props["aria-label"]).toBe("activity-indicator");
     expect(indicator.props.className).toBe("wna-activity-indicator");
-    expect(indicator.props.style).toEqual([{ marginTop: 8 }]);
-    expect(indicator.findAllByType("View")[1].props.style).toEqual([
-      expect.objectContaining({ width: 48, height: 48 }),
-      { borderTopColor: "#61afa7", pointerEvents: "none" },
-    ]);
+    expect(indicator.props.style).toEqual({ marginTop: 8 });
+    expect(indicator.findAllByType("div")[1].props.style).toEqual(
+      expect.objectContaining({
+        width: 48,
+        height: 48,
+        borderTopColor: "#61afa7",
+        pointerEvents: "none",
+      }),
+    );
   });
 });

@@ -1,4 +1,3 @@
-import { ViewStyle } from "react-native";
 import { CSSProperties, ReactNode } from "react";
 
 type GradientPoint = [number, number] | { x: number; y: number };
@@ -8,7 +7,7 @@ export type WnaCssGradientProps = {
   locations?: number[];
   start?: GradientPoint;
   end?: GradientPoint;
-  style?: ViewStyle | ViewStyle[];
+  style?: CSSProperties | CSSProperties[];
   children?: ReactNode;
 };
 

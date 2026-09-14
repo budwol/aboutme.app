@@ -65,7 +65,7 @@ describe("WnaFooter", () => {
     });
 
     const gradient = tree!.root.findByType("WnaCssGradient");
-    const text = tree!.root.findByType("Text");
+    const text = tree!.root.findByType("span");
 
     expect(gradient.props.colors).toEqual([
       "rgba(255,255,255,0)",

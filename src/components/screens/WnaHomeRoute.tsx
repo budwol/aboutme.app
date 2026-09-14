@@ -23,9 +23,9 @@ import {
   getNavigationLang,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { createProjectSlug } from "@utils/projectRoutes";
-import { useNavigation, useRouter } from "expo-router";
-import {
-  ElementRef,
+import { useRouter } from "expo-router";
+import React, {
+  CSSProperties,
   ReactNode,
   useCallback,
   useEffect,
@@ -34,14 +34,15 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, View } from "react-native";
 
 const separatorSpace = appLayoutConstants.contentPaddingBottom;
-const styles = StyleSheet.create({
+const styles = {
   content: {
+    display: "flex",
+    flexDirection: "column",
     width: "100%",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 function SectionCard({
   appColors,
@@ -66,10 +67,9 @@ export default function WnaHomeRoute(): ReactNode {
   const appBrand = t(i18nKeys.appBrand);
   const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
-  const navigation = useNavigation();
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
-  const scrollViewRef = useRef<ElementRef<typeof ScrollView>>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showDeferredSections, setShowDeferredSections] = useState(false);
 
   useEffect(() => {
@@ -93,8 +93,11 @@ export default function WnaHomeRoute(): ReactNode {
     };
   }, []);
 
-  const contentContainerStyle = useMemo(
+  const scrollContainerStyle: CSSProperties = useMemo(
     () => ({
+      display: "flex",
+      flexDirection: "column",
+      overflowY: "auto",
       paddingTop: appLayout.contentListPaddingTop,
       paddingBottom: appLayout.contentPaddingBottom,
     }),
@@ -117,7 +120,7 @@ export default function WnaHomeRoute(): ReactNode {
   );
 
   const handleTitlePress = useCallback(() => {
-    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handleExperiencePress = useCallback(() => {
@@ -146,21 +149,34 @@ export default function WnaHomeRoute(): ReactNode {
         />
       }
       headerButton1={
-        <WnaMenuToggleButton
-          appStyle={appStyle}
-          appColors={appColors}
-          t={t}
-          navigation={navigation}
-        />
+        <WnaMenuToggleButton appStyle={appStyle} appColors={appColors} t={t} />
       }
     >
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={contentContainerStyle}
-        scrollEventThrottle={appLayout.scrollEventThrottle}
-        onScroll={onScroll}
-      >
-        <View style={appStyle.containerCenterMaxWidth}>
+      {React.createElement(
+        "div",
+        {
+          ref: scrollContainerRef,
+          style: scrollContainerStyle,
+          // useWnaScrollY is shared with still-RN screens (e.g.
+          // WnaProjectsRoute) that pass its onScroll straight to a native
+          // ScrollView, so its signature stays NativeSyntheticEvent-shaped;
+          // adapt the real DOM event here instead of widening the shared hook.
+          onScroll: (event: React.UIEvent<HTMLDivElement>) =>
+            onScroll({
+              nativeEvent: {
+                contentOffset: { y: event.currentTarget.scrollTop },
+              },
+            } as never),
+        },
+        React.createElement(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              ...appStyle.containerCenterMaxWidth,
+            } as CSSProperties,
+          },
           <SectionCard appColors={appColors}>
             <WnaProfileSection
               appColors={appColors}
@@ -168,9 +184,8 @@ export default function WnaHomeRoute(): ReactNode {
               appStyle={appStyle}
               t={t}
             />
-          </SectionCard>
-
-          {showDeferredSections ? (
+          </SectionCard>,
+          showDeferredSections ? (
             <>
               <SectionCard appColors={appColors}>
                 <WnaExperienceSection
@@ -195,13 +210,15 @@ export default function WnaHomeRoute(): ReactNode {
                 />
               </SectionCard>
 
-              <View style={styles.content}>
-                <WnaContactFooter showTopSpacing={false} />
-              </View>
+              {React.createElement(
+                "div",
+                { style: styles.content },
+                <WnaContactFooter showTopSpacing={false} />,
+              )}
             </>
-          ) : null}
-        </View>
-      </ScrollView>
+          ) : null,
+        ),
+      )}
     </WnaBaseScreen>
   );
 }

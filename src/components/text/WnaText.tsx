@@ -2,17 +2,16 @@ import { isHtml, stripHtml } from "@/utils/htmlSanitizer";
 import WnaHtmlRenderer from "@components/content/WnaHtmlRenderer";
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
-import { FC, memo } from "react";
-import { Text, TextStyle } from "react-native";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import React, { CSSProperties, FC, memo } from "react";
 
 export type WnaTextProps = {
   appColors: Colors;
   appStyle: AppStyle;
   text?: string;
-  style?: TextStyle | TextStyle[];
+  style?: CSSProperties | CSSProperties[];
   numberOfLines?: number;
   ellipseMode?: "clip" | "head" | "middle" | "tail";
-  textBreakStrategy?: "balanced" | "simple" | "highQuality";
   showHtml?: boolean;
   fontFamily?: string;
   fontSize?: number;
@@ -26,8 +25,6 @@ const WnaTextComponent: FC<WnaTextProps> = ({
   text,
   style,
   numberOfLines,
-  ellipseMode,
-  textBreakStrategy,
   showHtml,
   fontFamily,
   fontSize,
@@ -36,8 +33,6 @@ const WnaTextComponent: FC<WnaTextProps> = ({
 }) => {
   const shouldShowHtml = showHtml ?? isHtml(text);
   const effectiveNumberOfLines = numberOfLines ?? 0;
-  const effectiveEllipseMode = ellipseMode ?? "clip";
-  const effectiveTextBreakStrategy = textBreakStrategy ?? "simple";
   const effectiveFontColor = fontColor ?? appColors.black;
 
   return shouldShowHtml ? (
@@ -52,19 +47,20 @@ const WnaTextComponent: FC<WnaTextProps> = ({
       fontColor={effectiveFontColor}
     />
   ) : (
-    <Text
-      style={[
-        style ? style : appStyle.textNeutralSmall,
-        {
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...(style ? {} : appStyle.textNeutralSmall),
+          ...(Array.isArray(style) ? Object.assign({}, ...style) : style),
           color: effectiveFontColor,
-        },
-      ]}
-      textBreakStrategy={effectiveTextBreakStrategy}
-      numberOfLines={effectiveNumberOfLines}
-      ellipsizeMode={effectiveEllipseMode}
-    >
-      {stripHtml(text)}
-    </Text>
+          ...(effectiveNumberOfLines > 0
+            ? lineClampStyle(effectiveNumberOfLines)
+            : null),
+        } as CSSProperties,
+      },
+      stripHtml(text),
+    )
   );
 };
 

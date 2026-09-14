@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Text, View } from "react-native";
+import React, { CSSProperties, useState } from "react";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { styles } from "./wnaExperienceSectionStyles";
@@ -48,31 +47,31 @@ export default function WnaExperienceCompanyLink({
       style: linkStyle as React.CSSProperties,
       "data-testid": `experience-company-link-${index}`,
     },
-    <View>
-      <View style={styles.companyLinkRow}>
-        <Text
-          style={[
-            appStyle.textNeutralSmall,
-            styles.companyLinkText,
-            isHovered && { color: appColors.accent5 },
-            {
-              textDecorationColor: convertHexToRgba(appColors.accent5, 0.45),
-            },
-          ]}
-        >
-          {company}
-        </Text>
-        <WnaIcon
-          iconName="open-in-new"
-          size={12}
-          color={
-            isHovered
-              ? appColors.accent5
-              : convertHexToRgba(appColors.accent5, 0.72)
-          }
-          style={styles.companyLinkIcon}
-        />
-      </View>
-    </View>,
+    React.createElement(
+      "div",
+      { style: styles.companyLinkRow as CSSProperties },
+      React.createElement(
+        "span",
+        {
+          style: {
+            ...appStyle.textNeutralSmall,
+            ...styles.companyLinkText,
+            ...(isHovered && { color: appColors.accent5 }),
+            textDecorationColor: convertHexToRgba(appColors.accent5, 0.45),
+          } as CSSProperties,
+        },
+        company,
+      ),
+      <WnaIcon
+        iconName="open-in-new"
+        size={12}
+        color={
+          isHovered
+            ? appColors.accent5
+            : convertHexToRgba(appColors.accent5, 0.72)
+        }
+        style={styles.companyLinkIcon}
+      />,
+    ),
   );
 }

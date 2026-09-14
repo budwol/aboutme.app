@@ -3,6 +3,10 @@ import WnaExperienceSection from "@components/sections/WnaExperienceSection";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+import {
+  detailsHeightBuffer,
+  detailsTopSpacing,
+} from "@components/sections/WnaExperienceSection/wnaExperienceSectionStyles";
 
 type RenderedTextNode = {
   props: {
@@ -33,6 +37,24 @@ function flattenText(children: unknown): string {
   }
 
   return typeof children === "string" ? children : "";
+}
+
+type ResizeObserverCallback = (
+  entries: { contentRect: { height: number } }[],
+) => void;
+
+let resizeObserverCallback: ResizeObserverCallback | undefined;
+
+class MockResizeObserver {
+  constructor(callback: ResizeObserverCallback) {
+    resizeObserverCallback = callback;
+  }
+  observe() {}
+  disconnect() {}
+}
+
+function emitResizeHeight(height: number) {
+  resizeObserverCallback?.([{ contentRect: { height } }]);
 }
 
 jest.mock("@components/text/WnaSectionTitle", () => {
@@ -73,6 +95,9 @@ jest.mock("@components/display/WnaBadge", () => {
 describe("WnaExperienceSection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resizeObserverCallback = undefined;
+    (global as { ResizeObserver?: unknown }).ResizeObserver =
+      MockResizeObserver;
   });
 
   it("renders one timeline card per experience entry", () => {
@@ -198,7 +223,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const toggle = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .find((node: RenderedTextNode) =>
         flattenText(node.props.children).includes("actionShowDetails"),
       );
@@ -247,7 +272,7 @@ describe("WnaExperienceSection", () => {
     const companyLink = tree!.root.findByProps({
       "data-testid": "experience-company-link-0",
     });
-    const linkText = companyLink.findByType("Text");
+    const linkText = companyLink.findByType("span");
 
     expect(companyLink.props.href).toBe("https://linked-employer.example.com");
     expect(companyLink.props.target).toBe("_blank");
@@ -383,7 +408,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const toggle = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .find((node: RenderedTextNode) =>
         flattenText(node.props.children).includes("actionShowDetails"),
       );
@@ -431,7 +456,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const toggle = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .find((node: RenderedTextNode) =>
         flattenText(node.props.children).includes("actionShowDetails"),
       );
@@ -489,7 +514,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const badges = tree!.root.findAllByType("WnaBadge");
     const cards = tree!.root.findAllByType("WnaCardVerticalSmall");
@@ -556,7 +581,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
 
     expect(textValues).toContain("Built the thing");
@@ -617,11 +642,11 @@ describe("WnaExperienceSection", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const detailsClip = tree!.root.find(
-      (node: { props: { nativeID?: string } }) =>
-        node.props.nativeID?.startsWith("wna-experience-details-") === true,
+      (node: { props: { id?: string } }) =>
+        node.props.id?.startsWith("wna-experience-details-") === true,
     );
     const detailsClipStyle = Array.isArray(detailsClip.props.style)
       ? detailsClip.props.style
@@ -663,33 +688,17 @@ describe("WnaExperienceSection", () => {
     });
 
     const timelineWrapper = tree!.root
-      .findAllByType("View")
+      .findAllByType("div")
       .find(
-        (node: {
-          props: { style?: { width?: string } | { width?: string }[] };
-        }) => {
-          const style = node.props.style;
-
-          if (Array.isArray(style)) {
-            return style.some((entry) => entry?.width === "100%");
-          }
-
-          return style?.width === "100%";
-        },
+        (node: { props: { style?: { width?: string } } }) =>
+          node.props.style?.width === "100%",
       );
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const periodColumns = tree!.root.findAll(
-      (node: { props: { style?: unknown } }) =>
-        Array.isArray(node.props.style) &&
-        node.props.style.some(
-          (entry) =>
-            entry &&
-            typeof entry === "object" &&
-            "lineHeight" in (entry as Record<string, unknown>) &&
-            (entry as Record<string, unknown>).lineHeight === 18,
-        ),
+      (node: { props: { style?: { lineHeight?: string } } }) =>
+        node.props.style?.lineHeight === "18px",
     );
 
     expect(timelineWrapper).toBeDefined();
@@ -739,32 +748,95 @@ describe("WnaExperienceSection", () => {
           t={((value: string) => value) as never}
           expandAllDetailsByDefault
         />,
+        { createNodeMock: () => ({}) },
       );
     });
 
-    const measuredView = tree!.root.find(
-      (node: { props: { onLayout?: (event: unknown) => void } }) =>
-        typeof node.props.onLayout === "function",
+    const findDetailsClip = () =>
+      tree!.root.find(
+        (node: { props: { id?: string } }) =>
+          node.props.id?.startsWith("wna-experience-details-") === true,
+      );
+
+    act(() => {
+      emitResizeHeight(48);
+    });
+
+    expect((findDetailsClip().props.style as { height?: number }).height).toBe(
+      48 + detailsTopSpacing + detailsHeightBuffer,
     );
 
     act(() => {
-      measuredView.props.onLayout?.({
-        nativeEvent: { layout: { height: 48 } },
-      });
+      emitResizeHeight(48);
     });
+
+    expect((findDetailsClip().props.style as { height?: number }).height).toBe(
+      48 + detailsTopSpacing + detailsHeightBuffer,
+    );
 
     act(() => {
-      measuredView.props.onLayout?.({
-        nativeEvent: { layout: { height: 48 } },
-      });
+      tree!.unmount();
+    });
+  });
+
+  it("does not measure the details height when ResizeObserver is unavailable", () => {
+    const originalResizeObserver = (global as { ResizeObserver?: unknown })
+      .ResizeObserver;
+    delete (global as { ResizeObserver?: unknown }).ResizeObserver;
+
+    const appData = {
+      ...testAppData,
+      experience: [
+        {
+          ...testAppData.experience[0],
+          details: ["Built the thing"],
+        },
+      ],
+    };
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaExperienceSection
+          appColors={
+            {
+              accent5: "#0aa",
+              coolgray1: "#fafafa",
+              coolgray2: "#ddd",
+              coolgray6: "#666",
+              warmgray6: "#444",
+              coolgray8: "#111",
+              white: "#fff",
+            } as never
+          }
+          appData={appData}
+          appStyle={
+            {
+              textNeutralSmall: {},
+              textMicro: {},
+              textNeutralMicro: {},
+              textNeutralLabel: {},
+            } as never
+          }
+          t={((value: string) => value) as never}
+          expandAllDetailsByDefault
+        />,
+        { createNodeMock: () => ({}) },
+      );
     });
 
-    expect(
-      tree!.root.findAll(
-        (node: { props: { nativeID?: string } }) =>
-          node.props.nativeID?.startsWith("wna-experience-details-") === true,
-      ),
-    ).not.toHaveLength(0);
+    const detailsClip = tree!.root.find(
+      (node: { props: { id?: string } }) =>
+        node.props.id?.startsWith("wna-experience-details-") === true,
+    );
+
+    expect((detailsClip.props.style as { height?: number }).height).toBe(
+      detailsTopSpacing + detailsHeightBuffer,
+    );
+
+    (global as { ResizeObserver?: unknown }).ResizeObserver =
+      originalResizeObserver;
   });
 
   it("falls back to an empty subtitle when experienceSubtitle is missing", () => {
@@ -884,7 +956,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
 
     expect(textValues).toContain(description);
@@ -935,7 +1007,7 @@ describe("WnaExperienceSection", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const badges = tree!.root.findAllByType("WnaBadge");
 
@@ -1012,7 +1084,7 @@ describe("WnaExperienceSection", () => {
 
     const cards = tree!.root.findAllByType("WnaCardVerticalSmall");
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => flattenText(node.props.children));
     const footerAction = tree!.root.find(
       (node: {

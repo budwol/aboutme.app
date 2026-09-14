@@ -5,8 +5,7 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import WnaCssGradient from "@components/effects/WnaCssGradient";
 import { TFunction } from "i18next";
-import { FC, memo } from "react";
-import { Text, TextStyle, ViewStyle } from "react-native";
+import React, { CSSProperties, FC, memo } from "react";
 
 export type WnaFooterProps = {
   appColors: Colors;
@@ -37,13 +36,18 @@ export const WnaFooter: FC<WnaFooterProps> = memo(
               convertHexToRgba(appColors.white, 0),
             ]}
             locations={[0, 0.2, 0.5, 0.8, 1]}
-            style={styles.gradient(isLandscape) as ViewStyle}
+            style={styles.gradient(isLandscape) as CSSProperties}
           >
-            <Text
-              style={[appStyle.textMicro, styles.text(appColors) as TextStyle]}
-            >
-              {t(i18nKeys.errorNoInternet).toUpperCase()}
-            </Text>
+            {React.createElement(
+              "span",
+              {
+                style: {
+                  ...appStyle.textMicro,
+                  ...styles.text(appColors),
+                } as CSSProperties,
+              },
+              t(i18nKeys.errorNoInternet).toUpperCase(),
+            )}
           </WnaCssGradient>
         )}
       </>
@@ -54,8 +58,9 @@ export const WnaFooter: FC<WnaFooterProps> = memo(
 WnaFooter.displayName = "WnaFooter";
 
 const styles = {
-  gradient: (isLandscape: boolean) => ({
-    pointerEvents: "box-none",
+  gradient: (isLandscape: boolean): CSSProperties => ({
+    display: "flex",
+    pointerEvents: "none",
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -64,7 +69,7 @@ const styles = {
     justifyContent: "center",
     alignItems: isLandscape ? "flex-end" : "center",
   }),
-  text: (appColors: Colors) => ({
+  text: (appColors: Colors): CSSProperties => ({
     color: appColors.staticWhite,
     alignSelf: "center",
   }),

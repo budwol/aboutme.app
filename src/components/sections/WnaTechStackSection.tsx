@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import React, { CSSProperties } from "react";
 import WnaBadge from "@components/display/WnaBadge";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { WnaSectionProps } from "@components/sections/wnaSectionProps";
@@ -39,72 +39,74 @@ export default function WnaTechStackSection({
     },
   ];
 
-  const renderBadges = (stack: string[], groupKey: string) => (
-    <View
-      style={{
-        flexDirection: "row",
-        flexWrap: "wrap",
-        alignItems: "flex-start",
-        gap: 8,
-      }}
-    >
-      {stack.map((tech) => (
+  const renderBadges = (stack: string[], groupKey: string) =>
+    React.createElement(
+      "div",
+      {
+        style: {
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          gap: 8,
+        } as CSSProperties,
+      },
+      stack.map((tech) => (
         <WnaBadge
           key={`${groupKey}-${tech}`}
           text={tech}
           appColors={appColors}
           appStyle={appStyle}
         />
-      ))}
-    </View>
-  );
+      )),
+    );
 
-  const renderGroupCard = (
-    title: string,
-    stack: string[],
-    groupKey: string,
-  ) => (
-    <View
-      key={groupKey}
-      style={{
-        flex: 1,
-        minWidth: 280,
-        padding: 16,
-        borderRadius: appLayoutConstants.globalCornerRadius,
-        gap: 16,
-        backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
-        borderWidth: 1,
-        borderColor: appColors.coolgray2,
-      }}
-    >
-      <Text
-        style={[
-          appStyle.textNeutralTitleLarge,
-          {
+  const renderGroupCard = (title: string, stack: string[], groupKey: string) =>
+    React.createElement(
+      "div",
+      {
+        key: groupKey,
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minWidth: 280,
+          padding: 16,
+          borderRadius: appLayoutConstants.globalCornerRadius,
+          gap: 16,
+          backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
+          borderWidth: 1,
+          borderStyle: "solid",
+          borderColor: appColors.coolgray2,
+        } as CSSProperties,
+      },
+      React.createElement(
+        "span",
+        {
+          style: {
+            ...appStyle.textNeutralTitleLarge,
             textTransform: "uppercase",
             color: appColors.coolgray8,
             letterSpacing: 1,
-          },
-        ]}
-      >
-        {title}
-      </Text>
+          } as CSSProperties,
+        },
+        title,
+      ),
+      renderBadges(stack, groupKey),
+    );
 
-      {renderBadges(stack, groupKey)}
-    </View>
-  );
-
-  return (
-    <View
-      style={{
+  return React.createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
         flexDirection: "row",
         gap: groupGap,
         flexWrap: "wrap",
-      }}
-    >
-      {resolvedGroups
-        .filter((group) => group.stack.length > 0)
-        .map((group) => renderGroupCard(group.title, group.stack, group.key))}
-    </View>
+      } as CSSProperties,
+    },
+    resolvedGroups
+      .filter((group) => group.stack.length > 0)
+      .map((group) => renderGroupCard(group.title, group.stack, group.key)),
   );
 }

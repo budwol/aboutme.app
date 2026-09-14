@@ -93,7 +93,7 @@ describe("WnaProjectsSection", () => {
 
     const title = tree!.root.findByType("WnaSectionTitle");
     const cards = tree!.root.findAllByType("WnaCardVerticalImage");
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAllByType("span");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
@@ -173,7 +173,9 @@ describe("WnaProjectsSection", () => {
       );
     });
 
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAll(
+      (node: { type: unknown }) => node.type === "Text" || node.type === "span",
+    );
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
@@ -191,7 +193,7 @@ describe("WnaProjectsSection", () => {
     );
     const actionNode = actionNodes[actionNodes.length - 1];
 
-    expect(textValues).toContainEqual(["actionShowMore", " →"]);
+    expect(textValues).toContain("actionShowMore →");
 
     act(() => {
       actionNode?.props.onClick();
@@ -225,7 +227,7 @@ describe("WnaProjectsSection", () => {
       );
     });
 
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAllByType("span");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );

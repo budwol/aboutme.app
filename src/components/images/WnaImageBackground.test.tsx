@@ -35,14 +35,10 @@ describe("WnaImageBackground", () => {
     });
 
     expect(tree!.root.findAllByType("img")).toHaveLength(0);
-    expect(tree!.root.findByType("View").props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "#fff" }),
-      ]),
+    expect(tree!.root.findByType("div").props.style).toEqual(
+      expect.objectContaining({ backgroundColor: "#fff" }),
     );
-    expect(tree!.root.findByType("View").props.nativeID).toBe(
-      "plain-background",
-    );
+    expect(tree!.root.findByType("div").props.id).toBe("plain-background");
   });
 
   it("renders the versioned image and blur overlay for configured images", () => {
@@ -62,16 +58,14 @@ describe("WnaImageBackground", () => {
 
     const image = tree!.root.findByType("img");
     const blur = tree!.root.findByType("WnaBlurView");
-    const views = tree!.root.findAllByType("View");
+    const views = tree!.root.findAllByType("div");
 
     expect(image.props.src).toBe("images/bg.webp");
     expect(image.props["aria-hidden"]).toBe("true");
     expect(image.props.fetchPriority).toBe("high");
     expect(image.props.loading).toBe("eager");
     expect(views[0].props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ position: "absolute" }),
-      ]),
+      expect.objectContaining({ position: "absolute" }),
     );
     expect(blur.props.style).toEqual(
       expect.objectContaining({ position: "absolute" }),

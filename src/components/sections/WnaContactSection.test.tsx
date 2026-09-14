@@ -7,7 +7,7 @@ import { testAppData } from "@/app-data/testAppData";
 import { useTranslation } from "react-i18next";
 
 jest.mock("@/state/WnaAppContext", () => ({
-  useWnaLayout: () => ({ currentWindowWidth: 390 }),
+  useWnaLayout: jest.fn(() => ({ currentWindowWidth: 390 })),
 }));
 
 jest.mock("react-i18next", () => ({
@@ -85,26 +85,21 @@ describe("WnaContactSection", () => {
 
     expect(buttons).toHaveLength(6);
     const actionContainer = testRenderer!.root
-      .findAllByType("View")
-      .find((node: ViewNode) => {
-        const style = Array.isArray(node.props.style) ? node.props.style : [];
-
-        return style.some(
-          (entry: { maxWidth?: number } | false | undefined) =>
-            entry && entry.maxWidth === 188,
-        );
-      });
+      .findAllByType("div")
+      .find(
+        (node: ViewNode) =>
+          (node.props.style as { maxWidth?: number } | undefined)?.maxWidth ===
+          188,
+      );
 
     expect(actionContainer).toBeDefined();
     expect(actionContainer!.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          flexDirection: "row",
-          flexWrap: "wrap",
-          width: "100%",
-        }),
-        expect.objectContaining({ maxWidth: 188 }),
-      ]),
+      expect.objectContaining({
+        flexDirection: "row",
+        flexWrap: "wrap",
+        width: "100%",
+        maxWidth: 188,
+      }),
     );
 
     await act(async () => {
@@ -276,5 +271,37 @@ describe("WnaContactSection", () => {
     });
 
     expect(canOpenURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_DE.pdf");
+  });
+
+  it("skips the narrow max-width constraint on wide viewports", async () => {
+    const { useWnaLayout } = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    useWnaLayout.mockReturnValueOnce({ currentWindowWidth: 900 });
+
+    let testRenderer: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      testRenderer = TestRenderer.create(
+        <WnaContactSection
+          appColors={undefined as never}
+          appData={testAppData}
+          appStyle={undefined as never}
+          t={((value: string) => value) as never}
+        />,
+      );
+    });
+
+    const actionContainer = testRenderer!.root
+      .findAllByType("div")
+      .find(
+        (node: ViewNode) =>
+          (node.props.style as { flexWrap?: string } | undefined)?.flexWrap ===
+          "wrap",
+      );
+
+    expect(
+      (actionContainer!.props.style as { maxWidth?: number }).maxWidth,
+    ).toBe(320);
   });
 });

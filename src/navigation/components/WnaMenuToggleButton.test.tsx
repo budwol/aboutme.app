@@ -1,8 +1,15 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { DrawerActions } from "@react-navigation/native";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
+
+const mockOpenDrawer = jest.fn();
+
+jest.mock("@/state/WnaAppContext", () => ({
+  useWnaAppLifecycle: () => ({
+    openDrawer: mockOpenDrawer,
+  }),
+}));
 
 jest.mock("@components/buttons/WnaButtonHeader", () => {
   const { createElement } = jest.requireActual(
@@ -16,7 +23,6 @@ jest.mock("@components/buttons/WnaButtonHeader", () => {
 
 describe("WnaMenuToggleButton", () => {
   it("updates the header text when translation output changes", () => {
-    const navigation = { dispatch: () => {} };
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -24,7 +30,6 @@ describe("WnaMenuToggleButton", () => {
         <WnaMenuToggleButton
           appColors={{ isDark: false } as never}
           appStyle={{} as never}
-          navigation={navigation}
           t={(() => "Menu") as never}
         />,
       );
@@ -35,7 +40,6 @@ describe("WnaMenuToggleButton", () => {
         <WnaMenuToggleButton
           appColors={{ isDark: false } as never}
           appStyle={{} as never}
-          navigation={navigation}
           t={(() => "Menue") as never}
         />,
       );
@@ -46,8 +50,8 @@ describe("WnaMenuToggleButton", () => {
     expect(buttonHeader.props.text).toBe("Menue");
   });
 
-  it("dispatches the drawer open action when pressed", () => {
-    const navigation = { dispatch: jest.fn() };
+  it("opens the drawer when pressed", () => {
+    mockOpenDrawer.mockClear();
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -55,7 +59,6 @@ describe("WnaMenuToggleButton", () => {
         <WnaMenuToggleButton
           appColors={{ isDark: false } as never}
           appStyle={{} as never}
-          navigation={navigation}
           t={(() => "Menu") as never}
         />,
       );
@@ -67,9 +70,6 @@ describe("WnaMenuToggleButton", () => {
       (buttonHeader.props as { onPress: () => void }).onPress();
     });
 
-    expect(navigation.dispatch).toHaveBeenCalledTimes(1);
-    expect(navigation.dispatch).toHaveBeenCalledWith(
-      DrawerActions.openDrawer(),
-    );
+    expect(mockOpenDrawer).toHaveBeenCalledTimes(1);
   });
 });

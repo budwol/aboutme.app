@@ -190,7 +190,7 @@ describe("WnaProjectDetailsRoute", () => {
         expect.any(Function),
       );
       expect(
-        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+        tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
       ).toEqual(
         expect.objectContaining({
           position: "fixed",
@@ -258,7 +258,7 @@ describe("WnaProjectDetailsRoute", () => {
 
       act(() => jest.advanceTimersByTime(16));
       expect(
-        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+        tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
       ).toEqual(expect.objectContaining({ opacity: 1 }));
 
       act(() => {
@@ -270,12 +270,12 @@ describe("WnaProjectDetailsRoute", () => {
       });
 
       expect(
-        tree!.root.findByProps({ nativeID: "private-repo-modal" }).props.style,
+        tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
       ).toEqual(expect.objectContaining({ opacity: 0, pointerEvents: "none" }));
 
       act(() => jest.runAllTimers());
       expect(
-        tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+        tree!.root.findAllByProps({ id: "private-repo-modal" }),
       ).toHaveLength(0);
     } finally {
       jest.useRealTimers();
@@ -391,7 +391,7 @@ describe("WnaProjectDetailsRoute", () => {
     const links = tree!.root.findAllByType("WnaButtonIconText");
     const techstackCard = tree!.root.findByType("WnaTechStackSection");
     const title = tree!.root.findByType("WnaSectionTitle");
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAllByType("span");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
@@ -484,7 +484,7 @@ describe("WnaProjectDetailsRoute", () => {
     expect(Linking.openURL).not.toHaveBeenCalled();
 
     const modal = tree!.root.findByProps({ role: "dialog" });
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAllByType("span");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
@@ -607,7 +607,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ id: "private-repo-modal" }),
     ).toHaveLength(0);
   });
 
@@ -641,7 +641,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -864,7 +864,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(Linking.openURL).not.toHaveBeenCalled();
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }).length,
+      tree!.root.findAllByProps({ id: "private-repo-modal" }).length,
     ).toBeGreaterThan(0);
 
     act(() => {
@@ -874,7 +874,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ id: "private-repo-modal" }),
     ).toHaveLength(0);
 
     act(() => {
@@ -882,7 +882,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }).length,
+      tree!.root.findAllByProps({ id: "private-repo-modal" }).length,
     ).toBeGreaterThan(0);
 
     const modalCloseButton = tree!.root.findByProps({
@@ -894,7 +894,7 @@ describe("WnaProjectDetailsRoute", () => {
     });
 
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ id: "private-repo-modal" }),
     ).toHaveLength(0);
 
     act(() => {
@@ -903,7 +903,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(Linking.openURL).toHaveBeenCalledWith("https://app.example.com");
     expect(
-      tree!.root.findAllByProps({ nativeID: "private-repo-modal" }),
+      tree!.root.findAllByProps({ id: "private-repo-modal" }),
     ).toHaveLength(0);
   });
 
@@ -945,7 +945,7 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(tree!.root.findAllByType("WnaButtonIcon")).toHaveLength(0);
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

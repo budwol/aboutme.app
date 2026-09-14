@@ -8,13 +8,20 @@ import {
   jest,
 } from "@jest/globals";
 import React from "react";
-import { Text } from "react-native";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 
 const mockLoggerError = jest.fn();
 const originalRequestAnimationFrame = global.requestAnimationFrame;
 let mockPathname = "/start";
+let activeTree: ReturnType<typeof TestRenderer.create> | undefined;
+
+function createTrackedTree(
+  element: React.ReactElement,
+): ReturnType<typeof TestRenderer.create> {
+  activeTree = TestRenderer.create(element);
+  return activeTree;
+}
 
 type RenderedTextNode = {
   props: {
@@ -160,6 +167,12 @@ describe("WnaApp", () => {
   });
 
   afterEach(() => {
+    if (activeTree) {
+      act(() => {
+        activeTree!.unmount();
+      });
+      activeTree = undefined;
+    }
     global.requestAnimationFrame = originalRequestAnimationFrame;
     jest.useRealTimers();
     jest.restoreAllMocks();
@@ -170,16 +183,16 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
 
     expect(tree!.root.findAllByType("SafeAreaView")).toHaveLength(0);
-    expect(tree!.root.findAllByType("Text")).toHaveLength(0);
-    expect(tree!.root.findByType("View").props.style).toEqual(
+    expect(tree!.root.findAllByType("span")).toHaveLength(0);
+    expect(tree!.root.findByType("div").props.style).toEqual(
       expect.objectContaining({ flex: 1 }),
     );
   });
@@ -194,14 +207,14 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
 
-    expect(tree!.root.findByType("View").props.style).toEqual(
+    expect(tree!.root.findByType("div").props.style).toEqual(
       expect.objectContaining({ backgroundColor: "#111" }),
     );
 
@@ -212,9 +225,9 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -235,9 +248,9 @@ describe("WnaApp", () => {
     } as Document;
 
     act(() => {
-      TestRenderer.create(
+      createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -260,7 +273,7 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={appData} theme="system">
           <></>
         </WnaApp>,
@@ -269,7 +282,7 @@ describe("WnaApp", () => {
 
     const heroField = tree!.root.findByType("WnaHeroField");
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => node.props.children);
 
     expect(heroField.props.compact).toBe(true);
@@ -277,10 +290,10 @@ describe("WnaApp", () => {
     expect(textValues).toContain(appData.profile.title.toUpperCase());
     expect(
       tree!.root
-        .findAllByType("View")
+        .findAllByType("div")
         .some(
-          (node: { props: { nativeID?: string } }) =>
-            node.props.nativeID === "wna-safe-area",
+          (node: { props: { id?: string } }) =>
+            node.props.id === "wna-safe-area",
         ),
     ).toBe(true);
   });
@@ -300,9 +313,9 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -340,9 +353,9 @@ describe("WnaApp", () => {
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -376,21 +389,13 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
           <></>
         </WnaApp>,
       );
     });
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -419,21 +424,13 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
           <></>
         </WnaApp>,
       );
     });
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -464,21 +461,20 @@ describe("WnaApp", () => {
     });
 
     const contentAfterNavigation = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
+      (node: { props: { style?: { flex?: number; opacity?: number } } }) =>
+        node.props.style?.flex === 1 &&
+        typeof node.props.style?.opacity === "number",
     );
     expect(contentAfterNavigation.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ opacity: 0 })]),
+      expect.objectContaining({ opacity: 0 }),
     );
     act(() => queuedFrames.shift()?.(0));
     act(() => queuedFrames.shift()?.(0));
 
     expect(
-      tree!.root.findByProps({ nativeID: "navigation-transition-overlay" })
-        .props.style,
-    ).toEqual(
-      expect.arrayContaining([expect.objectContaining({ opacity: 0 })]),
-    );
+      tree!.root.findByProps({ id: "navigation-transition-overlay" }).props
+        .style,
+    ).toEqual(expect.objectContaining({ opacity: 0 }));
 
     act(() => {
       jest.advanceTimersByTime(560);
@@ -498,26 +494,11 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
-    });
-
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
-
-    expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
-
-    act(() => {
-      contentView.props.onLayout({});
     });
 
     expect(tree!.root.findAllByType("WnaHeroField")).toHaveLength(1);
@@ -534,31 +515,21 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
 
     const introOverlay = tree!.root.findByProps({
-      nativeID: "wna-intro-overlay",
+      id: "wna-intro-overlay",
     });
 
     expect(introOverlay.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ backgroundColor: "#111111" }),
-      ]),
+      expect.objectContaining({ backgroundColor: "#111111" }),
     );
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -568,7 +539,7 @@ describe("WnaApp", () => {
     act(() => {
       tree!.update(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -580,20 +551,16 @@ describe("WnaApp", () => {
     );
     const transitionBackground = transitionContent.parent;
     const navigationOverlay = tree!.root.findByProps({
-      nativeID: "navigation-transition-overlay",
+      id: "navigation-transition-overlay",
     });
 
     expect(transitionBackground?.type).toBe("WnaImageBackground");
     expect(navigationOverlay?.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ zIndex: 20 }),
-        expect.objectContaining({ backgroundColor: "#111111" }),
-      ]),
-    );
-    expect(navigationOverlay?.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ pointerEvents: "auto" }),
-      ]),
+      expect.objectContaining({
+        zIndex: 20,
+        backgroundColor: "#111111",
+        pointerEvents: "auto",
+      }),
     );
     expect(transitionBackground?.props).toEqual(
       expect.objectContaining({
@@ -603,9 +570,7 @@ describe("WnaApp", () => {
         isDarkMode: true,
       }),
     );
-    expect(navigationOverlay?.props.nativeID).toBe(
-      "navigation-transition-overlay",
-    );
+    expect(navigationOverlay?.props.id).toBe("navigation-transition-overlay");
   });
 
   it("uses the active screen background image for the navigation transition", () => {
@@ -619,21 +584,13 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -643,7 +600,7 @@ describe("WnaApp", () => {
     act(() => {
       tree!.update(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -670,21 +627,13 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -694,7 +643,7 @@ describe("WnaApp", () => {
     act(() => {
       tree!.update(
         <WnaApp appData={testAppData} theme="system">
-          <Text>content</Text>
+          <></>
         </WnaApp>,
       );
     });
@@ -717,21 +666,13 @@ describe("WnaApp", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
-      tree = TestRenderer.create(
+      tree = createTrackedTree(
         <WnaApp appData={testAppData} theme="system">
           <></>
         </WnaApp>,
       );
     });
 
-    const contentView = tree!.root.find(
-      (node: { props: { onLayout?: unknown } }) =>
-        typeof node.props.onLayout === "function",
-    );
-
-    act(() => {
-      contentView.props.onLayout({});
-    });
     act(() => {
       jest.advanceTimersByTime(1320);
     });
@@ -781,20 +722,16 @@ describe("ErrorBoundary", () => {
     expect(mockLoggerError).toHaveBeenCalledWith("ErrorBoundary", error);
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: RenderedTextNode) => node.props.children);
     expect(textValues).toContain("boom");
     expect(textValues).toContain("actionRetry");
 
-    const retryButton = tree!.root.find(
-      (node: RenderedTextNode) =>
-        node.props.accessibilityRole === "button" &&
-        node.props.accessibilityLabel === "actionRetry",
-    );
-    expect(retryButton.props.accessibilityRole).toBe("button");
-    expect(retryButton.props.accessibilityLabel).toBe("actionRetry");
+    const retryButton = tree!.root.findByType("button");
+    expect(retryButton.props.type).toBe("button");
+    expect(retryButton.props["aria-label"]).toBe("actionRetry");
     act(() => {
-      retryButton.props.onPress!();
+      retryButton.props.onClick();
     });
 
     expect(retry).toHaveBeenCalledTimes(1);

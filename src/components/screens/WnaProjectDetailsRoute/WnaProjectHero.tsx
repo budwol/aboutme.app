@@ -3,8 +3,7 @@ import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import { getProjectImageForWidth } from "@components/images/wnaImageAssetResolver";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ReactNode } from "react";
-import { Text, View } from "react-native";
+import React, { CSSProperties, ReactNode } from "react";
 import type { TFunction } from "i18next";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
@@ -29,28 +28,26 @@ function WnaProjectHeroBadge({
 }: WnaProjectDetailsThemeProps & {
   subtitle: string;
 }): ReactNode {
-  return (
-    <View
-      style={[
-        styles.heroBadge,
-        {
-          backgroundColor: convertHexToRgba(appColors.staticCoolgray8, 0.8),
-          borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
-        },
-      ]}
-    >
-      <Text
-        style={[
-          appStyle.textSmall,
-          {
-            color: appColors.staticWhite,
-            lineHeight: 16,
-          },
-        ]}
-      >
-        {subtitle}
-      </Text>
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.heroBadge,
+        backgroundColor: convertHexToRgba(appColors.staticCoolgray8, 0.8),
+        borderColor: convertHexToRgba(appColors.coolgray2, 0.72),
+      } as CSSProperties,
+    },
+    React.createElement(
+      "span",
+      {
+        style: {
+          ...appStyle.textSmall,
+          color: appColors.staticWhite,
+          lineHeight: "16px",
+        } as CSSProperties,
+      },
+      subtitle,
+    ),
   );
 }
 
@@ -64,55 +61,70 @@ export default function WnaProjectHero({
   projectLinks,
   t,
 }: WnaProjectHeroProps): ReactNode {
-  return (
-    <View style={styles.heroSection}>
-      {project.subtitle && isLandscape ? (
-        <View style={styles.heroBadgeContainer}>
+  return React.createElement(
+    "div",
+    { style: styles.heroSection as CSSProperties },
+    project.subtitle && isLandscape
+      ? React.createElement(
+          "div",
+          { style: styles.heroBadgeContainer as CSSProperties },
           <WnaProjectHeroBadge
             appColors={appColors}
             appStyle={appStyle}
             subtitle={project.subtitle}
-          />
-        </View>
-      ) : null}
+          />,
+        )
+      : null,
 
-      {!isLandscape && (project.subtitle || projectLinks.length > 0) ? (
-        <View style={styles.heroBottomLeftStack}>
-          {projectLinks.length > 0 ? (
-            <View style={styles.actionSection}>
-              <View style={styles.actionLinks}>
-                {projectLinks.map((link) => (
-                  <WnaButtonIcon
-                    key={link.label}
-                    appColors={appColors}
-                    appStyle={appStyle}
-                    iconName={link.icon}
-                    toolTip={link.label}
-                    toolTipPosition="top"
-                    t={t}
-                    checkInternetConnection={false}
-                    onPress={() => onProjectLinkPress(link)}
-                  />
-                ))}
-              </View>
-            </View>
-          ) : null}
+    !isLandscape && (project.subtitle || projectLinks.length > 0)
+      ? React.createElement(
+          "div",
+          { style: styles.heroBottomLeftStack as CSSProperties },
+          projectLinks.length > 0
+            ? React.createElement(
+                "div",
+                { style: styles.actionSection as CSSProperties },
+                React.createElement(
+                  "div",
+                  { style: styles.actionLinks as CSSProperties },
+                  projectLinks.map((link) => (
+                    <WnaButtonIcon
+                      key={link.label}
+                      appColors={appColors}
+                      appStyle={appStyle}
+                      iconName={link.icon}
+                      toolTip={link.label}
+                      toolTipPosition="top"
+                      t={t}
+                      checkInternetConnection={false}
+                      onPress={() => onProjectLinkPress(link)}
+                    />
+                  )),
+                ),
+              )
+            : null,
 
-          {project.subtitle ? (
+          project.subtitle ? (
             <WnaProjectHeroBadge
               appColors={appColors}
               appStyle={appStyle}
               subtitle={project.subtitle}
             />
-          ) : null}
-        </View>
-      ) : null}
+          ) : null,
+        )
+      : null,
 
-      {projectLinks.length > 0 && isLandscape ? (
-        <View style={[styles.heroActionContainer]}>
-          <View style={styles.actionSection}>
-            <View style={styles.actionLinks}>
-              {projectLinks.map((link) =>
+    projectLinks.length > 0 && isLandscape
+      ? React.createElement(
+          "div",
+          { style: styles.heroActionContainer as CSSProperties },
+          React.createElement(
+            "div",
+            { style: styles.actionSection as CSSProperties },
+            React.createElement(
+              "div",
+              { style: styles.actionLinks as CSSProperties },
+              projectLinks.map((link) =>
                 /* istanbul ignore next -- isLandscape can't flip mid-map; the outer condition already guards this block to isLandscape === true */
                 isLandscape ? (
                   <WnaButtonIconText
@@ -137,17 +149,16 @@ export default function WnaProjectHero({
                     onPress={() => onProjectLinkPress(link)}
                   />
                 ) : null,
-              )}
-            </View>
-          </View>
-        </View>
-      ) : null}
+              ),
+            ),
+          ),
+        )
+      : null,
 
-      <WnaHeroImage
-        appColors={appColors}
-        imageUrl={`images/${getProjectImageForWidth(project, currentWindowWidth)}`}
-        imageTitle={project.title}
-      />
-    </View>
+    <WnaHeroImage
+      appColors={appColors}
+      imageUrl={`images/${getProjectImageForWidth(project, currentWindowWidth)}`}
+      imageTitle={project.title}
+    />,
   );
 }

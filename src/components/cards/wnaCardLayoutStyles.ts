@@ -11,6 +11,7 @@ export function createVerticalCardContainerStyle(
     backgroundColor: convertHexToRgba(appColors.warmgray6, 0.2),
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
     borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
     overflow: "hidden",
     opacity,

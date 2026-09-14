@@ -61,7 +61,7 @@ describe("WnaProfileHero", () => {
     });
 
     const accentBars = tree!.root.findAllByType("WnaAccentBar");
-    const texts = tree!.root.findAllByType("Text");
+    const texts = tree!.root.findAllByType("span");
     const textValues = texts.map(
       (node: { props: { children?: React.ReactNode } }) => node.props.children,
     );
@@ -122,13 +122,13 @@ describe("WnaProfileHero", () => {
     });
 
     const animatedShape = tree!.root
-      .findAllByType("View")
+      .findAllByType("div")
       .find(
-        (node: { props: { nativeID?: string } }) =>
-          node.props.nativeID === "wna-hero-shape-0",
+        (node: { props: { id?: string } }) =>
+          node.props.id === "wna-hero-shape-0",
       );
 
-    expect(animatedShape?.props.style[1]).toEqual(
+    expect(animatedShape?.props.style).toEqual(
       expect.objectContaining({
         "--wna-hero-shape-duration": "13000ms",
         "--wna-hero-shape-start-scale": expect.any(Number),
@@ -142,20 +142,20 @@ describe("WnaProfileHero", () => {
     expect(animatedShape?.props.className).toBe(
       "wna-hero-shape wna-hero-shape-swing-positive",
     );
-    expect(animatedShape?.props.style[1].animation).toBe(
+    expect(animatedShape?.props.style.animation).toBe(
       "wna-hero-shape-swing-positive 13000ms ease-in-out infinite alternate",
     );
 
     const negativeShape = tree!.root
-      .findAllByType("View")
+      .findAllByType("div")
       .find(
-        (node: { props: { nativeID?: string } }) =>
-          node.props.nativeID === "wna-hero-shape-1",
+        (node: { props: { id?: string } }) =>
+          node.props.id === "wna-hero-shape-1",
       );
     expect(negativeShape?.props.className).toBe(
       "wna-hero-shape wna-hero-shape-swing-negative",
     );
-    expect(negativeShape?.props.style[1].animation).toBe(
+    expect(negativeShape?.props.style.animation).toBe(
       "wna-hero-shape-swing-negative 13000ms ease-in-out infinite alternate",
     );
   });
@@ -188,8 +188,8 @@ describe("WnaProfileHero", () => {
       tree = TestRenderer.create(<WnaHeroField appColors={appColors} />);
     });
 
-    const shapeField = tree!.root.findByType("View" as never);
+    const shapeField = tree!.root.findAllByType("div")[0];
 
-    expect(shapeField.props.style[1]).toBe(false);
+    expect(shapeField.props.style.overflow).toBeUndefined();
   });
 });

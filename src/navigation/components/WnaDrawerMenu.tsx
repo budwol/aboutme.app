@@ -1,12 +1,12 @@
-import React, { CSSProperties, useCallback, useEffect, useMemo } from "react";
+import React, { CSSProperties, useCallback, useMemo } from "react";
 import { Linking } from "@utils/webLinking";
-import { useDrawerStatus } from "@react-navigation/drawer";
-import { Href, router, useNavigation, useSegments } from "expo-router";
+import { Href, router, useSegments } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import WnaDrawerNavigationItem from "@/navigation/components/WnaDrawerNavigationItem";
 import {
   useWnaAppData,
+  useWnaAppLifecycle,
   useWnaLayout,
   useWnaTheme,
 } from "@/state/WnaAppContext";
@@ -37,8 +37,7 @@ const logoSize = navigationLayoutConstants.drawerLogoSize;
 const headerHeight = navigationLayoutConstants.drawerHeaderHeight;
 
 export default function WnaDrawerMenu() {
-  const status = useDrawerStatus();
-  const navigation = useNavigation();
+  const { closeDrawer } = useWnaAppLifecycle();
   const { appData } = useWnaAppData();
   const { appStyle, appColors, theme, setTheme, setAppColors } = useWnaTheme();
   const { appLayout } = useWnaLayout();
@@ -103,18 +102,13 @@ export default function WnaDrawerMenu() {
     [langCode, rootRoute, t],
   );
 
-  useEffect(() => {
-    if (status === "open") {
-      navigation.setOptions({ animationEnabled: false });
-    }
-  }, [status, navigation]);
-
   const handleNavigate = useCallback(
     (targetRoute?: string, isActive?: boolean) => {
       if (!targetRoute || isActive) return;
       navigationRouter.push(targetRoute as Href);
+      closeDrawer();
     },
-    [navigationRouter],
+    [closeDrawer, navigationRouter],
   );
 
   const handleHeaderPress = useCallback(() => {
@@ -297,6 +291,7 @@ export default function WnaDrawerMenu() {
           onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault();
             navigationRouter.push(disclaimerRoute as Href);
+            closeDrawer();
           },
           style: {
             ...appStyle.textNeutralSmall,

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { DimensionValue, useWindowDimensions, View } from "react-native";
+import React, { CSSProperties, useEffect, useMemo, useState } from "react";
+import { DimensionValue, useWindowDimensions } from "react-native";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaFooterActionLink from "@components/sections/WnaFooterActionLink";
 import { i18nKeys } from "@/i18n/i18nKeys";
@@ -91,67 +91,73 @@ export default function WnaExperienceSection({
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <WnaSectionTitle
-        appColors={appColors}
-        appStyle={appStyle}
-        title={t(i18nKeys.screenTitleExperience)}
-        subtitle={(appData.experienceSubtitle ?? "").toUpperCase()}
-      />
+  return React.createElement(
+    "div",
+    { style: styles.container as CSSProperties },
+    <WnaSectionTitle
+      appColors={appColors}
+      appStyle={appStyle}
+      title={t(i18nKeys.screenTitleExperience)}
+      subtitle={(appData.experienceSubtitle ?? "").toUpperCase()}
+    />,
+    React.createElement(
+      "div",
+      {
+        style: {
+          ...styles.centerWrapper,
+          ...(isCompactLayout ? styles.centerWrapperCompact : null),
+        } as CSSProperties,
+      },
+      React.createElement(
+        "div",
+        {
+          style: {
+            ...styles.timelineWrapper,
+            width: timelineWidth,
+          } as CSSProperties,
+        },
+        React.createElement("div", {
+          style: {
+            ...styles.timelineLine,
+            left: lineLeft,
+            backgroundColor: appColors.coolgray6,
+            ...(isCompactLayout ? styles.timelineLineCompact : null),
+          } as CSSProperties,
+        }),
+        experienceItems.map((item, index) => {
+          const isExpanded = expandedIndexes.includes(index);
 
-      <View
-        style={[
-          styles.centerWrapper,
-          isCompactLayout && styles.centerWrapperCompact,
-        ]}
-      >
-        <View style={[styles.timelineWrapper, { width: timelineWidth }]}>
-          <View
-            style={[
-              styles.timelineLine,
-              {
-                left: lineLeft,
-                backgroundColor: appColors.coolgray6,
-              },
-              isCompactLayout && styles.timelineLineCompact,
-            ]}
-          />
-
-          {experienceItems.map((item, index) => {
-            const isExpanded = expandedIndexes.includes(index);
-
-            return (
-              <WnaExperienceTimelineItem
-                key={`${item.period}-${item.role}-${index}`}
-                appColors={appColors}
-                appStyle={appStyle}
-                t={t}
-                item={item}
-                index={index}
-                isCompactLayout={isCompactLayout}
-                effectiveCardWidth={effectiveCardWidth}
-                isExpanded={isExpanded}
-                showDetails={showDetails}
-                accentSurfaceColor={accentSurfaceColor}
-                accentBorderColor={accentBorderColor}
-                onToggleDetails={toggleExperienceDetails}
-              />
-            );
-          })}
-        </View>
-      </View>
-
-      {footerActionLabel && onFooterActionPress ? (
-        <View style={styles.footerActionRow}>
+          return (
+            <WnaExperienceTimelineItem
+              key={`${item.period}-${item.role}-${index}`}
+              appColors={appColors}
+              appStyle={appStyle}
+              t={t}
+              item={item}
+              index={index}
+              isCompactLayout={isCompactLayout}
+              effectiveCardWidth={effectiveCardWidth}
+              isExpanded={isExpanded}
+              showDetails={showDetails}
+              accentSurfaceColor={accentSurfaceColor}
+              accentBorderColor={accentBorderColor}
+              onToggleDetails={toggleExperienceDetails}
+            />
+          );
+        }),
+      ),
+    ),
+    footerActionLabel && onFooterActionPress
+      ? React.createElement(
+          "div",
+          { style: styles.footerActionRow as CSSProperties },
           <WnaFooterActionLink
             appColors={appColors}
             appStyle={appStyle}
             label={footerActionLabel}
             onPress={onFooterActionPress}
-          />
-        </View>
-      ) : null}
-    </View>
+          />,
+        )
+      : null,
   );
 }

@@ -140,7 +140,7 @@ describe("WnaProjectsRoute integration", () => {
     const tree = await renderWithAppContext(<WnaProjectsRoute />);
 
     const textValues = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -186,7 +186,7 @@ describe("WnaProjectsRoute integration", () => {
     });
 
     const textValues = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

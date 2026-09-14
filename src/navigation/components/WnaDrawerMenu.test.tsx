@@ -11,11 +11,10 @@ import {
 const mockHeaderButtonHeight = appLayoutConstants.headerButtonHeight;
 const mockGlobalCornerRadius = appLayoutConstants.globalCornerRadius;
 
-const mockSetOptions = jest.fn();
 const mockPush = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
-let mockDrawerStatus = "closed";
+const mockCloseDrawer = jest.fn();
 let mockSegments: string[] = ["(drawer)", "(tabs-de)"];
 
 type DrawerItemNode = {
@@ -47,6 +46,9 @@ jest.mock("@/state/WnaAppContext", () => ({
         title: "Software Engineer",
       },
     },
+  }),
+  useWnaAppLifecycle: () => ({
+    closeDrawer: mockCloseDrawer,
   }),
   useWnaLayout: jest.fn(() => ({
     appLayout: {
@@ -114,15 +116,8 @@ const mockShowWnaToast = (
   }
 ).showWnaToast;
 
-jest.mock("@react-navigation/drawer", () => ({
-  useDrawerStatus: () => mockDrawerStatus,
-}));
-
 jest.mock("expo-router", () => ({
   router: {},
-  useNavigation: () => ({
-    setOptions: mockSetOptions,
-  }),
   useSegments: () => mockSegments,
 }));
 
@@ -206,11 +201,10 @@ jest.mock("@/navigation/components/WnaDrawerNavigationItem", () => {
 describe("WnaDrawerMenu", () => {
   beforeEach(() => {
     mockPush.mockClear();
-    mockSetOptions.mockClear();
     mockSetTheme.mockClear();
     mockSetAppColors.mockClear();
     mockShowWnaToast.mockClear();
-    mockDrawerStatus = "closed";
+    mockCloseDrawer.mockClear();
     mockSegments = ["(drawer)", "(tabs-de)"];
   });
 
@@ -228,9 +222,10 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).not.toHaveBeenCalled();
+    expect(mockCloseDrawer).not.toHaveBeenCalled();
   });
 
-  it("navigates to the root route when the header is pressed outside the home route", async () => {
+  it("navigates to the root route and closes the drawer when the header is pressed outside the home route", async () => {
     mockSegments = ["(drawer)", "experience"];
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -245,6 +240,7 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)");
+    expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 
   it("marks the profile entry as active on the initial home route", async () => {
@@ -317,17 +313,7 @@ describe("WnaDrawerMenu", () => {
     );
   });
 
-  it("disables drawer animation when the drawer is open", async () => {
-    mockDrawerStatus = "open";
-
-    await act(async () => {
-      TestRenderer.create(<WnaDrawerMenu />);
-    });
-
-    expect(mockSetOptions).toHaveBeenCalledWith({ animationEnabled: false });
-  });
-
-  it("navigates when an inactive drawer item is pressed", async () => {
+  it("navigates and closes the drawer when an inactive drawer item is pressed", async () => {
     mockSegments = ["(drawer)", "experience"];
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -345,6 +331,7 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/projekte");
+    expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 
   it("renders the footer copyright with the profile name from app data", async () => {
@@ -379,6 +366,7 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/menu/impressum");
+    expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 
   it("renders a theme button in the drawer footer and toggles the theme", async () => {
@@ -466,6 +454,7 @@ describe("WnaDrawerMenu", () => {
     });
 
     expect(mockPush).not.toHaveBeenCalled();
+    expect(mockCloseDrawer).not.toHaveBeenCalled();
   });
 
   it("uses dark-mode colors and falls back to default layout values", async () => {

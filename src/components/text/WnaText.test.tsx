@@ -38,21 +38,21 @@ describe("WnaText", () => {
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const text = tree!.root.findByType("span");
 
     expect(text.props.children).toBe("Hello World");
-    expect(text.props.numberOfLines).toBe(0);
-    expect(text.props.ellipsizeMode).toBe("clip");
-    expect(text.props.textBreakStrategy).toBe("simple");
     expect(text.props.style).toEqual(
-      expect.arrayContaining([
-        { fontSize: 13, lineHeight: 18 },
-        { color: "#111111" },
-      ]),
+      expect.objectContaining({
+        fontSize: 13,
+        lineHeight: 18,
+        color: "#111111",
+      }),
     );
+    expect(text.props.style.whiteSpace).toBeUndefined();
+    expect(text.props.style.WebkitLineClamp).toBeUndefined();
   });
 
-  it("can force html stripping while rendering as text", () => {
+  it("can force html stripping while rendering as text and clamps to the requested line count", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -63,19 +63,66 @@ describe("WnaText", () => {
           text={"Hello <strong>World</strong>"}
           showHtml={false}
           numberOfLines={2}
-          ellipseMode="tail"
-          textBreakStrategy="balanced"
           style={{ fontSize: 15 }}
         />,
       );
     });
 
-    const text = tree!.root.findByType("Text");
+    const text = tree!.root.findByType("span");
 
     expect(text.props.children).toBe("Hello World");
-    expect(text.props.numberOfLines).toBe(2);
-    expect(text.props.ellipsizeMode).toBe("tail");
-    expect(text.props.textBreakStrategy).toBe("balanced");
+    expect(text.props.style).toEqual(
+      expect.objectContaining({
+        fontSize: 15,
+        WebkitLineClamp: 2,
+        display: "-webkit-box",
+      }),
+    );
+  });
+
+  it("flattens an array style into a single merged style object", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaText
+          appColors={appColors}
+          appStyle={appStyle}
+          text="Hello"
+          style={[{ fontSize: 15 }, { fontWeight: "700" }]}
+        />,
+      );
+    });
+
+    const text = tree!.root.findByType("span");
+
+    expect(text.props.style).toEqual(
+      expect.objectContaining({ fontSize: 15, fontWeight: "700" }),
+    );
+  });
+
+  it("uses single-line ellipsis truncation when numberOfLines is 1", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaText
+          appColors={appColors}
+          appStyle={appStyle}
+          text="Single line"
+          numberOfLines={1}
+        />,
+      );
+    });
+
+    const text = tree!.root.findByType("span");
+
+    expect(text.props.style).toEqual(
+      expect.objectContaining({
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+      }),
+    );
   });
 
   it("renders html through the html renderer with explicit display props", () => {
@@ -124,7 +171,7 @@ describe("WnaText", () => {
       );
     });
 
-    expect(tree!.root.findByType("Text").props.children).toBe("Stable");
+    expect(tree!.root.findByType("span").props.children).toBe("Stable");
 
     act(() => {
       tree!.update(
@@ -136,6 +183,6 @@ describe("WnaText", () => {
       );
     });
 
-    expect(tree!.root.findByType("Text").props.children).toBe("Changed");
+    expect(tree!.root.findByType("span").props.children).toBe("Changed");
   });
 });

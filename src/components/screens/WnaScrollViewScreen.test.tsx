@@ -28,10 +28,12 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+const mockOnScroll = jest.fn();
+
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
     scrollY: 0,
-    onScroll: () => undefined,
+    onScroll: (event: unknown) => mockOnScroll(event),
   }),
 }));
 
@@ -110,5 +112,34 @@ describe("WnaScrollViewScreen", () => {
     expect(baseScreen.props.backgroundImageUrl).toBe(
       "/project-background.webp",
     );
+  });
+
+  it("adapts the DOM scroll event into the shared hook's expected shape", () => {
+    mockOnScroll.mockClear();
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaScrollViewScreen headerTitle="Page">
+          <></>
+        </WnaScrollViewScreen>,
+      );
+    });
+
+    const scrollContainer = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
+
+    act(() => {
+      scrollContainer.props.onScroll!({
+        currentTarget: { scrollTop: 123 },
+      } as never);
+    });
+
+    expect(mockOnScroll).toHaveBeenCalledWith({
+      nativeEvent: { contentOffset: { y: 123 } },
+    });
   });
 });

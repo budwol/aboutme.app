@@ -8,8 +8,8 @@ import { sectionConstants } from "@constants/sectionConstants";
 import Colors from "@constants/theme/colors";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
-import { useEffect, useRef } from "react";
+import { lineClampStyle } from "@utils/lineClampStyle";
+import React, { CSSProperties, useEffect, useRef } from "react";
 
 type WebStyleTarget = {
   style?: {
@@ -294,7 +294,7 @@ function WnaHeroShape({
   index: number;
   appColors: Colors;
 }) {
-  const shapeRef = useRef<View>(null);
+  const shapeRef = useRef<HTMLDivElement>(null);
   const startScale = shape.swing === 1 ? 0.96 : 1.04;
   const endScale = shape.swing === 1 ? 1.04 : 0.96;
   const startOpacity = shape.swing === 1 ? 0.5 : 0.8;
@@ -322,16 +322,15 @@ function WnaHeroShape({
         animation: `wna-hero-shape-swing-${
           shape.swing === 1 ? "positive" : "negative"
         } ${sectionConstants.heroFieldMotionDuration}ms ease-in-out infinite alternate`,
-      } as ViewStyle)
-    : {
+      } as CSSProperties)
+    : ({
         opacity: 1,
-        transform: [{ rotate: `${shape.rotate}deg` }],
-      };
+        transform: `rotate(${shape.rotate}deg)`,
+      } as CSSProperties);
 
   useEffect(() => {
     if (!shape.animated) return;
 
-    const target = shapeRef.current as unknown as WebStyleTarget | null;
     const variables = {
       "--wna-hero-shape-duration": `${sectionConstants.heroFieldMotionDuration}ms`,
       "--wna-hero-shape-start-scale": String(startScale),
@@ -346,7 +345,7 @@ function WnaHeroShape({
       "--wna-hero-shape-end-y": `${endTranslateY}px`,
     };
 
-    applyHeroShapeWebStyles(target, variables);
+    applyHeroShapeWebStyles(shapeRef.current, variables);
   }, [
     endOpacity,
     endScale,
@@ -361,45 +360,42 @@ function WnaHeroShape({
     startRotate,
   ]);
 
-  return (
-    <View
-      ref={shapeRef}
-      nativeID={shape.animated ? `wna-hero-shape-${index}` : undefined}
-      {...(shape.animated
-        ? {
-            className: `wna-hero-shape wna-hero-shape-swing-${
-              shape.swing === 1 ? "positive" : "negative"
-            }`,
-          }
-        : {})}
-      style={[
-        {
-          position: "absolute",
-          top: shape.top,
-          right: shape.right,
-          bottom: shape.bottom,
-          left: shape.left,
-          width: shape.width,
-          height: shape.height,
-          borderRadius: shape.radius,
-          borderWidth: 1,
-          borderColor: convertHexToRgba(
-            shape.accent ? appColors.accent5 : appColors.coolgray2,
-            shape.borderColorOpacity,
-          ),
-          backgroundColor: convertHexToRgba(
-            shape.white
-              ? appColors.white
-              : shape.accent
-                ? appColors.accent5
-                : appColors.warmgray6,
-            shape.backgroundOpacity,
-          ),
-        },
-        animatedStyle,
-      ]}
-    />
-  );
+  return React.createElement("div", {
+    ref: shapeRef,
+    id: shape.animated ? `wna-hero-shape-${index}` : undefined,
+    ...(shape.animated
+      ? {
+          className: `wna-hero-shape wna-hero-shape-swing-${
+            shape.swing === 1 ? "positive" : "negative"
+          }`,
+        }
+      : {}),
+    style: {
+      position: "absolute",
+      top: shape.top,
+      right: shape.right,
+      bottom: shape.bottom,
+      left: shape.left,
+      width: shape.width,
+      height: shape.height,
+      borderRadius: shape.radius,
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: convertHexToRgba(
+        shape.accent ? appColors.accent5 : appColors.coolgray2,
+        shape.borderColorOpacity,
+      ),
+      backgroundColor: convertHexToRgba(
+        shape.white
+          ? appColors.white
+          : shape.accent
+            ? appColors.accent5
+            : appColors.warmgray6,
+        shape.backgroundOpacity,
+      ),
+      ...animatedStyle,
+    } as CSSProperties,
+  });
 }
 
 type WnaProfileHeroProps = Pick<
@@ -414,17 +410,22 @@ export function WnaHeroField({
   appColors,
   compact = false,
 }: Pick<WnaSectionProps, "appColors"> & { compact?: boolean }) {
-  return (
-    <View style={[styles.shapeField, compact && styles.shapeFieldCompact]}>
-      {heroShapes.map((shape, index) => (
-        <WnaHeroShape
-          key={`hero-shape-${index}`}
-          shape={shape}
-          index={index}
-          appColors={appColors}
-        />
-      ))}
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.shapeField,
+        ...(compact ? styles.shapeFieldCompact : {}),
+      } as CSSProperties,
+    },
+    heroShapes.map((shape, index) => (
+      <WnaHeroShape
+        key={`hero-shape-${index}`}
+        shape={shape}
+        index={index}
+        appColors={appColors}
+      />
+    )),
   );
 }
 
@@ -440,121 +441,131 @@ export default function WnaProfileHero({
     : sectionConstants.heroAvatarSize;
   const avatarSources = getAvatarImageSources(appData.profile.avatar);
 
-  return (
-    <View
-      style={[
-        styles.heroCard,
-        {
-          backgroundColor: convertHexToRgba(appColors.warmgray6, 0.08),
-          borderColor: convertHexToRgba(appColors.coolgray2, 0.52),
-        },
-        compact && styles.heroCardCompact,
-      ]}
-    >
-      <WnaHeroField appColors={appColors} compact={compact} />
-
-      <View
-        style={[
-          styles.avatarWrap,
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.heroCard,
+        backgroundColor: convertHexToRgba(appColors.warmgray6, 0.08),
+        borderColor: convertHexToRgba(appColors.coolgray2, 0.52),
+        ...(compact ? styles.heroCardCompact : {}),
+      } as CSSProperties,
+    },
+    <WnaHeroField appColors={appColors} compact={compact} />,
+    React.createElement(
+      "div",
+      {
+        style: {
+          ...styles.avatarWrap,
+          height: avatarSize,
+          marginTop: compact ? 0 : sectionConstants.heroAvatarMarginTop,
+        } as CSSProperties,
+      },
+      <WnaImage
+        appColors={appColors}
+        imageUrl={`images/${appData.profile.avatar}`}
+        imageTitle={imageTitle}
+        sources={avatarSources}
+        priority={compact ? "normal" : "high"}
+        responsivePolicy="static"
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+          backgroundColor: appColors.white,
+          borderWidth: 1,
+          borderStyle: "solid",
+          borderColor: appColors.coolgray2,
+        }}
+      />,
+    ),
+    compact ? (
+      React.createElement(
+        "div",
+        { style: styles.compactCopy },
+        React.createElement(
+          "span",
           {
-            height: avatarSize,
-            marginTop: compact ? 0 : sectionConstants.heroAvatarMarginTop,
+            style: {
+              ...styles.compactTitle,
+              color: appColors.coolgray8,
+              fontFamily: appStyle.textExtraLarge.fontFamily,
+              ...lineClampStyle(1),
+            } as CSSProperties,
           },
-        ]}
-      >
-        <WnaImage
+          appData.profile.name,
+        ),
+        <WnaAccentBar
           appColors={appColors}
-          imageUrl={`images/${appData.profile.avatar}`}
-          imageTitle={imageTitle}
-          sources={avatarSources}
-          priority={compact ? "normal" : "high"}
-          responsivePolicy="static"
-          style={{
-            width: avatarSize,
-            height: avatarSize,
-            borderRadius: avatarSize / 2,
-            backgroundColor: appColors.white,
-            borderWidth: 1,
-            borderColor: appColors.coolgray2,
-          }}
-        />
-      </View>
-
-      {compact ? (
-        <View style={styles.compactCopy}>
-          <Text
-            style={[
-              styles.compactTitle,
-              {
-                color: appColors.coolgray8,
-                fontFamily: appStyle.textExtraLarge.fontFamily,
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {appData.profile.name}
-          </Text>
-          <WnaAccentBar
-            appColors={appColors}
-            width={sectionConstants.heroAccentBarWidth}
-            pulseToWidth={sectionConstants.heroAccentBarPulseWidth}
-            pulseDuration={sectionConstants.heroAccentBarPulseDuration}
-          />
-          <Text
-            style={[
-              styles.compactSubtitle,
-              {
-                color: appColors.coolgray6,
-                fontFamily: appStyle.textMicro.fontFamily,
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {appData.profile.title.toUpperCase()}
-          </Text>
-        </View>
-      ) : (
-        <WnaSectionTitle
-          appColors={appColors}
-          appStyle={appStyle}
-          title={appData.profile.name}
-          subtitle={appData.profile.title.toUpperCase()}
-          showAccentBar
-          accentBarWidth={sectionConstants.heroAccentBarWidth}
-          accentBarPulseToWidth={sectionConstants.heroAccentBarPulseWidth}
-          accentBarPulseDuration={sectionConstants.heroAccentBarPulseDuration}
-        />
-      )}
-    </View>
+          width={sectionConstants.heroAccentBarWidth}
+          pulseToWidth={sectionConstants.heroAccentBarPulseWidth}
+          pulseDuration={sectionConstants.heroAccentBarPulseDuration}
+        />,
+        React.createElement(
+          "span",
+          {
+            style: {
+              ...styles.compactSubtitle,
+              color: appColors.coolgray6,
+              fontFamily: appStyle.textMicro.fontFamily,
+              ...lineClampStyle(1),
+            } as CSSProperties,
+          },
+          appData.profile.title.toUpperCase(),
+        ),
+      )
+    ) : (
+      <WnaSectionTitle
+        appColors={appColors}
+        appStyle={appStyle}
+        title={appData.profile.name}
+        subtitle={appData.profile.title.toUpperCase()}
+        showAccentBar
+        accentBarWidth={sectionConstants.heroAccentBarWidth}
+        accentBarPulseToWidth={sectionConstants.heroAccentBarPulseWidth}
+        accentBarPulseDuration={sectionConstants.heroAccentBarPulseDuration}
+      />
+    ),
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   shapeField: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   shapeFieldCompact: {
     overflow: "hidden",
   },
   heroCard: {
+    display: "flex",
+    flexDirection: "column",
     position: "relative",
     overflow: "hidden",
     gap: 16,
     padding: 18,
     borderRadius: appLayoutConstants.globalCornerRadius,
     borderWidth: 1,
+    borderStyle: "solid",
   },
   heroCardCompact: {
     width: 320,
     maxWidth: "86%",
-    paddingVertical: 20,
-    paddingHorizontal: 18,
+    paddingBlock: 20,
+    paddingInline: 18,
     gap: 14,
   },
   avatarWrap: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
   },
   compactCopy: {
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
     gap: 6,
   },
@@ -569,4 +580,4 @@ const styles = StyleSheet.create({
     letterSpacing: 2.2,
     textAlign: "center",
   },
-});
+} satisfies Record<string, CSSProperties>;

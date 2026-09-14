@@ -102,11 +102,11 @@ describe("WnaMultilineHeader", () => {
   ) {
     return tree.root.find(
       (node: HeaderViewNode) =>
-        node.type === "View" &&
+        node.type === "div" &&
         node.props.style?.height === 64 &&
         node.props.style?.paddingLeft !== undefined &&
         node
-          .findAllByType("Text")
+          .findAllByType("span")
           .some(
             (textNode: HeaderTextNode) =>
               textNode.props.children === "Projekt App",
@@ -133,7 +133,7 @@ describe("WnaMultilineHeader", () => {
   it("splits pipe-separated titles into main and subtitle", () => {
     const tree = renderSplitHeader();
     const textValues = tree.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map((node: HeaderTextNode) => node.props.children);
 
     expect(textValues).toEqual(["Main", "Sub"]);
@@ -177,13 +177,13 @@ describe("WnaMultilineHeader", () => {
 
     const titleWrapper = findSingleLineTitleWrapper(tree!);
     const titleText = titleWrapper
-      .findAllByType("Text")
+      .findAllByType("span")
       .find(
         (node: HeaderTextNode) => node.props.children === "Projekt App",
-      ) as unknown as { props: { style: unknown[] } };
+      ) as unknown as { props: { style: { fontSize?: number } } };
 
     expect(titleText.props.style).toEqual(
-      expect.arrayContaining([{ fontSize: 20 }]),
+      expect.objectContaining({ fontSize: 20 }),
     );
   });
 });

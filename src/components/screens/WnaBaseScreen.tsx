@@ -10,9 +10,8 @@ import { WnaHeader } from "@components/chrome/WnaHeader";
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
 import { Href } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { FC, ReactNode, memo, useCallback } from "react";
+import React, { CSSProperties, FC, ReactNode, memo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
 import WnaImageBackground from "@components/images/WnaImageBackground";
 
 export type WnaBaseScreenProps = {
@@ -128,33 +127,31 @@ const WnaBusyOverlay = memo(
       return null;
     }
 
-    return (
-      <View
-        nativeID="wna-busy-overlay"
-        style={[
-          styles.busyOverlay,
+    return React.createElement(
+      "div",
+      {
+        id: "wna-busy-overlay",
+        style: {
+          ...styles.busyOverlay,
+          opacity: isBusy ? 1 : 0,
+          backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
+          pointerEvents: isBusy ? "auto" : "none",
+          transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
+        } as CSSProperties,
+      },
+      <WnaActivityIndicator appColors={appColors} />,
+      Boolean(isBusyText) &&
+        React.createElement(
+          "span",
           {
-            opacity: isBusy ? 1 : 0,
-            backgroundColor: convertHexToRgba(appColors.staticBlack, 0.7),
-            pointerEvents: isBusy ? "auto" : "none",
-            transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
-          } as never,
-        ]}
-      >
-        <WnaActivityIndicator appColors={appColors} />
-
-        {Boolean(isBusyText) && (
-          <Text
-            style={[
-              appStyle.textTitleLarge,
-              styles.busyText,
-              { color: appColors.black },
-            ]}
-          >
-            {isBusyText}
-          </Text>
-        )}
-      </View>
+            style: {
+              ...appStyle.textTitleLarge,
+              ...styles.busyText,
+              color: appColors.black,
+            } as CSSProperties,
+          },
+          isBusyText,
+        ),
     );
   },
 );
@@ -218,9 +215,10 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
         appColors={appColors}
         isDarkMode={appColors.isDark}
       >
-        <View style={styles.container}>
-          <View style={styles.content}>{children}</View>
-
+        {React.createElement(
+          "div",
+          { style: styles.container },
+          React.createElement("div", { style: styles.content }, children),
           <WnaBaseScreenChrome
             appColors={appColors}
             appStyle={appStyle}
@@ -240,32 +238,41 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
             showHeaderShadow={showHeaderShadow}
             onTitlePress={onTitlePress}
             t={t}
-          />
-
+          />,
           <WnaBusyOverlay
             appColors={appColors}
             appStyle={appStyle}
             isBusy={isBusy}
             isBusyText={isBusyText}
-          />
-        </View>
+          />,
+        )}
       </WnaImageBackground>
     </WnaWebBaseScreen>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     alignContent: "stretch",
     overflow: "hidden",
   },
   content: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     alignContent: "stretch",
   },
   busyOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    display: "flex",
+    flexDirection: "column",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     alignItems: "center",
     justifyContent: "center",
     gap: 16,
@@ -274,6 +281,6 @@ const styles = StyleSheet.create({
     margin: 16,
     textAlign: "center",
   },
-});
+} satisfies Record<string, CSSProperties>;
 
 export default memo(WnaBaseScreen);

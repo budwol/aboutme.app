@@ -30,5 +30,6 @@ export function getCardBorderStyle(appColors: Colors): CSSProperties {
   return {
     borderColor: convertHexToRgba(appColors.coolgray2, 0.5),
     borderWidth: 1,
+    borderStyle: "solid",
   };
 }

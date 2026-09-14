@@ -4,8 +4,7 @@ import { cleanAndTruncate } from "@utils/cleanAndTruncate";
 import { getVersionedLocalAssetUrl } from "@/utils/versionedAssetUrl";
 import WnaActivityIndicator from "@components/feedback/WnaActivityIndicator";
 import Colors from "@constants/theme/colors";
-import { memo, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { CSSProperties, memo, useMemo } from "react";
 import WnaImageElement from "@components/images/WnaImageElement/WnaImageElement";
 import {
   WnaImageSource,
@@ -163,29 +162,35 @@ function WnaImage(props: WnaImageProps) {
     [props.hideBackground],
   );
 
-  return (
-    <View style={[styles.wrapper, wrapperBackgroundStyle, props.style]}>
-      {props.showActivityIndicator ? (
-        <WnaActivityIndicator
-          appColors={props.appColors}
-          style={styles.overlay}
-        />
-      ) : null}
-      {needsToShowActivityIndicator ? null : (
-        <WnaImageElement
-          appColors={props.appColors}
-          style={props.style}
-          imageUrl={displayImageUrl}
-          source={normalizedSources ?? displayImageUrl}
-          altText={altText}
-          grayScale={props.grayScale}
-          contentFit={contentFit}
-          overwriteAnimationSpeed={props.overwriteAnimationSpeed}
-          priority={props.priority}
-          responsivePolicy={props.responsivePolicy}
-        />
-      )}
-    </View>
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...styles.wrapper,
+        ...wrapperBackgroundStyle,
+        ...flattenStyle(props.style),
+      } as CSSProperties,
+    },
+    props.showActivityIndicator ? (
+      <WnaActivityIndicator
+        appColors={props.appColors}
+        style={styles.overlay}
+      />
+    ) : null,
+    needsToShowActivityIndicator ? null : (
+      <WnaImageElement
+        appColors={props.appColors}
+        style={props.style}
+        imageUrl={displayImageUrl}
+        source={normalizedSources ?? displayImageUrl}
+        altText={altText}
+        grayScale={props.grayScale}
+        contentFit={contentFit}
+        overwriteAnimationSpeed={props.overwriteAnimationSpeed}
+        priority={props.priority}
+        responsivePolicy={props.responsivePolicy}
+      />
+    ),
   );
 }
 
@@ -194,8 +199,20 @@ export default memo(
   (prevProps, nextProps) => !shouldRenderImage(prevProps, nextProps),
 );
 
-const styles = StyleSheet.create({
+function flattenStyle(style: WnaImageStyle): CSSProperties {
+  if (!Array.isArray(style)) return (style || {}) as CSSProperties;
+  return style.reduce<CSSProperties>(
+    (result, entry) => Object.assign(result, flattenStyle(entry)),
+    {},
+  );
+}
+
+const styles = {
   wrapper: {
+    // React Native Views are implicitly `position: relative`; a DOM `div`
+    // is `static` by default. `overlay` below is `position: absolute` and
+    // needs this as its containing block.
+    position: "relative",
     overflow: "hidden",
   },
   overlay: {
@@ -205,4 +222,4 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
   },
-});
+} satisfies Record<string, CSSProperties>;

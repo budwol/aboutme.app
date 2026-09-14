@@ -27,7 +27,9 @@ function renderHomeRoute(flushDeferredSections = false) {
   let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
   act(() => {
-    tree = TestRenderer.create(<WnaHomeRoute />);
+    tree = TestRenderer.create(<WnaHomeRoute />, {
+      createNodeMock: () => ({ scrollTo: mockScrollTo }),
+    });
   });
 
   if (flushDeferredSections) {
@@ -113,10 +115,12 @@ jest.mock("@components/screens/WnaBaseScreen", () => {
   };
 });
 
+const mockOnScroll = jest.fn();
+
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
     scrollY: { value: 0 },
-    onScroll: () => undefined,
+    onScroll: (event: unknown) => mockOnScroll(event),
   }),
 }));
 
@@ -169,28 +173,6 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
       "WnaContactFooter",
       props as Record<string, unknown>,
     );
-  };
-});
-
-jest.mock("react-native", () => {
-  const ReactModule = require("react") as typeof import("react");
-  const actual = jest.requireActual(
-    "react-native",
-  ) as typeof import("react-native");
-
-  return {
-    StyleSheet: actual.StyleSheet,
-    View: actual.View,
-    ScrollView: ReactModule.forwardRef((props: unknown, ref: unknown) => {
-      if (ref && typeof ref === "object") {
-        (ref as { current?: unknown }).current = { scrollTo: mockScrollTo };
-      }
-
-      return ReactModule.createElement(
-        "ScrollView",
-        props as Record<string, unknown>,
-      );
-    }),
   };
 });
 
@@ -259,8 +241,27 @@ describe("WnaHomeRoute", () => {
       baseScreen.props.onTitlePress();
     });
 
-    expect(mockScrollTo).toHaveBeenCalledWith({ y: 0, animated: true });
+    expect(mockScrollTo).toHaveBeenCalledWith({ top: 0, behavior: "smooth" });
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it("adapts the DOM scroll event into the shared hook's expected shape", () => {
+    mockOnScroll.mockClear();
+    const tree = renderHomeRoute();
+    const scrollContainer = tree.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
+
+    act(() => {
+      scrollContainer.props.onScroll!({
+        currentTarget: { scrollTop: 123 },
+      } as never);
+    });
+
+    expect(mockOnScroll).toHaveBeenCalledWith({
+      nativeEvent: { contentOffset: { y: 123 } },
+    });
   });
 
   it("defer-mounts the lower home sections until after the first paint", () => {

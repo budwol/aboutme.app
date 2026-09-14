@@ -2,44 +2,43 @@ import { appLayoutConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import { FontFamilies } from "@constants/theme/fontFamilies";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { StyleSheet } from "react-native";
-import { TextStyle, ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
 export default interface AppStyle {
-  containerCenterMaxWidth: ViewStyle;
-  containerMaxWidth: ViewStyle;
-  containerCenter: ViewStyle;
-  containerCenterCenter: ViewStyle;
-  containerFillPage: ViewStyle;
-  containerFillPageMaxWidth: ViewStyle;
-  containerForInputCenterCenter: ViewStyle;
-  containerForInputTopCenter: ViewStyle;
-  navigationHeaderTitleStyle: ViewStyle;
-  tabBarBadgeStyle: ViewStyle;
-  tabBarStyle: ViewStyle;
-  buttonWithText: ViewStyle;
-  separator: ViewStyle;
-  textExtraLarge: TextStyle;
-  textLarge: TextStyle;
-  textMedium: TextStyle;
-  textSmall: TextStyle;
-  textMicro: TextStyle;
-  textNeutralExtraLarge: TextStyle;
-  textNeutralLarge: TextStyle;
-  textNeutralMedium: TextStyle;
-  textNeutralSmall: TextStyle;
-  textNeutralMicro: TextStyle;
-  textNeutralLabel: TextStyle;
-  textTitleLarge: TextStyle;
-  textNeutralTitleLarge: TextStyle;
-  textNeutralSubtitle: TextStyle;
-  textInput: TextStyle;
+  containerCenterMaxWidth: CSSProperties;
+  containerMaxWidth: CSSProperties;
+  containerCenter: CSSProperties;
+  containerCenterCenter: CSSProperties;
+  containerFillPage: CSSProperties;
+  containerFillPageMaxWidth: CSSProperties;
+  containerForInputCenterCenter: CSSProperties;
+  containerForInputTopCenter: CSSProperties;
+  navigationHeaderTitleStyle: CSSProperties;
+  tabBarBadgeStyle: CSSProperties;
+  tabBarStyle: CSSProperties;
+  buttonWithText: CSSProperties;
+  separator: CSSProperties;
+  textExtraLarge: CSSProperties;
+  textLarge: CSSProperties;
+  textMedium: CSSProperties;
+  textSmall: CSSProperties;
+  textMicro: CSSProperties;
+  textNeutralExtraLarge: CSSProperties;
+  textNeutralLarge: CSSProperties;
+  textNeutralMedium: CSSProperties;
+  textNeutralSmall: CSSProperties;
+  textNeutralMicro: CSSProperties;
+  textNeutralLabel: CSSProperties;
+  textTitleLarge: CSSProperties;
+  textNeutralTitleLarge: CSSProperties;
+  textNeutralSubtitle: CSSProperties;
+  textInput: CSSProperties;
   separatorHorizontal: object;
   maxWidth: object;
 }
 
 const setAppStyle = (colors: Colors) => {
-  const style = StyleSheet.create({
+  const style = {
     maxWidth: {
       maxWidth: appLayoutConstants.maxContentWidth,
       width: "100%",
@@ -145,7 +144,7 @@ const setAppStyle = (colors: Colors) => {
 
     textExtraLarge: {
       fontSize: 24,
-      lineHeight: 30,
+      lineHeight: "30px",
       fontFamily: FontFamilies.UI,
       fontWeight: "600",
       color: colors.black,
@@ -153,7 +152,7 @@ const setAppStyle = (colors: Colors) => {
 
     textLarge: {
       fontSize: 18,
-      lineHeight: 24,
+      lineHeight: "24px",
       fontFamily: FontFamilies.UI,
       fontWeight: "600",
       color: colors.black,
@@ -161,7 +160,7 @@ const setAppStyle = (colors: Colors) => {
 
     textMedium: {
       fontSize: 16,
-      lineHeight: 22,
+      lineHeight: "22px",
       fontFamily: FontFamilies.UI,
       fontWeight: "600",
       color: colors.black,
@@ -169,7 +168,7 @@ const setAppStyle = (colors: Colors) => {
 
     textSmall: {
       fontSize: 14,
-      lineHeight: 18,
+      lineHeight: "18px",
       fontFamily: FontFamilies.UI,
       fontWeight: "600",
       color: colors.black,
@@ -177,7 +176,7 @@ const setAppStyle = (colors: Colors) => {
 
     textMicro: {
       fontSize: 12,
-      lineHeight: 16,
+      lineHeight: "16px",
       fontFamily: FontFamilies.UI,
       fontWeight: "500",
       color: colors.black,
@@ -185,7 +184,7 @@ const setAppStyle = (colors: Colors) => {
 
     textNeutralExtraLarge: {
       fontSize: 24,
-      lineHeight: 30,
+      lineHeight: "30px",
       fontFamily: FontFamilies.UI,
       fontWeight: "500",
       color: colors.black,
@@ -194,7 +193,7 @@ const setAppStyle = (colors: Colors) => {
     textNeutralLarge: {
       fontSize: 18,
       fontWeight: "500",
-      lineHeight: 24,
+      lineHeight: "24px",
       fontFamily: FontFamilies.UI,
       color: colors.black,
     },
@@ -202,7 +201,7 @@ const setAppStyle = (colors: Colors) => {
     textNeutralMedium: {
       fontSize: 15,
       fontWeight: "400",
-      lineHeight: 22,
+      lineHeight: "22px",
       fontFamily: FontFamilies.UI,
       color: colors.coolgray8,
     },
@@ -210,7 +209,7 @@ const setAppStyle = (colors: Colors) => {
     textNeutralSmall: {
       fontSize: 14,
       fontWeight: "500",
-      lineHeight: 18,
+      lineHeight: "18px",
       fontFamily: FontFamilies.UI,
       color: colors.coolgray6,
     },
@@ -218,7 +217,7 @@ const setAppStyle = (colors: Colors) => {
     textNeutralMicro: {
       fontSize: 12,
       fontWeight: "400",
-      lineHeight: 18,
+      lineHeight: "18px",
       fontFamily: FontFamilies.UI,
       color: colors.coolgray6,
     },
@@ -226,7 +225,7 @@ const setAppStyle = (colors: Colors) => {
     textNeutralLabel: {
       fontSize: 12,
       fontWeight: "500",
-      lineHeight: 18,
+      lineHeight: "18px",
       letterSpacing: 0.8,
       textTransform: "uppercase",
       fontFamily: FontFamilies.UI,
@@ -254,7 +253,7 @@ const setAppStyle = (colors: Colors) => {
       fontWeight: "500",
       letterSpacing: 0.5,
       textAlign: "center",
-      lineHeight: 22,
+      lineHeight: "22px",
       color: colors.isDark ? colors.coolgray7 : colors.coolgray5,
     },
 
@@ -265,7 +264,7 @@ const setAppStyle = (colors: Colors) => {
       width: "80%",
       padding: 8,
       fontSize: 18,
-      lineHeight: 24,
+      lineHeight: "24px",
       height: appLayoutConstants.textInputHeight,
       backgroundColor: colors.white,
       color: colors.black,
@@ -280,7 +279,7 @@ const setAppStyle = (colors: Colors) => {
       minWidth: 128,
       width: "90%",
     },
-  });
+  };
   return style as AppStyle;
 };
 

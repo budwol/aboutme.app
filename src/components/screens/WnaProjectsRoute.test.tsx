@@ -1,6 +1,6 @@
 import WnaProjectsRoute from "@components/screens/WnaProjectsRoute";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import React from "react";
+import React, { CSSProperties } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 
@@ -58,10 +58,12 @@ jest.mock("@/navigation/components/WnaHeaderRouteButton", () => {
   };
 });
 
+const mockOnScroll = jest.fn();
+
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
     scrollY: 0,
-    onScroll: () => undefined,
+    onScroll: (event: unknown) => mockOnScroll(event),
   }),
 }));
 
@@ -152,27 +154,6 @@ jest.mock("@components/chrome/WnaContactFooter", () => {
   };
 });
 
-jest.mock("react-native", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ReactModule = require("react");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const actual = require("@jest/globals").jest.requireActual(
-    "react-native",
-  ) as typeof import("react-native");
-
-  return {
-    StyleSheet: actual.StyleSheet,
-    Text: actual.Text,
-    View: actual.View,
-    ScrollView: (props: unknown) =>
-      ReactModule.createElement(
-        "ScrollView",
-        props as Record<string, unknown>,
-        (props as { children?: React.ReactNode }).children,
-      ),
-  };
-});
-
 describe("WnaProjectsRoute", () => {
   beforeEach(() => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
@@ -223,7 +204,10 @@ describe("WnaProjectsRoute", () => {
     });
 
     const baseScreen = tree!.root.findByType("WnaBaseScreen");
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
     const children = scrollView.props.children as React.ReactElement[];
     const header = children[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -232,7 +216,7 @@ describe("WnaProjectsRoute", () => {
       headerTree = TestRenderer.create(header);
     });
     const headerTextValues = headerTree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -246,7 +230,7 @@ describe("WnaProjectsRoute", () => {
     expect((children.at(-1)?.type as { name?: string }).name).toBe(
       "MockContactFooter",
     );
-    expect(scrollView.props.contentContainerStyle.paddingBottom).toBe(16);
+    expect(scrollView.props.style.paddingBottom).toBe(16);
   });
 
   it("renders the dedicated landscape projects layout when the screen is wide", () => {
@@ -271,10 +255,13 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
     const pressables = tree!.root.findAllByType("WnaPressable");
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -297,7 +284,7 @@ describe("WnaProjectsRoute", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -342,15 +329,18 @@ describe("WnaProjectsRoute", () => {
     });
 
     const featuredTitle = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .find(
         (node: {
-          props: { children?: React.ReactNode; numberOfLines?: number };
+          props: { children?: React.ReactNode; style?: CSSProperties };
         }) =>
           node.props.children ===
           "Event-Driven Backend for Tour Workflows with Extended Title",
       );
-    expect(featuredTitle?.props.numberOfLines).toBe(3);
+    expect(
+      (featuredTitle?.props.style as { WebkitLineClamp?: number })
+        ?.WebkitLineClamp,
+    ).toBe(3);
   });
 
   it("omits the portrait intro entirely when there is no context or highlights", () => {
@@ -371,7 +361,10 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
 
     expect((scrollView.props.children as React.ReactNode[])[0]).toBeNull();
   });
@@ -393,7 +386,10 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
     const header = (scrollView.props.children as React.ReactElement[])[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -402,7 +398,7 @@ describe("WnaProjectsRoute", () => {
     });
 
     const textValues = headerTree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -428,7 +424,10 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
     const header = (scrollView.props.children as React.ReactElement[])[0];
     let headerTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -437,7 +436,7 @@ describe("WnaProjectsRoute", () => {
     });
 
     const textValues = headerTree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,
@@ -488,7 +487,10 @@ describe("WnaProjectsRoute", () => {
       tree = TestRenderer.create(<WnaProjectsRoute />);
     });
 
-    const scrollView = tree!.root.findByType("ScrollView");
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
     const pressable = tree!.root.findAllByType("WnaPressable")[0];
 
     expect(pressable.props.ripple).toBe("light");
@@ -499,13 +501,74 @@ describe("WnaProjectsRoute", () => {
       });
     }).not.toThrow();
 
-    expect(scrollView.props.scrollEventThrottle).toBe(16);
     expect(scrollView.props.onScroll).toEqual(expect.any(Function));
     const projectGroups = scrollView.props.children[1] as React.ReactElement[];
     expect(projectGroups).toHaveLength(testAppData.projects.length);
     expect(projectGroups.map((group) => group.key)).toEqual(
       testAppData.projects.map((project, index) => `${project.title}-${index}`),
     );
+  });
+
+  it("adapts the portrait DOM scroll event into the shared hook's expected shape", () => {
+    mockOnScroll.mockClear();
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
+
+    act(() => {
+      scrollView.props.onScroll!({
+        currentTarget: { scrollTop: 123 },
+      } as never);
+    });
+
+    expect(mockOnScroll).toHaveBeenCalledWith({
+      nativeEvent: { contentOffset: { y: 123 } },
+    });
+  });
+
+  it("adapts the landscape DOM scroll event into the shared hook's expected shape", () => {
+    mockOnScroll.mockClear();
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaLayout.mockReturnValue({
+      appLayout: {
+        contentPaddingBottom: 16,
+        contentPaddingBottomWhenActionButton: 16,
+        contentListPaddingTop: 16,
+        scrollEventThrottle: 16,
+      },
+      currentWindowWidth: 1400,
+      isLandscape: true,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    const scrollView = tree!.root.find(
+      (node: { props: { onScroll?: (event: unknown) => void } }) =>
+        typeof node.props.onScroll === "function",
+    );
+
+    act(() => {
+      scrollView.props.onScroll!({
+        currentTarget: { scrollTop: 321 },
+      } as never);
+    });
+
+    expect(mockOnScroll).toHaveBeenCalledWith({
+      nativeEvent: { contentOffset: { y: 321 } },
+    });
   });
 
   it("collapses the landscape layout when there is no context data or projects", () => {
@@ -540,7 +603,7 @@ describe("WnaProjectsRoute", () => {
     });
 
     const textValues = tree!.root
-      .findAllByType("Text")
+      .findAllByType("span")
       .map(
         (node: { props: { children?: React.ReactNode } }) =>
           node.props.children,

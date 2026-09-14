@@ -105,14 +105,14 @@ describe("WnaCardTextContent", () => {
 
     expect(spans[0].props.style).toEqual(
       expect.objectContaining({
-        lineHeight: 20,
+        lineHeight: "20px",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis",
       }),
     );
     expect(spans[1].props.style).toEqual(
       expect.objectContaining({
-        lineHeight: 18,
+        lineHeight: "18px",
         paddingInline: 3,
         textAlign: "right",
         WebkitLineClamp: 2,
