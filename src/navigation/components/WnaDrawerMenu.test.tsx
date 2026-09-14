@@ -317,7 +317,7 @@ describe("WnaDrawerMenu", () => {
     // Regression test: the drawer panel now spans the full viewport height
     // (position: fixed overlay at 100% height), so `justifyContent: "center"`
     // on navWrapper would visually centre the nav items mid-panel instead of
-    // anchoring them below the header. See WEB-ONLY-MIGRATION.md fix.
+    // anchoring them below the header.
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {

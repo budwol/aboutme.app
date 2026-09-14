@@ -329,7 +329,7 @@ describe("WnaBaseScreen", () => {
     // flex-item child. Flex items default to `min-height: auto`, so without
     // an explicit `minHeight: 0` this container refuses to shrink below its
     // content's intrinsic height, which stops the inner scrollable content
-    // from ever being clipped by the viewport. See WEB-ONLY-MIGRATION.md fix.
+    // from ever being clipped by the viewport.
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {

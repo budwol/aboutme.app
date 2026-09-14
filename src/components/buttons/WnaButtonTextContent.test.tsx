@@ -35,7 +35,7 @@ describe("WnaButtonTextContent", () => {
     // Regression test: the fallback style previously had no `fontFamily`,
     // so a caller that forgot to forward `appStyle` (as WnaButtonIconText
     // did) silently rendered its button label in the browser's default
-    // font instead of Manrope. See WEB-ONLY-MIGRATION.md fix.
+    // font instead of Manrope.
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
