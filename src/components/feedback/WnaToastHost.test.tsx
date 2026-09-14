@@ -113,6 +113,42 @@ describe("WnaToastHost", () => {
     jest.useRealTimers();
   });
 
+  it("keeps the toast card within its max-width using border-box sizing", () => {
+    // Regression test: this card combines `width: "100%"` with
+    // `paddingInline: 18` on a real DOM div. Content-box (the browser
+    // default) would add that padding on top of the 100%-of-parent
+    // width, making the toast 36px wider than intended and able to
+    // overflow past the edge of the screen it's anchored to.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(renderWnaToastCard(appColors, "Saved"));
+    });
+
+    const style = tree!.root.findAllByType("div")[0].props.style as Record<
+      string,
+      unknown
+    >;
+
+    expect({
+      width: style.width,
+      boxSizing: style.boxSizing,
+      maxWidth: style.maxWidth,
+      paddingInline: style.paddingInline,
+      paddingBlock: style.paddingBlock,
+    }).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+      maxWidth: 328,
+      paddingInline: 18,
+      paddingBlock: 16,
+    });
+
+    act(() => {
+      tree!.unmount();
+    });
+  });
+
   it("unsubscribes cleanly when no toast is active", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

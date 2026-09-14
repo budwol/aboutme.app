@@ -275,6 +275,33 @@ describe("WnaDrawerMenu", () => {
     expect(headerTexts).not.toContain("appBrand");
   });
 
+  it("keeps the profile name/title column within the drawer's fixed width using border-box sizing", async () => {
+    // Regression test: this column combines `width: "100%"` with
+    // `paddingInline: 24` on a real DOM div. Content-box (the browser
+    // default) would add that padding on top of the 100%-of-parent
+    // width, overflowing the drawer's fixed panel width by 48px.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const nameSpan = tree!.root.find(
+      (node: { props: { children?: unknown } }) =>
+        node.props.children === "John Doe",
+    );
+    const centeredColumn = nameSpan.parent!;
+
+    expect(centeredColumn.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      width: "100%",
+      boxSizing: "border-box",
+      paddingInline: 24,
+    });
+  });
+
   it("keeps the drawer navigation top spacing separate from list padding", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

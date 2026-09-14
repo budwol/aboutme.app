@@ -536,6 +536,21 @@ describe("WnaProjectDetailsRoute", () => {
       backgroundColor: "rgba(252,252,252,0.96)",
       borderColor: "rgba(214,214,214,0.72)",
     });
+    // Regression test: this dialog combines `width: "100%"` with
+    // `padding: 32` on a real DOM div. Content-box (the browser default)
+    // would add that padding on top of the 100%-of-parent width, making
+    // the dialog 64px wider than its intended `maxWidth: 560`.
+    expect({
+      width: modalDialog.props.style.width,
+      boxSizing: modalDialog.props.style.boxSizing,
+      maxWidth: modalDialog.props.style.maxWidth,
+      padding: modalDialog.props.style.padding,
+    }).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+      maxWidth: 560,
+      padding: 32,
+    });
     expect(modalCloseButton.props.style).toMatchObject({
       backgroundColor: "rgba(252,252,252,0.98)",
       borderColor: "rgba(214,214,214,0.72)",

@@ -71,6 +71,12 @@ describe("WnaButtonIconText", () => {
         borderStyle: "solid",
         cursor: "not-allowed",
         opacity: 0.5,
+        // Regression test: this was `marginHorizontal`, a React-Native-only
+        // property. React silently drops it when writing to a plain DOM
+        // `style` attribute, so this button rendered with no horizontal
+        // margin at all instead of the intended 16px gap on each side.
+        // `marginInline` is the real CSS equivalent.
+        marginInline: 16,
       }),
     );
     expect(content.props.text).toBe("Open profile");

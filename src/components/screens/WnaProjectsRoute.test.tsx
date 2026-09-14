@@ -612,4 +612,88 @@ describe("WnaProjectsRoute", () => {
     expect(tree!.root.findAllByType("WnaPressable")).toHaveLength(0);
     expect(textValues).toContain("");
   });
+
+  it("keeps the portrait context/feature boxes and project cards within their parent's width using border-box sizing", () => {
+    // Regression test: these elements combine `width: "100%"` with
+    // horizontal padding or a border on a real DOM div. Content-box (the
+    // browser default) would add that padding/border on top of the
+    // 100%-of-parent width, overflowing the page horizontally.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    type StyleNode = { props: { style?: CSSProperties } };
+    const divs = tree!.root.findAllByType("div") as unknown as StyleNode[];
+    const radius16Boxes = divs.filter(
+      (node) => node.props.style?.borderRadius === 16,
+    );
+    const contextBox = radius16Boxes.find(
+      (node) => node.props.style?.flexDirection === "column",
+    );
+    const featureBox = radius16Boxes.find(
+      (node) => node.props.style?.flexDirection === "row",
+    );
+    const projectCard = divs.find(
+      (node) =>
+        node.props.style?.borderRadius === 12 &&
+        node.props.style?.position === "relative",
+    );
+
+    const boxSizingSubset = (style: CSSProperties | undefined) => ({
+      width: style?.width,
+      boxSizing: style?.boxSizing,
+    });
+
+    expect(boxSizingSubset(contextBox?.props.style)).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+    });
+    expect(boxSizingSubset(featureBox?.props.style)).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+    });
+    expect(boxSizingSubset(projectCard?.props.style)).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+    });
+  });
+
+  it("keeps the landscape shell within its parent's width using border-box sizing", () => {
+    // Regression test: this shell combines `width: "100%"` with
+    // `paddingInline: 28` on a real DOM div, the same content-box
+    // overflow risk as above.
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaLayout.mockReturnValue({
+      appLayout: {
+        contentPaddingBottom: 16,
+        contentPaddingBottomWhenActionButton: 16,
+        contentListPaddingTop: 16,
+        scrollEventThrottle: 16,
+      },
+      currentWindowWidth: 1400,
+      isLandscape: true,
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaProjectsRoute />);
+    });
+
+    type StyleNode = { props: { style?: CSSProperties } };
+    const landscapeShell = (
+      tree!.root.findAllByType("div") as unknown as StyleNode[]
+    ).find((node) => node.props.style?.maxWidth === 1480);
+
+    expect(landscapeShell?.props.style).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+      maxWidth: 1480,
+      paddingInline: 28,
+    });
+  });
 });
