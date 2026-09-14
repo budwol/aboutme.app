@@ -41,6 +41,10 @@ rm -rf "$ROOT_DIR/dist"
 
 mkdir -p "$ROOT_DIR/public/images"
 cp "$ROOT_DIR/assets/defaults/bg.webp" "$ROOT_DIR/public/bg.webp"
+cp "$ROOT_DIR/scripts/web-service-worker.js" "$ROOT_DIR/public/sw.js"
+convert "$ROOT_DIR/assets/defaults/logo.svg" \
+  -resize 96x96 -quality 90 \
+  "$ROOT_DIR/public/logo_96.webp"
 cp "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
   "$ROOT_DIR/public/images/default_avatar.webp"
 cp "$ROOT_DIR/assets/defaults/images/default_project.webp" \
