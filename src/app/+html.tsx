@@ -228,6 +228,7 @@ export default function Root({ children }: PropsWithChildren) {
                       overscroll-behavior: none;
                       -webkit-overflow-scrolling: auto;
                       scrollbar-width: thin;
+                      font-family: Manrope, "system-ui", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                     }
                 `}</style>
         <ScrollViewStyleReset />

@@ -357,7 +357,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     marginTop: appSpacingConstants.sm,
   },
   navList: {

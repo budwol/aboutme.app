@@ -402,6 +402,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     flex: 1,
+    minHeight: 0,
   },
   contentInitial: {
     opacity: 0.92,

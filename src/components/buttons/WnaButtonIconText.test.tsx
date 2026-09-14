@@ -33,6 +33,7 @@ jest.mock("@components/buttons/WnaButtonTextContent", () => {
 describe("WnaButtonIconText", () => {
   it("passes icon, text and disabled state into the composed button", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
+    const appStyle = { textNeutralMedium: { fontFamily: "Manrope" } } as never;
 
     act(() => {
       tree = TestRenderer.create(
@@ -46,6 +47,7 @@ describe("WnaButtonIconText", () => {
               background: "#111",
             } as never
           }
+          appStyle={appStyle}
           text="Open profile"
           iconName="account"
           onPress={() => {}}
@@ -73,6 +75,12 @@ describe("WnaButtonIconText", () => {
     );
     expect(content.props.text).toBe("Open profile");
     expect(content.props.childrenLeft.props.iconName).toBe("account");
+    // Regression test: `appStyle` was accepted as a prop type but never
+    // destructured or forwarded, so this button's visible label silently
+    // fell back to a font-family-less style object and rendered in the
+    // browser's default sans-serif instead of Manrope. See
+    // WEB-ONLY-MIGRATION.md fix.
+    expect(content.props.appStyle).toBe(appStyle);
   });
 
   it("updates rendered content when text and icon change", () => {

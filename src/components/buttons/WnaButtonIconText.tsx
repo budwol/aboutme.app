@@ -27,6 +27,7 @@ export type WnaButtonIconTextProps = WnaButtonThemeProps &
 
 const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
   appColors,
+  appStyle,
   text,
   iconName,
   onPress,
@@ -78,6 +79,7 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
       }) as React.CSSProperties,
     },
     <WnaButtonTextContent
+      appStyle={appStyle}
       text={text}
       textColor={effectiveTextColor}
       childrenLeft={

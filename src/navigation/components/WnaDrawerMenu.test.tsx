@@ -298,19 +298,44 @@ describe("WnaDrawerMenu", () => {
         Array.isArray(node.props.style)
           ? node.props.style.some(
               (style: { justifyContent?: string }) =>
+                style.justifyContent === "flex-start",
+            )
+          : (node.props.style as { justifyContent?: string } | undefined)
+              ?.justifyContent === "flex-start",
+    );
+
+    expect(navWrapper.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      justifyContent: "flex-start",
+      marginTop: appSpacingConstants.sm,
+    });
+  });
+
+  it("never re-centers the drawer navigation items vertically", async () => {
+    // Regression test: the drawer panel now spans the full viewport height
+    // (position: fixed overlay at 100% height), so `justifyContent: "center"`
+    // on navWrapper would visually centre the nav items mid-panel instead of
+    // anchoring them below the header. See WEB-ONLY-MIGRATION.md fix.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const centeredWrappers = tree!.root.findAll(
+      (node: { props: { style?: unknown } }) =>
+        Array.isArray(node.props.style)
+          ? node.props.style.some(
+              (style: { justifyContent?: string }) =>
                 style.justifyContent === "center",
             )
           : (node.props.style as { justifyContent?: string } | undefined)
               ?.justifyContent === "center",
     );
 
-    expect(navWrapper.props.style).toEqual(
-      expect.objectContaining({
-        flex: 1,
-        justifyContent: "center",
-        marginTop: appSpacingConstants.sm,
-      }),
-    );
+    expect(centeredWrappers).toHaveLength(0);
   });
 
   it("navigates and closes the drawer when an inactive drawer item is pressed", async () => {

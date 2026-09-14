@@ -323,4 +323,37 @@ describe("WnaBaseScreen", () => {
       expect.objectContaining({ opacity: 0, pointerEvents: "none" }),
     );
   });
+
+  it("keeps the screen content container able to shrink below its content height so the page can scroll", () => {
+    // Regression test: `styles.container` is a flex column and this is its
+    // flex-item child. Flex items default to `min-height: auto`, so without
+    // an explicit `minHeight: 0` this container refuses to shrink below its
+    // content's intrinsic height, which stops the inner scrollable content
+    // from ever being clipped by the viewport. See WEB-ONLY-MIGRATION.md fix.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaBaseScreen headerTitle="Home">
+          {React.createElement("div", {
+            "data-testid": "screen-content-marker",
+          })}
+        </WnaBaseScreen>,
+      );
+    });
+
+    const marker = tree!.root.findByProps({
+      "data-testid": "screen-content-marker",
+    });
+    const contentContainer = marker.parent!;
+
+    expect(contentContainer.type).toBe("div");
+    expect(contentContainer.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      minHeight: 0,
+      alignContent: "stretch",
+    });
+  });
 });

@@ -1,4 +1,5 @@
 import AppStyle from "@/theme/appStyle";
+import { FontFamilies } from "@constants/theme/fontFamilies";
 import React, { CSSProperties, FC, memo, ReactNode } from "react";
 
 export type WnaButtonTextContentProps = {
@@ -29,6 +30,7 @@ const styles = {
   fallbackText: {
     fontSize: 16,
     fontWeight: "500",
+    fontFamily: FontFamilies.UI,
   },
 } satisfies Record<string, CSSProperties>;
 
