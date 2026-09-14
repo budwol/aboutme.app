@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import Colors from "@constants/theme/colors";
+import { convertHexToRgba } from "@utils/colorConverter";
 import WnaToastHost, {
   renderWnaToastCard,
 } from "@components/feedback/WnaToastHost";
@@ -49,12 +50,41 @@ describe("WnaToastHost", () => {
         .findAllByType("span")
         .map((node: RenderedTextNode) => node.props.children),
     ).toEqual(["Saved", "Done"]);
-    expect(fallbackCard.root.findAllByType("div")[0].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "rgba(255,255,255,0.98)" }),
-    );
-    expect(darkCard.root.findAllByType("div")[0].props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "rgba(16,16,16,0.98)" }),
-    );
+    expect(fallbackCard.root.findAllByType("div")[0].props.style).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+      maxWidth: 328,
+      minHeight: 78,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: convertHexToRgba(appColors.coolgray2, 0.78),
+      backgroundColor: convertHexToRgba(appColors.white, 0.98),
+      paddingInline: 18,
+      paddingBlock: 16,
+      boxShadow: `0px 12px 22px ${convertHexToRgba(appColors.staticBlack, 0.12)}`,
+      overflow: "hidden",
+    });
+    const darkAppColors = {
+      ...appColors,
+      isDark: true,
+      background: "#101010",
+    } as Colors;
+    expect(darkCard.root.findAllByType("div")[0].props.style).toEqual({
+      width: "100%",
+      boxSizing: "border-box",
+      maxWidth: 328,
+      minHeight: 78,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: convertHexToRgba(darkAppColors.coolgray4, 0.3),
+      backgroundColor: convertHexToRgba(darkAppColors.background, 0.98),
+      paddingInline: 18,
+      paddingBlock: 16,
+      boxShadow: `0px 12px 22px ${convertHexToRgba(darkAppColors.staticBlack, 0.24)}`,
+      overflow: "hidden",
+    });
 
     act(() => {
       fallbackCard!.unmount();

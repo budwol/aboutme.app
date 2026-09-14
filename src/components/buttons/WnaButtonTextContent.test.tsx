@@ -44,12 +44,14 @@ describe("WnaButtonTextContent", () => {
       );
     });
 
-    expect(tree!.root.findByType("span").props.style).toEqual(
-      expect.objectContaining({
-        fontSize: 16,
-        fontWeight: "500",
-        fontFamily: FontFamilies.UI,
-      }),
-    );
+    expect(tree!.root.findByType("span").props.style).toEqual({
+      fontSize: 16,
+      fontWeight: "500",
+      fontFamily: FontFamilies.UI,
+      marginInline: 8,
+      alignSelf: "center",
+      letterSpacing: 0.5,
+      color: "#ffffff",
+    });
   });
 });

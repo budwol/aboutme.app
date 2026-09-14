@@ -22,23 +22,24 @@ describe("appStyle", () => {
       alignSelf: "center",
       paddingInline: 16,
     });
-    expect(style.tabBarStyle).toEqual(
-      expect.objectContaining({ backgroundColor: themePalettes.light.white }),
-    );
-    expect(style.textNeutralSmall).toEqual(
-      expect.objectContaining({
-        color: "#3e3e3e",
-        fontFamily:
-          '"Manrope","system-ui","-apple-system","BlinkMacSystemFont","Segoe UI",sans-serif',
-      }),
-    );
-    expect(style.separatorHorizontal).toEqual(
-      expect.objectContaining({
-        minHeight: 1,
-        minWidth: 128,
-        width: "90%",
-      }),
-    );
+    expect(style.tabBarStyle).toEqual({
+      backgroundColor: themePalettes.light.white,
+      borderTopWidth: 0,
+      borderBottomWidth: 0,
+    });
+    expect(style.textNeutralSmall).toEqual({
+      fontSize: 14,
+      fontWeight: "500",
+      lineHeight: "18px",
+      fontFamily: FontFamilies.UI,
+      color: themePalettes.light.coolgray6,
+    });
+    expect(style.separatorHorizontal).toEqual({
+      minHeight: 1,
+      margin: 16,
+      minWidth: 128,
+      width: "90%",
+    });
   });
 
   it("gives every text style an explicit font-family so it never silently falls back to the browser default", () => {

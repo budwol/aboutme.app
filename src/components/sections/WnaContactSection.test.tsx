@@ -93,14 +93,18 @@ describe("WnaContactSection", () => {
       );
 
     expect(actionContainer).toBeDefined();
-    expect(actionContainer!.props.style).toEqual(
-      expect.objectContaining({
-        flexDirection: "row",
-        flexWrap: "wrap",
-        width: "100%",
-        maxWidth: 188,
-      }),
-    );
+    expect(actionContainer!.props.style).toEqual({
+      display: "flex",
+      alignSelf: "center",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      columnGap: 16,
+      rowGap: 16,
+      width: "100%",
+      maxWidth: 188,
+      minWidth: 0,
+    });
 
     await act(async () => {
       for (const button of buttons) {
@@ -300,9 +304,18 @@ describe("WnaContactSection", () => {
           "wrap",
       );
 
-    expect(
-      (actionContainer!.props.style as { maxWidth?: number }).maxWidth,
-    ).toBe(320);
+    expect(actionContainer!.props.style).toEqual({
+      display: "flex",
+      alignSelf: "center",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      columnGap: 16,
+      rowGap: 16,
+      width: "100%",
+      maxWidth: 320,
+      minWidth: 0,
+    });
   });
 
   it("keeps the outer container within its parent's width by using border-box sizing", async () => {

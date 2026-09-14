@@ -10,6 +10,7 @@ import {
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+import { appMotionConstants } from "@constants/motionConstants";
 
 const mockLoggerError = jest.fn();
 const originalRequestAnimationFrame = global.requestAnimationFrame;
@@ -192,9 +193,10 @@ describe("WnaApp", () => {
 
     expect(tree!.root.findAllByType("SafeAreaView")).toHaveLength(0);
     expect(tree!.root.findAllByType("span")).toHaveLength(0);
-    expect(tree!.root.findByType("div").props.style).toEqual(
-      expect.objectContaining({ flex: 1 }),
-    );
+    expect(tree!.root.findByType("div").props.style).toEqual({
+      flex: 1,
+      backgroundColor: "#fff",
+    });
   });
 
   it("uses a dark neutral boot shell when the OS color scheme is dark", () => {
@@ -214,9 +216,10 @@ describe("WnaApp", () => {
       );
     });
 
-    expect(tree!.root.findByType("div").props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#111" }),
-    );
+    expect(tree!.root.findByType("div").props.style).toEqual({
+      flex: 1,
+      backgroundColor: "#111",
+    });
 
     colorSchemeSpy.mockRestore();
   });
@@ -465,16 +468,36 @@ describe("WnaApp", () => {
         node.props.style?.flex === 1 &&
         typeof node.props.style?.opacity === "number",
     );
-    expect(contentAfterNavigation.props.style).toEqual(
-      expect.objectContaining({ opacity: 0 }),
-    );
+    expect(contentAfterNavigation.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      minHeight: 0,
+      opacity: 0,
+      transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+    });
     act(() => queuedFrames.shift()?.(0));
     act(() => queuedFrames.shift()?.(0));
 
     expect(
       tree!.root.findByProps({ id: "navigation-transition-overlay" }).props
         .style,
-    ).toEqual(expect.objectContaining({ opacity: 0 }));
+    ).toEqual({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      zIndex: 20,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#f8f7f3",
+      pointerEvents: "auto",
+      opacity: 0,
+      transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+    });
 
     act(() => {
       jest.advanceTimersByTime(560);
@@ -526,9 +549,20 @@ describe("WnaApp", () => {
       id: "wna-intro-overlay",
     });
 
-    expect(introOverlay.props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#111111" }),
-    );
+    expect(introOverlay.props.style).toEqual({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      zIndex: 20,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#111111",
+      pointerEvents: "none",
+    });
 
     act(() => {
       jest.advanceTimersByTime(1320);
@@ -555,13 +589,30 @@ describe("WnaApp", () => {
     });
 
     expect(transitionBackground?.type).toBe("WnaImageBackground");
+    // `opacity`/`transition` depend on the in-flight transition phase
+    // timing and are intentionally left out of scope for this test, which
+    // is about the overlay's identity/background, not its fade timing
+    // (already covered by the dedicated transition-phase tests below).
     expect(navigationOverlay?.props.style).toEqual(
       expect.objectContaining({
+        position: "absolute",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         zIndex: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: "#111111",
         pointerEvents: "auto",
       }),
     );
+    // `children` is intentionally left out of scope here: it's already
+    // verified above via `transitionContent` (the `WnaNavigationTransitionOverlay`
+    // descendant lookup), so re-asserting the exact element tree here
+    // would just duplicate that check.
     expect(transitionBackground?.props).toEqual(
       expect.objectContaining({
         testID: "navigation-transition-background",
@@ -730,14 +781,15 @@ describe("WnaApp", () => {
     const contentContainer = marker.parent!;
 
     expect(contentContainer.type).toBe("div");
-    expect(contentContainer.props.style).toEqual(
-      expect.objectContaining({
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
-      }),
-    );
+    expect(contentContainer.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      minHeight: 0,
+      transform: "translateY(10px)",
+      opacity: 1,
+      transition: `opacity ${appMotionConstants.navigationTransitionDurationOut}ms ease-out`,
+    });
   });
 });
 
