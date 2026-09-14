@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
+import { convertHexToRgba } from "@utils/colorConverter";
 
 let mockIsAppInitialized = true;
 let mockBackgroundImageUrl = "default-background.webp";
@@ -295,13 +296,22 @@ describe("WnaBaseScreen", () => {
       (node: { props: { id?: string } }) =>
         node.props.id === "wna-busy-overlay",
     );
-    expect(busyOverlay.props.style).toEqual(
-      expect.objectContaining({
-        opacity: 1,
-        pointerEvents: "auto",
-        transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
-      }),
-    );
+    expect(busyOverlay.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+      opacity: 1,
+      backgroundColor: convertHexToRgba("#000000", 0.7),
+      pointerEvents: "auto",
+      transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
+    });
   });
 
   it("disables pointer events on the busy overlay when not busy", () => {
@@ -319,9 +329,22 @@ describe("WnaBaseScreen", () => {
       (node: { props: { id?: string } }) =>
         node.props.id === "wna-busy-overlay",
     );
-    expect(busyOverlay.props.style).toEqual(
-      expect.objectContaining({ opacity: 0, pointerEvents: "none" }),
-    );
+    expect(busyOverlay.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+      opacity: 0,
+      backgroundColor: convertHexToRgba("#000000", 0.7),
+      pointerEvents: "none",
+      transition: "opacity 250ms cubic-bezier(.5, .01, 0, 1)",
+    });
   });
 
   it("keeps the screen content container able to shrink below its content height so the page can scroll", () => {

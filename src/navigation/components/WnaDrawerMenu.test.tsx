@@ -435,13 +435,16 @@ describe("WnaDrawerMenu", () => {
     );
 
     expect(themeButton).toBeDefined();
-    expect(themeButton!.props.style).toEqual(
-      expect.objectContaining({
-        marginInline: 0,
-        height: appLayoutConstants.textInputHeight,
-        borderRadius: appLayoutConstants.globalCornerRadius,
-      }),
-    );
+    expect(themeButton!.props.style).toEqual({
+      width: "100%",
+      marginBottom: 8,
+      marginInline: 0,
+      height: Math.min(
+        appLayoutConstants.headerButtonHeight,
+        appLayoutConstants.textInputHeight,
+      ),
+      borderRadius: appLayoutConstants.globalCornerRadius,
+    });
 
     await act(async () => {
       await themeButton!.props.onPress();
@@ -558,9 +561,13 @@ describe("WnaDrawerMenu", () => {
     });
 
     const container = tree!.root.findAllByType("div")[0];
-    expect(container.props.style).toEqual(
-      expect.objectContaining({ backgroundColor: "#111" }),
-    );
+    expect(container.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      position: "relative",
+      flex: 1,
+      backgroundColor: "#111",
+    });
 
     const buttons = tree!.root.findAllByType("WnaButtonIconText");
     const themeButton = buttons.find(
@@ -568,11 +575,15 @@ describe("WnaDrawerMenu", () => {
         item.props.text === "settingsTheme: common:catalogThemeDark",
     );
 
-    expect(themeButton!.props.style).toEqual(
-      expect.objectContaining({
-        height: appLayoutConstants.textInputHeight,
-        borderRadius: appLayoutConstants.globalCornerRadius,
-      }),
-    );
+    expect(themeButton!.props.style).toEqual({
+      width: "100%",
+      marginBottom: 8,
+      marginInline: 0,
+      height: Math.min(
+        appLayoutConstants.headerButtonHeight,
+        appLayoutConstants.textInputHeight,
+      ),
+      borderRadius: appLayoutConstants.globalCornerRadius,
+    });
   });
 });

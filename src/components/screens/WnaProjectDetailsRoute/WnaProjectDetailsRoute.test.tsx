@@ -5,7 +5,9 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 import { WnaWebModal } from "./WnaPrivateRepoModal";
+import { styles as modalStyles } from "./wnaProjectDetailsRouteStyles";
 import { createProjectSlug } from "@utils/projectRoutes";
+import { convertHexToRgba } from "@utils/colorConverter";
 import { Linking } from "@utils/webLinking";
 
 jest.mock("@/state/WnaAppContext", () => {
@@ -189,20 +191,27 @@ describe("WnaProjectDetailsRoute", () => {
         "keydown",
         expect.any(Function),
       );
+      // `document.body` is undefined in this mock, so `canAnimate` is
+      // false: the modal skips the fade-in state entirely and renders
+      // fully opaque and interactive from the first render.
       expect(
         tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
-      ).toEqual(
-        expect.objectContaining({
-          position: "fixed",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          zIndex: 1000,
-          justifyContent: "center",
-          alignItems: "center",
-        }),
-      );
+      ).toEqual({
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+        opacity: 1,
+        pointerEvents: "auto",
+        transition: "opacity 180ms ease-out",
+      });
       const handleKeyDown = addEventListener.mock.calls[0][1] as (
         event: KeyboardEvent,
       ) => void;
@@ -259,7 +268,22 @@ describe("WnaProjectDetailsRoute", () => {
       act(() => jest.advanceTimersByTime(16));
       expect(
         tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
-      ).toEqual(expect.objectContaining({ opacity: 1 }));
+      ).toEqual({
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+        opacity: 1,
+        pointerEvents: "auto",
+        transition: "opacity 180ms ease-out",
+      });
 
       act(() => {
         tree!.update(
@@ -271,7 +295,22 @@ describe("WnaProjectDetailsRoute", () => {
 
       expect(
         tree!.root.findByProps({ id: "private-repo-modal" }).props.style,
-      ).toEqual(expect.objectContaining({ opacity: 0, pointerEvents: "none" }));
+      ).toEqual({
+        position: "fixed",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 1000,
+        opacity: 0,
+        pointerEvents: "none",
+        transition: "opacity 180ms ease-out",
+      });
 
       act(() => jest.runAllTimers());
       expect(
@@ -503,21 +542,12 @@ describe("WnaProjectDetailsRoute", () => {
 
     expect(modal.props["aria-modal"]).toBe(true);
     expect(modalBackdrop.type).toBe("div");
-    expect(modalBackdrop.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: "rgba(0, 0, 0, 0.58)",
-        backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }),
-    );
+    expect(modalBackdrop.props.style).toEqual({
+      ...modalStyles.modalBackdrop,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    });
     expect(modalCloseButton.type).toBe("button");
     expect(modalCloseButton.props.type).toBe("button");
     const stopPropagation = jest.fn();
@@ -530,45 +560,41 @@ describe("WnaProjectDetailsRoute", () => {
       i18nKeys.infoPrivateRepoBody,
     ]);
     expect(modalActions).toHaveLength(2);
-    expect(modalActions[0].props.style).toMatchObject({ flexBasis: 208 });
-    expect(modalActions[1].props.style).toMatchObject({ flexBasis: 208 });
-    expect(modalDialog.props.style).toMatchObject({
-      backgroundColor: "rgba(252,252,252,0.96)",
-      borderColor: "rgba(214,214,214,0.72)",
-    });
     // Regression test: this dialog combines `width: "100%"` with
     // `padding: 32` on a real DOM div. Content-box (the browser default)
     // would add that padding on top of the 100%-of-parent width, making
     // the dialog 64px wider than its intended `maxWidth: 560`.
-    expect({
-      width: modalDialog.props.style.width,
-      boxSizing: modalDialog.props.style.boxSizing,
-      maxWidth: modalDialog.props.style.maxWidth,
-      padding: modalDialog.props.style.padding,
-    }).toEqual({
-      width: "100%",
-      boxSizing: "border-box",
-      maxWidth: 560,
-      padding: 32,
+    expect(modalDialog.props.style).toEqual({
+      ...modalStyles.modalDialog,
+      backgroundColor: convertHexToRgba("#fcfcfc", 0.96),
+      borderColor: convertHexToRgba("#d6d6d6", 0.72),
     });
-    expect(modalCloseButton.props.style).toMatchObject({
-      backgroundColor: "rgba(252,252,252,0.98)",
-      borderColor: "rgba(214,214,214,0.72)",
+    expect(modalCloseButton.props.style).toEqual({
+      ...modalStyles.modalCloseButton,
+      backgroundColor: convertHexToRgba("#fcfcfc", 0.98),
+      borderColor: convertHexToRgba("#d6d6d6", 0.72),
       borderStyle: "solid",
       appearance: "none",
+      cursor: "pointer",
       padding: 0,
     });
     expect(modalActions[0].props.textColor).toBe("#ffffff");
-    expect(modalActions[0].props.backgroundColor).toBe("rgba(42,127,255,0.92)");
-    expect(modalActions[0].props.style).toMatchObject({
-      borderColor: "rgba(214,214,214,0.4)",
+    expect(modalActions[0].props.backgroundColor).toBe(
+      convertHexToRgba("#2a7fff", 0.92),
+    );
+    expect(modalActions[0].props.style).toEqual({
+      ...modalStyles.actionButton,
+      ...modalStyles.modalActionButton,
+      borderColor: convertHexToRgba("#d6d6d6", 0.4),
     });
     expect(modalActions[1].props.textColor).toBe("#111111");
     expect(modalActions[1].props.backgroundColor).toBe(
-      "rgba(252,252,252,0.98)",
+      convertHexToRgba("#fcfcfc", 0.98),
     );
-    expect(modalActions[1].props.style).toMatchObject({
-      borderColor: "rgba(214,214,214,0.72)",
+    expect(modalActions[1].props.style).toEqual({
+      ...modalStyles.actionButton,
+      ...modalStyles.modalActionButton,
+      borderColor: convertHexToRgba("#d6d6d6", 0.72),
     });
 
     await act(async () => {
@@ -791,21 +817,37 @@ describe("WnaProjectDetailsRoute", () => {
       .findAllByType("WnaButtonIconText")
       .slice(-2);
 
-    expect(modalDialog.props.style).toMatchObject({
-      backgroundColor: "rgba(24,24,24,0.96)",
-      borderColor: "rgba(40,45,55,0.72)",
+    expect(modalDialog.props.style).toEqual({
+      ...modalStyles.modalDialog,
+      backgroundColor: convertHexToRgba("#181818", 0.96),
+      borderColor: convertHexToRgba("#282D37", 0.72),
     });
-    expect(modalCloseButton.props.style).toMatchObject({
-      backgroundColor: "rgba(24,24,24,0.98)",
-      borderColor: "rgba(40,45,55,0.72)",
+    expect(modalCloseButton.props.style).toEqual({
+      ...modalStyles.modalCloseButton,
+      backgroundColor: convertHexToRgba("#181818", 0.98),
+      borderColor: convertHexToRgba("#282D37", 0.72),
+      borderStyle: "solid",
+      appearance: "none",
+      cursor: "pointer",
+      padding: 0,
     });
     expect(modalActions[0].props.textColor).toBe("#ffffff");
+    expect(modalActions[0].props.backgroundColor).toBe(
+      convertHexToRgba("#2a7fff", 0.92),
+    );
+    expect(modalActions[0].props.style).toEqual({
+      ...modalStyles.actionButton,
+      ...modalStyles.modalActionButton,
+      borderColor: convertHexToRgba("#282D37", 0.4),
+    });
     expect(modalActions[1].props.textColor).toBe("#ffffff");
     expect(modalActions[1].props.backgroundColor).toBe(
-      "rgba(255,255,255,0.12)",
+      convertHexToRgba("#ffffff", 0.12),
     );
-    expect(modalActions[1].props.style).toMatchObject({
-      borderColor: "rgba(255,255,255,0.4)",
+    expect(modalActions[1].props.style).toEqual({
+      ...modalStyles.actionButton,
+      ...modalStyles.modalActionButton,
+      borderColor: convertHexToRgba("#ffffff", 0.4),
     });
   });
 

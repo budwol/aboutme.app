@@ -2,6 +2,10 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaSurfaceCard from "@components/cards/WnaSurfaceCard";
+import {
+  getCardBorderStyle,
+  getGroupedCardRadius,
+} from "@components/cards/wnaCardStyles";
 
 jest.mock("@components/effects/WnaBlurView", () => {
   const { createElement } = jest.requireActual(
@@ -74,13 +78,16 @@ describe("WnaSurfaceCard", () => {
 
     expect(blur.props.blurIntensity).toBe(50);
     expect(blur.props.blurTint).toBe("dark");
-    expect(blur.props.style).toEqual(
-      expect.objectContaining({
-        borderTopWidth: 0,
-        minHeight: 80,
-        overflow: "visible",
-      }),
-    );
+    expect(blur.props.style).toEqual({
+      ...getGroupedCardRadius("middle"),
+      ...getCardBorderStyle(darkColors),
+      borderTopWidth: 0,
+      borderBottomWidth: 1,
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
+      minHeight: 80,
+      overflow: "visible",
+    });
     expect(views[0].props.style.backgroundColor).toBe("#000000");
     expect(views[1].props.style.backgroundColor).toBe("#ff0000");
   });

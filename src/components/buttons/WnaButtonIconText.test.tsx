@@ -6,6 +6,9 @@ import {
   actionButtonRightConstants,
   appLayoutConstants,
 } from "@constants/layoutConstants";
+import { StaticColors } from "@constants/theme/staticColors";
+import { createShadowStyle } from "@components/effects/wnaShadowStyle";
+import { createButtonOutlineStyle } from "@components/buttons/wnaButtonStyles";
 
 jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   const { createElement } = jest.requireActual(
@@ -60,25 +63,39 @@ describe("WnaButtonIconText", () => {
 
     const button = tree!.root.findByType("button");
     const content = tree!.root.findByType("WnaButtonTextContent");
+    const testAppColors = {
+      isDark: false,
+      staticWhite: "#fff",
+      staticWarmgray8: "#ccc",
+      staticWarmgray7: "#333",
+      background: "#111",
+    } as never;
     expect(button.props.disabled).toBe(true);
     expect(button.props["aria-disabled"]).toBe(true);
-    expect(button.props.style).toEqual(
-      expect.objectContaining({
-        appearance: "none",
-        height: actionButtonRightConstants.size,
-        borderRadius: appLayoutConstants.globalCornerRadius,
-        borderColor: "#747067",
-        borderStyle: "solid",
-        cursor: "not-allowed",
-        opacity: 0.5,
-        // Regression test: this was `marginHorizontal`, a React-Native-only
-        // property. React silently drops it when writing to a plain DOM
-        // `style` attribute, so this button rendered with no horizontal
-        // margin at all instead of the intended 16px gap on each side.
-        // `marginInline` is the real CSS equivalent.
-        marginInline: 16,
-      }),
-    );
+    // Regression test: `marginInline` was `marginHorizontal`, a
+    // React-Native-only property. React silently drops it when writing
+    // to a plain DOM `style` attribute, so this button rendered with no
+    // horizontal margin at all instead of the intended 16px gap on each
+    // side.
+    expect(button.props.style).toEqual({
+      height: actionButtonRightConstants.size,
+      borderRadius: appLayoutConstants.globalCornerRadius,
+      overflow: "hidden",
+      marginInline: 16,
+      ...createShadowStyle(),
+      ...createButtonOutlineStyle(testAppColors),
+      alignItems: "center",
+      appearance: "none",
+      backgroundColor: "#ccc",
+      borderColor: StaticColors.staticWarmgray6,
+      borderStyle: "solid",
+      borderWidth: 1,
+      boxSizing: "border-box",
+      cursor: "not-allowed",
+      display: "flex",
+      opacity: 0.5,
+      padding: 0,
+    });
     expect(content.props.text).toBe("Open profile");
     expect(content.props.childrenLeft.props.iconName).toBe("account");
     // Regression test: `appStyle` was accepted as a prop type but never
@@ -145,19 +162,18 @@ describe("WnaButtonIconText", () => {
 
   it("falls back to the dark background color and a custom border width", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
+    const darkAppColors = {
+      isDark: true,
+      staticWhite: "#fff",
+      staticWarmgray8: "#ccc",
+      staticWarmgray7: "#333",
+      background: "#111",
+    } as never;
 
     act(() => {
       tree = TestRenderer.create(
         <WnaButtonIconText
-          appColors={
-            {
-              isDark: true,
-              staticWhite: "#fff",
-              staticWarmgray8: "#ccc",
-              staticWarmgray7: "#333",
-              background: "#111",
-            } as never
-          }
+          appColors={darkAppColors}
           text="Open profile"
           iconName="account"
           onPress={() => {}}
@@ -168,14 +184,25 @@ describe("WnaButtonIconText", () => {
 
     const button = tree!.root.findByType("button");
 
-    expect(button.props.style).toEqual(
-      expect.objectContaining({
-        backgroundColor: "#333",
-        borderColor: "#747067",
-        borderStyle: "solid",
-        borderWidth: 3,
-      }),
-    );
+    expect(button.props.style).toEqual({
+      height: actionButtonRightConstants.size,
+      borderRadius: appLayoutConstants.globalCornerRadius,
+      overflow: "hidden",
+      marginInline: 16,
+      ...createShadowStyle(),
+      ...createButtonOutlineStyle(darkAppColors),
+      alignItems: "center",
+      appearance: "none",
+      backgroundColor: "#333",
+      borderColor: StaticColors.staticWarmgray6,
+      borderStyle: "solid",
+      borderWidth: 3,
+      boxSizing: "border-box",
+      cursor: "pointer",
+      display: "flex",
+      opacity: 1,
+      padding: 0,
+    });
 
     act(() => {
       button.props.onMouseEnter();
