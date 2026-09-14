@@ -40,6 +40,7 @@ cp "$EXAMPLE_FILE" "$TARGET_FILE"
 rm -rf "$ROOT_DIR/dist"
 
 mkdir -p "$ROOT_DIR/public/images"
+cp "$ROOT_DIR/assets/defaults/bg.webp" "$ROOT_DIR/public/bg.webp"
 cp "$ROOT_DIR/assets/defaults/images/default_avatar.webp" \
   "$ROOT_DIR/public/images/default_avatar.webp"
 cp "$ROOT_DIR/assets/defaults/images/default_project.webp" \
