@@ -104,6 +104,48 @@ describe("WnaImageElement", () => {
     expect(image.props.fetchPriority).toBe("high");
   });
 
+  it("uses each source's displayWidth for sizes, not its file resolution", () => {
+    // Regression test: `sizes` must describe the CSS width the image
+    // actually renders at, not the source file's own pixel resolution --
+    // conflating the two makes the browser assume the element is
+    // rendered much larger than it is and download a needlessly high
+    // resolution file for it (this shipped for the avatar: sizes claimed
+    // up to 1024px for an image that always renders at 200px).
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaImageElement
+          appColors={{} as never}
+          altText="Avatar"
+          source={[
+            {
+              uri: "/images/ava_300.webp",
+              width: 300,
+              webMaxViewportWidth: 1200,
+              displayWidth: 200,
+            },
+            {
+              uri: "/images/ava.webp",
+              width: 1024,
+              webMaxViewportWidth: 2048,
+              displayWidth: 200,
+            },
+          ]}
+          priority="high"
+          responsivePolicy="static"
+        />,
+      );
+    });
+
+    const image = tree!.root.findByType("img");
+
+    expect(image.props.srcSet).toBe(
+      "/images/ava_300.webp 300w, /images/ava.webp 1024w",
+    );
+    expect(image.props.sizes).toBe("(max-width: 1200px) 200px, 200px");
+  });
+
   it("accepts a single responsive source object", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

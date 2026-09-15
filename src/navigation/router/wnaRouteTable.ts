@@ -1,19 +1,10 @@
-import { ComponentType } from "react";
+import { ComponentType, lazy } from "react";
 import {
   routeDefinitions,
   WnaRouteKey,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { getProjectPathSegment } from "@utils/projectRoutes";
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
-import WnaMenuRoute from "@components/screens/WnaMenuRoute";
-import WnaDisclaimerRoute from "@components/screens/WnaDisclaimerRoute";
-import WnaPrivacyRoute from "@components/screens/WnaPrivacyRoute";
-import WnaTermsRoute from "@components/screens/WnaTermsRoute";
-import WnaLicensesRoute from "@components/screens/WnaLicensesRoute";
-import WnaProjectsRoute from "@components/screens/WnaProjectsRoute";
-import WnaExperienceRoute from "@components/screens/WnaExperienceRoute";
-import WnaContactRoute from "@components/screens/WnaContactRoute";
-import WnaProjectDetailsRoute from "@components/screens/WnaProjectDetailsRoute";
 
 export type WnaRouteMatch = {
   // A route table intentionally mixes components with different prop
@@ -24,17 +15,65 @@ export type WnaRouteMatch = {
   params: Record<string, string>;
 };
 
+// Every route but the home screen loads on demand instead of shipping in
+// the initial bundle: Lighthouse measured ~40% of that bundle as unused
+// on first paint, since every screen (including rarely-visited ones like
+// the legal pages) was imported eagerly regardless of which route the
+// visitor actually lands on. `displayName` makes the resulting lazy
+// wrapper identifiable in React DevTools and in wnaRouteTable.test.ts,
+// which can't compare it by reference to the real, statically-imported
+// component the way it could before.
+function lazyRoute<P extends object>(
+  importer: () => Promise<{ default: ComponentType<P> }>,
+  displayName: string,
+): ComponentType<P> {
+  const Component = lazy(importer) as ComponentType<P> & {
+    displayName?: string;
+  };
+  Component.displayName = displayName;
+  return Component;
+}
+
 const routeComponents: Record<WnaRouteKey, ComponentType> = {
   root: WnaHomeRoute,
-  menu: WnaMenuRoute,
-  disclaimer: WnaDisclaimerRoute,
-  privacy: WnaPrivacyRoute,
-  terms: WnaTermsRoute,
-  licenses: WnaLicensesRoute,
-  projects: WnaProjectsRoute,
-  experience: WnaExperienceRoute,
-  contact: WnaContactRoute,
+  menu: lazyRoute(
+    () => import("@components/screens/WnaMenuRoute"),
+    "WnaMenuRoute",
+  ),
+  disclaimer: lazyRoute(
+    () => import("@components/screens/WnaDisclaimerRoute"),
+    "WnaDisclaimerRoute",
+  ),
+  privacy: lazyRoute(
+    () => import("@components/screens/WnaPrivacyRoute"),
+    "WnaPrivacyRoute",
+  ),
+  terms: lazyRoute(
+    () => import("@components/screens/WnaTermsRoute"),
+    "WnaTermsRoute",
+  ),
+  licenses: lazyRoute(
+    () => import("@components/screens/WnaLicensesRoute"),
+    "WnaLicensesRoute",
+  ),
+  projects: lazyRoute(
+    () => import("@components/screens/WnaProjectsRoute"),
+    "WnaProjectsRoute",
+  ),
+  experience: lazyRoute(
+    () => import("@components/screens/WnaExperienceRoute"),
+    "WnaExperienceRoute",
+  ),
+  contact: lazyRoute(
+    () => import("@components/screens/WnaContactRoute"),
+    "WnaContactRoute",
+  ),
 };
+
+const WnaProjectDetailsRoute = lazyRoute(
+  () => import("@components/screens/WnaProjectDetailsRoute"),
+  "WnaProjectDetailsRoute",
+);
 
 const staticRouteMap = new Map<string, ComponentType>();
 for (const key of Object.keys(routeDefinitions) as WnaRouteKey[]) {
