@@ -65,6 +65,35 @@ describe("WnaButtonHeader", () => {
     expect(icon.props.iconName).toBe("home");
   });
 
+  it("gives the tooltip a positioned ancestor to anchor against", () => {
+    // Regression test: the tooltip inside this wrapper is `position:
+    // absolute` and anchors to the nearest positioned ancestor. Without
+    // `position: relative` here, it anchors to whatever positioned
+    // element happens to be further up the tree instead — this broke
+    // when the wrapper was converted from a React Native `View`
+    // (implicitly `position: relative`) to a plain `div` (implicitly
+    // `position: static`).
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaButtonHeader
+          appColors={{ staticWhite: "#fff" } as never}
+          appStyle={{ containerCenterCenter: {} } as never}
+          iconName="menu"
+          text="Menu"
+          onPress={() => {}}
+        />,
+      );
+    });
+
+    const wrapper = tree!.root.findAllByType("div")[0];
+
+    expect(wrapper.props.style).toEqual(
+      expect.objectContaining({ position: "relative" }),
+    );
+  });
+
   it("defaults tooltip text and hides the badge when omitted", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

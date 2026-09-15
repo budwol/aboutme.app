@@ -49,6 +49,36 @@ describe("WnaPressable", () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
+  it("gives the tooltip a positioned ancestor to anchor against", () => {
+    // Regression test: the tooltip inside this wrapper is `position:
+    // absolute` and anchors to the nearest positioned ancestor. Without
+    // `position: relative` here, it anchors to whatever positioned
+    // element happens to be further up the tree instead — this class of
+    // bug hit WnaButtonIcon/WnaButtonHeader when their wrapper was
+    // converted from a React Native `View` (implicitly `position:
+    // relative`) to a plain `div` (implicitly `position: static`).
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaPressable
+          onPress={jest.fn()}
+          ripple="dark"
+          toolTip="Open"
+          toolTipPosition="top"
+        >
+          child
+        </WnaPressable>,
+      );
+    });
+
+    const wrapper = tree!.root.findAllByType("div")[0];
+
+    expect(wrapper.props.style).toEqual(
+      expect.objectContaining({ position: "relative" }),
+    );
+  });
+
   it("renders a top tooltip and throttles repeated presses", () => {
     jest.useFakeTimers();
     const onPress = jest.fn();
