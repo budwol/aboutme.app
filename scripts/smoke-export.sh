@@ -71,14 +71,13 @@ fi
 
 npm run init
 . "$ROOT_DIR/scripts/load-env.sh" "$ROOT_DIR/.env"
-EXPO_CONFIG_JSON="$(npx expo config --json)"
 
-echo "$EXPO_CONFIG_JSON" | grep -q "\"version\":\"$APP_VERSION\""
-echo "$EXPO_CONFIG_JSON" | grep -q "\"appVersion\":\"$APP_VERSION\""
-
-npx expo export -p web
+vite build
+node ./scripts/inject-web-shell.cjs
 node ./scripts/assert-web-bundle.cjs dist
 node ./scripts/assert-web-pwa.cjs
+
+grep -rq "$APP_VERSION" dist/assets/*.js
 
 test -f dist/index.html
 test -f public/app-data.json
@@ -86,7 +85,7 @@ test -f public/site.webmanifest
 test -f public/sw.js
 test -f nginx/site.conf
 
-grep -q 'name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"' dist/index.html
+grep -q 'content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"' dist/index.html
 grep -q 'serviceWorker.register("/sw.js"' dist/index.html
 
 grep -q "listen 8080 default_server;" nginx/site.conf

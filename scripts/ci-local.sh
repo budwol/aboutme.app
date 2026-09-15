@@ -8,7 +8,6 @@ cd "$PROJECT_DIR"
 
 rm -rf dist web-build .expo .expo/web .cache
 npm prune
-./node_modules/.bin/expo-doctor
 npm run test:prettier
 npm run lint
 npm run test:types

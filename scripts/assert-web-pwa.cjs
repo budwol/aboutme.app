@@ -7,7 +7,10 @@ function assertWebPwa(distDir, publicDir) {
     fs.readFileSync(path.join(publicDir, "site.webmanifest"), "utf8"),
   );
 
-  if (!html.includes('name="robots" content="noindex, nofollow')) {
+  if (
+    !/name="robots"\s+content="noindex,\s*nofollow/.test(html) &&
+    !html.includes('name="robots" content="noindex, nofollow')
+  ) {
     throw new Error("web PWA must keep the noindex robots policy");
   }
   if (!html.includes('serviceWorker.register("/sw.js"')) {

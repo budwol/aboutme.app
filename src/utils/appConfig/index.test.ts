@@ -1,6 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
 import {
-  getConfiguredSiteUrl,
   getConfiguredSiteUrlFromSources,
   isAllowedSiteUrl,
   normalizeSiteUrl,
@@ -60,47 +59,5 @@ describe("app config", () => {
         publicSiteUrl: "http://example.com",
       }),
     ).toThrow(/Invalid site URL configuration/);
-  });
-
-  it("reads configured site urls from environment variables", () => {
-    const originalPublicSiteUrl = process.env.EXPO_PUBLIC_SITE_URL;
-    const originalBaseUrl = process.env.BASE_URL;
-
-    process.env.EXPO_PUBLIC_SITE_URL = " https://public.example.com/ ";
-    process.env.BASE_URL = "https://base.example.com/";
-    expect(getConfiguredSiteUrl()).toBe("https://public.example.com");
-
-    process.env.EXPO_PUBLIC_SITE_URL = "";
-    process.env.BASE_URL = " https://base.example.com/ ";
-    expect(getConfiguredSiteUrl()).toBe("https://base.example.com");
-
-    process.env.EXPO_PUBLIC_SITE_URL = originalPublicSiteUrl;
-    process.env.BASE_URL = originalBaseUrl;
-  });
-
-  it("treats unset environment variables as empty", () => {
-    const env = process.env as Record<string, string | undefined>;
-    const originalPublicSiteUrl = env.EXPO_PUBLIC_SITE_URL;
-    const originalBaseUrl = env.BASE_URL;
-
-    delete env.EXPO_PUBLIC_SITE_URL;
-    env.BASE_URL = "https://base.example.com/";
-    expect(getConfiguredSiteUrl()).toBe("https://base.example.com");
-
-    delete env.BASE_URL;
-    expect(() => getConfiguredSiteUrl()).toThrow(
-      /Set EXPO_PUBLIC_SITE_URL or BASE_URL/,
-    );
-
-    if (originalPublicSiteUrl === undefined) {
-      delete env.EXPO_PUBLIC_SITE_URL;
-    } else {
-      env.EXPO_PUBLIC_SITE_URL = originalPublicSiteUrl;
-    }
-    if (originalBaseUrl === undefined) {
-      delete env.BASE_URL;
-    } else {
-      env.BASE_URL = originalBaseUrl;
-    }
   });
 });

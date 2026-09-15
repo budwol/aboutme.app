@@ -1,6 +1,5 @@
 {
   "name": "about-me",
-  "main": "expo-router/entry",
   "packageManager": "npm@11.5.2",
   "version": "1.5.0",
   "scripts": {
@@ -9,7 +8,7 @@
     "deploy:container": "./scripts/deploy-container.sh",
     "deploy:local": "./scripts/deploy-local.sh",
     "deploy:web": "npm run deploy:container && echo deploy:web done.",
-    "export:web": "node ./scripts/sync-web-app-data.cjs && npm run ci:local && node ./scripts/sync-web-app-data.cjs && node ./scripts/generate-resume-pdf.cjs && npx expo export -p web -c && node ./scripts/inject-web-shell.cjs",
+    "export:web": "node ./scripts/sync-web-app-data.cjs && npm run ci:local && node ./scripts/sync-web-app-data.cjs && node ./scripts/generate-resume-pdf.cjs && vite build && node ./scripts/inject-web-shell.cjs",
     "fix:prettier": "prettier --write .",
     "generate:resume-pdf": "node ./scripts/generate-resume-pdf.cjs",
     "init": "./init.sh",
@@ -33,7 +32,7 @@
     "test:types": "tsc --skipLibCheck",
     "test:coverage": "jest --runInBand --watchAll=false --coverage src && node scripts/assert-coverage.cjs",
     "test:unit": "jest --runInBand --watchAll=false src",
-    "web": "node ./scripts/sync-web-app-data.cjs && node ./scripts/generate-resume-pdf.cjs && expo start --web"
+    "web": "node ./scripts/sync-web-app-data.cjs && node ./scripts/generate-resume-pdf.cjs && vite"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -71,6 +70,7 @@
     "@types/react": "~19.1.0",
     "@types/react-test-renderer": "^19.1.0",
     "@types/sanitize-html": "^2.16.1",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
@@ -83,7 +83,8 @@
     "prettier": "^3.7.4",
     "react-test-renderer": "19.1.0",
     "ts-jest": "^29.4.12",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vite": "^8.3.0"
   },
   "engines": {
     "node": ">=20.19.4 <21",
