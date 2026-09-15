@@ -92,12 +92,28 @@ jest.mock("@components/display/WnaBadge", () => {
   };
 });
 
+jest.mock("@/state/WnaAppContext", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+
+  return {
+    useWnaLayout: jestModule.fn(),
+  };
+});
+
 describe("WnaExperienceSection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     resizeObserverCallback = undefined;
     (global as { ResizeObserver?: unknown }).ResizeObserver =
       MockResizeObserver;
+
+    const { useWnaLayout } = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    // 1024 matches jsdom's default window.innerWidth, preserving the
+    // non-compact layout every other test in this file already assumed.
+    useWnaLayout.mockReturnValue({ currentWindowWidth: 1024 });
   });
 
   it("renders one timeline card per experience entry", () => {
@@ -661,11 +677,10 @@ describe("WnaExperienceSection", () => {
   });
 
   it("uses the compact timeline layout on narrow screens", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const RN = require("react-native") as typeof import("react-native");
-    const useWindowDimensionsSpy = jest
-      .spyOn(RN, "useWindowDimensions")
-      .mockReturnValue({ width: 480, height: 900, scale: 1, fontScale: 1 });
+    const { useWnaLayout } = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    useWnaLayout.mockReturnValue({ currentWindowWidth: 480 });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -704,8 +719,6 @@ describe("WnaExperienceSection", () => {
     expect(timelineWrapper).toBeDefined();
     expect(textValues).toContain(testAppData.experience[0].period);
     expect(periodColumns.length).toBeGreaterThan(0);
-
-    useWindowDimensionsSpy.mockRestore();
   });
 
   it("updates the detail box height when the content layout is measured", () => {

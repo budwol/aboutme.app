@@ -4,7 +4,7 @@ import {
 } from "@components/images/WnaImageElement/wnaImageElementTypes";
 import { appMotionConstants } from "@constants/motionConstants";
 import { memo, useState } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 
 function getImageSources(props: WnaImageElementProps) {
   if (!props.source) {
@@ -47,7 +47,7 @@ function WnaImageElement(props: WnaImageElementProps) {
     .filter((imageSource) => imageSource.width !== undefined)
     .map((imageSource) => `${imageSource.uri} ${imageSource.width}w`)
     .join(", ");
-  const style = StyleSheet.flatten(props.style) as WnaImageStyleProps;
+  const style = flattenStyle<WnaImageStyleProps>(props.style);
   const imageStyle = {
     ...style,
     objectFit: props.contentFit ?? "cover",

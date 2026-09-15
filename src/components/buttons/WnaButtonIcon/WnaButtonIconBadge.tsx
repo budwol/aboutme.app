@@ -4,7 +4,7 @@ import { actionButtonRightConstants } from "@constants/layoutConstants";
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import React, { CSSProperties, FC, memo } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
 export type WnaButtonIconBadgeProps = {
@@ -32,7 +32,7 @@ const WnaButtonIconBadgeComponent: FC<WnaButtonIconBadgeProps> = ({
   return React.createElement(
     "div",
     {
-      style: StyleSheet.flatten([
+      style: flattenStyle([
         appStyle.containerCenterCenter,
         {
           width: effectiveSize,
@@ -42,7 +42,7 @@ const WnaButtonIconBadgeComponent: FC<WnaButtonIconBadgeProps> = ({
           backgroundColor: defaultColor,
           borderRadius: _borderRadius,
         },
-      ]) as CSSProperties,
+      ]),
     },
     <WnaIcon
       iconName={iconName ?? "cube"}

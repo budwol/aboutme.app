@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 import { WnaBasePressableProps } from "./wnaBasePressableProps";
 import { WnaBasePressableState } from "./wnaBasePressableState";
 
@@ -26,7 +26,7 @@ const WnaBasePressable: FC<WnaBasePressableProps> = (props) => {
   const isEnabled = props.isEnabled ?? true;
   const { hovered, pressed } = state;
 
-  const style = StyleSheet.flatten([
+  const style = flattenStyle([
     resetStyle,
     styles.base,
     !isEnabled && styles.disabled,
@@ -44,7 +44,7 @@ const WnaBasePressable: FC<WnaBasePressableProps> = (props) => {
       cursor: isEnabled ? "pointer" : "auto",
     },
     props.baseStyle,
-  ]) as React.CSSProperties;
+  ]);
 
   return React.createElement(
     "button",
@@ -79,7 +79,7 @@ const resetStyle: React.CSSProperties = {
   flexDirection: "column",
 };
 
-const styles = StyleSheet.create({
+const styles: { base: React.CSSProperties; disabled: React.CSSProperties } = {
   base: {
     flex: 1,
     opacity: 1,
@@ -87,6 +87,6 @@ const styles = StyleSheet.create({
   disabled: {
     backgroundColor: "rgba(0,0,0,0.02)",
   },
-});
+};
 
 export default WnaBasePressable;

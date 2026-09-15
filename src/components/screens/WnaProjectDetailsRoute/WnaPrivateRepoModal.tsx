@@ -5,7 +5,7 @@ import { convertHexToRgba } from "@utils/colorConverter";
 import type { TFunction } from "i18next";
 import React, { ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 import { Linking } from "@utils/webLinking";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type {
@@ -138,7 +138,7 @@ export default function WnaPrivateRepoModal({
         {
           "data-testid": "private-repo-modal-backdrop",
           style: {
-            ...StyleSheet.flatten(styles.modalBackdrop),
+            ...styles.modalBackdrop,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -149,7 +149,7 @@ export default function WnaPrivateRepoModal({
           "div",
           {
             "data-testid": "private-repo-modal-dialog",
-            style: StyleSheet.flatten([
+            style: flattenStyle([
               styles.modalDialog,
               {
                 backgroundColor: convertHexToRgba(appColors.background, 0.96),
@@ -187,7 +187,7 @@ export default function WnaPrivateRepoModal({
                     "data-testid": "private-repo-modal-close",
                     "aria-label": t(i18nKeys.actionClose),
                     onClick: onClose,
-                    style: StyleSheet.flatten([
+                    style: flattenStyle([
                       styles.modalCloseButton,
                       {
                         backgroundColor: convertHexToRgba(

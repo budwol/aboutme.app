@@ -1,6 +1,6 @@
 import Logger from "@/utils/logger";
 import { AppData } from "@/app-data";
-import { useColorScheme } from "react-native";
+import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
 import { ErrorBoundaryProps, usePathname } from "expo-router";
 import React, {
   CSSProperties,
@@ -122,7 +122,7 @@ export type AppComponentProps = PropsWithChildren<{
 }>;
 
 const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
-  const colorScheme = useColorScheme();
+  const colorScheme = useBrowserColorScheme();
   const pathname = usePathname();
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealFrameRef = useRef<number | null>(null);

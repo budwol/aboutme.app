@@ -13,7 +13,7 @@ import {
 } from "@constants/layoutConstants";
 import { StaticColors } from "@constants/theme/staticColors";
 import React, { CSSProperties, FC, memo, useState } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";
 
 export type WnaButtonIconTextProps = WnaButtonThemeProps &
@@ -60,7 +60,7 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
         setIsHovered(false);
         setIsPressed(false);
       },
-      style: StyleSheet.flatten({
+      style: {
         ...componentStyle.pressableContainer,
         ...createShadowStyle(),
         ...createButtonOutlineStyle(appColors),
@@ -75,8 +75,8 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
         display: "flex",
         opacity: isDisabled ? 0.5 : isPressed ? 0.8 : isHovered ? 0.9 : 1,
         padding: 0,
-        ...StyleSheet.flatten(style),
-      }) as React.CSSProperties,
+        ...flattenStyle(style),
+      } as React.CSSProperties,
     },
     <WnaButtonTextContent
       appStyle={appStyle}
@@ -89,14 +89,14 @@ const WnaButtonIconTextComponent: FC<WnaButtonIconTextProps> = ({
   );
 };
 
-const componentStyle = StyleSheet.create({
+const componentStyle: { pressableContainer: CSSProperties } = {
   pressableContainer: {
     height: actionButtonRightConstants.size,
     borderRadius: appLayoutConstants.globalCornerRadius,
     overflow: "hidden",
     marginInline: 16,
   },
-});
+};
 
 const WnaButtonIconText = memo(WnaButtonIconTextComponent);
 

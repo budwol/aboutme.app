@@ -31,7 +31,7 @@ import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { getResumePdfUrl } from "@utils/resumePdfUrl";
 import WnaImage from "@components/images/WnaImage";
-import { useColorScheme } from "react-native";
+import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
 
 const logoSize = navigationLayoutConstants.drawerLogoSize;
 const headerHeight = navigationLayoutConstants.drawerHeaderHeight;
@@ -44,7 +44,7 @@ export default function WnaDrawerMenu() {
   const { t } = useTranslation(["common"]);
   const segments = useSegments();
   const navigationRouter = useWnaNavigationTransition(router);
-  const colorScheme = useColorScheme();
+  const colorScheme = useBrowserColorScheme();
 
   const langCode = getNavigationLang(getLangCode());
   const lastSegment = segments.at(-1);

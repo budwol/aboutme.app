@@ -15,7 +15,7 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 import { useRouter } from "expo-router";
 import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useColorScheme } from "react-native";
+import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 
 export default function WnaMenuRoute(): ReactNode {
@@ -25,7 +25,7 @@ export default function WnaMenuRoute(): ReactNode {
   const navigationRouter = useWnaNavigationTransition(router);
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
-  const colorScheme = useColorScheme();
+  const colorScheme = useBrowserColorScheme();
   const styleSectionHeadline: CSSProperties = {
     ...(appStyle.textNeutralMedium as CSSProperties),
     textTransform: "uppercase",

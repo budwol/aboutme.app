@@ -202,9 +202,9 @@ describe("WnaApp", () => {
   it("uses a dark neutral boot shell when the OS color scheme is dark", () => {
     mockIsAppInitialized = false;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const RN = require("react-native") as typeof import("react-native");
+    const colorSchemeModule = require("@utils/useBrowserColorScheme");
     const colorSchemeSpy = jest
-      .spyOn(RN, "useColorScheme")
+      .spyOn(colorSchemeModule, "useBrowserColorScheme")
       .mockReturnValue("dark");
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

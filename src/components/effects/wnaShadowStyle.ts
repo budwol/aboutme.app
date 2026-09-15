@@ -1,10 +1,10 @@
 import { convertHexToRgba } from "@utils/colorConverter";
-import { ViewStyle } from "react-native";
+import { CSSProperties } from "react";
 
 export function createShadowStyle(
   opacity: number = 1,
   color: string = "#000000",
-): ViewStyle {
+): CSSProperties {
   const destOpacity = opacity * 0.08;
 
   const offsetX = 0;

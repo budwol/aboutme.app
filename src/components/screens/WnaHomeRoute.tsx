@@ -157,16 +157,7 @@ export default function WnaHomeRoute(): ReactNode {
         {
           ref: scrollContainerRef,
           style: scrollContainerStyle,
-          // useWnaScrollY is shared with still-RN screens (e.g.
-          // WnaProjectsRoute) that pass its onScroll straight to a native
-          // ScrollView, so its signature stays NativeSyntheticEvent-shaped;
-          // adapt the real DOM event here instead of widening the shared hook.
-          onScroll: (event: React.UIEvent<HTMLDivElement>) =>
-            onScroll({
-              nativeEvent: {
-                contentOffset: { y: event.currentTarget.scrollTop },
-              },
-            } as never),
+          onScroll,
         },
         React.createElement(
           "div",

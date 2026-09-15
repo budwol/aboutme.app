@@ -4,7 +4,6 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { useWnaLayout } from "@/state/WnaAppContext";
 import { WnaHeader } from "@components/chrome/WnaHeader";
-import { Platform } from "react-native";
 
 const mockReplace = jest.fn();
 const mockBack = jest.fn();
@@ -140,10 +139,6 @@ describe("WnaHeader", () => {
       isLandscape: true,
     });
 
-    Object.defineProperty(Platform, "OS", {
-      configurable: true,
-      value: "web",
-    });
     Object.defineProperty(window, "history", {
       configurable: true,
       value: {

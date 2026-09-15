@@ -509,7 +509,7 @@ describe("WnaProjectsRoute", () => {
     );
   });
 
-  it("adapts the portrait DOM scroll event into the shared hook's expected shape", () => {
+  it("wires the portrait scroll container's onScroll straight to the shared hook", () => {
     mockOnScroll.mockClear();
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -521,19 +521,16 @@ describe("WnaProjectsRoute", () => {
       (node: { props: { onScroll?: (event: unknown) => void } }) =>
         typeof node.props.onScroll === "function",
     );
+    const event = { currentTarget: { scrollTop: 123 } };
 
     act(() => {
-      scrollView.props.onScroll!({
-        currentTarget: { scrollTop: 123 },
-      } as never);
+      scrollView.props.onScroll!(event as never);
     });
 
-    expect(mockOnScroll).toHaveBeenCalledWith({
-      nativeEvent: { contentOffset: { y: 123 } },
-    });
+    expect(mockOnScroll).toHaveBeenCalledWith(event);
   });
 
-  it("adapts the landscape DOM scroll event into the shared hook's expected shape", () => {
+  it("wires the landscape scroll container's onScroll straight to the shared hook", () => {
     mockOnScroll.mockClear();
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaLayout: jest.Mock;
@@ -559,16 +556,13 @@ describe("WnaProjectsRoute", () => {
       (node: { props: { onScroll?: (event: unknown) => void } }) =>
         typeof node.props.onScroll === "function",
     );
+    const event = { currentTarget: { scrollTop: 321 } };
 
     act(() => {
-      scrollView.props.onScroll!({
-        currentTarget: { scrollTop: 321 },
-      } as never);
+      scrollView.props.onScroll!(event as never);
     });
 
-    expect(mockOnScroll).toHaveBeenCalledWith({
-      nativeEvent: { contentOffset: { y: 321 } },
-    });
+    expect(mockOnScroll).toHaveBeenCalledWith(event);
   });
 
   it("collapses the landscape layout when there is no context data or projects", () => {

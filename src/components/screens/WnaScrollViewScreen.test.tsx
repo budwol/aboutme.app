@@ -114,7 +114,7 @@ describe("WnaScrollViewScreen", () => {
     );
   });
 
-  it("adapts the DOM scroll event into the shared hook's expected shape", () => {
+  it("wires the scroll container's onScroll straight to the shared hook", () => {
     mockOnScroll.mockClear();
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -131,15 +131,12 @@ describe("WnaScrollViewScreen", () => {
       (node: { props: { onScroll?: (event: unknown) => void } }) =>
         typeof node.props.onScroll === "function",
     );
+    const event = { currentTarget: { scrollTop: 123 } };
 
     act(() => {
-      scrollContainer.props.onScroll!({
-        currentTarget: { scrollTop: 123 },
-      } as never);
+      scrollContainer.props.onScroll!(event as never);
     });
 
-    expect(mockOnScroll).toHaveBeenCalledWith({
-      nativeEvent: { contentOffset: { y: 123 } },
-    });
+    expect(mockOnScroll).toHaveBeenCalledWith(event);
   });
 });
