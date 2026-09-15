@@ -75,6 +75,7 @@ This thing runs on plain React and Vite. No wizard cave, no enchanted build fore
    - `public/site.webmanifest`
    - `public/robots.txt`
    - `public/sitemap.xml`
+   - `public/llms.txt`
    - `nginx/site.conf`
 
    If you just want to peek without writing files:
