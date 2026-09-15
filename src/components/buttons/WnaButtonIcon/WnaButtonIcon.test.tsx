@@ -65,6 +65,14 @@ describe("WnaButtonIcon", () => {
 
     expect(wrapper.props.style).toEqual(
       expect.objectContaining({
+        // Regression test: the tooltip inside this wrapper is
+        // `position: absolute` and anchors to the nearest positioned
+        // ancestor. Without `position: relative` here, it anchors to
+        // whatever positioned element happens to be further up the tree
+        // instead — this broke when the wrapper was converted from a
+        // React Native `View` (implicitly `position: relative`) to a
+        // plain `div` (implicitly `position: static`).
+        position: "relative",
         boxShadow: "0px 1px 8px rgba(0, 0, 0, 0.2)",
         marginTop: 12,
       }),

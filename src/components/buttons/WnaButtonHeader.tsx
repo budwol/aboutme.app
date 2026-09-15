@@ -110,6 +110,7 @@ const styles = {
   wrapper: {
     display: "flex",
     alignItems: "center",
+    position: "relative",
   },
   pressable: {
     outlineOffset: 2,

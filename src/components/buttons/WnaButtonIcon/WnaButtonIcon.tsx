@@ -45,7 +45,11 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
   return React.createElement(
     "div",
     {
-      style: flattenStyle([createShadowStyle(), style as CSSProperties]),
+      style: flattenStyle([
+        { position: "relative" },
+        createShadowStyle(),
+        style as CSSProperties,
+      ]),
     },
     toolTip && toolTipPosition ? (
       <WnaTooltip
