@@ -63,7 +63,7 @@ export function getAppLayout(isLandscape: boolean) {
     globalCornerRadius: appLayoutConstants.globalCornerRadius,
     contentListPaddingTop: isLandscape
       ? headerHeightLandscape
-      : headerHeightPortrait + 8,
+      : headerHeightPortrait,
     contentPaddingBottom: appLayoutConstants.contentPaddingBottom,
     contentPaddingBottomWhenActionButton:
       appLayoutConstants.contentPaddingBottomWhenActionButton,
