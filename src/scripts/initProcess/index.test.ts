@@ -12,6 +12,7 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
     nginxConfig: string;
     robotsTxt: string;
     sitemapXml: string;
+    llmsTxt: string;
     manifest: string;
   };
   buildAvatarVariantFileName: (fileName: string, size: number) => string;
@@ -327,6 +328,9 @@ describe("init.sh", () => {
       true,
     );
     expect(fs.existsSync(path.join(fixtureRoot, "public", "sitemap.xml"))).toBe(
+      true,
+    );
+    expect(fs.existsSync(path.join(fixtureRoot, "public", "llms.txt"))).toBe(
       true,
     );
     expect(fs.existsSync(path.join(fixtureRoot, "nginx", "site.conf"))).toBe(

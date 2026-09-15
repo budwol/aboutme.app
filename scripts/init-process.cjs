@@ -251,6 +251,21 @@ Disallow: /
 </urlset>
 `;
 
+  // Same opt-out intent as robots.txt/X-Robots-Tag above, expressed in the
+  // format large language model crawlers look for (see llmstxt.org). A
+  // well-formed llms.txt is not a technical block by itself, just like
+  // robots.txt isn't -- it's the AI-crawling-era equivalent of asking
+  // nicely, which is exactly what this site already does for indexing.
+  const llmsTxt = `# ${profileName || appName}
+
+This is a personal portfolio site, not a dataset. It already opts out of
+search indexing (\`noindex, nofollow\`) and disallows all crawling in
+\`robots.txt\`. The same applies here: please do not crawl this site or
+use its content for AI training.
+
+[Homepage](${normalizedSiteUrl}/)
+`;
+
   const manifest = JSON.stringify(
     {
       id: manifestId,
@@ -296,7 +311,7 @@ Disallow: /
     2,
   );
 
-  return { nginxConfig, robotsTxt, sitemapXml, manifest };
+  return { nginxConfig, robotsTxt, sitemapXml, llmsTxt, manifest };
 }
 
 function defaultProcessLogo(rootDir, publicDir) {
@@ -599,15 +614,17 @@ function runInitProcess(rootDir, options = {}) {
   copyFile(sourceLogoSvg, publicLogoSvg);
   processLogo(rootDir, publicDir);
 
-  const { nginxConfig, robotsTxt, sitemapXml, manifest } = buildGeneratedFiles({
-    siteUrl: appData.siteUrl,
-    profileName: appData?.profile?.name ?? "",
-    appName: process.env.APP_NAME ?? "AboutMe",
-  });
+  const { nginxConfig, robotsTxt, sitemapXml, llmsTxt, manifest } =
+    buildGeneratedFiles({
+      siteUrl: appData.siteUrl,
+      profileName: appData?.profile?.name ?? "",
+      appName: process.env.APP_NAME ?? "AboutMe",
+    });
 
   writeTextFile(nginxConfFile, nginxConfig);
   writeTextFile(path.join(publicDir, "robots.txt"), robotsTxt);
   writeTextFile(path.join(publicDir, "sitemap.xml"), sitemapXml);
+  writeTextFile(path.join(publicDir, "llms.txt"), llmsTxt);
   writeTextFile(path.join(publicDir, "site.webmanifest"), `${manifest}\n`);
   copyFile(
     path.join(__dirname, "web-service-worker.js"),
