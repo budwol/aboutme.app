@@ -1,7 +1,10 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
+
+jest.mock("@/i18n/i18n", () => ({
+  getLangCode: () => "de",
+}));
 
 jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
   useWnaNavigationTransition: (router: {

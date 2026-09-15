@@ -1,4 +1,4 @@
-import React, { CSSProperties, memo } from "react";
+import { CSSProperties, memo } from "react";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import WnaIcon from "../icon/WnaIcon/WnaIcon";
 import AppStyle from "@/theme/appStyle";

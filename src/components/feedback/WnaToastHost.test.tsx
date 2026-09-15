@@ -1,5 +1,4 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";

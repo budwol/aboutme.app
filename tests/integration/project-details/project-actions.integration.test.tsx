@@ -17,6 +17,13 @@ import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockOpenURL = jest.fn();
 
+// react-test-renderer can't follow a real DOM portal (it isn't ReactDOM),
+// so render the portal's children inline instead, same as the component's
+// own unit test does.
+jest.mock("react-dom", () => ({
+  createPortal: (children: React.ReactNode) => children,
+}));
+
 function createProjectDetailsAppData(
   project: (typeof testAppData.projects)[number],
 ) {

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { useWnaLayout } from "@/state/WnaAppContext";
 import { WnaHeader } from "@components/chrome/WnaHeader";

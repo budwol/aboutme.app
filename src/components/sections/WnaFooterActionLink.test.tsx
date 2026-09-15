@@ -1,6 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import WnaFooterActionLink from "@components/sections/WnaFooterActionLink";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 describe("WnaFooterActionLink", () => {

@@ -7,7 +7,6 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import React from "react";
 import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 

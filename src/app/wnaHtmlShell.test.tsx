@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 jest.mock("expo-router/html", () => ({
@@ -11,13 +10,9 @@ jest.mock("expo-router/html", () => ({
 describe("+html", () => {
   it("renders the root html shell and removes Expo's injected font node", () => {
     const remove = jest.fn();
-    const originalDocument = global.document;
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: {
-        getElementById: jest.fn(() => ({ remove })),
-      },
-    });
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation(() => ({ remove }) as unknown as HTMLElement);
     const RootHtml = require("./+html").default;
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -47,20 +42,13 @@ describe("+html", () => {
     expect(shellStyles).toContain("wna-hero-shape-swing-positive 13s");
     expect(shellStyles).toContain("wna-hero-shape-swing-negative 13s");
 
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: originalDocument,
-    });
+    getElementByIdSpy.mockRestore();
   });
 
   it("skips removing the font node when it is absent", () => {
-    const originalDocument = global.document;
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: {
-        getElementById: jest.fn(() => null),
-      },
-    });
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation(() => null);
     const RootHtml = require("./+html").default;
 
     expect(() => {
@@ -73,9 +61,6 @@ describe("+html", () => {
       });
     }).not.toThrow();
 
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: originalDocument,
-    });
+    getElementByIdSpy.mockRestore();
   });
 });

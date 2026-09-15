@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import WnaContactSection from "@components/sections/WnaContactSection";
 import { Linking } from "@utils/webLinking";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 import { useTranslation } from "react-i18next";

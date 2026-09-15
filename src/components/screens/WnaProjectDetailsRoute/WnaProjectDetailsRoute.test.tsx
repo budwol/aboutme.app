@@ -10,6 +10,12 @@ import { createProjectSlug } from "@utils/projectRoutes";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { Linking } from "@utils/webLinking";
 
+// WnaWebModal fades out over 180ms once a real `document` is available
+// (jsdom provides one), so tests that close it need to wait past that.
+function waitForModalCloseAnimation() {
+  return act(() => new Promise((resolve) => setTimeout(resolve, 200)));
+}
+
 jest.mock("@/state/WnaAppContext", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { jest: jestModule } = require("@jest/globals");
@@ -618,6 +624,7 @@ describe("WnaProjectDetailsRoute", () => {
         .findByProps({ "data-testid": "private-repo-modal-close" })
         .props.onClick();
     });
+    await waitForModalCloseAnimation();
 
     expect(
       tree!.root.findAllByProps({ id: "private-repo-modal" }),
@@ -870,6 +877,7 @@ describe("WnaProjectDetailsRoute", () => {
         .findByProps({ "data-testid": "private-repo-modal-backdrop" })
         .props.onClick();
     });
+    await waitForModalCloseAnimation();
 
     expect(
       tree!.root.findAllByProps({ id: "private-repo-modal" }),
@@ -890,6 +898,7 @@ describe("WnaProjectDetailsRoute", () => {
     act(() => {
       modalCloseButton.props.onClick();
     });
+    await waitForModalCloseAnimation();
 
     expect(
       tree!.root.findAllByProps({ id: "private-repo-modal" }),

@@ -8,7 +8,6 @@ import {
   it,
   jest,
 } from "@jest/globals";
-import React from "react";
 import { testAppData } from "@/app-data/testAppData";
 import { mockDimensions } from "../../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../../helpers/renderWithAppContext";
