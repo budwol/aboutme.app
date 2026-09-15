@@ -8,9 +8,8 @@ import WnaActivityIndicator from "@components/feedback/WnaActivityIndicator";
 import { WnaFooter } from "@components/chrome/WnaFooter";
 import { WnaHeader } from "@components/chrome/WnaHeader";
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
-import { Href } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { CSSProperties, FC, ReactNode, memo, useCallback } from "react";
+import { WnaHref } from "@/navigation/router/wnaRouter";
+import React, { CSSProperties, FC, ReactNode, memo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import WnaImageBackground from "@components/images/WnaImageBackground";
 
@@ -22,8 +21,8 @@ export type WnaBaseScreenProps = {
   onCancel?: () => void;
   preventBack?: boolean;
   askBeforeBack?: boolean;
-  backHref?: Href;
-  titleHref?: Href;
+  backHref?: WnaHref;
+  titleHref?: WnaHref;
   headerTitle?: string;
   documentTitle?: string;
   icon?: string;
@@ -187,21 +186,19 @@ const WnaBaseScreen: FC<WnaBaseScreenProps> = ({
   const resolvedBackgroundImageUrl =
     backgroundImageUrl ?? appLayout.backgroundImageUrl;
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!isAppInitialized) {
-        return undefined;
-      }
+  useEffect(() => {
+    if (!isAppInitialized) {
+      return undefined;
+    }
 
-      return registerNavigationTransitionBackgroundImageUrl(
-        resolvedBackgroundImageUrl,
-      );
-    }, [
-      isAppInitialized,
-      registerNavigationTransitionBackgroundImageUrl,
+    return registerNavigationTransitionBackgroundImageUrl(
       resolvedBackgroundImageUrl,
-    ]),
-  );
+    );
+  }, [
+    isAppInitialized,
+    registerNavigationTransitionBackgroundImageUrl,
+    resolvedBackgroundImageUrl,
+  ]);
 
   if (!isAppInitialized) return null;
 

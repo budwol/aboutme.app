@@ -1,6 +1,6 @@
 import React, { CSSProperties, useCallback, useMemo } from "react";
 import { Linking } from "@utils/webLinking";
-import { Href, router, useSegments } from "expo-router";
+import { router, useWnaPathname } from "@/navigation/router/wnaRouter";
 import { useTranslation } from "react-i18next";
 
 import WnaDrawerNavigationItem from "@/navigation/components/WnaDrawerNavigationItem";
@@ -19,8 +19,8 @@ import WnaNavigationList, {
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 import {
-  getDrawerNavigationPath,
   getNavigationLang,
+  getNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import {
   appLayoutConstants,
@@ -42,18 +42,17 @@ export default function WnaDrawerMenu() {
   const { appStyle, appColors, theme, setTheme, setAppColors } = useWnaTheme();
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
-  const segments = useSegments();
+  const pathname = useWnaPathname();
   const navigationRouter = useWnaNavigationTransition(router);
   const colorScheme = useBrowserColorScheme();
 
   const langCode = getNavigationLang(getLangCode());
-  const lastSegment = segments.at(-1);
+  const lastSegment = pathname.split("/").filter(Boolean).pop();
 
-  const rootRoute = getDrawerNavigationPath("root", langCode);
-  const disclaimerRoute = getDrawerNavigationPath("disclaimer", langCode);
+  const rootRoute = getNavigationPath("root", langCode);
+  const disclaimerRoute = getNavigationPath("disclaimer", langCode);
 
-  const isStartActive =
-    !lastSegment || ["(tabs)", "(tabs-de)", "(tabs-en)"].includes(lastSegment);
+  const isStartActive = !lastSegment;
   const drawerBackgroundColor = appColors.isDark
     ? appColors.staticCoolgray8
     : appColors.warmgray1;
@@ -77,25 +76,25 @@ export default function WnaDrawerMenu() {
       {
         text: t(i18nKeys.screenTitleExperience),
         iconName: "walk",
-        route: getDrawerNavigationPath("experience", langCode),
+        route: getNavigationPath("experience", langCode),
         type: "secondary",
       },
       {
         text: t(i18nKeys.screenTitleContact),
         iconName: "email-outline",
-        route: getDrawerNavigationPath("contact", langCode),
+        route: getNavigationPath("contact", langCode),
         type: "secondary",
       },
       {
         text: t(i18nKeys.screenTitleProjects),
         iconName: "rocket-launch-outline",
-        route: getDrawerNavigationPath("projects", langCode),
+        route: getNavigationPath("projects", langCode),
         type: "nav",
       },
       {
         text: t(i18nKeys.screenTitleMenuWithoutDots),
         iconName: "dots-horizontal",
-        route: getDrawerNavigationPath("menu", langCode),
+        route: getNavigationPath("menu", langCode),
         type: "nav",
       },
     ],
@@ -105,7 +104,7 @@ export default function WnaDrawerMenu() {
   const handleNavigate = useCallback(
     (targetRoute?: string, isActive?: boolean) => {
       if (!targetRoute || isActive) return;
-      navigationRouter.push(targetRoute as Href);
+      navigationRouter.push(targetRoute);
       closeDrawer();
     },
     [closeDrawer, navigationRouter],
@@ -290,7 +289,7 @@ export default function WnaDrawerMenu() {
           href: disclaimerRoute,
           onClick: (event: React.MouseEvent<HTMLAnchorElement>) => {
             event.preventDefault();
-            navigationRouter.push(disclaimerRoute as Href);
+            navigationRouter.push(disclaimerRoute);
             closeDrawer();
           },
           style: {

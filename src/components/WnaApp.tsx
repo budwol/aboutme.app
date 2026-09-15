@@ -1,7 +1,7 @@
 import Logger from "@/utils/logger";
 import { AppData } from "@/app-data";
 import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
-import { ErrorBoundaryProps, usePathname } from "expo-router";
+import { useWnaPathname } from "@/navigation/router/wnaRouter";
 import React, {
   CSSProperties,
   FC,
@@ -75,7 +75,16 @@ function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
   );
 }
 
-export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+// Structurally matches expo-router's ErrorBoundaryProps (the shape it
+// requires from a route's exported `ErrorBoundary`) without importing it,
+// so this component stays free of expo-router until Phase 3 replaces the
+// bootstrap shim that re-exports it from src/app/_layout.tsx.
+export type WnaErrorBoundaryProps = {
+  error: Error;
+  retry: () => Promise<void>;
+};
+
+export function ErrorBoundary({ error, retry }: WnaErrorBoundaryProps) {
   const { t } = useTranslation(["common"]);
 
   useEffect(() => {
@@ -123,7 +132,7 @@ export type AppComponentProps = PropsWithChildren<{
 
 const WnaApp: FC<AppComponentProps> = ({ children, appData, theme }) => {
   const colorScheme = useBrowserColorScheme();
-  const pathname = usePathname();
+  const pathname = useWnaPathname();
   const dimensionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealFrameRef = useRef<number | null>(null);
   const navigationRevealFrameRef = useRef<number | null>(null);

@@ -4,7 +4,7 @@ import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationT
 import { i18nKeys } from "@/i18n/i18nKeys";
 import AppStyle from "@/theme/appStyle";
 import Colors from "@constants/theme/colors";
-import { Router } from "expo-router";
+import { WnaRouter } from "@/navigation/router/wnaRouter";
 import { TFunction } from "i18next";
 import React, { CSSProperties, memo } from "react";
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
@@ -13,7 +13,7 @@ export type WnaHeaderRouteButtonProps = {
   appColors: Colors;
   appStyle: AppStyle;
   t: TFunction<string[], undefined>;
-  router: Router;
+  router: WnaRouter;
   route: "home" | "projects" | "experience";
 };
 

@@ -15,7 +15,7 @@ const mockPush = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
 const mockCloseDrawer = jest.fn();
-let mockSegments: string[] = ["(drawer)", "(tabs-de)"];
+let mockPathname = "/";
 
 type DrawerItemNode = {
   props: {
@@ -116,9 +116,9 @@ const mockShowWnaToast = (
   }
 ).showWnaToast;
 
-jest.mock("expo-router", () => ({
+jest.mock("@/navigation/router/wnaRouter", () => ({
   router: {},
-  useSegments: () => mockSegments,
+  useWnaPathname: () => mockPathname,
 }));
 
 jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
@@ -205,7 +205,7 @@ describe("WnaDrawerMenu", () => {
     mockSetAppColors.mockClear();
     mockShowWnaToast.mockClear();
     mockCloseDrawer.mockClear();
-    mockSegments = ["(drawer)", "(tabs-de)"];
+    mockPathname = "/";
   });
 
   it("does not trigger a navigation transition when the header is pressed on the home route", async () => {
@@ -226,7 +226,7 @@ describe("WnaDrawerMenu", () => {
   });
 
   it("navigates to the root route and closes the drawer when the header is pressed outside the home route", async () => {
-    mockSegments = ["(drawer)", "experience"];
+    mockPathname = "/taetigkeiten";
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
@@ -239,7 +239,7 @@ describe("WnaDrawerMenu", () => {
       headerPressable.props.onPress();
     });
 
-    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)");
+    expect(mockPush).toHaveBeenCalledWith("/");
     expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 
@@ -366,7 +366,7 @@ describe("WnaDrawerMenu", () => {
   });
 
   it("navigates and closes the drawer when an inactive drawer item is pressed", async () => {
-    mockSegments = ["(drawer)", "experience"];
+    mockPathname = "/taetigkeiten";
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
@@ -382,7 +382,7 @@ describe("WnaDrawerMenu", () => {
       projectsItem!.props.onPress();
     });
 
-    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/projekte");
+    expect(mockPush).toHaveBeenCalledWith("/projekte");
     expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 
@@ -441,7 +441,7 @@ describe("WnaDrawerMenu", () => {
       footerLink.props.onClick({ preventDefault: () => {} });
     });
 
-    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/menu/impressum");
+    expect(mockPush).toHaveBeenCalledWith("/menu/impressum");
     expect(mockCloseDrawer).toHaveBeenCalledTimes(1);
   });
 

@@ -145,22 +145,15 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
   };
 });
 
-jest.mock("expo-router", () => {
+jest.mock("@/navigation/router/WnaRedirect", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ReactModule = require("react");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { jest: jestModule } = require("@jest/globals");
 
-  return {
-    Redirect: (props: unknown) =>
-      ReactModule.createElement("Redirect", props as Record<string, unknown>),
-    useLocalSearchParams: jestModule.fn(),
-    useNavigation: () => ({}),
-    useRouter: () => ({
-      push: jestModule.fn(),
-      replace: jestModule.fn(),
-      back: jestModule.fn(),
-    }),
+  return function MockWnaRedirect(props: unknown) {
+    return ReactModule.createElement(
+      "WnaRedirect",
+      props as Record<string, unknown>,
+    );
   };
 });
 
@@ -368,38 +361,23 @@ describe("WnaProjectDetailsRoute", () => {
       isLandscape: true,
     });
     appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
-
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
-    expoRouter.useLocalSearchParams.mockReset();
   });
 
   it("redirects to the localized projects route when the slug is unknown", async () => {
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: "missing-project",
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute slug="missing-project" />,
+      );
     });
 
-    expect(tree!.root.findByType("Redirect").props.href).toBe(
-      "/(drawer)/(tabs-de)/projekte",
-    );
+    expect(tree!.root.findByType("WnaRedirect").props.href).toBe("/projekte");
   });
 
   it("renders the matching project details for a known slug", async () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
-    };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
     };
     const appData = {
       ...testAppData,
@@ -415,14 +393,15 @@ describe("WnaProjectDetailsRoute", () => {
     };
 
     appContext.useWnaAppData.mockReturnValue({ appData });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     const scrollViewScreen = tree!.root.findByType("WnaScrollViewScreen");
@@ -436,9 +415,7 @@ describe("WnaProjectDetailsRoute", () => {
     );
 
     expect(scrollViewScreen.props.backHref).toBeUndefined();
-    expect(scrollViewScreen.props.titleHref).toBe(
-      "/(drawer)/(tabs-de)/projekte",
-    );
+    expect(scrollViewScreen.props.titleHref).toBe("/projekte");
     expect(scrollViewScreen.props.headerTitle).toBe(appData.projects[0].title);
     expect(heroImage.props.imageUrl).toBe(
       `images/${appData.projects[0].imageL}`,
@@ -480,9 +457,6 @@ describe("WnaProjectDetailsRoute", () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
     const appData = {
       ...testAppData,
       contact: {
@@ -496,16 +470,14 @@ describe("WnaProjectDetailsRoute", () => {
         },
       ],
     };
+    const slug = createProjectSlug(appData.projects[0].title, 0);
 
     appContext.useWnaAppData.mockReturnValue({ appData });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(<WnaProjectDetailsRoute slug={slug} />);
     });
 
     const repoLink = tree!.root
@@ -606,7 +578,7 @@ describe("WnaProjectDetailsRoute", () => {
     );
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(<WnaProjectDetailsRoute slug={slug} />);
     });
 
     const linksAfterRerender = tree!.root.findAllByType("WnaButtonIconText");
@@ -631,7 +603,7 @@ describe("WnaProjectDetailsRoute", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(appData.projects[0].repoUrl);
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(<WnaProjectDetailsRoute slug={slug} />);
     });
 
     const linksAfterSecondRerender =
@@ -656,9 +628,6 @@ describe("WnaProjectDetailsRoute", () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
 
     appContext.useWnaAppData.mockReturnValue({
       appData: {
@@ -671,14 +640,14 @@ describe("WnaProjectDetailsRoute", () => {
         ],
       },
     });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(testAppData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(testAppData.projects[0].title, 0)}
+        />,
+      );
     });
 
     const textValues = tree!.root
@@ -699,9 +668,6 @@ describe("WnaProjectDetailsRoute", () => {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
     };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
     const appData = {
       ...testAppData,
       projects: [
@@ -719,14 +685,14 @@ describe("WnaProjectDetailsRoute", () => {
       currentWindowWidth: 420,
       isLandscape: false,
     });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     const iconButtons = tree!.root.findAllByType("WnaButtonIcon");
@@ -751,9 +717,6 @@ describe("WnaProjectDetailsRoute", () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaTheme: jest.Mock;
-    };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
     };
     const appData = {
       ...testAppData,
@@ -785,14 +748,14 @@ describe("WnaProjectDetailsRoute", () => {
       },
     });
     appContext.useWnaAppData.mockReturnValue({ appData });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     const repoLink = tree!.root
@@ -851,32 +814,10 @@ describe("WnaProjectDetailsRoute", () => {
     });
   });
 
-  it("redirects when the slug param is passed as an array", async () => {
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: [createProjectSlug(testAppData.projects[0].title, 0)],
-    });
-
-    let tree: ReturnType<typeof TestRenderer.create> | undefined;
-
-    await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
-    });
-
-    expect(tree!.root.findByType("WnaScrollViewScreen").props.headerTitle).toBe(
-      testAppData.projects[0].title,
-    );
-  });
-
   it("opens the private repo modal from the compact portrait actions and dismisses it via backdrop and close button", async () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
-    };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
     };
     const appData = {
       ...testAppData,
@@ -895,14 +836,14 @@ describe("WnaProjectDetailsRoute", () => {
       currentWindowWidth: 420,
       isLandscape: false,
     });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     const iconButtons = tree!.root.findAllByType("WnaButtonIcon");
@@ -969,9 +910,6 @@ describe("WnaProjectDetailsRoute", () => {
       useWnaAppData: jest.Mock;
       useWnaLayout: jest.Mock;
     };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
     const appData = {
       ...testAppData,
       projects: [
@@ -990,14 +928,14 @@ describe("WnaProjectDetailsRoute", () => {
       currentWindowWidth: 420,
       isLandscape: false,
     });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     expect(tree!.root.findAllByType("WnaButtonIcon")).toHaveLength(0);
@@ -1015,9 +953,6 @@ describe("WnaProjectDetailsRoute", () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;
     };
-    const expoRouter = jest.requireMock("expo-router") as {
-      useLocalSearchParams: jest.Mock;
-    };
     const appData = {
       ...testAppData,
       projectDetailsContext: undefined,
@@ -1031,14 +966,14 @@ describe("WnaProjectDetailsRoute", () => {
     };
 
     appContext.useWnaAppData.mockReturnValue({ appData });
-    expoRouter.useLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
-      tree = TestRenderer.create(<WnaProjectDetailsRoute />);
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
     });
 
     expect(tree!.root.findAllByType("WnaTechStackSection")).toHaveLength(0);

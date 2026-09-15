@@ -1,8 +1,8 @@
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 import { testAppData } from "@/app-data/testAppData";
 import {
-  getDrawerNavigationPath,
-  getDrawerProjectNavigationPath,
+  getNavigationPath,
+  getProjectNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { createProjectSlug } from "@utils/projectRoutes";
 import {
@@ -28,11 +28,6 @@ jest.mock("react-i18next", () => ({
 
 jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
-}));
-
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({ push: mockPush }),
 }));
 
 jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
@@ -159,15 +154,15 @@ describe("WnaHomeRoute integration", () => {
 
     expect(mockPush).toHaveBeenNthCalledWith(
       1,
-      getDrawerNavigationPath("experience", "de"),
+      getNavigationPath("experience", "de"),
     );
     expect(mockPush).toHaveBeenNthCalledWith(
       2,
-      getDrawerNavigationPath("projects", "de"),
+      getNavigationPath("projects", "de"),
     );
     expect(mockPush).toHaveBeenNthCalledWith(
       3,
-      getDrawerProjectNavigationPath(
+      getProjectNavigationPath(
         createProjectSlug(testAppData.projects[0].title, 0),
         "de",
       ),
@@ -186,7 +181,7 @@ describe("WnaHomeRoute integration", () => {
     projectsCard.props.onProjectPress(1);
 
     expect(mockPush).toHaveBeenCalledWith(
-      getDrawerProjectNavigationPath(
+      getProjectNavigationPath(
         createProjectSlug(testAppData.projects[1].title, 1),
         "de",
       ),

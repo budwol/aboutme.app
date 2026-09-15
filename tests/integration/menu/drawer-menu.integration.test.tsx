@@ -1,4 +1,4 @@
-import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
+import { getNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import { appMotionConstants } from "@constants/motionConstants";
 import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 import {
@@ -52,9 +52,9 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("expo-router", () => ({
+jest.mock("@/navigation/router/wnaRouter", () => ({
   router: {},
-  useSegments: () => ["(drawer)", "(tabs-de)", "kontakt"],
+  useWnaPathname: () => "/kontakt",
 }));
 
 jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
@@ -147,15 +147,15 @@ describe("WnaDrawerMenu integration", () => {
 
     expect(mockPush).toHaveBeenNthCalledWith(
       1,
-      getDrawerNavigationPath("root", "de"),
+      getNavigationPath("root", "de"),
     );
     expect(mockPush).toHaveBeenNthCalledWith(
       2,
-      getDrawerNavigationPath("root", "de"),
+      getNavigationPath("root", "de"),
     );
     expect(mockPush).toHaveBeenNthCalledWith(
       3,
-      getDrawerNavigationPath("projects", "de"),
+      getNavigationPath("projects", "de"),
     );
 
     await act(async () => {
@@ -170,7 +170,7 @@ describe("WnaDrawerMenu integration", () => {
     });
 
     expect(mockPush).toHaveBeenLastCalledWith(
-      getDrawerNavigationPath("disclaimer", "de"),
+      getNavigationPath("disclaimer", "de"),
     );
   });
 });

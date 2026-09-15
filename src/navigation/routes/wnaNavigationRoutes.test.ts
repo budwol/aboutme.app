@@ -28,23 +28,29 @@ describe("wnaNavigationRoutes", () => {
     expect(getNavigationLang("en")).toBe("en");
   });
 
-  it("defaults the drawer path language from getLangCode when not passed", () => {
-    const { getDrawerNavigationPath } = loadRoutesWithLang("de");
+  it("defaults the navigation path language from getLangCode when not passed", () => {
+    const { getNavigationPath } = loadRoutesWithLang("de");
 
-    expect(getDrawerNavigationPath("menu")).toBe("/(drawer)/(tabs-de)/menu");
+    expect(getNavigationPath("menu")).toBe("/menu");
   });
 
-  it("returns the bare tab root for the drawer root route", () => {
-    const { getDrawerNavigationPath } = loadRoutesWithLang("en");
+  it("resolves the root route to a plain slash", () => {
+    const { getNavigationPath } = loadRoutesWithLang("en");
 
-    expect(getDrawerNavigationPath("root", "en")).toBe("/(drawer)/(tabs-en)");
+    expect(getNavigationPath("root", "en")).toBe("/");
   });
 
-  it("defaults the drawer project path language from getLangCode when not passed", () => {
-    const { getDrawerProjectNavigationPath } = loadRoutesWithLang("de");
+  it("defaults the project path language from getLangCode when not passed", () => {
+    const { getProjectNavigationPath } = loadRoutesWithLang("de");
 
-    expect(getDrawerProjectNavigationPath("my-project")).toBe(
-      "/(drawer)/(tabs-de)/projekte/my-project",
+    expect(getProjectNavigationPath("my-project")).toBe("/projekte/my-project");
+  });
+
+  it("builds the english project path with the english segment", () => {
+    const { getProjectNavigationPath } = loadRoutesWithLang("en");
+
+    expect(getProjectNavigationPath("my-project", "en")).toBe(
+      "/projects/my-project",
     );
   });
 });

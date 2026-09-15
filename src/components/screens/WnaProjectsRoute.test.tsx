@@ -29,10 +29,20 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({ push: jest.fn() }),
-}));
+jest.mock("@/navigation/router/wnaRouter", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+
+  return {
+    router: {
+      push: jestModule.fn(),
+      replace: jestModule.fn(),
+      navigate: jestModule.fn(),
+      back: jestModule.fn(),
+      canGoBack: jestModule.fn(() => false),
+    },
+  };
+});
 
 jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -223,7 +233,7 @@ describe("WnaProjectsRoute", () => {
       );
 
     expect(baseScreen.props.headerTitle).toBe("screenTitleProjects");
-    expect(baseScreen.props.titleHref).toBe("/(drawer)/(tabs-de)");
+    expect(baseScreen.props.titleHref).toBe("/");
     expect(headerTextValues).toContain(testAppData.projectsContext);
     expect(headerTextValues).toContain(testAppData.projectsHighlights[0].text);
     expect(headerTextValues).toContain(testAppData.projectsHighlights[1].text);

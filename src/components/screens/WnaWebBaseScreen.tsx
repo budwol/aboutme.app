@@ -1,5 +1,3 @@
-import { useIsFocused } from "@react-navigation/native";
-import { Stack } from "expo-router";
 import { FC, ReactNode, useEffect } from "react";
 
 export type WnaWebBaseScreenProps = {
@@ -8,20 +6,13 @@ export type WnaWebBaseScreenProps = {
 };
 
 const WnaWebBaseScreen: FC<WnaWebBaseScreenProps> = ({ children, title }) => {
-  const isFocused = useIsFocused();
-
   useEffect(() => {
-    if (!title || !isFocused) return;
+    if (!title) return;
 
     document.title = title;
-  }, [isFocused, title]);
+  }, [title]);
 
-  return (
-    <>
-      <Stack.Screen options={{ headerShown: false, title }} />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 };
 
 export default WnaWebBaseScreen;

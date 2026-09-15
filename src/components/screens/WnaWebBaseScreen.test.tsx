@@ -1,26 +1,10 @@
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
-import { describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
-const mockStackScreen = jest.fn();
-const mockUseIsFocused = jest.fn(() => true);
-
-jest.mock("@react-navigation/native", () => ({
-  useIsFocused: () => mockUseIsFocused(),
-}));
-
-jest.mock("expo-router", () => ({
-  Stack: {
-    Screen: (props: unknown) => {
-      mockStackScreen(props);
-      return null;
-    },
-  },
-}));
-
 describe("WnaWebBaseScreen", () => {
-  it("sets the screen options and browser title from the page title", () => {
+  it("sets the browser title from the page title on mount", () => {
     Object.defineProperty(globalThis, "document", {
       value: { title: "Initial" },
       configurable: true,
@@ -35,20 +19,15 @@ describe("WnaWebBaseScreen", () => {
       );
     });
 
-    expect(mockStackScreen).toHaveBeenCalledWith({
-      options: { headerShown: false, title: "Portfolio" },
-    });
     expect(globalThis.document.title).toBe("Portfolio");
   });
 
-  it("restores the browser title when an already mounted screen becomes focused again", () => {
+  it("updates the browser title when the title prop changes", () => {
     Object.defineProperty(globalThis, "document", {
       value: { title: "Project" },
       configurable: true,
       writable: true,
     });
-
-    mockUseIsFocused.mockReturnValue(false);
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -60,18 +39,48 @@ describe("WnaWebBaseScreen", () => {
       );
     });
 
-    expect(globalThis.document.title).toBe("Project");
-
-    mockUseIsFocused.mockReturnValue(true);
+    expect(globalThis.document.title).toBe("Start");
 
     act(() => {
       tree!.update(
-        <WnaWebBaseScreen title="Start">
+        <WnaWebBaseScreen title="Other">
           <></>
         </WnaWebBaseScreen>,
       );
     });
 
-    expect(globalThis.document.title).toBe("Start");
+    expect(globalThis.document.title).toBe("Other");
+  });
+
+  it("leaves the browser title untouched when no title is given", () => {
+    Object.defineProperty(globalThis, "document", {
+      value: { title: "Unchanged" },
+      configurable: true,
+      writable: true,
+    });
+
+    act(() => {
+      TestRenderer.create(
+        <WnaWebBaseScreen>
+          <></>
+        </WnaWebBaseScreen>,
+      );
+    });
+
+    expect(globalThis.document.title).toBe("Unchanged");
+  });
+
+  it("renders its children", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaWebBaseScreen title="Portfolio">
+          <span>content</span>
+        </WnaWebBaseScreen>,
+      );
+    });
+
+    expect(tree!.root.findByType("span").props.children).toBe("content");
   });
 });

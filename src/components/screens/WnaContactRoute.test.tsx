@@ -28,11 +28,6 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({}),
-}));
-
 jest.mock("@components/cards/WnaSurfaceCard", () => {
   const { createElement } = require("react") as typeof import("react");
 
@@ -148,7 +143,7 @@ describe("WnaContactRoute", () => {
     });
 
     expect(tree!.root.findByType("WnaScrollViewScreen").props.titleHref).toBe(
-      "/(drawer)/(tabs-de)",
+      "/",
     );
   });
 });

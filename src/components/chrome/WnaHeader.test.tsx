@@ -48,13 +48,17 @@ jest.mock("@/state/WnaAppContext", () => {
   };
 });
 
-jest.mock("expo-router", () => ({
-  useRouter: () => ({
-    replace: mockReplace,
-    back: mockBack,
-    navigate: mockNavigate,
-    canGoBack: mockCanGoBack,
-  }),
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  // Wrapped (not referenced directly) so each call reads the mock-prefixed
+  // const's current value lazily — the object literal below would
+  // otherwise be built once at module-eval time, before those consts are
+  // initialized, permanently capturing them as undefined.
+  router: {
+    replace: (href: string) => mockReplace(href),
+    back: (fallbackHref?: string) => mockBack(fallbackHref),
+    navigate: (href: string) => mockNavigate(href),
+    canGoBack: () => mockCanGoBack(),
+  },
 }));
 
 jest.mock("@components/effects/WnaBlurView", () => {

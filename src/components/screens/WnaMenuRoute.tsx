@@ -6,13 +6,13 @@ import WnaNavigationItem from "@/navigation/components/WnaNavigationItem";
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 import {
-  getDrawerNavigationPath,
   getNavigationLang,
+  getNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { useRouter } from "expo-router";
+import { router } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
@@ -21,7 +21,6 @@ import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 export default function WnaMenuRoute(): ReactNode {
   const { isAppInitialized } = useWnaAppLifecycle();
   const { appColors, appStyle, theme, setTheme, setAppColors } = useWnaTheme();
-  const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
@@ -94,9 +93,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"scale-balance"}
           type={"first"}
           onPress={() =>
-            navigationRouter.navigate(
-              getDrawerNavigationPath("disclaimer", lang),
-            )
+            navigationRouter.navigate(getNavigationPath("disclaimer", lang))
           }
           t={t}
         />
@@ -107,7 +104,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"shield-account"}
           type={"middle"}
           onPress={() =>
-            navigationRouter.navigate(getDrawerNavigationPath("privacy", lang))
+            navigationRouter.navigate(getNavigationPath("privacy", lang))
           }
           t={t}
         />
@@ -118,7 +115,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"file-sign"}
           type={"middle"}
           onPress={() =>
-            navigationRouter.navigate(getDrawerNavigationPath("terms", lang))
+            navigationRouter.navigate(getNavigationPath("terms", lang))
           }
           t={t}
         />
@@ -129,7 +126,7 @@ export default function WnaMenuRoute(): ReactNode {
           iconName={"certificate-outline"}
           type={"last"}
           onPress={() =>
-            navigationRouter.navigate(getDrawerNavigationPath("licenses", lang))
+            navigationRouter.navigate(getNavigationPath("licenses", lang))
           }
           t={t}
         />

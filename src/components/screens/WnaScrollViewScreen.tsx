@@ -3,7 +3,7 @@ import WnaBaseScreen from "@components/screens/WnaBaseScreen";
 import WnaContactFooter from "@components/chrome/WnaContactFooter";
 import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
-import { Href } from "expo-router";
+import { WnaHref } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, FC, ReactNode, useMemo } from "react";
 
 export type WnaScrollViewScreenProps = {
@@ -12,8 +12,8 @@ export type WnaScrollViewScreenProps = {
   isBusyText?: string | null;
   backgroundImageUrl?: string;
   onCancel?: () => void;
-  backHref?: Href;
-  titleHref?: Href;
+  backHref?: WnaHref;
+  titleHref?: WnaHref;
   preventBack?: boolean;
   askBeforeBack?: boolean;
   headerTitle?: string;

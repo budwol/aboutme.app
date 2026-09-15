@@ -7,13 +7,14 @@ import WnaHtmlRenderer from "@components/content/WnaHtmlRenderer";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
 import {
-  getDrawerNavigationPath,
   getNavigationLang,
+  getNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { getLangCode } from "@/i18n/i18n";
 import { convertHexToRgba } from "@utils/colorConverter";
-import { Redirect, useRouter } from "expo-router";
+import WnaRedirect from "@/navigation/router/WnaRedirect";
+import { router } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
@@ -30,12 +31,11 @@ export default function WnaLegalDocumentScreen({
   const { isAppInitialized } = useWnaAppLifecycle();
   const { appColors, appStyle } = useWnaTheme();
   const { currentWindowWidth } = useWnaLayout();
-  const router = useRouter();
   const { t } = useTranslation(["common"]);
   const lang = getNavigationLang(getLangCode());
 
   if (!isAppInitialized) {
-    return <Redirect href={getDrawerNavigationPath("menu", lang)} />;
+    return <WnaRedirect href={getNavigationPath("menu", lang)} />;
   }
 
   return (

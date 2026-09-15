@@ -52,20 +52,13 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
   };
 });
 
-jest.mock("expo-router", () => {
+jest.mock("@/navigation/router/WnaRedirect", () => {
   const { createElement } = jest.requireActual(
     "react",
   ) as typeof import("react");
 
-  return {
-    Redirect: (props: unknown) =>
-      createElement("Redirect", props as Record<string, unknown>),
-    useNavigation: () => ({}),
-    useRouter: () => ({
-      push: () => undefined,
-      replace: () => undefined,
-      back: () => undefined,
-    }),
+  return function MockWnaRedirect(props: unknown) {
+    return createElement("WnaRedirect", props as Record<string, unknown>);
   };
 });
 
@@ -91,9 +84,7 @@ describe("WnaLegalDocumentScreen", () => {
       );
     });
 
-    expect(tree!.root.findByType("Redirect").props.href).toBe(
-      "/(drawer)/(tabs-de)/menu",
-    );
+    expect(tree!.root.findByType("WnaRedirect").props.href).toBe("/menu");
   });
 
   it("disables the shared contact footer for legal content pages", () => {

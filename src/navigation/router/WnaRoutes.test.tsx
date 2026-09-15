@@ -1,0 +1,61 @@
+import { describe, expect, it, jest } from "@jest/globals";
+import React from "react";
+import TestRenderer, { act } from "react-test-renderer";
+import WnaRoutes from "@/navigation/router/WnaRoutes";
+
+const mockUseWnaPathname = jest.fn();
+const mockMatchRoute = jest.fn();
+const mockReplace = jest.fn();
+const mockGetNavigationPath = jest.fn((_key: string) => "/root");
+
+jest.mock("@/navigation/router/wnaRouteTable", () => ({
+  matchRoute: (...args: unknown[]) => mockMatchRoute(...args),
+}));
+
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  router: { replace: (href: string) => mockReplace(href) },
+  useWnaPathname: () => mockUseWnaPathname(),
+}));
+
+jest.mock("@/navigation/routes/wnaNavigationRoutes", () => ({
+  getNavigationPath: (key: string) => mockGetNavigationPath(key),
+}));
+
+function MockScreen({ slug }: { slug?: string }) {
+  return React.createElement("MockScreen", { slug });
+}
+
+describe("WnaRoutes", () => {
+  it("renders the matched route's component with its params", () => {
+    mockUseWnaPathname.mockReturnValue("/projekte/pizza-app-2");
+    mockMatchRoute.mockReturnValue({
+      Component: MockScreen,
+      params: { slug: "pizza-app-2" },
+    });
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaRoutes />);
+    });
+
+    const screen = tree!.root.findByType(MockScreen);
+    expect(screen.props.slug).toBe("pizza-app-2");
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it("renders nothing and redirects to the root route when no route matches", () => {
+    mockUseWnaPathname.mockReturnValue("/this-page-does-not-exist");
+    mockMatchRoute.mockReturnValue(undefined);
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaRoutes />);
+    });
+
+    expect(tree!.toJSON()).toBeNull();
+    expect(mockGetNavigationPath).toHaveBeenCalledWith("root");
+    expect(mockReplace).toHaveBeenCalledWith("/root");
+  });
+});

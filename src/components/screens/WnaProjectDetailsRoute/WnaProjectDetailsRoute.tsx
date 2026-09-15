@@ -7,8 +7,8 @@ import WnaSurfaceCard from "@components/cards/WnaSurfaceCard";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
 import {
-  getDrawerNavigationPath,
   getNavigationLang,
+  getNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
@@ -16,7 +16,8 @@ import WnaTechStackSection from "@components/sections/WnaTechStackSection";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { findProjectBySlug } from "@utils/projectRoutes";
-import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import WnaRedirect from "@/navigation/router/WnaRedirect";
+import { router } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, ReactNode, useMemo, useState } from "react";
 import { Linking } from "@utils/webLinking";
 import { useTranslation } from "react-i18next";
@@ -27,28 +28,28 @@ import WnaProjectHero from "./WnaProjectHero";
 import { styles } from "./wnaProjectDetailsRouteStyles";
 import type { WnaProjectLink } from "./wnaProjectDetailsRouteTypes";
 
-export default function WnaProjectDetailsRoute(): ReactNode {
+export type WnaProjectDetailsRouteProps = {
+  slug?: string;
+};
+
+export default function WnaProjectDetailsRoute({
+  slug,
+}: WnaProjectDetailsRouteProps): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
   const { currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
-  const router = useRouter();
-  const params = useLocalSearchParams<{ slug?: string | string[] }>();
   const [isPrivateRepoModalVisible, setIsPrivateRepoModalVisible] =
     useState(false);
-  const rawSlug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const projectMatch = useMemo(
-    () => findProjectBySlug(appData.projects, rawSlug),
-    [appData.projects, rawSlug],
+    () => findProjectBySlug(appData.projects, slug),
+    [appData.projects, slug],
   );
 
   if (!projectMatch) {
     return (
-      <Redirect
-        href={getDrawerNavigationPath(
-          "projects",
-          getNavigationLang(getLangCode()),
-        )}
+      <WnaRedirect
+        href={getNavigationPath("projects", getNavigationLang(getLangCode()))}
       />
     );
   }
@@ -90,7 +91,7 @@ export default function WnaProjectDetailsRoute(): ReactNode {
     <WnaScrollViewScreen
       headerTitle={project.title}
       iconName="rocket-launch-outline"
-      titleHref={getDrawerNavigationPath("projects", lang)}
+      titleHref={getNavigationPath("projects", lang)}
       headerButton0={
         <WnaHeaderRouteButton
           appStyle={appStyle}

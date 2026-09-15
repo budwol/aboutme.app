@@ -3,12 +3,12 @@ import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
-import { getDrawerNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
+import { getNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaSeparatorHorizontal from "@components/display/WnaSeparatorHorizontal";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaContactSection from "@components/sections/WnaContactSection";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { useRouter } from "expo-router";
+import { router } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
@@ -31,13 +31,12 @@ export default function WnaContactRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
   const { t } = useTranslation(["common"]);
-  const router = useRouter();
 
   return (
     <WnaScrollViewScreen
       isRootPage
       headerTitle={t(i18nKeys.screenTitleContact)}
-      titleHref={getDrawerNavigationPath("root")}
+      titleHref={getNavigationPath("root")}
       iconName={"email"}
       showContactFooter={false}
       headerButton0={

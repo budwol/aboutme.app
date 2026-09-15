@@ -1,8 +1,8 @@
 # Plain React Migration
 
-Fortschritt: `[#####---------------]` 25% (1 von 4 Phasen abgeschlossen)
+Fortschritt: `[##########----------]` 50% (2 von 4 Phasen abgeschlossen)
 
-Status: **in Arbeit** (Phase 1 abgeschlossen, Phase 2 als nächstes). Dieses
+Status: **in Arbeit** (Phase 1 und 2 abgeschlossen, Phase 3 als nächstes). Dieses
 Dokument ist am 2026-09-15 vollständig anhand des
 tatsächlichen Codestands neu geschrieben worden (vorherige Fassung stammte von
 vor Abschluss der Web-Only-Migration und war an mehreren Stellen nicht mehr
@@ -79,15 +79,15 @@ Punkt; die Migration beginnt direkt mit Phase 1.
 
 ## Dependency-Zielbild (verifiziert 2026-09-15)
 
-| Dependency                                                                                                                                   | Aktuell genutzt von                                                                                                   | Ziel      | Phase                                     |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------- |
-| `expo-linking`                                                                                                                               | niemandem direkt in `src/` — aber nicht-optionaler Peer von `expo-router`                                             | entfernen | 3 (fällt automatisch mit expo-router weg) |
-| `react-native-safe-area-context`, `react-native-screens`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | niemandem direkt — nur noch Peer-Dependencies von `expo-router`/`@react-navigation/native`                            | entfernen | 3 (fällt automatisch mit expo-router weg) |
-| `react-native-logs`                                                                                                                          | `src/utils/loggerBase/index.ts` (1 Datei)                                                                             | entfernen | 1                                         |
-| `@react-navigation/native`                                                                                                                   | `useFocusEffect` (WnaBaseScreen.tsx), `useIsFocused` (WnaWebBaseScreen.tsx)                                           | entfernen | 2                                         |
-| `expo-router`                                                                                                                                | 22 Dateien, siehe Phase 2                                                                                             | entfernen | 2                                         |
-| `expo`, `expo-doctor`, `jest-expo`, `eslint-config-expo`, `expo-constants`                                                                   | Build/Dev-Tooling, `app.config.ts`, `metro.config.js`, `jest.config.cjs`, `currentAppVersion.ts`, `eslint.config.cjs` | entfernen | 3                                         |
-| `react-native`, `react-native-web`                                                                                                           | 19 Dateien, siehe Phase 1 (Rest-APIs) — Grundlast fällt mit `expo`/`expo-router` weg, da diese sie als Peer verlangen | entfernen | 3/4                                       |
+| Dependency                                                                                                                                   | Aktuell genutzt von                                                                                                                        | Ziel      | Phase                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----------------------------------------- |
+| `expo-linking`                                                                                                                               | niemandem direkt in `src/` — aber nicht-optionaler Peer von `expo-router`                                                                  | entfernen | 3 (fällt automatisch mit expo-router weg) |
+| `react-native-safe-area-context`, `react-native-screens`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | niemandem direkt — nur noch Peer-Dependencies von `expo-router`/`@react-navigation/native`                                                 | entfernen | 3 (fällt automatisch mit expo-router weg) |
+| `react-native-logs`                                                                                                                          | `src/utils/loggerBase/index.ts` (1 Datei)                                                                                                  | entfernen | 1                                         |
+| `@react-navigation/native`                                                                                                                   | niemandem mehr (Phase 2 hat `useFocusEffect`/`useIsFocused` durch `useEffect` ersetzt) — nur noch transitive `expo-router`-Peer-Dependency | entfernen | 3 (fällt automatisch mit expo-router weg) |
+| `expo-router`                                                                                                                                | nur noch der minimale Bootstrap-Shim in `src/app/` (siehe Phase 2) — keine Routing-API mehr sonst in `src/` genutzt                        | entfernen | 3                                         |
+| `expo`, `expo-doctor`, `jest-expo`, `eslint-config-expo`, `expo-constants`                                                                   | Build/Dev-Tooling, `app.config.ts`, `metro.config.js`, `jest.config.cjs`, `currentAppVersion.ts`, `eslint.config.cjs`                      | entfernen | 3                                         |
+| `react-native`, `react-native-web`                                                                                                           | 19 Dateien, siehe Phase 1 (Rest-APIs) — Grundlast fällt mit `expo`/`expo-router` weg, da diese sie als Peer verlangen                      | entfernen | 3/4                                       |
 
 ## Phasen
 
@@ -221,8 +221,53 @@ grün, 100 % Coverage weiter erfüllt.
 
 ### Phase 2: Routing-Ablösung (`expo-router` + `@react-navigation/native`)
 
-Status: **geplant** · Risiko: mittel-hoch · das ist der eigentliche Kern der
-Migration.
+Status: **abgeschlossen** (2026-09-15) · Risiko: mittel-hoch · das ist der
+eigentliche Kern der Migration.
+
+Umgesetzt: ein neuer, handgeschriebener Router unter
+`src/navigation/router/` (`wnaRouter.ts` — History-API-Singleton +
+`useWnaPathname()` via `useSyncExternalStore`; `wnaRouteTable.ts` —
+`matchRoute()` gegen die unveränderte `routeDefinitions`-Tabelle plus
+Slug-Erkennung; `WnaRoutes.tsx` — löst die aktuelle Route auf und rendert
+sie, Fallback per `router.replace()`; `WnaRedirect.tsx` — Drop-in für die
+drei verbliebenen deklarativen Redirects) ersetzt vollständig
+`useRouter`/`useLocalSearchParams`/`useSegments`/`usePathname`/`Redirect`/
+`<Slot>`/`<Stack>`/`<Tabs>` in der gesamten Anwendung.
+`getDrawerNavigationPath`/`getDrawerProjectNavigationPath`
+(`wnaNavigationRoutes.ts`) sind zu `getNavigationPath`/
+`getProjectNavigationPath` vereinfacht (kein `/(drawer)/(tabs-…)`-Präfix
+mehr nötig). `WnaTabLayout.tsx`, `WnaStackLayout.tsx`,
+`WnaStackScreenOptions.tsx` und `wnaTabLayoutConfig.ts` sind gelöscht
+(Befund 2 bestätigt: keine sichtbare UI, kein zu erhaltender Zustand).
+`useFocusEffect`/`useIsFocused` sind durch einen einfachen `useEffect`
+ersetzt (`WnaBaseScreen.tsx`, `WnaWebBaseScreen.tsx`).
+
+**`src/app/` bleibt bewusst bestehen, aber minimal**: `_layout.tsx`
+(Shim, mountet `WnaRootLayout`), `+html.tsx` (unverändert), `+not-found.tsx`
+sowie 17 Ein-Zeilen-Stub-Dateien (`export { default } from
+"@/navigation/router/WnaRoutes"`), je eine pro echtem URL-Pfad aus
+`routeDefinitions` plus die zwei dynamischen Slug-Routen. Grund: ein
+einzelner Catch-all (`[...all].tsx`) wurde zuerst versucht und
+funktionierte im Dev-Server einwandfrei, brach aber beim echten
+`expo export -p web` zwei unabhängige Dinge, die nur der volle
+Validierungslauf (nicht `test:unit`/`test:integration`) aufgedeckt hat:
+(1) `dist/index.html` wurde nicht mehr erzeugt — ein Wildcard-Routenknoten
+kann von Expos Exporter nicht auf einen konkreten Pfad vorgerendert
+werden, das hätte eine Serverseitig konfigurierte SPA-Fallback-Regel für
+die Produktions-Domain vorausgesetzt, die aktuell nicht existiert (und
+deren Einführung eine bewusste, mit dem Nutzer abgestimmte
+Infrastruktur-Änderung wäre, keine Nebenwirkung dieser Phase); (2) echte
+unbekannte Pfade luden gar nicht mehr die eigene App (landeten auf Expos
+eingebauter Default-404-Seite statt auf `WnaRoutes`' eigener
+"kein Match → redirect"-Logik), weil ohne konkrete Datei pro Route auch
+kein `+not-found.tsx` mehr fürs Auffangen zuständig war. Die
+Stub-Datei-Lösung reproduziert exakt das bisherige
+Pro-Route-Export-Verhalten (verifiziert: alle 20 vorher vorhandenen
+`dist/**/*.html`-Dateien inkl. `dist/index.html` entstehen weiterhin,
+`test:smoke` grün) und hält damit das Deployment-Modell unverändert — eine
+Vereinfachung auf eine einzelne `index.html` bleibt bewusst Phase 3
+vorbehalten, wo sie ohnehin ansteht (siehe dortige Sektion) und dort mit
+einer expliziten Hosting-Absprache einhergehen kann.
 
 **Genutzte API-Oberfläche** (22 Dateien, per grep vollständig erfasst):
 `Slot` (2×, Root- und Drawer-Layout), `Stack`/`Stack.Screen` (2×, siehe
@@ -482,6 +527,8 @@ erfüllt, die Ergebnisse hier dokumentiert und die Änderungen committed sind.
 | 2026-09-15 | -     | Plan vollständig neu geschrieben: Web-Only-Migration ist inzwischen abgeschlossen (alter "Phase 1" entfällt), verbleibende `react-native`-Nutzung auf 19 Dateien/7 Kategorien reduziert und einzeln verifiziert, `expo-router`-API-Oberfläche auf 22 Dateien vollständig erfasst, bilinguale Slug-Routing-Struktur dokumentiert, Stack/Tabs-Redundanz zur eigenen Transition-Overlay per Live-Test indiziert (noch zu bestätigen), Build-Tooling-Kopplung an Expo (Metro, app.config.ts, +html.tsx, Export-Skripte, jest-expo) Datei für Datei aufgelistet, `expo-linking` als toter Import identifiziert | Keine Code-Änderung in dieser Session; Recherche per `grep -rl` (react-native, expo-router, expo-linking, react-native-logs, react-navigation, EXPO_PUBLIC), Playwright-Live-Test der Stack-Transition, Lesen von `metro.config.js`/`app.config.ts`/`jest.config.cjs`/allen `scripts/*.cjs`/`scripts/*.sh`/`.github/workflows/*.yml` |
 
 | 2026-09-15 | 1 | Phase 1 vollständig umgesetzt: alle 7 Kategorien der `react-native`-Restnutzung entfernt (`StyleSheet.flatten`/`.create` → `flattenStyle.ts`, `useColorScheme` → `useBrowserColorScheme.ts`, `useWindowDimensions` → `useWnaLayout().currentWindowWidth`, `Platform.OS` vereinfacht, `ViewStyle`/`TextStyle`/`ColorSchemeName`/`DimensionValue` → Web-Typen, `NativeScrollEvent`/`NativeSyntheticEvent` → `React.UIEvent`, `react-native-logs` → eigener Console-Wrapper); `expo-linking`-Fehleinschätzung aus der letzten Session korrigiert (bleibt bis Phase 3, ist nicht-optionaler `expo-router`-Peer) | `test:prettier`, `lint`, `test:types`, `test:circular`, `test:unit` (573/573), `test:coverage` (100 %), `test:integration` (31/31), `test:deps`, `test:e2e` (47/47, mehrfach wiederholt) — alle grün; ein vierter, zunächst übersehener `useWnaScrollY`-Aufrufer (`WnaScrollViewScreen.tsx`) wurde nur durch die E2E-Suite aufgedeckt (`pageerror` auf der mobilen Kontaktseite) und per `git stash`-Gegenprobe als echte Regression bestätigt, dann gefixt |
+
+| 2026-09-15 | 2 | Phase 2 vollständig umgesetzt: handgeschriebener Router unter `src/navigation/router/` (`wnaRouter.ts`, `wnaRouteTable.ts`, `WnaRoutes.tsx`, `WnaRedirect.tsx`) ersetzt `expo-router`s Routing-API überall in der Anwendung (nur der minimale Bootstrap-Shim in `src/app/` importiert noch `expo-router` selbst); `<Tabs>`/`<Stack>`/zugehörige Konfigurationsdateien gelöscht; `useFocusEffect`/`useIsFocused` durch `useEffect` ersetzt | `test:prettier`, `lint`, `test:types`, `test:circular`, `test:unit` (598/598), `test:coverage` (100 %), `test:integration` (31/31), `test:deps`, `test:e2e` (47/47, 3× wiederholt), `test:smoke` (2×) — alle grün. Ein Catch-all-Routenansatz (`[...all].tsx`) wurde verworfen: er bestand `test:e2e` gegen den Dev-Server, brach aber beim echten `expo export -p web` sowohl `dist/index.html` als auch die 404-Weiterleitung für echte unbekannte Pfade — nur durch `test:smoke` und eine erneute volle `test:e2e`-Runde nach der Korrektur aufgedeckt, siehe Phase-2-Abschnitt oben für Details |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

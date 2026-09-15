@@ -16,7 +16,6 @@ import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockOpenURL = jest.fn();
-const mockUseLocalSearchParams = jest.fn();
 
 function createProjectDetailsAppData(
   project: (typeof testAppData.projects)[number],
@@ -101,26 +100,24 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
   return createMockComponent("WnaScrollViewScreen", true);
 });
 
-jest.mock("expo-router", () => {
+jest.mock("@/navigation/router/wnaRouter", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { jest: jestModule } = require("@jest/globals");
-  const ReactModule = jestModule.requireActual(
-    "react",
-  ) as typeof import("react");
 
   return {
-    Redirect: (props: unknown) =>
-      ReactModule.createElement("Redirect", props as Record<string, unknown>),
-    useLocalSearchParams: () => mockUseLocalSearchParams(),
-    useNavigation: () => ({}),
-    useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
+    router: {
+      push: jestModule.fn(),
+      replace: jestModule.fn(),
+      navigate: jestModule.fn(),
+      back: jestModule.fn(),
+      canGoBack: jestModule.fn(() => false),
+    },
   };
 });
 
 describe("WnaProjectDetailsRoute mobile action integration", () => {
   beforeEach(() => {
     mockDimensions(390, 844);
-    mockUseLocalSearchParams.mockReset();
     mockOpenURL.mockReset();
     jest
       .spyOn(Linking, "openURL")
@@ -142,13 +139,10 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
       webUrl: "https://example.com/app",
       playStoreUrl: "https://play.google.com/store/apps/details?id=app",
     };
-    mockUseLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(project.title, 0),
-    });
-
-    const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: createProjectDetailsAppData(project),
-    });
+    const tree = await renderWithAppContext(
+      <WnaProjectDetailsRoute slug={createProjectSlug(project.title, 0)} />,
+      { appData: createProjectDetailsAppData(project) },
+    );
 
     const iconActions = getIconActions(tree);
 
@@ -172,13 +166,10 @@ describe("WnaProjectDetailsRoute mobile action integration", () => {
       repoUrl: "https://github.com/example/private-repo",
       webUrl: "https://example.com/app",
     };
-    mockUseLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(project.title, 0),
-    });
-
-    const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData: createProjectDetailsAppData(project),
-    });
+    const tree = await renderWithAppContext(
+      <WnaProjectDetailsRoute slug={createProjectSlug(project.title, 0)} />,
+      { appData: createProjectDetailsAppData(project) },
+    );
 
     const iconActions = getIconActions(tree);
 
