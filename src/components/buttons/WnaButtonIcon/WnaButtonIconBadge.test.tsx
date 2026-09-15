@@ -1,5 +1,4 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaButtonIconBadge from "@components/buttons/WnaButtonIcon/WnaButtonIconBadge";
 import WnaIcon from "@components/icon/WnaIcon/WnaIcon";

@@ -8,7 +8,7 @@ import {
   jest,
 } from "@jest/globals";
 import React from "react";
-import { Linking } from "react-native";
+import { Linking } from "@utils/webLinking";
 import { act } from "react-test-renderer";
 import WnaProjectDetailsRoute from "@/components/screens/WnaProjectDetailsRoute";
 import { testAppData } from "@/app-data/testAppData";
@@ -16,6 +16,13 @@ import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockOpenURL = jest.fn();
+
+// react-test-renderer can't follow a real DOM portal (it isn't ReactDOM),
+// so render the portal's children inline instead, same as the component's
+// own unit test does.
+jest.mock("react-dom", () => ({
+  createPortal: (children: React.ReactNode) => children,
+}));
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({

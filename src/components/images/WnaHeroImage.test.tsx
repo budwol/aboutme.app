@@ -1,6 +1,5 @@
 import WnaHeroImage from "@components/images/WnaHeroImage";
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 jest.mock("@components/images/WnaImage", () => {

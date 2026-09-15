@@ -1,32 +1,21 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { afterEach, describe, expect, it } from "@jest/globals";
+import currentAppVersion from "@utils/currentAppVersion";
 
 describe("currentAppVersion", () => {
-  it("reads the app version exposed via Constants.expoConfig.extra", () => {
-    jest.resetModules();
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: { expoConfig: { extra: { appVersion: "9.9.9" } } },
-    }));
+  const originalVersion = globalThis.__APP_VERSION__;
 
-    const currentAppVersion =
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      (require("@utils/currentAppVersion") as { default: () => string })
-        .default;
+  afterEach(() => {
+    globalThis.__APP_VERSION__ = originalVersion;
+  });
+
+  it("reads the build-injected app version", () => {
+    globalThis.__APP_VERSION__ = "9.9.9";
 
     expect(currentAppVersion()).toBe("9.9.9");
   });
 
-  it("falls back to a placeholder version when the config is unavailable", () => {
-    jest.resetModules();
-    jest.doMock("expo-constants", () => ({
-      __esModule: true,
-      default: { expoConfig: undefined },
-    }));
-
-    const currentAppVersion =
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      (require("@utils/currentAppVersion") as { default: () => string })
-        .default;
+  it("falls back to a placeholder version when it is not injected", () => {
+    globalThis.__APP_VERSION__ = undefined;
 
     expect(currentAppVersion()).toBe("0.0.0");
   });

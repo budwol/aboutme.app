@@ -3,7 +3,6 @@ import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
 import WnaContactSection from "@components/sections/WnaContactSection";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import Logger from "wna-logger";
-import React from "react";
 import { Linking } from "@utils/webLinking";
 import { act } from "react-test-renderer";
 import { mockDimensions } from "../../helpers/mockDimensions";

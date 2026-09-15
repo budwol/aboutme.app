@@ -1,5 +1,11 @@
 module.exports = {
-  preset: "jest-expo",
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      { isolatedModules: true, tsconfig: { module: "commonjs" } },
+    ],
+  },
   setupFiles: ["<rootDir>/jest.setup.cjs"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",

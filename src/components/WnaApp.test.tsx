@@ -13,7 +13,6 @@ import { testAppData } from "@/app-data/testAppData";
 import { appMotionConstants } from "@constants/motionConstants";
 
 const mockLoggerError = jest.fn();
-const originalRequestAnimationFrame = global.requestAnimationFrame;
 let mockPathname = "/start";
 let activeTree: ReturnType<typeof TestRenderer.create> | undefined;
 
@@ -174,9 +173,8 @@ describe("WnaApp", () => {
       });
       activeTree = undefined;
     }
-    global.requestAnimationFrame = originalRequestAnimationFrame;
-    jest.useRealTimers();
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   it("renders only the neutral boot shell before initialization", () => {
@@ -242,13 +240,13 @@ describe("WnaApp", () => {
 
   it("removes the static export shell when the app mounts", () => {
     const removeStaticShell = jest.fn();
-    const originalDocument = global.document;
-    (global as typeof globalThis & { document: Document }).document = {
-      getElementById: (id: string) =>
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation((id: string) =>
         id === "wna-static-shell"
           ? ({ remove: removeStaticShell } as unknown as HTMLElement)
           : null,
-    } as Document;
+      );
 
     act(() => {
       createTrackedTree(
@@ -260,7 +258,33 @@ describe("WnaApp", () => {
 
     expect(removeStaticShell).toHaveBeenCalled();
 
-    global.document = originalDocument;
+    getElementByIdSpy.mockRestore();
+  });
+
+  it("skips removing the static export shell when no document is available", () => {
+    const originalDocument = globalThis.document;
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      writable: true,
+      value: undefined,
+    });
+
+    try {
+      expect(() => {
+        act(() => {
+          createTrackedTree(
+            <WnaApp appData={testAppData} theme="system">
+              <></>
+            </WnaApp>,
+          );
+        });
+      }).not.toThrow();
+    } finally {
+      Object.defineProperty(globalThis, "document", {
+        configurable: true,
+        value: originalDocument,
+      });
+    }
   });
 
   it("renders the opener bubble field with the provided app data", () => {
@@ -382,13 +406,40 @@ describe("WnaApp", () => {
     });
   });
 
+  it("skips wiring resize events when window.addEventListener is unavailable", () => {
+    // `addEventListener` lives on the prototype, so shadow it with an
+    // own, non-function property instead of trying to `delete` it.
+    Object.defineProperty(window, "addEventListener", {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      expect(() => {
+        act(() => {
+          createTrackedTree(
+            <WnaApp appData={testAppData} theme="system">
+              <></>
+            </WnaApp>,
+          );
+        });
+      }).not.toThrow();
+
+      expect(mockSetDimensions).toHaveBeenCalledTimes(1);
+    } finally {
+      delete (window as { addEventListener?: unknown }).addEventListener;
+    }
+  });
+
   it("shows the navigation transition overlay after the intro completed", () => {
     jest.useFakeTimers();
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -419,11 +470,13 @@ describe("WnaApp", () => {
 
   it("finishes the navigation transition after the pathname changes", () => {
     jest.useFakeTimers();
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -450,10 +503,12 @@ describe("WnaApp", () => {
 
     mockPathname = "/next";
     const queuedFrames: FrameRequestCallback[] = [];
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      queuedFrames.push(callback);
-      return queuedFrames.length;
-    }) as never;
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        queuedFrames.push(callback);
+        return queuedFrames.length;
+      });
 
     act(() => {
       tree!.update(
@@ -513,7 +568,7 @@ describe("WnaApp", () => {
   it("keeps the navigation transition inactive during the intro", () => {
     jest.useFakeTimers();
     mockIsNavigationTransitionActive = true;
-    global.requestAnimationFrame = jest.fn(() => 1) as never;
+    jest.spyOn(global, "requestAnimationFrame").mockImplementation(() => 1);
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -530,11 +585,13 @@ describe("WnaApp", () => {
   it("renders the navigation transition over its background image", () => {
     jest.useFakeTimers();
     mockAppColors = { ...mockAppColors, isDark: true };
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -627,11 +684,13 @@ describe("WnaApp", () => {
   it("uses the active screen background image for the navigation transition", () => {
     jest.useFakeTimers();
     mockNavigationTransitionBackgroundImageUrl = "/project-background.webp";
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -670,11 +729,13 @@ describe("WnaApp", () => {
   it("falls back to the layout background when the active transition background is blank", () => {
     jest.useFakeTimers();
     mockNavigationTransitionBackgroundImageUrl = "   ";
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -708,11 +769,13 @@ describe("WnaApp", () => {
 
   it("waits for the outgoing CSS transition before finishing navigation", () => {
     jest.useFakeTimers();
-    global.requestAnimationFrame = ((callback: FrameRequestCallback) => {
-      callback(0);
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
 
-      return 1;
-    }) as never;
+        return 1;
+      });
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

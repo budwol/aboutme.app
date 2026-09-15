@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaCardVerticalImage from "@components/cards/WnaCardVerticalImage";
 

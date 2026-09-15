@@ -1,5 +1,4 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerLayout from "@/navigation/components/WnaDrawerLayout";
 
@@ -99,15 +98,6 @@ describe("WnaDrawerLayout", () => {
 
   it("activates the drawer panel transition on the next frame after opening", () => {
     jest.useFakeTimers();
-    const originalDocument = global.document;
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: {
-        body: {},
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-      },
-    });
     mockUseWnaTheme.mockReturnValue({ appColors: lightColors });
     mockUseWnaAppLifecycle.mockImplementation(() => ({
       isDrawerOpen: true,
@@ -134,29 +124,43 @@ describe("WnaDrawerLayout", () => {
     });
     expect(backdropAfter.props.style.opacity).toBe(1);
 
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: originalDocument,
-    });
     jest.useRealTimers();
+  });
+
+  it("starts already active when no real document body is available to animate against", () => {
+    const bodySpy = jest
+      .spyOn(document, "body", "get")
+      .mockReturnValue(undefined as never);
+    mockUseWnaTheme.mockReturnValue({ appColors: lightColors });
+    mockUseWnaAppLifecycle.mockImplementation(() => ({
+      isDrawerOpen: true,
+      closeDrawer: jest.fn(),
+    }));
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaDrawerLayout />);
+    });
+
+    const backdrop = tree!.root.findByProps({
+      "data-testid": "wna-drawer-backdrop",
+    });
+    expect(backdrop.props.style.opacity).toBe(1);
+
+    bodySpy.mockRestore();
   });
 
   it("closes on Escape and disables pointer events on the overlay", () => {
     jest.useFakeTimers();
-    const originalDocument = global.document;
     const escapeHandlers: ((event: { key: string }) => void)[] = [];
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: {
-        body: {},
-        addEventListener: jest.fn((type: string, listener: unknown) => {
-          if (type === "keydown") {
-            escapeHandlers.push(listener as (event: { key: string }) => void);
-          }
-        }),
-        removeEventListener: jest.fn(),
-      },
-    });
+    const addEventListenerSpy = jest
+      .spyOn(document, "addEventListener")
+      .mockImplementation((type: string, listener: unknown) => {
+        if (type === "keydown") {
+          escapeHandlers.push(listener as (event: { key: string }) => void);
+        }
+      });
     mockUseWnaTheme.mockReturnValue({ appColors: lightColors });
     const mockCloseDrawer = jest.fn();
     let isOpen = true;
@@ -200,10 +204,7 @@ describe("WnaDrawerLayout", () => {
     });
     expect(panel.props.style.transform).toBe("translateX(100%)");
 
-    Object.defineProperty(global, "document", {
-      configurable: true,
-      value: originalDocument,
-    });
+    addEventListenerSpy.mockRestore();
     jest.useRealTimers();
   });
 });

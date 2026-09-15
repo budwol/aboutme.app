@@ -386,6 +386,31 @@ describe("normalizeAppData", () => {
     fetchSpy.mockRestore();
   });
 
+  it("falls back to the public json endpoint when no document is available", async () => {
+    const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        siteUrl: "https://portfolio.example.com/",
+        profile: {
+          name: "Loaded Person",
+        },
+      }),
+    } as Response);
+    const originalDocument = globalThis.document;
+    // @ts-expect-error -- simulating an environment with no DOM at all
+    delete globalThis.document;
+
+    try {
+      const data = await loadAppData();
+
+      expect(data.profile.name).toBe("Loaded Person");
+    } finally {
+      globalThis.document = originalDocument;
+    }
+
+    fetchSpy.mockRestore();
+  });
+
   it("prefers embedded export app-data over the public json endpoint", async () => {
     const fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
@@ -395,9 +420,9 @@ describe("normalizeAppData", () => {
         },
       }),
     } as Response);
-    const originalDocument = global.document;
-    (global as typeof globalThis & { document: Document }).document = {
-      getElementById: (id: string) =>
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation((id: string) =>
         id === "wna-app-data"
           ? ({
               textContent: JSON.stringify({
@@ -408,7 +433,7 @@ describe("normalizeAppData", () => {
               }),
             } as HTMLElement)
           : null,
-    } as Document;
+      );
 
     const data = await loadAppData();
 
@@ -416,7 +441,7 @@ describe("normalizeAppData", () => {
     expect(data.siteUrl).toBe("https://embedded.example.com");
     expect(data.profile.name).toBe("Embedded Person");
 
-    global.document = originalDocument;
+    getElementByIdSpy.mockRestore();
     fetchSpy.mockRestore();
   });
 
@@ -429,11 +454,11 @@ describe("normalizeAppData", () => {
         },
       }),
     } as Response);
-    const originalDocument = global.document;
-    (global as typeof globalThis & { document: Document }).document = {
-      getElementById: (id: string) =>
+    const getElementByIdSpy = jest
+      .spyOn(document, "getElementById")
+      .mockImplementation((id: string) =>
         id === "wna-app-data" ? ({ textContent: " " } as HTMLElement) : null,
-    } as Document;
+      );
 
     const data = await loadAppData();
 
@@ -445,7 +470,7 @@ describe("normalizeAppData", () => {
     });
     expect(data.profile.name).toBe("Fetched Person");
 
-    global.document = originalDocument;
+    getElementByIdSpy.mockRestore();
     fetchSpy.mockRestore();
   });
 

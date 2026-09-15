@@ -1,5 +1,3 @@
-import Constants from "expo-constants";
-
 export default function currentAppVersion(): string {
-  return Constants.expoConfig?.extra?.appVersion ?? "0.0.0";
+  return typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "0.0.0";
 }

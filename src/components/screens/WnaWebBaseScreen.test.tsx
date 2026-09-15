@@ -1,6 +1,5 @@
 import WnaWebBaseScreen from "@components/screens/WnaWebBaseScreen";
 import { describe, expect, it } from "@jest/globals";
-import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 describe("WnaWebBaseScreen", () => {
