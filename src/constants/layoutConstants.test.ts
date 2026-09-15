@@ -28,8 +28,13 @@ describe("getAppLayout", () => {
     const layout = getAppLayout(false);
 
     expect(layout.headerHeight).toBe(appLayoutConstants.headerButtonHeight);
+    // Regression test: this used to add an extra +8 on top of
+    // headerButtonHeight, leaving an 8px gap between the (absolutely
+    // positioned) header's real bottom edge and the first scrolled
+    // content element in portrait mode — content must start exactly at
+    // the header's own height, not further down.
     expect(layout.contentListPaddingTop).toBe(
-      appLayoutConstants.headerButtonHeight + 8,
+      appLayoutConstants.headerButtonHeight,
     );
   });
 });
