@@ -8,8 +8,6 @@ import { AppData, loadAppData } from "@/app-data";
 import { getThemeFromStorageAsync, Theme } from "@/storage/themeStorage";
 import { WnaAppContextProvider } from "@/state/WnaAppContext";
 
-global.__expo_disable_font_preloading__ = true;
-
 function WnaRootLayoutContent() {
   const [appData, setAppData] = useState<AppData | undefined>(undefined);
   const [theme, setTheme] = useState<Theme | "system">("system");

@@ -35,8 +35,7 @@ fi
 
 cp "$EXAMPLE_FILE" "$TARGET_FILE"
 
-# Expo can serve an existing static export with embedded app data. Remove it
-# so the E2E server always builds from the example data prepared above.
+# Clear out any stale production build so nothing shadows the dev server.
 rm -rf "$ROOT_DIR/dist"
 
 mkdir -p "$ROOT_DIR/public/images"
@@ -63,4 +62,4 @@ load_env_file "$ROOT_DIR/.env.example"
 load_env_file "$ROOT_DIR/.env"
 load_env_file "$ROOT_DIR/.env.local"
 
-CI=1 EXPO_NO_TELEMETRY=1 npx expo start --web --port "$PORT"
+npx vite --port "$PORT" --strictPort

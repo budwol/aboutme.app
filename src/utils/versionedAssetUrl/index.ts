@@ -1,3 +1,5 @@
+import { readPublicEnv } from "@utils/publicEnv";
+
 function appendQueryParam(url: string, key: string, value: string) {
   const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}${key}=${encodeURIComponent(value)}`;
@@ -18,7 +20,7 @@ export function getVersionedLocalAssetUrl(url: string) {
     return normalizedUrl;
   }
 
-  const deployVersion = process.env.EXPO_PUBLIC_DEPLOY_VERSION?.trim();
+  const deployVersion = readPublicEnv("EXPO_PUBLIC_DEPLOY_VERSION")?.trim();
 
   if (!deployVersion) {
     return normalizedUrl;

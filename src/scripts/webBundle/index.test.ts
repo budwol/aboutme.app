@@ -36,7 +36,7 @@ describe("assert-web-bundle", () => {
   it("rejects missing bundles and oversized bundles", () => {
     const emptyDist = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-bundle-"));
     fixtures.push(emptyDist);
-    fs.mkdirSync(path.join(emptyDist, "_expo", "static", "js", "web"), {
+    fs.mkdirSync(path.join(emptyDist, "assets"), {
       recursive: true,
     });
 
@@ -60,7 +60,7 @@ describe("assert-web-bundle", () => {
 function createDist(content: string) {
   const dist = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-bundle-"));
   fixtures.push(dist);
-  const bundleDir = path.join(dist, "_expo", "static", "js", "web");
+  const bundleDir = path.join(dist, "assets");
   fs.mkdirSync(bundleDir, { recursive: true });
   fs.writeFileSync(path.join(bundleDir, "entry.js"), content, "utf8");
   return dist;

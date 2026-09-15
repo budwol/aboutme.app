@@ -7,10 +7,10 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@tests/(.*)$": "<rootDir>/tests/$1",
-    "^@app/(.*)$": "<rootDir>/src/app/$1",
     "^@assets/(.*)$": "<rootDir>/assets/$1",
     "^@components/(.*)$": "<rootDir>/src/components/$1",
     "^@constants/(.*)$": "<rootDir>/src/constants/$1",
+    "^@utils/publicEnv$": "<rootDir>/src/utils/publicEnv.jest.ts",
     "^@utils/(.*)$": "<rootDir>/src/utils/$1",
     "^wna-logger$": "<rootDir>/src/utils/logger.ts",
   },
@@ -25,6 +25,7 @@ module.exports = {
     "src/**/*.{ts,tsx}",
     "!src/**/*.test.{ts,tsx}",
     "!src/**/*.d.ts",
+    "!src/utils/publicEnv.ts",
   ],
   coverageThreshold: {
     global: {

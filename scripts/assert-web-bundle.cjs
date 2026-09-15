@@ -2,14 +2,19 @@ const fs = require("fs");
 const path = require("path");
 
 const DEFAULT_MAX_BYTES = 1_700_000;
-const FORBIDDEN_MARKERS = ["expo-image", "react-native-reanimated"];
+const FORBIDDEN_MARKERS = [
+  "expo-image",
+  "react-native-reanimated",
+  "expo-router",
+  "react-native",
+];
 
 function assertWebBundle(
   distDir,
   maxBytes = DEFAULT_MAX_BYTES,
   logger = console.log,
 ) {
-  const bundleDir = path.join(distDir, "_expo", "static", "js", "web");
+  const bundleDir = path.join(distDir, "assets");
   const files = fs
     .readdirSync(bundleDir)
     .filter((file) => file.endsWith(".js"))
