@@ -34,9 +34,11 @@ function getSizes(
     .slice(0, -1)
     .map(
       (source) =>
-        `(max-width: ${source.webMaxViewportWidth}px) ${source.width}px`,
+        `(max-width: ${source.webMaxViewportWidth}px) ${source.displayWidth ?? source.width}px`,
     )
-    .join(", ")}, ${sizedSources.at(-1)!.width}px`;
+    .join(
+      ", ",
+    )}, ${sizedSources.at(-1)!.displayWidth ?? sizedSources.at(-1)!.width}px`;
 }
 
 function WnaImageElement(props: WnaImageElementProps) {

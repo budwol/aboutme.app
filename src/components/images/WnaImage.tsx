@@ -36,6 +36,10 @@ export type WnaResponsiveImageSource = {
   width: number;
   height?: number;
   webMaxViewportWidth?: number;
+  // See WnaImageSource.displayWidth (wnaImageElementTypes.ts) -- the CSS
+  // width this source is actually rendered at, distinct from `width`
+  // (the source file's own resolution).
+  displayWidth?: number;
 };
 
 type ImageState = {
@@ -145,6 +149,7 @@ function WnaImage(props: WnaImageProps) {
       width: source.width,
       height: source.height ?? source.width,
       webMaxViewportWidth: source.webMaxViewportWidth,
+      displayWidth: source.displayWidth,
     }));
   }, [props.sources]);
 

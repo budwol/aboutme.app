@@ -451,7 +451,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;
@@ -488,7 +490,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;
@@ -622,7 +626,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;
@@ -702,7 +708,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;
@@ -747,7 +755,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;
@@ -788,7 +798,9 @@ describe("WnaApp", () => {
     });
 
     act(() => {
-      jest.advanceTimersByTime(1320);
+      jest.advanceTimersByTime(
+        appMotionConstants.introDelay + appMotionConstants.introDuration,
+      );
     });
 
     mockIsNavigationTransitionActive = true;

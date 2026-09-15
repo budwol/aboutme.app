@@ -440,7 +440,10 @@ export default function WnaProfileHero({
   const avatarSize = compact
     ? sectionConstants.heroAvatarCompactSize
     : sectionConstants.heroAvatarSize;
-  const avatarSources = getAvatarImageSources(appData.profile.avatar);
+  const avatarSources = getAvatarImageSources(
+    appData.profile.avatar,
+    avatarSize,
+  );
 
   return React.createElement(
     "div",

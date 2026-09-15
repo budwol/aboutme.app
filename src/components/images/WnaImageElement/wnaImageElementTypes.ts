@@ -42,6 +42,14 @@ export type WnaImageSource = {
   width?: number;
   height?: number;
   webMaxViewportWidth?: number;
+  // The CSS width this source is actually rendered at, for the `sizes`
+  // attribute. Distinct from `width` (the source file's own pixel
+  // resolution, used for `srcSet`'s "w" descriptor) -- conflating the
+  // two makes the browser think the element renders at each source's
+  // full resolution and pick a far larger file than the layout needs.
+  // Falls back to `width` when omitted, matching sources that render at
+  // their native resolution.
+  displayWidth?: number;
 };
 
 export type WnaImageElementState = {
