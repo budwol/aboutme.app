@@ -90,13 +90,13 @@ export class LegalPage extends BasePage {
   async assertLicensesContent() {
     await expect(this.body()).toContainText("Open Source Software");
     await expect(this.body()).toContainText("Core technologies used");
-    await expect(this.body()).toContainText("React Native Web");
+    await expect(this.body()).toContainText("Vite");
   }
 
   async assertGermanLicensesContent() {
     await expect(this.body()).toContainText("Open Source Software");
     await expect(this.body()).toContainText("Verwendete Kerntechnologien");
-    await expect(this.body()).toContainText("React Native Web");
+    await expect(this.body()).toContainText("Vite");
   }
 
   async goBack() {

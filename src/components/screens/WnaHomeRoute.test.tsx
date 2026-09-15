@@ -65,10 +65,6 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-}));
-
 jest.mock("@/navigation/router/wnaRouter", () => ({
   // Wrapped, not referenced directly — see WnaHeader.test.tsx for why.
   router: { push: (href: string) => mockPush(href) },

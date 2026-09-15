@@ -394,22 +394,15 @@ libraries. I thank the respective authors and communities for their work.
 <h3>Core technologies used</h3>
 <ul>
   <li>React - MIT License</li>
-  <li>React Native - MIT License</li>
-  <li>React Native Web - MIT License</li>
-  <li>Expo - MIT License</li>
-  <li>Expo Router - MIT License</li>
+  <li>React DOM - MIT License</li>
+  <li>Vite - MIT License</li>
   <li>i18next / react-i18next - MIT License</li>
 </ul>
 
 <h3>Additional libraries and components</h3>
 <ul>
-  <li>React Navigation - MIT License</li>
-  <li>React Native Reanimated - MIT License</li>
-  <li>React Native Gesture Handler - MIT License</li>
-  <li>React Native Screens - MIT License</li>
-  <li>React Native SVG - MIT License</li>
-  <li>Async Storage - MIT License</li>
-  <li>Material Design Icons (mdi/js) - MIT License</li>
+  <li>sanitize-html - MIT License</li>
+  <li>Material Design Icons (mdi/js) - Apache License 2.0</li>
 </ul>
 
 <p>
@@ -435,22 +428,15 @@ Communitys für ihre Arbeit.
 <h3>Verwendete Kerntechnologien</h3>
 <ul>
   <li>React - MIT License</li>
-  <li>React Native - MIT License</li>
-  <li>React Native Web - MIT License</li>
-  <li>Expo - MIT License</li>
-  <li>Expo Router - MIT License</li>
+  <li>React DOM - MIT License</li>
+  <li>Vite - MIT License</li>
   <li>i18next / react-i18next - MIT License</li>
 </ul>
 
 <h3>Weitere Bibliotheken & Komponenten</h3>
 <ul>
-  <li>React Navigation - MIT License</li>
-  <li>React Native Reanimated - MIT License</li>
-  <li>React Native Gesture Handler - MIT License</li>
-  <li>React Native Screens - MIT License</li>
-  <li>React Native SVG - MIT License</li>
-  <li>Async Storage - MIT License</li>
-  <li>Material Design Icons (mdi/js) - MIT License</li>
+  <li>sanitize-html - MIT License</li>
+  <li>Material Design Icons (mdi/js) - Apache License 2.0</li>
 </ul>
 
 <p>

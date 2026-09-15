@@ -75,10 +75,8 @@ function WnaNavigationTransitionOverlay({ appColors }: { appColors: Colors }) {
   );
 }
 
-// Structurally matches expo-router's ErrorBoundaryProps (the shape it
-// requires from a route's exported `ErrorBoundary`) without importing it,
-// so this component stays free of expo-router until Phase 3 replaces the
-// bootstrap shim that re-exports it from src/app/_layout.tsx.
+// Rendered by the real WnaErrorBoundary class component (src/components/
+// WnaErrorBoundary.tsx) whenever it catches a render error.
 export type WnaErrorBoundaryProps = {
   error: Error;
   retry: () => Promise<void>;

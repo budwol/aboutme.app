@@ -30,16 +30,6 @@ jest.mock("@components/theme/wnaThemeToggle", () => ({
   toggleWnaTheme: require("@jest/globals").jest.fn(async () => undefined),
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    canGoBack: () => false,
-  }),
-}));
-
 describe("WnaMenuRoute uninitialized integration", () => {
   beforeEach(() => {
     mockDimensions(1280, 800);

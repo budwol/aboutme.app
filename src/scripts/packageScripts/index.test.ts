@@ -4,6 +4,7 @@ import path from "path";
 
 type PackageJson = {
   dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
   scripts?: Record<string, string>;
   version: string;
 };
@@ -29,7 +30,7 @@ describe("package scripts", () => {
     const ciLocal = packageJson.scripts?.["ci:local"];
     const ciLocalScript = readRootFile("scripts/ci-local.sh");
     const orderedCommands = [
-      "rm -rf dist web-build .expo .expo/web .cache",
+      "rm -rf dist .cache",
       "npm prune",
       "npm run test:prettier",
       "npm run lint",
@@ -145,20 +146,32 @@ describe("package scripts", () => {
     expect(packageJson.dependencies).not.toHaveProperty("expo-font");
   });
 
-  it("keeps required Expo Router and drawer peers installed directly", () => {
+  it("stays free of Expo and React Native dependencies", () => {
     const packageJson = readPackageJson();
-    const requiredPeers = [
+    const allDependencies = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
+    const removedPackages = [
+      "expo",
+      "expo-router",
       "expo-constants",
+      "expo-doctor",
       "expo-linking",
-      "react-native-gesture-handler",
-      "react-native-reanimated",
+      "eslint-config-expo",
+      "jest-expo",
+      "react-native",
+      "react-native-web",
+      "@react-navigation/native",
       "react-native-safe-area-context",
       "react-native-screens",
+      "react-native-gesture-handler",
+      "react-native-reanimated",
       "react-native-worklets",
     ];
 
-    for (const dependency of requiredPeers) {
-      expect(packageJson.dependencies).toHaveProperty(dependency);
+    for (const dependency of removedPackages) {
+      expect(allDependencies).not.toHaveProperty(dependency);
     }
   });
 });

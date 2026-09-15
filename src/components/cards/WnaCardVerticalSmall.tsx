@@ -83,7 +83,7 @@ const WnaCardVerticalSmallComponent: FC<WnaCardVerticalSmallProps> = ({
         />
       ) : null,
     ),
-    !!description
+    description
       ? React.createElement(
           "span",
           { style: appStyle.textNeutralMicro as CSSProperties },

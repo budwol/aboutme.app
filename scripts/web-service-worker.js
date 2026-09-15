@@ -1,5 +1,3 @@
-/* global caches, self, URL */
-
 const CACHE_NAME = "aboutme-shell-v1";
 
 self.addEventListener("install", () => self.skipWaiting());

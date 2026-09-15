@@ -7,3 +7,7 @@
 export function readPublicEnv(key: string): string | undefined {
   return import.meta.env[key];
 }
+
+export function isDevMode(): boolean {
+  return import.meta.env.DEV;
+}

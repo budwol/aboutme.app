@@ -4,3 +4,7 @@
 export function readPublicEnv(key: string): string | undefined {
   return process.env[key];
 }
+
+export function isDevMode(): boolean {
+  return process.env.NODE_ENV !== "production";
+}

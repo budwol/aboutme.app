@@ -7,23 +7,25 @@ const mockLoggerBase = {
   error: jest.fn(),
 };
 
+const mockIsDevMode = jest.fn();
+
 jest.mock("@utils/loggerBase", () => ({
   __esModule: true,
   default: mockLoggerBase,
 }));
 
-describe("Logger", () => {
-  const devGlobal = global as typeof globalThis & { __DEV__?: boolean };
-  const originalDev = devGlobal.__DEV__;
+jest.mock("@utils/publicEnv", () => ({
+  isDevMode: () => mockIsDevMode(),
+}));
 
+describe("Logger", () => {
   afterEach(() => {
-    devGlobal.__DEV__ = originalDev;
     jest.resetModules();
     jest.clearAllMocks();
   });
 
   it("forwards messages to LoggerBase in dev mode", () => {
-    devGlobal.__DEV__ = true;
+    mockIsDevMode.mockReturnValue(true);
     const Logger = require("@utils/logger").default;
 
     Logger.info("hello");
@@ -36,7 +38,7 @@ describe("Logger", () => {
   });
 
   it("does not initialize LoggerBase outside dev mode", () => {
-    devGlobal.__DEV__ = false;
+    mockIsDevMode.mockReturnValue(false);
     const Logger = require("@utils/logger").default;
 
     Logger.info("hello");

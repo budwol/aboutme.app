@@ -22,11 +22,6 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({}),
-}));
-
 jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createMockComponent } = require("@tests/helpers/createMockComponent");

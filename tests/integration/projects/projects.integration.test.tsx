@@ -81,43 +81,6 @@ jest.mock("@components/screens/useWnaScrollY", () => ({
   }),
 }));
 
-jest.mock("react-native", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ReactModule = require("react") as typeof import("react");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const actual = require("@jest/globals").jest.requireActual(
-    "react-native",
-  ) as typeof import("react-native");
-
-  const FlatList = (props: {
-    data?: unknown[];
-    renderItem?: (info: { item: unknown; index: number }) => React.ReactNode;
-    ListHeaderComponent?: React.ReactNode;
-    ListFooterComponent?: React.ReactNode;
-  }) =>
-    ReactModule.createElement(
-      "FlatList",
-      null,
-      props.ListHeaderComponent,
-      props.data?.map((item, index) =>
-        ReactModule.createElement(
-          ReactModule.Fragment,
-          { key: index },
-          props.renderItem?.({ item, index }),
-        ),
-      ),
-      props.ListFooterComponent,
-    );
-
-  return new Proxy(actual, {
-    get(target, property, receiver) {
-      return property === "FlatList"
-        ? FlatList
-        : Reflect.get(target, property, receiver);
-    },
-  });
-});
-
 describe("WnaProjectsRoute integration", () => {
   beforeEach(() => {
     jest.useFakeTimers();
