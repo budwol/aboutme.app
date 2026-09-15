@@ -378,6 +378,7 @@ function WnaHeroShape({
       left: shape.left,
       width: shape.width,
       height: shape.height,
+      boxSizing: "border-box",
       borderRadius: shape.radius,
       borderWidth: 1,
       borderStyle: "solid",
@@ -471,6 +472,7 @@ export default function WnaProfileHero({
         style={{
           width: avatarSize,
           height: avatarSize,
+          boxSizing: "border-box",
           borderRadius: avatarSize / 2,
           backgroundColor: appColors.white,
           borderWidth: 1,

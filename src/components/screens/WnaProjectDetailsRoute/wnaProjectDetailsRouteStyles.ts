@@ -139,6 +139,7 @@ export const styles = {
     display: "flex",
     width: 32,
     height: 32,
+    boxSizing: "border-box",
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",

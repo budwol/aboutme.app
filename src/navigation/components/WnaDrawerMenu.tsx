@@ -385,7 +385,6 @@ const styles = {
   footerLink: {
     textDecoration: "underline",
     opacity: 0.9,
-    color: "inherit",
   },
   version: {
     opacity: 0.7,

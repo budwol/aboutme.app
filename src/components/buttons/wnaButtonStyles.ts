@@ -16,6 +16,7 @@ export function createButtonTextContainerStyle(
     borderWidth: 1,
     borderStyle: "solid",
     height: actionButtonRightConstants.size,
+    boxSizing: "border-box",
     borderRadius: appLayoutConstants.globalCornerRadius,
     overflow: "hidden",
     padding: 12,
@@ -35,6 +36,7 @@ export function createRoundIconButtonStyle(appColors: Colors): CSSProperties {
   return {
     height: size,
     width: size,
+    boxSizing: "border-box",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: convertHexToRgba(appColors.coolgray2, 0.5),

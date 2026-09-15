@@ -29,6 +29,7 @@ const styles = {
   spinner: {
     width: 48,
     height: 48,
+    boxSizing: "border-box",
     borderWidth: 4,
     borderStyle: "solid",
     borderRadius: 999,

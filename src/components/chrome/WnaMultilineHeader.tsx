@@ -76,6 +76,11 @@ export default function WnaMultilineHeader(
           outlineOffset: 2,
           height: appLayout.headerButtonHeight,
         }}
+        baseStyle={{
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 0,
+        }}
       >
         {React.createElement(
           "div",
@@ -112,6 +117,7 @@ export default function WnaMultilineHeader(
                     display: "flex",
                     flexDirection: "column",
                     height: 64,
+                    boxSizing: "border-box",
                     justifyContent: "center",
                     alignItems: "center",
                     padding: 8,
@@ -138,6 +144,7 @@ export default function WnaMultilineHeader(
                     display: "flex",
                     flexDirection: "column",
                     padding: 8,
+                    boxSizing: "border-box",
                     flexShrink: 1,
                     minWidth: 0,
                     height: appLayout.headerButtonHeight,

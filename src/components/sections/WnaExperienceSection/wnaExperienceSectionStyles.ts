@@ -83,6 +83,7 @@ export const styles = {
   dot: {
     width: 12,
     height: 12,
+    boxSizing: "border-box",
     borderRadius: 6,
     borderWidth: 2,
     borderStyle: "solid",

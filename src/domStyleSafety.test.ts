@@ -45,6 +45,19 @@ const RN_ONLY_PROPERTY_ALLOWLIST = new Set([
   path.join(SRC_ROOT, "components/cards/WnaCardVerticalSmall.tsx"),
 ]);
 
+// Line-level allowlist for the vertical box-sizing check: `file:line`
+// (1-indexed, the object literal's own start line) for object literals
+// that combine a fixed `height` with vertical padding/border but are
+// verified safe for a specific, documented reason — not just "seems
+// fine". Keep this list short; prefer fixing the object over allowing it.
+const VERTICAL_BOX_SIZING_ALLOWLIST = new Set([
+  // Passed as the `style` prop into `<WnaBadge>`, which always merges its
+  // own `styles.container` (boxSizing: "border-box") underneath any
+  // caller-supplied style — boxSizing already applies, just not visible
+  // to this single-object-literal scan.
+  `${path.join(SRC_ROOT, "components/cards/WnaCardVerticalSmall.tsx")}:73`,
+]);
+
 // Only these keys affect the horizontal box and can combine with
 // `width: "100%"` to overflow a content-box element. `paddingBlock`/
 // `paddingVertical`/`paddingTop`/`paddingBottom` only affect height and
@@ -60,6 +73,24 @@ const HORIZONTAL_BORDER_KEYS = new Set([
   "borderWidth",
   "borderLeftWidth",
   "borderRightWidth",
+]);
+
+// Same bug, vertical axis: a fixed `height` combined with vertical
+// padding/border on a content-box element renders taller than declared.
+// This is exactly how `WnaMultilineHeader`'s header title box rendered
+// 80px tall instead of 64, pushing the title text below the vertical
+// center of the header's back button/icons.
+const VERTICAL_PADDING_KEYS = new Set([
+  "padding",
+  "paddingVertical",
+  "paddingTop",
+  "paddingBottom",
+  "paddingBlock",
+]);
+const VERTICAL_BORDER_KEYS = new Set([
+  "borderWidth",
+  "borderTopWidth",
+  "borderBottomWidth",
 ]);
 
 function listSourceFiles(dir: string, out: string[] = []): string[] {
@@ -137,6 +168,76 @@ describe("DOM style object safety", () => {
             const { line } = sourceFile.getLineAndCharacterOfPosition(
               node.getStart(sourceFile),
             );
+            offenses.push(`${path.relative(SRC_ROOT, file)}:${line + 1}`);
+          }
+        }
+        ts.forEachChild(node, visit);
+      }
+
+      visit(sourceFile);
+    }
+
+    expect(offenses).toEqual([]);
+  });
+
+  it('never combines a fixed height with vertical padding/border on a content-box element without boxSizing: "border-box"', () => {
+    const offenses: string[] = [];
+
+    for (const file of files) {
+      const { sourceFile } = parse(file);
+
+      function visit(node: ts.Node) {
+        if (ts.isObjectLiteralExpression(node)) {
+          let hasFixedHeight = false;
+          let hasVerticalPadding = false;
+          let hasVerticalBorder = false;
+          let hasBoxSizing = false;
+
+          for (const prop of node.properties) {
+            if (!ts.isPropertyAssignment(prop)) continue;
+            const name = prop.name.getText(sourceFile);
+
+            if (name === "height") {
+              const value = prop.initializer.getText(sourceFile);
+              // `height: 0` combined with borders is the CSS
+              // "triangle"/caret trick (a zero-size box whose colored
+              // borders form the visible shape) — the border is
+              // *supposed* to extend outside the zero-size box there, so
+              // it's excluded rather than treated as a bug.
+              if (
+                value !== '"auto"' &&
+                value !== "undefined" &&
+                value !== "0"
+              ) {
+                hasFixedHeight = true;
+              }
+            }
+            if (VERTICAL_PADDING_KEYS.has(name)) {
+              hasVerticalPadding = true;
+            }
+            if (
+              VERTICAL_BORDER_KEYS.has(name) &&
+              prop.initializer.getText(sourceFile) !== "0"
+            ) {
+              hasVerticalBorder = true;
+            }
+            if (name === "boxSizing") {
+              hasBoxSizing = true;
+            }
+          }
+
+          if (
+            hasFixedHeight &&
+            (hasVerticalPadding || hasVerticalBorder) &&
+            !hasBoxSizing
+          ) {
+            const { line } = sourceFile.getLineAndCharacterOfPosition(
+              node.getStart(sourceFile),
+            );
+            if (VERTICAL_BOX_SIZING_ALLOWLIST.has(`${file}:${line + 1}`)) {
+              ts.forEachChild(node, visit);
+              return;
+            }
             offenses.push(`${path.relative(SRC_ROOT, file)}:${line + 1}`);
           }
         }

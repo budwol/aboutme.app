@@ -32,7 +32,7 @@ jest.mock("@components/display/WnaAccentBar", () => {
 });
 
 describe("WnaProfileHero", () => {
-  const appColors = {
+  const appColorsValues = {
     white: "#ffffff",
     black: "#000000",
     accent5: "#22aa66",
@@ -40,7 +40,8 @@ describe("WnaProfileHero", () => {
     coolgray8: "#222222",
     coolgray6: "#666666",
     warmgray6: "#999999",
-  } as never;
+  };
+  const appColors = appColorsValues as never;
 
   it("renders the accent bar between name and title in the regular hero", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -74,6 +75,43 @@ describe("WnaProfileHero", () => {
       testAppData.profile.name,
       testAppData.profile.title.toUpperCase(),
     ]);
+  });
+
+  it("keeps the avatar image at its declared size using border-box sizing", () => {
+    // Regression test: this style combines a fixed `width`/`height` with
+    // a `borderWidth` on the avatar image. Content-box (the browser
+    // default) would render it 2px larger than `avatarSize`, breaking
+    // the circular clip computed from that same size
+    // (`borderRadius: avatarSize / 2`).
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProfileHero
+          appColors={appColors}
+          appData={testAppData}
+          appStyle={
+            {
+              textExtraLarge: {},
+              textNeutralSubtitle: {},
+            } as never
+          }
+        />,
+      );
+    });
+
+    const avatar = tree!.root.findByType("WnaImage");
+
+    expect(avatar.props.style).toEqual({
+      width: 200,
+      height: 200,
+      boxSizing: "border-box",
+      borderRadius: 100,
+      backgroundColor: appColorsValues.white,
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: appColorsValues.coolgray2,
+    });
   });
 
   it("renders the accent bar in the compact hero copy as well", () => {
@@ -137,6 +175,10 @@ describe("WnaProfileHero", () => {
         "--wna-hero-shape-end-opacity": expect.any(Number),
         animation:
           "wna-hero-shape-swing-positive 13000ms ease-in-out infinite alternate",
+        // Regression test: this shape combines a fixed `width`/`height`
+        // with a `borderWidth` on a real DOM element. Content-box (the
+        // browser default) would render it 2px larger than declared.
+        boxSizing: "border-box",
       }),
     );
     expect(animatedShape?.props.className).toBe(
