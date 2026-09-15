@@ -1,6 +1,6 @@
 import WnaMultilineHeader from "@components/chrome/WnaMultilineHeader";
 import { describe, expect, it, jest } from "@jest/globals";
-import React from "react";
+import React, { CSSProperties } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 
 jest.mock("@components/images/WnaImage", () => {
@@ -53,11 +53,12 @@ describe("WnaMultilineHeader", () => {
     textTitleLarge: {},
     textSmall: {},
   } as never;
-  const appLayout = {
+  const appLayoutValues = {
     headerHeight: 64,
     globalCornerRadius: 16,
     headerButtonHeight: 48,
-  } as never;
+  };
+  const appLayout = appLayoutValues as never;
 
   function renderHeader(isTabRoot: boolean) {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -118,7 +119,22 @@ describe("WnaMultilineHeader", () => {
     const tree = renderHeader(true);
     const titleWrapper = findSingleLineTitleWrapper(tree);
 
-    expect(titleWrapper.props.style.paddingLeft).toBe(16);
+    // Regression test: this box combines a fixed `height: 64` with
+    // vertical padding on a real DOM div. Content-box (the browser
+    // default) would add that padding on top of the 64px height, making
+    // the box 80px tall instead of 64 — 24px more than the header row
+    // actually has room for, which visibly pushed the title text below
+    // the vertical center of the header's back button/icons.
+    expect(titleWrapper.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      height: 64,
+      boxSizing: "border-box",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 8,
+      paddingLeft: 16,
+    });
     expect(tree.root.findAllByType("WnaImage")).toHaveLength(1);
   });
 
@@ -126,8 +142,39 @@ describe("WnaMultilineHeader", () => {
     const tree = renderHeader(false);
     const titleWrapper = findSingleLineTitleWrapper(tree);
 
-    expect(titleWrapper.props.style.paddingLeft).toBe(8);
+    expect(titleWrapper.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      height: 64,
+      boxSizing: "border-box",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 8,
+      paddingLeft: 8,
+    });
     expect(tree.root.findAllByType("WnaImage")).toHaveLength(0);
+  });
+
+  it("keeps the pressable centering the header content on its exact declared height", () => {
+    // Regression test: `WnaBasePressable`'s underlying `<button>` uses
+    // `flex: 1` with the browser default `overflow: visible`, so it never
+    // gets the CSS spec's automatic flex minimum-size override — its
+    // content (this title box) silently forced it taller than the
+    // explicit `height` below. Once that's fixed elsewhere, the button
+    // also needs `alignItems`/`justifyContent: "center"` (its own default
+    // packing is top-aligned, not centered) so the still-taller title
+    // content overflows symmetrically instead of entirely downward.
+    const tree = renderHeader(false);
+    const pressable = tree.root.findByType("WnaPressable");
+
+    expect(pressable.props.style).toEqual(
+      expect.objectContaining({ height: appLayoutValues.headerButtonHeight }),
+    );
+    expect(pressable.props.baseStyle).toEqual({
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 0,
+    });
   });
 
   it("splits pipe-separated titles into main and subtitle", () => {
@@ -137,6 +184,29 @@ describe("WnaMultilineHeader", () => {
       .map((node: HeaderTextNode) => node.props.children);
 
     expect(textValues).toEqual(["Main", "Sub"]);
+  });
+
+  it("uses border-box sizing for the two-line title box too", () => {
+    // Same regression as the single-line box above: `height` combined
+    // with `padding` on a content-box div would render taller than the
+    // declared `appLayoutValues.headerButtonHeight`.
+    const tree = renderSplitHeader();
+    const titleBox = tree.root.find(
+      (node: HeaderViewNode) =>
+        node.type === "div" &&
+        node.props.style?.height === appLayoutValues.headerButtonHeight,
+    ) as unknown as { props: { style: CSSProperties } };
+
+    expect(titleBox.props.style).toEqual({
+      display: "flex",
+      flexDirection: "column",
+      padding: 8,
+      boxSizing: "border-box",
+      flexShrink: 1,
+      minWidth: 0,
+      height: appLayoutValues.headerButtonHeight,
+      justifyContent: "center",
+    });
   });
 
   it("returns null when no header title is given", () => {

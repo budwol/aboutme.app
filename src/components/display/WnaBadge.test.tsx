@@ -59,18 +59,29 @@ describe("WnaBadge", () => {
     expect(text.props.style).toEqual(
       expect.objectContaining({ color: "#ffffff" }),
     );
+    // Regression test: this pill rendered visibly "brick"-like/too tall
+    // at height 28 with only 4px of padding — reduced to 26 to match the
+    // intended pill proportions. Locked to an exact value (not a
+    // objectContaining lower bound) so a future height change is a
+    // deliberate, visible diff here.
     expect(tree!.root.findByType("div").props).toEqual(
       expect.objectContaining({
         "aria-label": "Profile",
-        style: expect.objectContaining({
-          alignSelf: "flex-start",
-          alignItems: "center",
-          boxSizing: "border-box",
+        style: {
           display: "flex",
+          alignSelf: "flex-start",
           flexGrow: 0,
           flexShrink: 0,
-          height: 28,
-        }),
+          boxSizing: "border-box",
+          height: 26,
+          padding: 4,
+          borderRadius: 4,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 4,
+          backgroundColor: "#666666",
+        },
       }),
     );
   });

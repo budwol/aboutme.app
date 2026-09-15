@@ -400,6 +400,30 @@ describe("WnaDrawerMenu", () => {
     expect(footerLink.props.children).toBe("© John Doe");
   });
 
+  it("lets the footer link inherit its color from appStyle.textNeutralSmall instead of hardcoding it", async () => {
+    // Regression test: this link previously set `color: "inherit"`,
+    // added when the drawer was converted to a real DOM `<a>`. That
+    // silently overrode the legible gray color coming from
+    // `appStyle.textNeutralSmall` with whatever the surrounding text
+    // color happened to be, rendering the copyright link nearly
+    // invisible against the drawer background. `styles.footerLink` must
+    // not set its own `color` at all, so `textNeutralSmall`'s color wins.
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(<WnaDrawerMenu />);
+    });
+
+    const footerLink = tree!.root.find(
+      (node: FooterLinkNode) => typeof node.props.href === "string",
+    ) as unknown as { props: { style: object } };
+
+    expect(footerLink.props.style).toEqual({
+      textDecoration: "underline",
+      opacity: 0.9,
+    });
+  });
+
   it("navigates to the disclaimer route from the footer link", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

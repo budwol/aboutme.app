@@ -12,6 +12,7 @@ export type WnaImageStyleProps = {
   borderColor?: string;
   borderWidth?: number;
   borderStyle?: "solid" | "dashed" | "dotted";
+  boxSizing?: "border-box" | "content-box";
   opacity?: number;
   aspectRatio?: number;
 };

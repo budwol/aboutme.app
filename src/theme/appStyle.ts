@@ -265,6 +265,7 @@ const setAppStyle = (colors: Colors) => {
       borderRadius: 8,
       borderColor: convertHexToRgba(colors.coolgray2, 0.5),
       width: "80%",
+      boxSizing: "border-box",
       padding: 8,
       fontSize: 18,
       lineHeight: "24px",

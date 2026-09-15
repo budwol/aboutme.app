@@ -118,6 +118,7 @@ const styles = {
     display: "flex",
     width: 34,
     height: 34,
+    boxSizing: "border-box",
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
