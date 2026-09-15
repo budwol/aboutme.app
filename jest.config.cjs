@@ -1,10 +1,7 @@
 module.exports = {
   testEnvironment: "jsdom",
   transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      { isolatedModules: true, tsconfig: { module: "commonjs" } },
-    ],
+    "^.+\\.tsx?$": ["ts-jest", { tsconfig: { module: "commonjs" } }],
   },
   setupFiles: ["<rootDir>/jest.setup.cjs"],
   moduleNameMapper: {
