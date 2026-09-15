@@ -250,47 +250,47 @@ wie die bestehende `routeDefinitions`. Diese Tabelle kann eins-zu-eins
 weiterverwendet werden, unabhängig davon, welche Router-Bibliothek (falls
 überhaupt eine) darunterliegt.
 
-**Wichtiger, noch zu verifizierender Befund — Stack/Tabs vermutlich
-redundant zur eigenen Transition-Overlay:** Live-Test (Playwright,
-2026-09-15, Navigation `/menu` → `/menu/privacy`) zeigt: Während der
-Navigation wird der Bildschirm vollständig von der App-eigenen
-Transition-Overlay (`WnaApp.tsx`, `showNavigationTransition`, Hintergrundbild
+**Befund 1 (verifiziert 2026-09-15) — Stack-Animation ist unsichtbar:**
+Live-Messung (Playwright, Navigation `/menu` → `/menu/privacy`) der
+Overlay-Opazität per `requestAnimationFrame`-Sampling zeigt: die
+App-eigene Transition-Overlay (`WnaApp.tsx`, `showNavigationTransition`)
+erscheint sofort bei voller Opazität (1) und bleibt **545 ms** lang
+vollständig undurchsichtig, bevor sie über 560 ms ausblendet — dabei ist
+sie noch bei t+312 ms auf 90 % Opazität. `WnaStackScreenOptions.tsx`s
+`animation: "fade_from_bottom"` dauert nur 240 ms und läuft laut
+`startNavigationTransition` (420 ms Verzögerung vor dem eigentlichen
+`router.push()`) vollständig innerhalb des Opak-Fensters der Overlay ab.
+Bestätigt: die Stack-Animation ist praktisch nie sichtbar. **Konsequenz:**
+der Ersatzrouter braucht keine eingebaute Transition-/Animations-Engine —
+ein einfacher, sofortiger Routenwechsel reicht, die App-eigene Overlay
+übernimmt die gesamte visuelle Übergangswirkung unverändert.
 
-- Ladebalken) verdeckt. Das bedeutet, `WnaStackScreenOptions.tsx`s
-  `animation: "fade_from_bottom"` (240 ms, auf 8 verschachtelten
-  `Stack`-Layouts unter `menu/`, `projekte|projects/`, `kontakt|contact/`,
-  `taetigkeiten|experience/`, je einmal pro Sprache) ist mit hoher
-  Wahrscheinlichkeit unsichtbar/redundant, weil die eigene Overlay sie
-  verdeckt. **Vor der Umsetzung verifizieren**: Overlay temporär deaktivieren
-  und prüfen, ob die Stack-Animation dann sichtbar wird und ob sie überhaupt
-  gewünscht ist — falls nein (wahrscheinlich), kann der Ersatzrouter komplett
-  ohne eingebaute Transition-Engine auskommen, was ihn erheblich einfacher
-  macht. `<Tabs>` (`WnaTabLayout.tsx`) wird mit versteckter Tab-Bar
-  (`tabBarStyle: { display: "none" }`) rein als Datei-Routing-Gruppierung
-  genutzt, nicht als sichtbare UI — zu klären, ob dabei irgendein Zustand
-  (Scroll-Position, Formularinhalt) beim Wechsel zwischen den 5 Tabs innerhalb
-  einer Sprache erhalten bleiben muss (aktuell durch React Navigations
-  Screen-Stack-Verhalten technisch möglich); falls nicht, kann `<Tabs>` durch
-  denselben Mechanismus wie `<Slot>` ersetzt werden.
+**Befund 2 (verifiziert 2026-09-15) — kein Tab-Zustand wird erhalten:**
+Live-Test (Playwright): Home-Route 400px herunterscrollen, per Header-Button
+zu `/projects` navigieren, per Browser-Back zurück zu `/` — Ergebnis:
+`scrollTop` ist nach der Rückkehr **0**, nicht die zuvor gesetzten 400px.
+React Navigations Screen-Stack-Mechanismus (der Tabs technisch am Leben
+hält) wird also faktisch nicht genutzt, um Scroll- oder anderen
+UI-Zustand über einen Tab-Wechsel hinweg zu erhalten. **Konsequenz:**
+`<Tabs>` (`WnaTabLayout.tsx`) kann 1:1 durch denselben Mechanismus wie
+`<Slot>` ersetzt werden (einfaches Mount/Unmount pro Route, kein
+Keep-Alive nötig) — das entfernt eine der ursprünglich vermuteten
+Komplexitätsquellen für den Ersatzrouter vollständig.
 
 **Vorgehen:**
 
-1. Fakten sichern: obige zwei Befunde (Stack-Animation, Tab-Zustand) am
-   laufenden Dev-Server verifizieren und hier dokumentieren, bevor Code
-   geschrieben wird.
-2. Entscheidung treffen und dokumentieren: `react-router` (v6/v7,
-   Data-Router oder einfacher `BrowserRouter`) vs. ein handgeschriebener
-   Router. Für die Größe dieser App (9 logische Seiten laut
-   `routeDefinitions` × 2 Sprachen + 1 dynamische Projekt-Slug-Route, keine
-   verschachtelten Datenlader nötig)
-   ist ein handgeschriebener Router (History API + die bestehende
-   `routeDefinitions`-Tabelle + ein `<Route>`-Matching auf Basis von
-   `window.location.pathname`) realistisch und vermeidet eine neue
-   Kern-Abhängigkeit — passt zum bisherigen Muster dieses Repos (eigener
-   Drawer, eigenes Modal, eigene Scroll-Adapter statt Fremdbibliotheken).
-   `react-router` ist die risikoärmere, dokumentierte Alternative, falls der
-   Eigenbau in der Praxis mehr Kanten zeigt als erwartet (Deep-Links,
-   Browser-Back/Forward, `popstate`).
+1. ~~Fakten sichern~~ — erledigt, siehe Befund 1 und 2 oben.
+2. ~~Entscheidung treffen~~ — **entschieden (2026-09-15, mit dem Nutzer
+   abgestimmt): handgeschriebener Router** (History API + die bestehende
+   `routeDefinitions`-Tabelle + eigenes Pfad-Matching auf Basis von
+   `window.location.pathname`). Begründung: keine neue Kern-Abhängigkeit,
+   passt zum bisherigen Repo-Muster (eigener Drawer, eigenes Modal, eigene
+   Scroll-Adapter statt Fremdbibliotheken), und die App-Größe (9 logische
+   Seiten × 2 Sprachen + 1 dynamische Projekt-Slug-Route, keine
+   verschachtelten Datenlader nötig) rechtfertigt keine
+   Data-Router-Funktionalität, die ohnehin ungenutzt bliebe. Der Verzicht
+   auf `react-router`s bereits gelöste Handhabung von Back/Forward,
+   `popstate` und Deep-Links ist der bewusst akzeptierte Trade-off.
 3. `useRouter().push/replace/back` → äquivalente Funktionen des gewählten
    Routers (bei Eigenbau: `history.pushState`/`replaceState` + eigener
    Listener, `window.history.back()`).
