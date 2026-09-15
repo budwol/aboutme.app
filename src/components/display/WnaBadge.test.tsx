@@ -60,10 +60,14 @@ describe("WnaBadge", () => {
       expect.objectContaining({ color: "#ffffff" }),
     );
     // Regression test: this pill rendered visibly "brick"-like/too tall
-    // at height 28 with only 4px of padding — reduced to 26 to match the
-    // intended pill proportions. Locked to an exact value (not a
-    // objectContaining lower bound) so a future height change is a
-    // deliberate, visible diff here.
+    // at height 28 (then still too tall at 26) with 4px of padding on
+    // every side. The text itself is only 16px tall (12px font, 16px
+    // line-height), so height is now 20 — exactly the text height plus a
+    // slim 2px top/bottom via `paddingBlock`, kept separate from the
+    // horizontal 4px via `paddingInline` since `boxSizing: "border-box"`
+    // means only `height` (not `padding`) controls the outer box size.
+    // Locked to an exact value (not an objectContaining lower bound) so a
+    // future height change is a deliberate, visible diff here.
     expect(tree!.root.findByType("div").props).toEqual(
       expect.objectContaining({
         "aria-label": "Profile",
@@ -73,8 +77,9 @@ describe("WnaBadge", () => {
           flexGrow: 0,
           flexShrink: 0,
           boxSizing: "border-box",
-          height: 26,
-          padding: 4,
+          height: 20,
+          paddingInline: 4,
+          paddingBlock: 2,
           borderRadius: 4,
           flexDirection: "row",
           alignItems: "center",
