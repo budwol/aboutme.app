@@ -2,7 +2,7 @@
  * @jest-environment node
  *
  * pdfkit's package exports only resolve the Node CJS build under the
- * "node" export condition. The default react-native test environment
+ * "node" export condition. The project's default jsdom test environment
  * omits that condition and falls back to its ESM browser bundle, which
  * Jest can't parse. This script only ever runs under plain Node, so a
  * plain node test environment matches how it's actually executed.
@@ -13,13 +13,6 @@ import os from "os";
 import path from "path";
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-// jest-expo's setup installs Expo's "winter" runtime polyfills globally,
-// which replace TextDecoder/TextEncoder with a strict WHATWG-only version
-// that fontkit's Node code path (via pdfkit) doesn't expect. Restore
-// Node's native implementations before pdfkit loads.
-const nodeUtil = require("util") as typeof import("util");
-(globalThis as { TextDecoder: unknown }).TextDecoder = nodeUtil.TextDecoder;
-(globalThis as { TextEncoder: unknown }).TextEncoder = nodeUtil.TextEncoder;
 
 const { generateResumePdf } =
   require("../../../scripts/generate-resume-pdf.cjs") as {

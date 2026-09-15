@@ -49,7 +49,7 @@ describe("env-parser", () => {
   });
 
   it("parses quoted values and escaped control characters", () => {
-    expect(parseEnvValue(' "line 1\\nline 2\\t\\\"quoted\\\"" ')).toBe(
+    expect(parseEnvValue(' "line 1\\nline 2\\t\\"quoted\\"" ')).toBe(
       'line 1\nline 2\t"quoted"',
     );
     expect(parseEnvValue("'single quoted value'")).toBe("single quoted value");

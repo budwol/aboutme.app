@@ -1,9 +1,9 @@
 import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
-import { Theme } from "@/storage/themeStorage";
 import Colors from "@constants/theme/colors";
 import {
   getThemeFromStorageAsync,
   setThemeToStorageAsync,
+  Theme,
 } from "@/storage/themeStorage";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
 import { BrowserColorScheme } from "@utils/useBrowserColorScheme";

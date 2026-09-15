@@ -6,7 +6,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_DIR"
 
-rm -rf dist web-build .expo .expo/web .cache
+rm -rf dist .cache
 npm prune
 npm run test:prettier
 npm run lint

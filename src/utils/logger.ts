@@ -1,3 +1,5 @@
+import { isDevMode } from "@utils/publicEnv";
+
 type LoggerBaseType = {
   info: (msg: unknown) => void;
   warn: (methodName: string, msg: unknown) => void;
@@ -7,7 +9,7 @@ type LoggerBaseType = {
 let LoggerBase: LoggerBaseType | null = null;
 
 function ensureLogger() {
-  if (!__DEV__ || LoggerBase) return;
+  if (!isDevMode() || LoggerBase) return;
 
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   LoggerBase = require("@utils/loggerBase").default as LoggerBaseType;

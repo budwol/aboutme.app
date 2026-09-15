@@ -14,12 +14,9 @@ tests/playwright/results
 test-results/
 *-20??????T??????.json
 
-# Expo
-.expo/
-.expo-shared/
+# Build output
 .cache/
 dist/
-web-build/
 
 # GIT
 .git/
@@ -34,9 +31,6 @@ web-build/
 *.key
 *.mobileprovision
 
-# Metro
-.metro-health-check*
-
 # debug
 npm-debug.*
 yarn-debug.*
@@ -48,7 +42,6 @@ yarn-error.*
 
 # local env files
 .env
-expo-env.d.ts
 .env*.local
 .aboutme/
 
