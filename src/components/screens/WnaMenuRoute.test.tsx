@@ -46,9 +46,9 @@ const mockShowWnaToast = (
   }
 ).showWnaToast;
 
-jest.mock("expo-router", () => ({
-  useRouter: () => ({ navigate: mockNavigate }),
-  useNavigation: () => ({}),
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  // Wrapped, not referenced directly — see WnaHeader.test.tsx for why.
+  router: { navigate: (href: string) => mockNavigate(href) },
 }));
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -144,22 +144,13 @@ describe("WnaMenuRoute", () => {
     act(() => items[3].props.onPress());
     act(() => items[4].props.onPress());
 
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      1,
-      "/(drawer)/(tabs-de)/menu/impressum",
-    );
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      2,
-      "/(drawer)/(tabs-de)/menu/datenschutz",
-    );
+    expect(mockNavigate).toHaveBeenNthCalledWith(1, "/menu/impressum");
+    expect(mockNavigate).toHaveBeenNthCalledWith(2, "/menu/datenschutz");
     expect(mockNavigate).toHaveBeenNthCalledWith(
       3,
-      "/(drawer)/(tabs-de)/menu/nutzungsbedingungen",
+      "/menu/nutzungsbedingungen",
     );
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      4,
-      "/(drawer)/(tabs-de)/menu/lizenzen",
-    );
+    expect(mockNavigate).toHaveBeenNthCalledWith(4, "/menu/lizenzen");
   });
 
   it("renders a theme entry and toggles the theme from the drawer", async () => {

@@ -12,9 +12,9 @@ import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 import {
-  getDrawerNavigationPath,
-  getDrawerProjectNavigationPath,
   getNavigationLang,
+  getNavigationPath,
+  getProjectNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaBaseScreen from "@components/screens/WnaBaseScreen";
 import WnaContactFooter from "@components/chrome/WnaContactFooter";
@@ -22,7 +22,7 @@ import { useWnaScrollY } from "@components/screens/useWnaScrollY";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { createProjectSlug } from "@utils/projectRoutes";
-import { useRouter } from "expo-router";
+import { router } from "@/navigation/router/wnaRouter";
 import React, {
   CSSProperties,
   Fragment,
@@ -306,7 +306,6 @@ export default function WnaProjectsRoute(): ReactNode {
   const { appData } = useWnaAppData();
   const { appLayout, currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
-  const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
@@ -473,7 +472,7 @@ export default function WnaProjectsRoute(): ReactNode {
           t={t}
           onPress={() =>
             navigationRouter.push(
-              getDrawerProjectNavigationPath(
+              getProjectNavigationPath(
                 createProjectSlug(item.title, index),
                 lang,
               ),
@@ -798,7 +797,7 @@ export default function WnaProjectsRoute(): ReactNode {
     <WnaBaseScreen
       isRootPage
       headerTitle={t(i18nKeys.screenTitleProjects)}
-      titleHref={getDrawerNavigationPath("root", lang)}
+      titleHref={getNavigationPath("root", lang)}
       scrollY={scrollY}
       headerButton0={
         <WnaHeaderRouteButton

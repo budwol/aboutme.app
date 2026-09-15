@@ -3,7 +3,7 @@ import { getNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 import { useWnaLayout, useWnaTheme } from "@/state/WnaAppContext";
 import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
-import { Href, useRouter } from "expo-router";
+import { router, WnaHref } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, FC, memo, ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
@@ -18,8 +18,8 @@ export type WnaHeaderProps = {
   isRootPage?: boolean;
   isBusy?: boolean;
   askBeforeBack?: boolean;
-  backHref?: Href;
-  titleHref?: Href;
+  backHref?: WnaHref;
+  titleHref?: WnaHref;
   preventBack?: boolean;
   headerButton0?: ReactNode;
   headerButton1?: ReactNode;
@@ -43,7 +43,6 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     showShadow,
     onTitlePress,
   }) => {
-    const router = useRouter();
     const navigationRouter = useWnaNavigationTransition(router);
     const { appColors, appStyle, setAppColors, theme, setTheme } =
       useWnaTheme();
@@ -98,7 +97,7 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
       } else {
         navigationRouter.navigate(getNavigationPath("root"));
       }
-    }, [backHref, canUseBrowserBack, isBusy, navigationRouter, router]);
+    }, [backHref, canUseBrowserBack, isBusy, navigationRouter]);
 
     const handleTitlePress = useCallback(() => {
       if (isBusy) return;

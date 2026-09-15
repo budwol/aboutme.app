@@ -87,8 +87,8 @@ jest.mock("@/state/WnaAppContext", () => ({
   }),
 }));
 
-jest.mock("expo-router", () => ({
-  usePathname: () => mockPathname,
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  useWnaPathname: () => mockPathname,
 }));
 
 jest.mock("@utils/themeColors", () => ({

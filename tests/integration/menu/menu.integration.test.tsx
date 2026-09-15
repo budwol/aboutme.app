@@ -24,16 +24,6 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
-jest.mock("expo-router", () => ({
-  useNavigation: () => ({}),
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    canGoBack: () => false,
-  }),
-}));
-
 jest.mock("@/navigation/hooks/useWnaNavigationTransition", () => ({
   useWnaNavigationTransition: () => ({
     navigate: mockNavigate,
@@ -109,22 +99,13 @@ describe("WnaMenuRoute integration", () => {
       items[4].props.onPress();
     });
 
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      1,
-      "/(drawer)/(tabs-de)/menu/impressum",
-    );
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      2,
-      "/(drawer)/(tabs-de)/menu/datenschutz",
-    );
+    expect(mockNavigate).toHaveBeenNthCalledWith(1, "/menu/impressum");
+    expect(mockNavigate).toHaveBeenNthCalledWith(2, "/menu/datenschutz");
     expect(mockNavigate).toHaveBeenNthCalledWith(
       3,
-      "/(drawer)/(tabs-de)/menu/nutzungsbedingungen",
+      "/menu/nutzungsbedingungen",
     );
-    expect(mockNavigate).toHaveBeenNthCalledWith(
-      4,
-      "/(drawer)/(tabs-de)/menu/lizenzen",
-    );
+    expect(mockNavigate).toHaveBeenNthCalledWith(4, "/menu/lizenzen");
   });
 
   it("forwards the theme action through the theme toggle helper", async () => {

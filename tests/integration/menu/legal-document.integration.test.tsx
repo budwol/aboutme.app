@@ -49,18 +49,33 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
   return createMockComponent("WnaScrollViewScreen", true);
 });
 
-jest.mock("expo-router", () => {
+jest.mock("@/navigation/router/WnaRedirect", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { jest: jestModule } = require("@jest/globals");
   const ReactModule = jestModule.requireActual(
     "react",
   ) as typeof import("react");
 
+  return function MockWnaRedirect(props: unknown) {
+    return ReactModule.createElement(
+      "WnaRedirect",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
+jest.mock("@/navigation/router/wnaRouter", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+
   return {
-    Redirect: (props: unknown) =>
-      ReactModule.createElement("Redirect", props as Record<string, unknown>),
-    useNavigation: () => ({}),
-    useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
+    router: {
+      push: jestModule.fn(),
+      replace: jestModule.fn(),
+      navigate: jestModule.fn(),
+      back: jestModule.fn(),
+      canGoBack: jestModule.fn(() => false),
+    },
   };
 });
 
@@ -79,9 +94,7 @@ describe("WnaLegalDocumentScreen integration", () => {
       { isAppInitialized: false },
     );
 
-    expect(tree.root.findByType("Redirect").props.href).toBe(
-      "/(drawer)/(tabs-de)/menu",
-    );
+    expect(tree.root.findByType("WnaRedirect").props.href).toBe("/menu");
   });
 
   it("renders the html document inside the shared legal screen shell", async () => {

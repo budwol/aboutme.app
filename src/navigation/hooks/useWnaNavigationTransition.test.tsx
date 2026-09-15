@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { Router } from "expo-router";
+import { WnaRouter } from "@/navigation/router/wnaRouter";
 import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationTransition";
 
 const mockUseWnaAppLifecycle = jest.fn();
@@ -14,7 +14,7 @@ function Probe({
   router,
   onValue,
 }: {
-  router: Router;
+  router: WnaRouter;
   onValue: (value: ReturnType<typeof useWnaNavigationTransition>) => void;
 }) {
   const value = useWnaNavigationTransition(router);
@@ -30,10 +30,10 @@ function createRouter() {
     navigate: jest.fn(),
     back: jest.fn(),
     canGoBack: jest.fn(() => false),
-  } as unknown as Router;
+  } as unknown as WnaRouter;
 }
 
-function renderHook(router: Router) {
+function renderHook(router: WnaRouter) {
   let controller: ReturnType<typeof useWnaNavigationTransition> | undefined;
 
   act(() => {
@@ -54,7 +54,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.push("/home" as never));
+    act(() => controller.push("/home"));
 
     expect(router.push).not.toHaveBeenCalled();
   });
@@ -66,7 +66,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.push("/home" as never));
+    act(() => controller.push("/home"));
 
     expect(router.push).toHaveBeenCalledWith("/home");
   });
@@ -80,7 +80,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.replace("/menu" as never));
+    act(() => controller.replace("/menu"));
 
     expect(startNavigationTransition).toHaveBeenCalledWith(
       expect.any(Function),
@@ -109,7 +109,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.back("/fallback" as never));
+    act(() => controller.back("/fallback"));
 
     expect(router.back).not.toHaveBeenCalled();
     expect(router.replace).toHaveBeenCalledWith("/fallback");
@@ -135,7 +135,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.navigate("/projects" as never));
+    act(() => controller.navigate("/projects"));
 
     expect(router.navigate).toHaveBeenCalledWith("/projects");
   });

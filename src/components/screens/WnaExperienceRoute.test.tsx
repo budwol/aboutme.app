@@ -23,8 +23,13 @@ jest.mock("@/i18n/i18n", () => ({
   getLangCode: () => "de",
 }));
 
-jest.mock("expo-router", () => ({
-  useRouter: () => mockRouter,
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  // `get` so this is read lazily — a plain `router: mockRouter` property
+  // would capture `mockRouter` at module-eval time, before the `const`
+  // above has run, permanently as `undefined`.
+  get router() {
+    return mockRouter;
+  },
 }));
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -109,7 +114,7 @@ describe("WnaExperienceRoute", () => {
 
     expect(screen.props.isRootPage).toBe(true);
     expect(screen.props.headerTitle).toBe("screenTitleExperience");
-    expect(screen.props.titleHref).toBe("/(drawer)/(tabs-de)");
+    expect(screen.props.titleHref).toBe("/");
     expect(homeButton.props.route).toBe("home");
     expect(homeButton.props.router).toBe(mockRouter);
     expect(menuButton.type).toBeDefined();

@@ -18,12 +18,12 @@ import { appLayoutConstants } from "@constants/layoutConstants";
 import { appMotionConstants } from "@constants/motionConstants";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import {
-  getDrawerNavigationPath,
-  getDrawerProjectNavigationPath,
   getNavigationLang,
+  getNavigationPath,
+  getProjectNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { createProjectSlug } from "@utils/projectRoutes";
-import { useRouter } from "expo-router";
+import { router } from "@/navigation/router/wnaRouter";
 import React, {
   CSSProperties,
   ReactNode,
@@ -65,7 +65,6 @@ export default function WnaHomeRoute(): ReactNode {
   const { appLayout } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const appBrand = t(i18nKeys.appBrand);
-  const router = useRouter();
   const navigationRouter = useWnaNavigationTransition(router);
   const { scrollY, onScroll } = useWnaScrollY();
   const lang = getNavigationLang();
@@ -110,10 +109,7 @@ export default function WnaHomeRoute(): ReactNode {
       if (!project) return;
 
       navigationRouter.push(
-        getDrawerProjectNavigationPath(
-          createProjectSlug(project.title, index),
-          lang,
-        ),
+        getProjectNavigationPath(createProjectSlug(project.title, index), lang),
       );
     },
     [appData.projects, lang, navigationRouter],
@@ -124,11 +120,11 @@ export default function WnaHomeRoute(): ReactNode {
   }, []);
 
   const handleExperiencePress = useCallback(() => {
-    navigationRouter.push(getDrawerNavigationPath("experience", lang));
+    navigationRouter.push(getNavigationPath("experience", lang));
   }, [lang, navigationRouter]);
 
   const handleProjectsPress = useCallback(() => {
-    navigationRouter.push(getDrawerNavigationPath("projects", lang));
+    navigationRouter.push(getNavigationPath("projects", lang));
   }, [lang, navigationRouter]);
 
   return (

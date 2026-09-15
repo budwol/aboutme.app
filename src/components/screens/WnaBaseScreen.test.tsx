@@ -10,8 +10,6 @@ const mockUnregisterNavigationTransitionBackgroundImageUrl = jest.fn();
 const mockRegisterNavigationTransitionBackgroundImageUrl = jest.fn(
   () => mockUnregisterNavigationTransitionBackgroundImageUrl,
 );
-type FocusEffectCallback = () => void | (() => void);
-let mockFocusEffectCallbacks: FocusEffectCallback[] = [];
 
 jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppLifecycle: () => ({
@@ -35,12 +33,6 @@ jest.mock("@/state/WnaAppContext", () => ({
       backgroundImageUrl: mockBackgroundImageUrl,
     },
   }),
-}));
-
-jest.mock("@react-navigation/native", () => ({
-  useFocusEffect: (callback: FocusEffectCallback) => {
-    mockFocusEffectCallbacks.push(callback);
-  },
 }));
 
 jest.mock("react-i18next", () => ({
@@ -112,16 +104,9 @@ describe("WnaBaseScreen", () => {
   beforeEach(() => {
     mockIsAppInitialized = true;
     mockBackgroundImageUrl = "default-background.webp";
-    mockFocusEffectCallbacks = [];
     mockRegisterNavigationTransitionBackgroundImageUrl.mockClear();
     mockUnregisterNavigationTransitionBackgroundImageUrl.mockClear();
   });
-
-  function focusScreen(index = mockFocusEffectCallbacks.length - 1) {
-    const cleanup = mockFocusEffectCallbacks[index]?.();
-
-    return typeof cleanup === "function" ? cleanup : () => undefined;
-  }
 
   it("renders nothing until the app is initialized", () => {
     mockIsAppInitialized = false;
@@ -132,9 +117,6 @@ describe("WnaBaseScreen", () => {
     });
 
     expect(tree!.toJSON()).toBeNull();
-
-    focusScreen();
-
     expect(
       mockRegisterNavigationTransitionBackgroundImageUrl,
     ).not.toHaveBeenCalled();
@@ -154,8 +136,6 @@ describe("WnaBaseScreen", () => {
     const webBaseScreen = tree!.root.findByType("WnaWebBaseScreen");
     const imageBackground = tree!.root.findByType("WnaImageBackground");
     const header = tree!.root.findByType("WnaHeader");
-
-    focusScreen();
 
     expect(webBaseScreen.props.title).toBe("Projects");
     expect(imageBackground.props.testID).toBe("screen-background");
@@ -183,7 +163,6 @@ describe("WnaBaseScreen", () => {
     });
 
     const imageBackground = tree!.root.findByType("WnaImageBackground");
-    const blurScreen = focusScreen();
 
     expect(imageBackground.props.imageUri).toBe("/project-background.webp");
     expect(
@@ -191,7 +170,6 @@ describe("WnaBaseScreen", () => {
     ).toHaveBeenCalledWith("/project-background.webp");
 
     act(() => {
-      blurScreen();
       tree!.unmount();
     });
 
@@ -200,15 +178,17 @@ describe("WnaBaseScreen", () => {
     ).toHaveBeenCalledTimes(1);
   });
 
-  it("updates the transition background when focus moves between mounted screens", () => {
+  it("registers and unregisters each mounted screen's background independently", () => {
     const unregisterFirst = jest.fn();
     const unregisterSecond = jest.fn();
     mockRegisterNavigationTransitionBackgroundImageUrl
       .mockReturnValueOnce(unregisterFirst)
       .mockReturnValueOnce(unregisterSecond);
 
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
     act(() => {
-      TestRenderer.create(
+      tree = TestRenderer.create(
         <>
           <WnaBaseScreen
             headerTitle="First"
@@ -226,9 +206,6 @@ describe("WnaBaseScreen", () => {
       );
     });
 
-    const blurFirst = focusScreen(0);
-    const blurSecond = focusScreen(1);
-
     expect(
       mockRegisterNavigationTransitionBackgroundImageUrl,
     ).toHaveBeenNthCalledWith(1, "/first-background.webp");
@@ -237,17 +214,11 @@ describe("WnaBaseScreen", () => {
     ).toHaveBeenNthCalledWith(2, "/second-background.webp");
 
     act(() => {
-      blurSecond();
-    });
-
-    expect(unregisterSecond).toHaveBeenCalledTimes(1);
-    expect(unregisterFirst).not.toHaveBeenCalled();
-
-    act(() => {
-      blurFirst();
+      tree!.unmount();
     });
 
     expect(unregisterFirst).toHaveBeenCalledTimes(1);
+    expect(unregisterSecond).toHaveBeenCalledTimes(1);
   });
 
   it("uses documentTitle for the browser tab without changing the header text", () => {

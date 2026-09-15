@@ -1,8 +1,8 @@
 import * as WnaAppContext from "@/state/WnaAppContext";
-import { Href, Router } from "expo-router";
+import { WnaHref, WnaRouter } from "@/navigation/router/wnaRouter";
 import { useCallback } from "react";
 
-export function useWnaNavigationTransition(router: Router) {
+export function useWnaNavigationTransition(router: WnaRouter) {
   const useLifecycle = WnaAppContext.useWnaAppLifecycle ?? (() => null);
   const lifecycle = useLifecycle();
   const isNavigationTransitionActive =
@@ -26,7 +26,7 @@ export function useWnaNavigationTransition(router: Router) {
   );
 
   const push = useCallback(
-    (href: Href) => {
+    (href: WnaHref) => {
       runNavigationTransition(() => {
         router.push(href);
       });
@@ -35,7 +35,7 @@ export function useWnaNavigationTransition(router: Router) {
   );
 
   const replace = useCallback(
-    (href: Href) => {
+    (href: WnaHref) => {
       runNavigationTransition(() => {
         router.replace(href);
       });
@@ -44,7 +44,7 @@ export function useWnaNavigationTransition(router: Router) {
   );
 
   const navigate = useCallback(
-    (href: Href) => {
+    (href: WnaHref) => {
       runNavigationTransition(() => {
         router.navigate(href);
       });
@@ -53,7 +53,7 @@ export function useWnaNavigationTransition(router: Router) {
   );
 
   const back = useCallback(
-    (fallbackHref?: Href) => {
+    (fallbackHref?: WnaHref) => {
       runNavigationTransition(() => {
         if (router.canGoBack()) {
           router.back();

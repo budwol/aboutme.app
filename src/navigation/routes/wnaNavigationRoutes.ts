@@ -1,5 +1,4 @@
 import { getProjectPathSegment } from "@utils/projectRoutes";
-import { Href } from "expo-router";
 import { getLangCode } from "@/i18n/i18n";
 
 export type WnaRouteLang = "de" | "en";
@@ -16,7 +15,7 @@ export type WnaRouteKey =
 
 type RouteDefinition = Record<WnaRouteLang, string>;
 
-const routeDefinitions: Record<WnaRouteKey, RouteDefinition> = {
+export const routeDefinitions: Record<WnaRouteKey, RouteDefinition> = {
   root: { de: "/", en: "/" },
   menu: { de: "/menu", en: "/menu" },
   disclaimer: { de: "/menu/impressum", en: "/menu/disclaimer" },
@@ -35,26 +34,13 @@ export function getNavigationLang(lang = getLangCode()): WnaRouteLang {
 export function getNavigationPath(
   key: WnaRouteKey,
   lang = getNavigationLang(),
-): Href {
-  return routeDefinitions[key][lang] as Href;
-}
-
-export function getDrawerNavigationPath(
-  key: WnaRouteKey,
-  lang = getNavigationLang(),
 ): string {
-  const path = getNavigationPath(key, lang);
-
-  if (path === "/") {
-    return `/(drawer)/(tabs-${lang})`;
-  }
-
-  return `/(drawer)/(tabs-${lang})${path}`;
+  return routeDefinitions[key][lang];
 }
 
-export function getDrawerProjectNavigationPath(
+export function getProjectNavigationPath(
   slug: string,
   lang = getNavigationLang(),
 ): string {
-  return `/(drawer)/(tabs-${lang})/${getProjectPathSegment(lang)}/${slug}`;
+  return `/${getProjectPathSegment(lang)}/${slug}`;
 }

@@ -67,7 +67,11 @@ jest.mock("@/i18n/i18n", () => ({
 
 jest.mock("expo-router", () => ({
   useNavigation: () => ({}),
-  useRouter: () => ({ push: mockPush }),
+}));
+
+jest.mock("@/navigation/router/wnaRouter", () => ({
+  // Wrapped, not referenced directly — see WnaHeader.test.tsx for why.
+  router: { push: (href: string) => mockPush(href) },
 }));
 
 jest.mock("@/navigation/components/WnaMenuToggleButton", () => {
@@ -305,7 +309,7 @@ describe("WnaHomeRoute", () => {
       experiencePreview.props.onFooterActionPress();
     });
 
-    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/taetigkeiten");
+    expect(mockPush).toHaveBeenCalledWith("/taetigkeiten");
   });
 
   it("keeps the experience details toggle enabled on the home teaser", () => {
@@ -323,7 +327,7 @@ describe("WnaHomeRoute", () => {
       projectsCard.props.onShowMorePress();
     });
 
-    expect(mockPush).toHaveBeenCalledWith("/(drawer)/(tabs-de)/projekte");
+    expect(mockPush).toHaveBeenCalledWith("/projekte");
   });
 
   it("navigates to the project details route from the projects teaser", () => {
@@ -335,7 +339,7 @@ describe("WnaHomeRoute", () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(
-      `/(drawer)/(tabs-de)/projekte/${createProjectSlug(testAppData.projects[0].title, 0)}`,
+      `/projekte/${createProjectSlug(testAppData.projects[0].title, 0)}`,
     );
   });
 

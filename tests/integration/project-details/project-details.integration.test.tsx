@@ -16,7 +16,6 @@ import { mockDimensions } from "../../helpers/mockDimensions";
 import { renderWithAppContext } from "../../helpers/renderWithAppContext";
 
 const mockOpenURL = jest.fn();
-const mockUseLocalSearchParams = jest.fn();
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -82,22 +81,35 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
   return createMockComponent("WnaScrollViewScreen", true);
 });
 
-jest.mock("expo-router", () => {
+jest.mock("@/navigation/router/WnaRedirect", () => {
   const ReactModule = jest.requireActual("react") as typeof import("react");
 
+  return function MockWnaRedirect(props: unknown) {
+    return ReactModule.createElement(
+      "WnaRedirect",
+      props as Record<string, unknown>,
+    );
+  };
+});
+
+jest.mock("@/navigation/router/wnaRouter", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { jest: jestModule } = require("@jest/globals");
+
   return {
-    Redirect: (props: unknown) =>
-      ReactModule.createElement("Redirect", props as Record<string, unknown>),
-    useLocalSearchParams: () => mockUseLocalSearchParams(),
-    useNavigation: () => ({}),
-    useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
+    router: {
+      push: jestModule.fn(),
+      replace: jestModule.fn(),
+      navigate: jestModule.fn(),
+      back: jestModule.fn(),
+      canGoBack: jestModule.fn(() => false),
+    },
   };
 });
 
 describe("WnaProjectDetailsRoute integration", () => {
   beforeEach(() => {
     mockDimensions(1280, 800);
-    mockUseLocalSearchParams.mockReset();
     mockOpenURL.mockReset();
     jest
       .spyOn(Linking, "openURL")
@@ -122,13 +134,12 @@ describe("WnaProjectDetailsRoute integration", () => {
       ],
     };
 
-    mockUseLocalSearchParams.mockReturnValue({
-      slug: createProjectSlug(appData.projects[0].title, 0),
-    });
-
-    const tree = await renderWithAppContext(<WnaProjectDetailsRoute />, {
-      appData,
-    });
+    const tree = await renderWithAppContext(
+      <WnaProjectDetailsRoute
+        slug={createProjectSlug(appData.projects[0].title, 0)}
+      />,
+      { appData },
+    );
 
     const scrollViewScreen = tree.root.findByType("WnaScrollViewScreen");
     const title = tree.root.findByType("WnaSectionTitle");
@@ -164,14 +175,10 @@ describe("WnaProjectDetailsRoute integration", () => {
   });
 
   it("redirects unknown project slugs to the localized projects route", async () => {
-    mockUseLocalSearchParams.mockReturnValue({
-      slug: "missing-project",
-    });
-
-    const tree = await renderWithAppContext(<WnaProjectDetailsRoute />);
-
-    expect(tree.root.findByType("Redirect").props.href).toBe(
-      "/(drawer)/(tabs-de)/projekte",
+    const tree = await renderWithAppContext(
+      <WnaProjectDetailsRoute slug="missing-project" />,
     );
+
+    expect(tree.root.findByType("WnaRedirect").props.href).toBe("/projekte");
   });
 });
