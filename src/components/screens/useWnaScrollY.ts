@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 export type WnaScrollYController = {
   scrollY: number;
-  onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  onScroll: (event: React.UIEvent<HTMLDivElement>) => void;
 };
 
 export function useWnaScrollY(): WnaScrollYController {
   const [scrollY, setScrollY] = useState(0);
 
-  function onScroll(event: NativeSyntheticEvent<NativeScrollEvent>) {
-    setScrollY(event.nativeEvent.contentOffset.y);
+  function onScroll(event: React.UIEvent<HTMLDivElement>) {
+    setScrollY(event.currentTarget.scrollTop);
   }
 
   return { scrollY, onScroll };

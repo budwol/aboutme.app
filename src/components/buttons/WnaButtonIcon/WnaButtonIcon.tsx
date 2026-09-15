@@ -8,7 +8,7 @@ import { iconMap } from "@components/icon/WnaIcon/WnaIconMap";
 import { createShadowStyle } from "@components/effects/wnaShadowStyle";
 import WnaTooltip from "@components/effects/WnaTooltip";
 import React, { CSSProperties, FC, memo, useState } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 
 export type WnaButtonIconProps = WnaButtonThemeProps &
   Required<Pick<WnaButtonThemeProps, "appStyle">> &
@@ -45,10 +45,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
   return React.createElement(
     "div",
     {
-      style: StyleSheet.flatten([
-        createShadowStyle(),
-        style as CSSProperties,
-      ]) as CSSProperties,
+      style: flattenStyle([createShadowStyle(), style as CSSProperties]),
     },
     toolTip && toolTipPosition ? (
       <WnaTooltip
@@ -70,7 +67,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
           setIsHovered(false);
           setIsPressed(false);
         },
-        style: StyleSheet.flatten({
+        style: {
           ...buttonStyle,
           appearance: "none",
           backgroundColor: interactionColor,
@@ -78,7 +75,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
           borderStyle: "solid",
           cursor: "pointer",
           padding: 0,
-        }) as React.CSSProperties,
+        } as React.CSSProperties,
       },
       <WnaButtonIconBadge
         appStyle={appStyle}

@@ -1,5 +1,5 @@
 import React, { CSSProperties, useEffect, useMemo, useState } from "react";
-import { DimensionValue, useWindowDimensions } from "react-native";
+import { useWnaLayout } from "@/state/WnaAppContext";
 import WnaSectionTitle from "@components/text/WnaSectionTitle";
 import WnaFooterActionLink from "@components/sections/WnaFooterActionLink";
 import { i18nKeys } from "@/i18n/i18nKeys";
@@ -28,7 +28,7 @@ export default function WnaExperienceSection({
   footerActionLabel,
   onFooterActionPress,
 }: WnaExperienceSectionProps) {
-  const { width } = useWindowDimensions();
+  const { currentWindowWidth: width } = useWnaLayout();
   const isCompactLayout = width < compactBreakpoint;
   const experienceItems = useMemo(
     () => appData.experience.slice(0, maxItems ?? appData.experience.length),
@@ -62,7 +62,7 @@ export default function WnaExperienceSection({
   }, [isCompactLayout, width]);
 
   const { timelineWidth, lineLeft } = useMemo(() => {
-    let nextTimelineWidth: DimensionValue;
+    let nextTimelineWidth: CSSProperties["width"];
     let nextLineLeft: number;
 
     if (isCompactLayout) {

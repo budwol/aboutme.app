@@ -26,7 +26,7 @@ describe("useWnaScrollY", () => {
 
     act(() => {
       controller!.onScroll({
-        nativeEvent: { contentOffset: { y: 42 } },
+        currentTarget: { scrollTop: 42 },
       } as never);
     });
 

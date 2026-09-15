@@ -589,12 +589,7 @@ export default function WnaProjectsRoute(): ReactNode {
       "div",
       {
         style: landscapeScrollContainerStyle,
-        onScroll: (event: React.UIEvent<HTMLDivElement>) =>
-          onScroll({
-            nativeEvent: {
-              contentOffset: { y: event.currentTarget.scrollTop },
-            },
-          } as never),
+        onScroll,
       },
       React.createElement(
         "div",
@@ -824,12 +819,7 @@ export default function WnaProjectsRoute(): ReactNode {
             "div",
             {
               style: scrollContainerStyle,
-              onScroll: (event: React.UIEvent<HTMLDivElement>) =>
-                onScroll({
-                  nativeEvent: {
-                    contentOffset: { y: event.currentTarget.scrollTop },
-                  },
-                } as never),
+              onScroll,
             },
             renderPortraitIntro,
             projects.map((item, index) => (

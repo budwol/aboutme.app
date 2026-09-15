@@ -1,13 +1,15 @@
 # Plain React Migration
 
-Fortschritt: `[--------------------]` 0% (0 von 4 Phasen abgeschlossen)
+Fortschritt: `[#####---------------]` 25% (1 von 4 Phasen abgeschlossen)
 
-Status: **geplant**. Dieses Dokument ist am 2026-09-15 vollständig anhand des
+Status: **in Arbeit** (Phase 1 abgeschlossen, Phase 2 als nächstes). Dieses
+Dokument ist am 2026-09-15 vollständig anhand des
 tatsächlichen Codestands neu geschrieben worden (vorherige Fassung stammte von
 vor Abschluss der Web-Only-Migration und war an mehreren Stellen nicht mehr
-zutreffend — siehe "Korrektur 2026-09-15" unten). Es wird noch keine
-Migration umgesetzt; jede Datei-/API-Angabe unten ist am 2026-09-15 gegen den
-Code verifiziert (grep + gezielte Stichproben), keine Vermutung.
+zutreffend — siehe "Korrektur 2026-09-15" unten). Phase 1 ist seit
+2026-09-15 umgesetzt (siehe Fortschrittsprotokoll); jede Datei-/API-Angabe
+unten ist am 2026-09-15 gegen den Code verifiziert (grep + gezielte
+Stichproben), keine Vermutung.
 
 ## Korrektur 2026-09-15
 
@@ -56,20 +58,30 @@ erhalten.
   Performance 97, Accessibility 100, Best Practices 100, SEO 66). Kein Wert
   darf sich durch diese Migration verschlechtern.
 
-## Sofort möglich, unabhängig von jeder Phase
+## Korrektur 2026-09-15 (2)
 
-- `expo-linking` aus `package.json` entfernen. Verifiziert: **keine** Datei
-  in `src/` importiert `expo-linking` — der Browser-Adapter
-  `src/utils/webLinking.ts` deckt `Linking.canOpenURL`/`openURL` bereits
-  vollständig ab (siehe `WEB-ONLY-MIGRATION.md`-Historie, "Linking durch
-  Browser-Adapter ersetzt"). Reines Aufräumen einer toten Dependency, kein
-  Risiko, keine Abhängigkeit zu den Phasen unten.
+Der ursprüngliche Eintrag unten ("Sofort möglich: `expo-linking`
+entfernen") war unvollständig verifiziert — geprüft wurde nur, ob `src/`
+`expo-linking` importiert, nicht, ob `expo-router` selbst es als Peer
+braucht. Tatsächlich ist `expo-linking` ein **nicht-optionaler** Peer von
+`expo-router` (`node_modules/expo-router/package.json`,
+`peerDependencies`, fehlt in `peerDependenciesMeta`) und wird intern von
+`expo-router` verwendet (`build/link/linking.js`,
+`build/fork/useLinking.native.js`, `build/ui/TabRouter.js`,
+`build/views/Unmatched.js`). Ein bestehender Test
+(`src/scripts/packageScripts/index.test.ts`, "keeps required Expo Router
+and drawer peers installed directly") schützt genau davor, ihn zu
+entfernen, solange `expo-router` noch im Einsatz ist. **`expo-linking`
+kann daher nicht "sofort" entfernt werden** — das verschiebt sich auf
+Phase 3/4, zusammen mit `expo-router` selbst und den übrigen
+Peer-Dependencies. Es gibt aktuell keinen weiteren "sofort möglich"-
+Punkt; die Migration beginnt direkt mit Phase 1.
 
 ## Dependency-Zielbild (verifiziert 2026-09-15)
 
 | Dependency                                                                                                                                   | Aktuell genutzt von                                                                                                   | Ziel      | Phase                                     |
 | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------- |
-| `expo-linking`                                                                                                                               | niemandem (tot)                                                                                                       | entfernen | sofort                                    |
+| `expo-linking`                                                                                                                               | niemandem direkt in `src/` — aber nicht-optionaler Peer von `expo-router`                                             | entfernen | 3 (fällt automatisch mit expo-router weg) |
 | `react-native-safe-area-context`, `react-native-screens`, `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | niemandem direkt — nur noch Peer-Dependencies von `expo-router`/`@react-navigation/native`                            | entfernen | 3 (fällt automatisch mit expo-router weg) |
 | `react-native-logs`                                                                                                                          | `src/utils/loggerBase/index.ts` (1 Datei)                                                                             | entfernen | 1                                         |
 | `@react-navigation/native`                                                                                                                   | `useFocusEffect` (WnaBaseScreen.tsx), `useIsFocused` (WnaWebBaseScreen.tsx)                                           | entfernen | 2                                         |
@@ -81,9 +93,54 @@ erhalten.
 
 ### Phase 1: React-Native-API-Restspuren entfernen
 
-Status: **geplant** · Risiko: niedrig · Umfang: 19 Quelldateien in 7
-Kategorien (`WnaHeader.tsx` zählt in zwei Kategorien, b und d) · unabhängig
-von Phase 2/3, kann zuerst und isoliert gemacht werden.
+Status: **abgeschlossen** (2026-09-15) · Risiko: niedrig · Umfang: 19
+Quelldateien in 7 Kategorien (`WnaHeader.tsx` zählt in zwei Kategorien, b
+und d) · unabhängig von Phase 2/3, kann zuerst und isoliert gemacht werden.
+
+Alle 7 Kategorien umgesetzt: (a) `StyleSheet.flatten`/`.create` durch die
+neue generische Utility `src/utils/flattenStyle.ts` ersetzt (7 Dateien);
+(b) `useColorScheme` durch den neuen Hook
+`src/utils/useBrowserColorScheme.ts`
+(`window.matchMedia("(prefers-color-scheme: dark)")`, SSR-sicher wie
+`webViewport.ts`) ersetzt (4 Dateien), `ColorSchemeName` durch dessen
+`BrowserColorScheme`-Typ ersetzt (2 weitere Dateien); (c)
+`useWindowDimensions` in `WnaExperienceSection.tsx` durch
+`useWnaLayout().currentWindowWidth` ersetzt, `DimensionValue` durch
+`CSSProperties["width"]`; (d) `Platform.OS === "web"` in `WnaHeader.tsx`
+ersatzlos vereinfacht; (e) `ViewStyle`/`TextStyle` durch `CSSProperties`
+ersetzt (3 Dateien); (f) `NativeScrollEvent`/`NativeSyntheticEvent` in
+`useWnaScrollY.ts` durch `React.UIEvent<HTMLDivElement>` ersetzt, alle 4
+Aufrufer (nicht nur die ursprünglich vermuteten 3 — `WnaScrollViewScreen.tsx`
+war ein zusätzlicher, zunächst übersehener vierter Aufrufer, siehe
+Validierungshinweis unten) auf direkte Übergabe des Hooks umgestellt; (g)
+`LogBox`/`react-native-logs` in `loggerBase/index.ts` durch einen
+~30-Zeilen-Wrapper um `console.log/info/warn/error` ersetzt,
+`react-native-logs` aus `package.json` entfernt.
+
+Zusätzlich vorab korrigiert: der ursprüngliche "Sofort möglich"-Punkt
+(`expo-linking` entfernen) war falsch — es ist ein nicht-optionaler Peer
+von `expo-router` und wird von diesem intern verwendet; verschoben auf
+Phase 3 (siehe "Korrektur 2026-09-15 (2)" oben).
+
+**Validierungshinweis:** Die reguläre Unit-/Integrations-/Typecheck-Suite
+hätte den vierten `useWnaScrollY`-Aufrufer (`WnaScrollViewScreen.tsx`)
+nicht aufgedeckt — sie blieb durchgehend grün, weil die dortige,
+inzwischen überholte manuelle `{ nativeEvent: { contentOffset: ... } }`-
+Adaption in ihrem eigenen Test exakt gegen sich selbst mockt. Erst die
+volle E2E-Suite (`npm run test:e2e`) zeigte einen echten
+`pageerror: Cannot read properties of undefined (reading 'scrollTop')`
+auf der mobilen Kontaktseite. Gegenprobe: derselbe Testlauf gegen den
+Stand vor dieser Phase (`git stash`) war 4/4 grün, der Stand mit dem Bug
+war 4/4 rot — bestätigt eine echte Regression, keine Umgebungs-Flakiness.
+Lehre für die weiteren Phasen: bei jeder Änderung an einem geteilten Hook
+zusätzlich `grep -rl "<hookName>" src` (nicht nur die zuvor dokumentierte
+Aufruferliste) gegenprüfen, und die E2E-Suite ist für dieser Art Fehler
+die einzige Suite mit tatsächlicher Trefferquote.
+
+Validierung: `test:prettier`, `lint`, `test:types`, `test:circular`,
+`test:unit` (573 Tests), `test:coverage` (100 %), `test:integration`,
+`test:deps`, `test:e2e` (47 Tests, je 5× wiederholt für die zuvor
+betroffenen Specs) — alle grün.
 
 Jede verbleibende `react-native`-Import-Stelle ist geprüft. Es ist **keine**
 `View`/`Text`/`Pressable`/`FlatList` mehr darunter — nur folgende
@@ -423,6 +480,8 @@ erfüllt, die Ergebnisse hier dokumentiert und die Änderungen committed sind.
 | ---------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2026-09-13 | -     | Migrationspfad für Plain React nach Release `1.4.0` angelegt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Noch keine Implementierung; Ausgangsstand festgehalten                                                                                                                                                                                                                                                                               |
 | 2026-09-15 | -     | Plan vollständig neu geschrieben: Web-Only-Migration ist inzwischen abgeschlossen (alter "Phase 1" entfällt), verbleibende `react-native`-Nutzung auf 19 Dateien/7 Kategorien reduziert und einzeln verifiziert, `expo-router`-API-Oberfläche auf 22 Dateien vollständig erfasst, bilinguale Slug-Routing-Struktur dokumentiert, Stack/Tabs-Redundanz zur eigenen Transition-Overlay per Live-Test indiziert (noch zu bestätigen), Build-Tooling-Kopplung an Expo (Metro, app.config.ts, +html.tsx, Export-Skripte, jest-expo) Datei für Datei aufgelistet, `expo-linking` als toter Import identifiziert | Keine Code-Änderung in dieser Session; Recherche per `grep -rl` (react-native, expo-router, expo-linking, react-native-logs, react-navigation, EXPO_PUBLIC), Playwright-Live-Test der Stack-Transition, Lesen von `metro.config.js`/`app.config.ts`/`jest.config.cjs`/allen `scripts/*.cjs`/`scripts/*.sh`/`.github/workflows/*.yml` |
+
+| 2026-09-15 | 1 | Phase 1 vollständig umgesetzt: alle 7 Kategorien der `react-native`-Restnutzung entfernt (`StyleSheet.flatten`/`.create` → `flattenStyle.ts`, `useColorScheme` → `useBrowserColorScheme.ts`, `useWindowDimensions` → `useWnaLayout().currentWindowWidth`, `Platform.OS` vereinfacht, `ViewStyle`/`TextStyle`/`ColorSchemeName`/`DimensionValue` → Web-Typen, `NativeScrollEvent`/`NativeSyntheticEvent` → `React.UIEvent`, `react-native-logs` → eigener Console-Wrapper); `expo-linking`-Fehleinschätzung aus der letzten Session korrigiert (bleibt bis Phase 3, ist nicht-optionaler `expo-router`-Peer) | `test:prettier`, `lint`, `test:types`, `test:circular`, `test:unit` (573/573), `test:coverage` (100 %), `test:integration` (31/31), `test:deps`, `test:e2e` (47/47, mehrfach wiederholt) — alle grün; ein vierter, zunächst übersehener `useWnaScrollY`-Aufrufer (`WnaScrollViewScreen.tsx`) wurde nur durch die E2E-Suite aufgedeckt (`pageerror` auf der mobilen Kontaktseite) und per `git stash`-Gegenprobe als echte Regression bestätigt, dann gefixt |
 
 Bei jeder Migrationserweiterung wird diese Tabelle ergänzt und der Status der
 betroffenen Phase aktualisiert.

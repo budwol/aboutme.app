@@ -6,7 +6,7 @@ import {
   setThemeToStorageAsync,
 } from "@/storage/themeStorage";
 import { getNextTheme, resolveAppColors } from "@utils/themeColors";
-import { ColorSchemeName } from "react-native";
+import { BrowserColorScheme } from "@utils/useBrowserColorScheme";
 import { showWnaToast } from "@components/feedback/wnaToast";
 
 function getThemeLabel(theme: Theme) {
@@ -32,7 +32,7 @@ export function getThemeIcon(theme: Theme): keyof typeof iconMap {
 }
 
 type ToggleWnaThemeArgs = {
-  colorScheme: ColorSchemeName;
+  colorScheme: BrowserColorScheme;
   theme: Theme;
   setTheme: (theme: Theme) => void;
   setAppColors: (colors: Colors) => void;

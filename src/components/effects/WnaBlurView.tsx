@@ -1,7 +1,6 @@
 import { StaticColors } from "@constants/theme/staticColors";
 import { convertHexToRgba } from "@utils/colorConverter";
 import type { CSSProperties, ReactNode } from "react";
-import type { ViewStyle } from "react-native";
 
 export type BlurTint =
   | "dark"
@@ -13,8 +12,7 @@ export type BlurTint =
 export type WnaBlurViewProps = {
   style?:
     | CSSProperties
-    | ViewStyle
-    | (CSSProperties | ViewStyle | null | undefined)[]
+    | (CSSProperties | null | undefined)[]
     | null
     | undefined;
   blurIntensity?: number;

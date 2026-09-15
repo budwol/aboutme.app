@@ -2,7 +2,7 @@ import WnaBasePressable from "@components/buttons/WnaBasePressable/WnaBasePressa
 import WnaTooltip from "@components/effects/WnaTooltip";
 import { TFunction } from "i18next";
 import React, { CSSProperties, FC, ReactNode, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
+import { flattenStyle } from "@utils/flattenStyle";
 
 export type WnaPressableState = Readonly<{
   pressed: boolean;
@@ -45,15 +45,15 @@ const WnaPressable: FC<WnaPressableProps> = (props) => {
     }, 500);
   };
   const hasTooltip = Boolean(toolTip && toolTipPosition);
-  const flattenedStyle = StyleSheet.flatten(props.style);
+  const flattenedStyle = flattenStyle(props.style);
   return React.createElement(
     "div",
     {
-      style: StyleSheet.flatten([
+      style: flattenStyle([
         { display: "flex", flexDirection: "column" },
         { overflow: "visible", position: "relative" },
         props.style,
-      ]) as React.CSSProperties,
+      ]),
     },
     hasTooltip && (
       <WnaTooltip

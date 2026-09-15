@@ -6,7 +6,7 @@ import { getThemeIcon, toggleWnaTheme } from "@components/theme/wnaThemeToggle";
 import { Href, useRouter } from "expo-router";
 import React, { CSSProperties, FC, memo, ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, useColorScheme } from "react-native";
+import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
 import WnaButtonHeader from "@components/buttons/WnaButtonHeader";
 import { WnaBlurView } from "@components/effects/WnaBlurView";
 import WnaMultilineHeader from "@components/chrome/WnaMultilineHeader";
@@ -48,14 +48,12 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const { appColors, appStyle, setAppColors, theme, setTheme } =
       useWnaTheme();
     const { appLayout, isLandscape } = useWnaLayout();
-    const colorScheme = useColorScheme();
+    const colorScheme = useBrowserColorScheme();
     const { t } = useTranslation(["common"]);
 
     const themeIcon = getThemeIcon(theme);
     const canUseBrowserBack =
-      Platform.OS === "web" &&
-      typeof window !== "undefined" &&
-      window.history.length > 1;
+      typeof window !== "undefined" && window.history.length > 1;
 
     const scrollValue = scrollY ?? 0;
     const baseOpacity = Math.min(0.4, Math.max(0, scrollValue / 1000));
