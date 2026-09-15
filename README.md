@@ -3,15 +3,13 @@
 [![ci](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml/badge.svg)](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml)
 [![license: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![node](https://img.shields.io/badge/node-20.19.4-339933?logo=node.js&logoColor=white)](./package.json)
-[![expo](https://img.shields.io/badge/expo-SDK%2054-000020?logo=expo&logoColor=white)](./package.json)
+[![vite](https://img.shields.io/badge/vite-8-646CFF?logo=vite&logoColor=white)](./package.json)
 
-AboutMe is my little portfolio app built with Expo and React Native Web.
+AboutMe is my little portfolio app built with plain React and Vite.
 
-Current release: `1.4.0`. The app is already shipped as a static, installable
-web PWA, while the runtime still uses Expo Router and React Native Web. The
-next planned step is the staged move to plain React and React DOM; see
-[PLAIN-REACT-MIGRATION.md](PLAIN-REACT-MIGRATION.md) for the fixed phases and
-exit criteria.
+Current release: `1.5.0`. The app ships as a static, installable web PWA
+built with a plain React + Vite toolchain — no React Native or Expo left
+in the runtime or the build.
 
 Clone it, throw in your own data and images, run `npm run init`, and there you go: projects, experience, tech stack, contact stuff, all sitting there like happy little trees on a calm digital canvas. Just a few soft clouds, a couple of brave colors, and your portfolio starts to live.
 
@@ -27,15 +25,13 @@ That gets you from clone to a running template without wandering through the who
 
 ## Tech Stack
 
-This thing runs on React Native Web with Expo. No wizard cave, no enchanted build forest, just a web app with a few happy little layers and enough room to put a mountain where you want one.
+This thing runs on plain React and Vite. No wizard cave, no enchanted build forest, just a web app with a few happy little layers and enough room to put a mountain where you want one.
 
 ### Core
 
 - React 19
-- React Native 0.81
-- React Native Web
-- Expo (SDK 54)
-- Expo Router
+- React DOM
+- Vite
 
 ### Tooling & Quality
 
@@ -43,7 +39,7 @@ This thing runs on React Native Web with Expo. No wizard cave, no enchanted buil
 - ESLint
 - Prettier
 - Husky (Git hooks)
-- Jest (jest-expo)
+- Jest (ts-jest, jsdom)
 - Playwright
 
 ## Setup
@@ -160,9 +156,7 @@ Right now the app gives you a nice little set of pages. Nothing overcooked, just
 - dedicated contact page
 - menu/legal pages (imprint, privacy, terms, licenses)
 
-Navigation is built with Expo Router under `src/app/`, while reusable navigation UI and route helpers live under `src/navigation/`.
-
-Metro blocks `*.test.*` and `*.spec.*` files from the app bundle. That keeps Expo Router focused on routes instead of wandering into test files under `src/app/`. The tests can keep their little easel right beside the route they cover, and the production canvas stays clean.
+Navigation is a small hand-rolled client-side router living under `src/navigation/router/`, matching the current URL against a route table and rendering the right screen — no file-based routing convention to keep in sync with the URL structure. Reusable navigation UI lives alongside it under `src/navigation/`.
 
 ### Recommended Image Ratios
 
@@ -194,7 +188,7 @@ If you are just using this as a portfolio template, you can ignore Docker for a 
 
 Both `npm run web` and `npm run export:web` sync `.aboutme/app-data.json` into `public/app-data.json`, mirror `.aboutme/images/*` into `public/images/*`, and bump the web asset version first, so the web app always starts from the latest source content and image files.
 
-They also generate a condensed portfolio PDF from the same `.aboutme/app-data.json` — `public/Portfolio-DE.pdf` (German) and `public/Portfolio-EN.pdf` (English) — covering profile, contact, tech stack, and work experience, deliberately leaving out the private side projects. Alongside those, `public/Portfolio-DE-ATS.pdf`/`public/Portfolio-EN-ATS.pdf` are a deliberately plain, single-column companion: no sidebar, no photo, skill levels spelled out as text instead of bars — meant to survive an Applicant Tracking System's automated parsing, which the two-column designed version is not well-suited for. The designed PDF links to its own ATS counterpart from its page footer. All four ship in `dist` alongside the rest of the export, and the app links to the designed PDF from the contact footer and from a standalone download button in the navigation drawer's footer. Run `npm run generate:resume-pdf` on its own if you just want to regenerate the PDFs without a full export.
+They also generate a condensed portfolio PDF from the same `.aboutme/app-data.json` — `public/{Name}_-_Portfolio_DE.pdf` (German) and `public/{Name}_-_Portfolio_EN.pdf` (English), named after the profile's own name — covering profile, contact, tech stack, and work experience, deliberately leaving out the private side projects. Alongside those, the `_ATS` variants (`public/{Name}_-_Portfolio_DE_ATS.pdf`/`_EN_ATS.pdf`) are a deliberately plain, single-column companion: no sidebar, no photo, skill levels spelled out as text instead of bars — meant to survive an Applicant Tracking System's automated parsing, which the two-column designed version is not well-suited for. The designed PDF links to its own ATS counterpart from its page footer. All four ship in `dist` alongside the rest of the export, and the app links to the designed PDF from the contact footer and from a standalone download button in the navigation drawer's footer. Run `npm run generate:resume-pdf` on its own if you just want to regenerate the PDFs without a full export.
 
 Docker is there for people who actually want that delivery path, not as a rite of passage before the app is allowed to exist.
 
@@ -252,10 +246,9 @@ The runtime path is meant to stay plain and inspectable, not clever.
 - HTML content goes through `sanitize-html` with a small allowlist. That path is meant for trusted portfolio content, but it is no longer hanging off a homegrown regex filter.
 - The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `Cross-Origin-Resource-Policy`, `Referrer-Policy`, `Permissions-Policy`, and `X-Robots-Tag`.
 - Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
-- Production web builds do not publish JavaScript source maps. For bundle analysis, create a temporary export with `npx expo export -p web --source-maps`, inspect it, and remove it afterward. See [ADR 0021](adr/0021-production-source-maps-are-not-published.md).
+- Production web builds do not publish JavaScript source maps. For bundle analysis, create a temporary export with `npx vite build --sourcemap`, inspect it, and remove it afterward. See [ADR 0021](adr/0021-production-source-maps-are-not-published.md).
 - The production SEO restriction is intentional: `noindex, nofollow` remains enabled and must not be removed to improve Lighthouse.
-- The migration from Expo/React Native primitives to a web-only PWA is complete (see git history for `WEB-ONLY-MIGRATION.md`, since removed).
-- The follow-up migration from the web-only Expo shell to plain React is tracked in [PLAIN-REACT-MIGRATION.md](PLAIN-REACT-MIGRATION.md).
+- The migration away from React Native and Expo is complete, in two stages: first to a web-only PWA still running on the Expo/React-Native-Web shell, then off that shell entirely onto plain React and Vite (see git history for `WEB-ONLY-MIGRATION.md` and `PLAIN-REACT-MIGRATION.md`, both removed once their work was done).
 
 ## Production Checklist
 
@@ -343,7 +336,7 @@ The quality gates are meant to run in this order:
 - `npm run test:e2e:ui`
 - `npm run init -- --dry-run`
 
-Coverage is collected for executable TypeScript under `src/`. The 100% lines/branches/statements/functions target is not a claim that every file contains runtime statements: TypeScript-only files and Expo Router re-export entry points correctly appear as `0/0`. Build scripts under `scripts/` have dedicated Jest tests and are exercised by the full pipeline, but are outside the Istanbul threshold because their CLI entry points and external tool adapters are process-boundary code. Always inspect the per-file report, especially when adding a new build script.
+Coverage is collected for executable TypeScript under `src/`. The 100% lines/branches/statements/functions target is not a claim that every file contains runtime statements: pure type/interface-only files correctly appear as `0/0`. Build scripts under `scripts/` have dedicated Jest tests and are exercised by the full pipeline, but are outside the Istanbul threshold because their CLI entry points and external tool adapters are process-boundary code. Always inspect the per-file report, especially when adding a new build script.
 
 `npm run test:all` is the broad local test stack for `prettier + types + circular deps + unit + coverage + integration + e2e`. `smoke` stays separate on purpose.
 
@@ -382,7 +375,7 @@ If you want the full local CI pass:
 npm run ci:local
 ```
 
-`ci:local` preserves the tracked `package-lock.json`, refreshes the local validation path, runs `expo-doctor`, Prettier, ESLint, TypeScript, unit tests, coverage, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
+`ci:local` preserves the tracked `package-lock.json`, refreshes the local validation path, runs Prettier, ESLint, TypeScript, unit tests, coverage, integration tests, dry-run, smoke, and E2Es, then syncs the real app data back into `public/app-data.json`. It is the broad local verification path, not a tiny cleanup helper.
 
 The E2E path uses the example dataset on purpose, not your personalized portfolio content. After the E2E run, the real `.aboutme/app-data.json` is synced back into `public/app-data.json`, so deploy and export paths do not accidentally keep the example data around.
 
