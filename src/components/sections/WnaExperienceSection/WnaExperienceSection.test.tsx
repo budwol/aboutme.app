@@ -40,7 +40,7 @@ function flattenText(children: unknown): string {
 }
 
 type ResizeObserverCallback = (
-  entries: { contentRect: { height: number } }[],
+  entries: { target: { offsetHeight: number } }[],
 ) => void;
 
 let resizeObserverCallback: ResizeObserverCallback | undefined;
@@ -53,8 +53,13 @@ class MockResizeObserver {
   disconnect() {}
 }
 
+// WnaExperienceDetailsBox reads target.offsetHeight (the observed node's
+// real border-box size, including styles.detailsBox's own padding/border)
+// rather than contentRect.height (content box only) -- see
+// WnaExperienceDetailsBox.test.tsx for the clipping bug this guards
+// against.
 function emitResizeHeight(height: number) {
-  resizeObserverCallback?.([{ contentRect: { height } }]);
+  resizeObserverCallback?.([{ target: { offsetHeight: height } }]);
 }
 
 jest.mock("@components/text/WnaSectionTitle", () => {
