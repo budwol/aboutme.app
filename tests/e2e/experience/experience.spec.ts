@@ -18,6 +18,7 @@ test("user reviews experience items, toggles details, and navigates to the exper
 
   await test.step("verify the experience preview content", async () => {
     await homePage.assertExperiencePreviewContent();
+    await homePage.assertExperienceTimelineDotsAlignWithPeriods();
   });
 
   await test.step("expand and collapse the first experience item", async () => {

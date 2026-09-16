@@ -75,7 +75,13 @@ export const styles = {
     flexDirection: "column",
     width: dotColumnWidth,
     alignItems: "center",
-    paddingTop: 15,
+    // Centers the dot on periodText's line box (14px/18px line-height,
+    // 12px top/bottom padding -- about 22px tall): half of that (11) minus
+    // half the dot's own height (6) is 5. Verified against the live
+    // rendering, not derived from the CSS alone, since periodText's
+    // padding is on an inline span and doesn't grow its block parent by
+    // the full padding amount.
+    paddingTop: 5,
   },
   dotColumnCompact: {
     paddingTop: 2,
