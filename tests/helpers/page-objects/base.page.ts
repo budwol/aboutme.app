@@ -110,6 +110,32 @@ export abstract class BasePage {
     this.browserErrors.length = 0;
   }
 
+  // Every route's scrollable content lives in its own internal
+  // overflow:auto div (there's a fixed header/footer chrome around it),
+  // never the window/document -- see useWnaScrollY.ts, which is what
+  // saves and restores a position under this exact container.
+  async scrollMainContentBy(delta: number) {
+    await this.page.evaluate((amount) => {
+      const container = Array.from(document.querySelectorAll("div")).find(
+        (element) =>
+          getComputedStyle(element).overflowY === "auto" &&
+          !element.closest("#wna-drawer-overlay"),
+      );
+      container?.scrollBy(0, amount);
+    }, delta);
+  }
+
+  async getMainContentScrollTop(): Promise<number> {
+    return this.page.evaluate(() => {
+      const container = Array.from(document.querySelectorAll("div")).find(
+        (element) =>
+          getComputedStyle(element).overflowY === "auto" &&
+          !element.closest("#wna-drawer-overlay"),
+      );
+      return container?.scrollTop ?? 0;
+    });
+  }
+
   async prepareExternalUrlCapture() {
     await installExternalUrlCapture(this.page);
   }

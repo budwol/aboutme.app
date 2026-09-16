@@ -201,28 +201,6 @@ export class HomePage extends BasePage {
     ).toBeVisible();
   }
 
-  async scrollMainContentBy(delta: number) {
-    await this.page.evaluate((amount) => {
-      const container = Array.from(document.querySelectorAll("div")).find(
-        (element) =>
-          getComputedStyle(element).overflowY === "auto" &&
-          !element.closest("#wna-drawer-overlay"),
-      );
-      container?.scrollBy(0, amount);
-    }, delta);
-  }
-
-  async getMainContentScrollTop(): Promise<number> {
-    return this.page.evaluate(() => {
-      const container = Array.from(document.querySelectorAll("div")).find(
-        (element) =>
-          getComputedStyle(element).overflowY === "auto" &&
-          !element.closest("#wna-drawer-overlay"),
-      );
-      return container?.scrollTop ?? 0;
-    });
-  }
-
   async openExperiencePage() {
     await this.page
       .getByText(exampleAppData.experience.footerAction)
