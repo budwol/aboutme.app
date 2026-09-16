@@ -34,9 +34,33 @@ function useWnaAccentBarAnimation(
   pulseDuration: number,
 ) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setIsCollapsed(animated && pulseToWidth === undefined);
+    if (!animated || pulseToWidth !== undefined) {
+      setIsCollapsed(false);
+      return;
+    }
+
+    // A single requestAnimationFrame (or none at all) can land in the same
+    // paint as the initial mount, so the browser never actually renders the
+    // full-width starting frame before it's already collapsed -- the CSS
+    // transition then has nothing to interpolate from and the bar just
+    // snaps straight to its collapsed width instead of animating there.
+    // Two nested rAFs guarantee a real paint of the starting state first,
+    // same trick WnaApp.tsx uses for its own reveal/transition timings.
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = requestAnimationFrame(() => {
+        setIsCollapsed(true);
+      });
+    });
+
+    return () => {
+      /* istanbul ignore else -- frameRef.current is assigned synchronously by the requestAnimationFrame call above in the same effect run that registers this cleanup, so it can never be null when the cleanup runs */
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
   }, [animated, pulseToWidth, width]);
 
   if (pulseToWidth !== undefined) {

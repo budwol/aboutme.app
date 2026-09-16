@@ -47,6 +47,13 @@ describe("WnaAccentBar", () => {
   });
 
   it("uses a CSS transition when enabled", () => {
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
+
+        return 1;
+      });
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -62,6 +69,62 @@ describe("WnaAccentBar", () => {
         transition: "width 820ms cubic-bezier(0.33, 1, 0.68, 1)",
       }),
     );
+  });
+
+  it("keeps the bar painted at full width until two real frames have passed, so the browser has something to animate from", () => {
+    // Regression test: collapsing isCollapsed to true within the same
+    // effect tick as the mount (no rAF, or only one) lets React commit
+    // both the starting and collapsed widths before the browser ever
+    // paints the starting one -- the CSS transition then has nothing to
+    // interpolate from and the bar snaps straight to its collapsed width
+    // instead of visibly animating there.
+    const frameCallbacks: FrameRequestCallback[] = [];
+    jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        frameCallbacks.push(callback);
+
+        return frameCallbacks.length;
+      });
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaAccentBar appColors={appColors} animated width={180} />,
+      );
+    });
+
+    expect(tree!.root.findAllByType("div")[1].props.style.width).toBe(180);
+
+    act(() => {
+      frameCallbacks.shift()!(0);
+    });
+
+    expect(tree!.root.findAllByType("div")[1].props.style.width).toBe(180);
+
+    act(() => {
+      frameCallbacks.shift()!(0);
+    });
+
+    expect(tree!.root.findAllByType("div")[1].props.style.width).toBe(8);
+  });
+
+  it("cancels the pending collapse frame if unmounted first", () => {
+    const cancelAnimationFrame = jest.spyOn(global, "cancelAnimationFrame");
+    jest.spyOn(global, "requestAnimationFrame").mockImplementation(() => 42);
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaAccentBar appColors={appColors} animated width={180} />,
+      );
+    });
+
+    act(() => {
+      tree!.unmount();
+    });
+
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(42);
   });
 
   it("uses CSS keyframes for pulsing bars", () => {
