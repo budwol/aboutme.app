@@ -2,6 +2,8 @@ import { describe, expect, it, jest } from "@jest/globals";
 import React, { lazy } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaRoutes from "@/navigation/router/WnaRoutes";
+import { preloadRoute } from "@/navigation/router/wnaRouteTable";
+import { registerRoutePreloader } from "@/navigation/router/wnaRouter";
 
 const mockUseWnaPathname = jest.fn();
 const mockMatchRoute = jest.fn();
@@ -10,11 +12,13 @@ const mockGetNavigationPath = jest.fn((_key: string) => "/root");
 
 jest.mock("@/navigation/router/wnaRouteTable", () => ({
   matchRoute: (...args: unknown[]) => mockMatchRoute(...args),
+  preloadRoute: jest.fn(),
 }));
 
 jest.mock("@/navigation/router/wnaRouter", () => ({
   router: { replace: (href: string) => mockReplace(href) },
   useWnaPathname: () => mockUseWnaPathname(),
+  registerRoutePreloader: jest.fn(),
 }));
 
 jest.mock("@/navigation/routes/wnaNavigationRoutes", () => ({
@@ -26,6 +30,14 @@ function MockScreen({ slug }: { slug?: string }) {
 }
 
 describe("WnaRoutes", () => {
+  it("registers the route table's preloader with the router at module load", () => {
+    // Regression test: this indirection (rather than wnaRouter.ts
+    // importing wnaRouteTable.ts directly) is what keeps
+    // useWnaNavigationTransition.ts from being pulled into a circular
+    // import through every screen component's own header buttons.
+    expect(registerRoutePreloader).toHaveBeenCalledWith(preloadRoute);
+  });
+
   it("renders the matched route's component with its params", () => {
     mockUseWnaPathname.mockReturnValue("/projekte/pizza-app-2");
     mockMatchRoute.mockReturnValue({

@@ -4,7 +4,11 @@
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { router, useWnaPathname } from "@/navigation/router/wnaRouter";
+import {
+  registerRoutePreloader,
+  router,
+  useWnaPathname,
+} from "@/navigation/router/wnaRouter";
 
 function PathnameProbe({ onValue }: { onValue: (value: string) => void }) {
   onValue(useWnaPathname());
@@ -159,6 +163,25 @@ describe("wnaRouter", () => {
         value: originalWindow,
       });
     }
+  });
+
+  it("resolves immediately when no route preloader has been registered", async () => {
+    // The real router singleton always sets preload (see the router
+    // object below) -- it's optional only on the WnaRouter type, for
+    // test doubles that don't need it.
+    await expect(router.preload!("/anything")).resolves.toBeUndefined();
+  });
+
+  it("delegates preload() to whatever was registered", async () => {
+    // WnaRoutes.tsx registers the real route table's preloader this way
+    // instead of this module importing it directly, which would pull
+    // every screen component into wnaRouter.ts's graph (see WnaRoutes.tsx
+    // for why that would circle back into useWnaNavigationTransition.ts).
+    const preloadImpl = jest.fn(() => Promise.resolve("loaded"));
+    registerRoutePreloader(preloadImpl);
+
+    await expect(router.preload!("/menu")).resolves.toBe("loaded");
+    expect(preloadImpl).toHaveBeenCalledWith("/menu");
   });
 
   it("removes its popstate listener on unmount", () => {

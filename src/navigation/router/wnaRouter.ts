@@ -8,6 +8,13 @@ export type WnaRouter = {
   navigate: (href: WnaHref) => void;
   back: (fallbackHref?: WnaHref) => void;
   canGoBack: () => boolean;
+  // Optional: only the real router (below) has a route table to preload
+  // from -- registered onto it by WnaRoutes.tsx via registerRoutePreloader
+  // rather than imported here directly, which would otherwise pull every
+  // screen component into this module's dependency graph and, through
+  // their own header buttons, straight back into useWnaNavigationTransition
+  // (a circular import). Test doubles can omit it.
+  preload?: (href: WnaHref) => Promise<unknown>;
 };
 
 type WnaHistoryState = { __wnaNavIndex?: number };
@@ -80,7 +87,29 @@ function back(fallbackHref?: WnaHref) {
   }
 }
 
-export const router: WnaRouter = { push, replace, navigate, back, canGoBack };
+let preloadImpl: ((href: WnaHref) => Promise<unknown>) | undefined;
+
+// Called once by WnaRoutes.tsx to wire the real route table's preloader
+// in without this module ever importing it directly (see the WnaRouter
+// type above for why).
+export function registerRoutePreloader(
+  implementation: (href: WnaHref) => Promise<unknown>,
+) {
+  preloadImpl = implementation;
+}
+
+function preload(href: WnaHref): Promise<unknown> {
+  return preloadImpl?.(href) ?? Promise.resolve();
+}
+
+export const router: WnaRouter = {
+  push,
+  replace,
+  navigate,
+  back,
+  canGoBack,
+  preload,
+};
 
 export function useWnaPathname(): string {
   return useSyncExternalStore(subscribe, getPathname, getPathname);

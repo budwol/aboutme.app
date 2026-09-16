@@ -1,7 +1,19 @@
 import { Suspense, useEffect } from "react";
-import { matchRoute } from "@/navigation/router/wnaRouteTable";
-import { router, useWnaPathname } from "@/navigation/router/wnaRouter";
+import { matchRoute, preloadRoute } from "@/navigation/router/wnaRouteTable";
+import {
+  registerRoutePreloader,
+  router,
+  useWnaPathname,
+} from "@/navigation/router/wnaRouter";
 import { getNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
+
+// Wires the route table's preloader into the router as a side effect of
+// importing this module (loaded once, at app bootstrap, well before any
+// navigation can happen) instead of wnaRouter.ts importing wnaRouteTable.ts
+// directly -- that would pull every screen component into wnaRouter.ts's
+// graph and, through their own header buttons, straight back into
+// useWnaNavigationTransition, which already depends on wnaRouter.ts.
+registerRoutePreloader(preloadRoute);
 
 export default function WnaRoutes() {
   const pathname = useWnaPathname();
