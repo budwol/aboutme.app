@@ -120,6 +120,35 @@ describe("init process security", () => {
     );
     expect(generated.manifest).toContain('"scope": "/"');
     expect(generated.manifest).toContain('"start_url": "/"');
+  });
+
+  it("exempts the service worker script from the long-lived immutable cache rule", () => {
+    // Regression test: sw.js is a .js file, so the generic asset rule
+    // below would otherwise cache it as immutable for a year -- since
+    // there's no separate .css bundle (every style lives inline in
+    // index.html's own <style> tag), a browser stuck on a year-old,
+    // never-rechecked service worker has no way to ever notice that
+    // index.html (and the CSS inside it) changed either. This needs its
+    // own exact ("=") location: nginx always prefers an exact match over
+    // a regex one regardless of which is declared first, so this alone
+    // guarantees it wins over the general asset rule below it.
+    const generated = buildGeneratedFiles({
+      siteUrl: "https://portfolio.example.com/",
+      profileName: "Jane Example",
+      appName: "AboutMe",
+    });
+
+    expect(generated.nginxConfig).toMatch(
+      /location = \/sw\.js \{\s*add_header Cache-Control "no-cache";\s*\}/,
+    );
+
+    const swLocationIndex = generated.nginxConfig.indexOf("location = /sw.js");
+    const genericAssetLocationIndex = generated.nginxConfig.indexOf(
+      "location ~* \\.(js|css|",
+    );
+    expect(swLocationIndex).toBeGreaterThan(-1);
+    expect(genericAssetLocationIndex).toBeGreaterThan(-1);
+    expect(swLocationIndex).toBeLessThan(genericAssetLocationIndex);
     expect(
       fs.existsSync(
         path.resolve(process.cwd(), "scripts/web-service-worker.js"),

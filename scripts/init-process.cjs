@@ -199,6 +199,18 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
         add_header Cache-Control "no-cache";
     }
 
+    # All CSS ships inline in index.html's own <style> tag (there is no
+    # separately hashed .css file), and the service worker below governs
+    # every other asset's runtime cache -- so both must always be
+    # revalidated, or a browser can get stuck for a full year on a stale
+    # index.html/service worker and never notice new CSS was deployed at
+    # all. This location must stay an exact ("=") match so it outranks the
+    # regex rule below regardless of file order (nginx always prefers an
+    # exact match over a regex one).
+    location = /sw.js {
+        add_header Cache-Control "no-cache";
+    }
+
     location ~* \\.(js|css|png|jpg|jpeg|webp|gif|ico|svg|ttf|woff|woff2|webmanifest)$ {
         expires 1y;
         add_header Cache-Control "public, max-age=31536000, immutable";
