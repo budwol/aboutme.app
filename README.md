@@ -7,7 +7,7 @@
 
 AboutMe is my little portfolio app built with plain React and Vite.
 
-Current release: `2.0.0`. The app ships as a static, installable web PWA
+Current release: `2.0.1`. The app ships as a static, installable web PWA
 built with a plain React + Vite toolchain — no React Native or Expo left
 in the runtime or the build.
 
