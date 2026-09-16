@@ -59,19 +59,22 @@ describe("useWnaNavigationTransition", () => {
     expect(router.push).not.toHaveBeenCalled();
   });
 
-  it("runs the action directly when no transition starter is available", () => {
+  it("runs the action directly when no transition starter is available", async () => {
     mockUseWnaAppLifecycle.mockReturnValue({
       isNavigationTransitionActive: false,
     });
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.push("/home"));
+    // push() preloads the target route's chunk before actually navigating
+    // (see wnaRouteTable.ts's preloadRoute), so the router call lands one
+    // microtask later than the synchronous act() above can observe.
+    await act(async () => controller.push("/home"));
 
     expect(router.push).toHaveBeenCalledWith("/home");
   });
 
-  it("defers the action to the transition starter when available", () => {
+  it("defers the action to the transition starter when available", async () => {
     const startNavigationTransition = jest.fn((action: () => void) => action());
     mockUseWnaAppLifecycle.mockReturnValue({
       isNavigationTransitionActive: false,
@@ -80,7 +83,7 @@ describe("useWnaNavigationTransition", () => {
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.replace("/menu"));
+    await act(async () => controller.replace("/menu"));
 
     expect(startNavigationTransition).toHaveBeenCalledWith(
       expect.any(Function),
@@ -128,14 +131,14 @@ describe("useWnaNavigationTransition", () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
-  it("also exposes a working navigate() helper", () => {
+  it("also exposes a working navigate() helper", async () => {
     mockUseWnaAppLifecycle.mockReturnValue({
       isNavigationTransitionActive: false,
     });
     const router = createRouter();
 
     const controller = renderHook(router);
-    act(() => controller.navigate("/projects"));
+    await act(async () => controller.navigate("/projects"));
 
     expect(router.navigate).toHaveBeenCalledWith("/projects");
   });

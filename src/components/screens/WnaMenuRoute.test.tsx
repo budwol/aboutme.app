@@ -124,7 +124,7 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
 });
 
 describe("WnaMenuRoute", () => {
-  it("uses localized drawer paths for legal navigation entries", () => {
+  it("uses localized drawer paths for legal navigation entries", async () => {
     mockNavigate.mockClear();
 
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
@@ -139,10 +139,13 @@ describe("WnaMenuRoute", () => {
     expect(scrollViewScreen.props.showContactFooter).toBe(false);
     expect(scrollViewScreen.props.titleHref).toBe("/");
 
-    act(() => items[1].props.onPress());
-    act(() => items[2].props.onPress());
-    act(() => items[3].props.onPress());
-    act(() => items[4].props.onPress());
+    // navigate() preloads the target route's chunk before actually
+    // navigating (see wnaRouteTable.ts's preloadRoute), so each router
+    // call lands one microtask later than a synchronous act() can observe.
+    await act(async () => items[1].props.onPress());
+    await act(async () => items[2].props.onPress());
+    await act(async () => items[3].props.onPress());
+    await act(async () => items[4].props.onPress());
 
     expect(mockNavigate).toHaveBeenNthCalledWith(1, "/menu/impressum");
     expect(mockNavigate).toHaveBeenNthCalledWith(2, "/menu/datenschutz");

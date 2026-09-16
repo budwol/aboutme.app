@@ -23,14 +23,22 @@ export type WnaRouteMatch = {
 // wrapper identifiable in React DevTools and in wnaRouteTable.test.ts,
 // which can't compare it by reference to the real, statically-imported
 // component the way it could before.
+type PreloadableComponent<P extends object> = ComponentType<P> & {
+  displayName?: string;
+  preload?: () => Promise<unknown>;
+};
+
 function lazyRoute<P extends object>(
   importer: () => Promise<{ default: ComponentType<P> }>,
   displayName: string,
 ): ComponentType<P> {
-  const Component = lazy(importer) as ComponentType<P> & {
-    displayName?: string;
-  };
+  const Component = lazy(importer) as PreloadableComponent<P>;
   Component.displayName = displayName;
+  // The dynamic import() behind a lazy() wrapper only actually fires once
+  // Suspense first tries to render it -- calling it again here just reuses
+  // the browser's module cache, but doing so eagerly (see preloadRoute
+  // below) lets the chunk start downloading well before that render.
+  Component.preload = importer;
   return Component;
 }
 
@@ -103,4 +111,20 @@ export function matchRoute(pathname: string): WnaRouteMatch | undefined {
   }
 
   return undefined;
+}
+
+// Kicks off the target route's chunk download as early as possible --
+// ideally right when the user clicks, well before the navigation
+// transition's own timers would otherwise trigger it via Suspense. See
+// useWnaNavigationTransition, which awaits this before actually changing
+// the URL, so the transition overlay never reveals a still-loading route.
+export function preloadRoute(pathname: string): Promise<unknown> {
+  const component = matchRoute(pathname)?.Component as
+    | PreloadableComponent<object>
+    | undefined;
+
+  // Never reject: a failed chunk load (e.g. a stale cached bundle after a
+  // new deploy) must not block navigation itself -- Suspense still handles
+  // that failure the normal way once it actually renders the component.
+  return Promise.resolve(component?.preload?.()).catch(() => undefined);
 }

@@ -177,7 +177,7 @@ describe("WnaHeader", () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it("falls back to titleHref when no custom title handler exists", () => {
+  it("falls back to titleHref when no custom title handler exists", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -188,7 +188,10 @@ describe("WnaHeader", () => {
 
     const title = tree!.root.findByType("WnaMultilineHeader");
 
-    act(() => {
+    // replace() preloads the target route's chunk before actually
+    // navigating (see wnaRouteTable.ts's preloadRoute), so the router
+    // call lands one microtask later than a synchronous act() can observe.
+    await act(async () => {
       title.props.onPress();
     });
 
@@ -265,7 +268,7 @@ describe("WnaHeader", () => {
     expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it("prefers backHref over browser history", () => {
+  it("prefers backHref over browser history", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     act(() => {
@@ -280,7 +283,7 @@ describe("WnaHeader", () => {
 
     const backButton = tree!.root.findAllByType("WnaButtonHeader")[0];
 
-    act(() => {
+    await act(async () => {
       backButton.props.onPress();
     });
 
@@ -289,7 +292,7 @@ describe("WnaHeader", () => {
     expect(mockBack).not.toHaveBeenCalled();
   });
 
-  it("falls back to the root route when no back path is available", () => {
+  it("falls back to the root route when no back path is available", async () => {
     Object.defineProperty(window, "history", {
       configurable: true,
       value: {
@@ -308,7 +311,7 @@ describe("WnaHeader", () => {
 
     const title = tree!.root.findByType("WnaMultilineHeader");
 
-    act(() => {
+    await act(async () => {
       title.props.onPress();
     });
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import React, { Suspense } from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { matchRoute } from "@/navigation/router/wnaRouteTable";
+import { matchRoute, preloadRoute } from "@/navigation/router/wnaRouteTable";
 import { routeDefinitions } from "@/navigation/routes/wnaNavigationRoutes";
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
 
@@ -174,4 +174,39 @@ describe("matchRoute", () => {
       expect(tree!.root.findByType(expectedName)).toBeTruthy();
     },
   );
+});
+
+describe("preloadRoute", () => {
+  it("kicks off the matched lazy route's chunk download", async () => {
+    await expect(preloadRoute("/menu")).resolves.toEqual(
+      expect.objectContaining({ default: expect.any(Function) }),
+    );
+  });
+
+  it("resolves without a match", async () => {
+    await expect(
+      preloadRoute("/this-page-does-not-exist"),
+    ).resolves.toBeUndefined();
+  });
+
+  it("does not preload the root route (it isn't lazy)", async () => {
+    await expect(preloadRoute("/")).resolves.toBeUndefined();
+  });
+
+  it("swallows a failed chunk load instead of rejecting", async () => {
+    // Regression test: useWnaNavigationTransition awaits this promise
+    // before it ever changes the URL, so a rejection here would silently
+    // block every future navigation to that route instead of just letting
+    // Suspense handle the failure the normal way once it actually renders.
+    const match = matchRoute("/menu");
+    const component = match!.Component as { preload?: () => Promise<unknown> };
+    const originalPreload = component.preload;
+    component.preload = () => Promise.reject(new Error("chunk load failed"));
+
+    try {
+      await expect(preloadRoute("/menu")).resolves.toBeUndefined();
+    } finally {
+      component.preload = originalPreload;
+    }
+  });
 });

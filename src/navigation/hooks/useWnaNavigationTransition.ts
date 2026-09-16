@@ -1,5 +1,6 @@
 import * as WnaAppContext from "@/state/WnaAppContext";
 import { WnaHref, WnaRouter } from "@/navigation/router/wnaRouter";
+import { preloadRoute } from "@/navigation/router/wnaRouteTable";
 import { useCallback } from "react";
 
 export function useWnaNavigationTransition(router: WnaRouter) {
@@ -27,8 +28,15 @@ export function useWnaNavigationTransition(router: WnaRouter) {
 
   const push = useCallback(
     (href: WnaHref) => {
+      // Start the target route's chunk downloading immediately instead of
+      // waiting for Suspense to trigger it once the URL actually changes --
+      // otherwise the transition overlay can finish fading before a slow
+      // chunk load does, briefly revealing a blank Suspense fallback (see
+      // WnaRoutes.tsx) instead of the real screen.
+      const ready = preloadRoute(href);
+
       runNavigationTransition(() => {
-        router.push(href);
+        void ready.then(() => router.push(href));
       });
     },
     [router, runNavigationTransition],
@@ -36,8 +44,10 @@ export function useWnaNavigationTransition(router: WnaRouter) {
 
   const replace = useCallback(
     (href: WnaHref) => {
+      const ready = preloadRoute(href);
+
       runNavigationTransition(() => {
-        router.replace(href);
+        void ready.then(() => router.replace(href));
       });
     },
     [router, runNavigationTransition],
@@ -45,8 +55,10 @@ export function useWnaNavigationTransition(router: WnaRouter) {
 
   const navigate = useCallback(
     (href: WnaHref) => {
+      const ready = preloadRoute(href);
+
       runNavigationTransition(() => {
-        router.navigate(href);
+        void ready.then(() => router.navigate(href));
       });
     },
     [router, runNavigationTransition],

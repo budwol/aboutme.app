@@ -297,11 +297,14 @@ describe("WnaHomeRoute", () => {
     ]);
   });
 
-  it("navigates to the experience route from the home teaser", () => {
+  it("navigates to the experience route from the home teaser", async () => {
     const tree = renderHomeRoute(true);
     const experiencePreview = tree.root.findByType("WnaExperienceSection");
 
-    act(() => {
+    // push() preloads the target route's chunk before actually navigating
+    // (see wnaRouteTable.ts's preloadRoute), so the router call lands one
+    // microtask later than a synchronous act() can observe.
+    await act(async () => {
       experiencePreview.props.onFooterActionPress();
     });
 
@@ -315,22 +318,22 @@ describe("WnaHomeRoute", () => {
     expect(experiencePreview.props.showDetails).toBeUndefined();
   });
 
-  it("navigates to the projects route from the projects teaser action", () => {
+  it("navigates to the projects route from the projects teaser action", async () => {
     const tree = renderHomeRoute(true);
     const projectsCard = tree.root.findByType("WnaProjectsSection");
 
-    act(() => {
+    await act(async () => {
       projectsCard.props.onShowMorePress();
     });
 
     expect(mockPush).toHaveBeenCalledWith("/projekte");
   });
 
-  it("navigates to the project details route from the projects teaser", () => {
+  it("navigates to the project details route from the projects teaser", async () => {
     const tree = renderHomeRoute(true);
     const projectsCard = tree.root.findByType("WnaProjectsSection");
 
-    act(() => {
+    await act(async () => {
       projectsCard.props.onProjectPress(0);
     });
 
