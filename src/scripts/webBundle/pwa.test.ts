@@ -17,7 +17,7 @@ const { assertWebPwa } = require("../../../scripts/assert-web-pwa.cjs") as {
 function writeFixture(
   root: string,
   {
-    html = '<meta name="robots" content="noindex, nofollow"><script>if (true && "serviceWorker" in navigator) { serviceWorker.register("/sw.js") }</script>',
+    html = '<meta name="robots" content="noindex, nofollow"><script>if (true) { serviceWorker.register("/sw.js") }</script>',
     manifest = { display: "standalone", scope: "/", icons: [{}] },
     includeSw = true,
   }: { html?: string; manifest?: object; includeSw?: boolean } = {},
@@ -57,7 +57,7 @@ describe("assert-web-pwa", () => {
     // worker in production.
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-pwa-"));
     const { dist, publicDir } = writeFixture(root, {
-      html: '<meta name="robots" content="noindex, nofollow"><script>if (false && "serviceWorker" in navigator) { serviceWorker.register("/sw.js") }</script>',
+      html: '<meta name="robots" content="noindex, nofollow"><script>if (false) { serviceWorker.register("/sw.js") } else { unregisterExisting() }</script>',
     });
 
     expect(() => assertWebPwa(dist, publicDir)).toThrow(

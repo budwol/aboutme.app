@@ -23,7 +23,7 @@ function assertWebPwa(distDir, publicDir) {
   // site data is cleared by hand. A production build must resolve that
   // placeholder to `true`, or a real deploy would silently ship with no
   // service worker (and no offline support) at all.
-  if (!html.includes('if (true && "serviceWorker" in navigator)')) {
+  if (!html.includes("if (true) {") || html.includes("if (false) {")) {
     throw new Error(
       "web PWA must enable the service worker in production builds",
     );
