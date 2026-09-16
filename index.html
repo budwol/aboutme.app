@@ -31,7 +31,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/logo_180.png" />
     <script>
-      if ("serviceWorker" in navigator) {
+      if (%WNA_ENABLE_SERVICE_WORKER% && "serviceWorker" in navigator) {
         window.addEventListener("load", function () {
           navigator.serviceWorker.register("/sw.js", { scope: "/" });
         });

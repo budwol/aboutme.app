@@ -16,6 +16,18 @@ function assertWebPwa(distDir, publicDir) {
   if (!html.includes('serviceWorker.register("/sw.js"')) {
     throw new Error("web PWA must register /sw.js");
   }
+  // The registration is gated behind %WNA_ENABLE_SERVICE_WORKER% (see
+  // vite.config.ts) so `vite dev` never registers it -- its cache-first
+  // fetch handler would otherwise permanently cache local dev's unhashed
+  // module URLs, masking every later code change until the browser's
+  // site data is cleared by hand. A production build must resolve that
+  // placeholder to `true`, or a real deploy would silently ship with no
+  // service worker (and no offline support) at all.
+  if (!html.includes('if (true && "serviceWorker" in navigator)')) {
+    throw new Error(
+      "web PWA must enable the service worker in production builds",
+    );
+  }
   if (manifest.display !== "standalone" || manifest.scope !== "/") {
     throw new Error(
       "web PWA manifest must use standalone display and root scope",
