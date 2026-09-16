@@ -116,11 +116,13 @@ jest.mock("@components/screens/WnaBaseScreen", () => {
 });
 
 const mockOnScroll = jest.fn();
+const mockScrollContainerRef: { current: unknown } = { current: null };
 
 jest.mock("@components/screens/useWnaScrollY", () => ({
   useWnaScrollY: () => ({
     scrollY: { value: 0 },
     onScroll: (event: unknown) => mockOnScroll(event),
+    scrollContainerRef: mockScrollContainerRef,
   }),
 }));
 

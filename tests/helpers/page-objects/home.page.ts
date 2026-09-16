@@ -201,10 +201,44 @@ export class HomePage extends BasePage {
     ).toBeVisible();
   }
 
+  async scrollMainContentBy(delta: number) {
+    await this.page.evaluate((amount) => {
+      const container = Array.from(document.querySelectorAll("div")).find(
+        (element) =>
+          getComputedStyle(element).overflowY === "auto" &&
+          !element.closest("#wna-drawer-overlay"),
+      );
+      container?.scrollBy(0, amount);
+    }, delta);
+  }
+
+  async getMainContentScrollTop(): Promise<number> {
+    return this.page.evaluate(() => {
+      const container = Array.from(document.querySelectorAll("div")).find(
+        (element) =>
+          getComputedStyle(element).overflowY === "auto" &&
+          !element.closest("#wna-drawer-overlay"),
+      );
+      return container?.scrollTop ?? 0;
+    });
+  }
+
   async openExperiencePage() {
     await this.page
       .getByText(exampleAppData.experience.footerAction)
       .first()
+      .click();
+  }
+
+  async openProjectsPageFromHeader() {
+    // Unlike openProjectsPage() (the in-content "Show more" link near the
+    // bottom of the projects preview), the header button is always
+    // visible and never needs Playwright to auto-scroll it into view
+    // first -- important for tests asserting an exact scroll position,
+    // since that auto-scroll would otherwise move it itself.
+    await this.page
+      .locator("#wna-header-actions")
+      .getByRole("button", { name: "Some Projects" })
       .click();
   }
 

@@ -114,3 +114,19 @@ export const router: WnaRouter = {
 export function useWnaPathname(): string {
   return useSyncExternalStore(subscribe, getPathname, getPathname);
 }
+
+// Each route mounts a fresh scroll container (see wnaRouteTable.ts: a
+// pathname change swaps in a different component, so the DOM node -- and
+// any state react-test-renderer or React itself keeps on it -- is
+// discarded, not reused). Without this, going back to an already-visited
+// page always starts scrolled to the top. Keyed by pathname so distinct
+// project-detail slugs get independent positions too.
+const scrollPositions = new Map<string, number>();
+
+export function getSavedScrollY(pathname: string): number {
+  return scrollPositions.get(pathname) ?? 0;
+}
+
+export function saveScrollY(pathname: string, scrollY: number): void {
+  scrollPositions.set(pathname, scrollY);
+}

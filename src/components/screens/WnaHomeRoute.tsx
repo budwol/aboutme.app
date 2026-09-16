@@ -30,7 +30,6 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -66,9 +65,8 @@ export default function WnaHomeRoute(): ReactNode {
   const { t } = useTranslation(["common"]);
   const appBrand = t(i18nKeys.appBrand);
   const navigationRouter = useWnaNavigationTransition(router);
-  const { scrollY, onScroll } = useWnaScrollY();
+  const { scrollY, onScroll, scrollContainerRef } = useWnaScrollY();
   const lang = getNavigationLang();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showDeferredSections, setShowDeferredSections] = useState(false);
 
   useEffect(() => {
@@ -117,7 +115,7 @@ export default function WnaHomeRoute(): ReactNode {
 
   const handleTitlePress = useCallback(() => {
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [scrollContainerRef]);
 
   const handleExperiencePress = useCallback(() => {
     navigationRouter.push(getNavigationPath("experience", lang));

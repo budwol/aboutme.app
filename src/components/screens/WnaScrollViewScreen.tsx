@@ -43,7 +43,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
 }) => {
   const { appStyle } = useWnaTheme();
   const { appLayout } = useWnaLayout();
-  const { scrollY, onScroll } = useWnaScrollY();
+  const { scrollY, onScroll, scrollContainerRef } = useWnaScrollY();
 
   const scrollContainerStyle: CSSProperties = useMemo(
     () => ({
@@ -73,6 +73,7 @@ const WnaScrollViewScreen: FC<WnaScrollViewScreenProps> = ({
       {React.createElement(
         "div",
         {
+          ref: scrollContainerRef,
           style: scrollContainerStyle,
           onScroll,
         },

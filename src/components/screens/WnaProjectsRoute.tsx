@@ -307,7 +307,7 @@ export default function WnaProjectsRoute(): ReactNode {
   const { appLayout, currentWindowWidth, isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
   const navigationRouter = useWnaNavigationTransition(router);
-  const { scrollY, onScroll } = useWnaScrollY();
+  const { scrollY, onScroll, scrollContainerRef } = useWnaScrollY();
   const lang = getNavigationLang();
   const projects = appData.projects;
   const featuredProject = projects[0];
@@ -587,6 +587,7 @@ export default function WnaProjectsRoute(): ReactNode {
     return React.createElement(
       "div",
       {
+        ref: scrollContainerRef,
         style: landscapeScrollContainerStyle,
         onScroll,
       },
@@ -784,6 +785,7 @@ export default function WnaProjectsRoute(): ReactNode {
     appData.projectsSubtitle,
     landscapeScrollContainerStyle,
     onScroll,
+    scrollContainerRef,
     appStyle,
     featuredProject,
     gridProjectColumns,
@@ -817,6 +819,7 @@ export default function WnaProjectsRoute(): ReactNode {
         : React.createElement(
             "div",
             {
+              ref: scrollContainerRef,
               style: scrollContainerStyle,
               onScroll,
             },
