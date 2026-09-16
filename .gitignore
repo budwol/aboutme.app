@@ -13,6 +13,7 @@ playwright-artifacts.zip
 tests/playwright/results
 test-results/
 *-20??????T??????.json
+*Report.pdf
 
 # Build output
 .cache/
