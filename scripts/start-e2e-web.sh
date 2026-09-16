@@ -62,4 +62,9 @@ load_env_file "$ROOT_DIR/.env.example"
 load_env_file "$ROOT_DIR/.env"
 load_env_file "$ROOT_DIR/.env.local"
 
-npx vite --port "$PORT" --strictPort
+echo "starting vite on 127.0.0.1:$PORT at $(date -u +%H:%M:%S)"
+# Bind to the literal IP Playwright polls (127.0.0.1) instead of the
+# hostname "localhost" -- on some CI runners, Node's dns.lookup("localhost")
+# for the bind call can stall or resolve to ::1 first, leaving Playwright's
+# IPv4 health check connecting to nothing until config.webServer times out.
+npx vite --port "$PORT" --strictPort --host 127.0.0.1
