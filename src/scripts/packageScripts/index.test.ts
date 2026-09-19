@@ -134,7 +134,7 @@ describe("package scripts", () => {
     // Jest's CommonJS runtime -- assert the wiring by content instead of
     // executing it (`vite build` itself exercises the real thing, see
     // scripts/smoke-export.sh's version check against the built bundle).
-    const viteConfig = readRootFile("vite.config.ts");
+    const viteConfig = readRootFile("vite.config.mts");
 
     expect(viteConfig).toContain("packageJson.version");
     expect(viteConfig).toContain("__APP_VERSION__");

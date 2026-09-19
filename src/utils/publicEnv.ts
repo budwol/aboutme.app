@@ -1,5 +1,5 @@
 // Vite only inlines `import.meta.env.X` for vars matching its `envPrefix`
-// (see vite.config.ts), and only in files it bundles for the browser --
+// (see vite.config.mts), and only in files it bundles for the browser --
 // this indirection exists so the two or three call sites needing a
 // runtime env var don't each depend on `import.meta` directly, which
 // Jest's CommonJS runtime can't parse at all (see publicEnv.jest.ts,

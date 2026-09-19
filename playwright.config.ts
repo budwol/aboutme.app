@@ -4,6 +4,12 @@ import {
   type ReporterDescription,
 } from "@playwright/test";
 
+// Playwright sets FORCE_COLOR for its workers; an inherited NO_COLOR makes
+// Node print a warning for every worker and the web server.
+if (process.env.NO_COLOR !== undefined) {
+  delete process.env.NO_COLOR;
+}
+
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
 const reporter: "list" | ReporterDescription[] = process.env.CI
   ? ([

@@ -38,17 +38,21 @@ test("round buttons keep clipped press feedback on mobile", async ({
     expect(button.radius).toBeGreaterThanOrEqual(button.width * 0.45);
   }
 
-  const button = page.locator("button").nth(roundButtons[0].index);
-  const initialColor = await button.evaluate(
+  const button = await page
+    .locator("button")
+    .nth(roundButtons[0].index)
+    .elementHandle();
+  expect(button).not.toBeNull();
+  const initialColor = await button!.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
   );
-  await button.dispatchEvent("mousedown");
+  await button!.dispatchEvent("mousedown");
   await expect
     .poll(() =>
-      button.evaluate((element) => getComputedStyle(element).backgroundColor),
+      button!.evaluate((element) => getComputedStyle(element).backgroundColor),
     )
     .not.toBe(initialColor);
   expect(
-    await button.evaluate((element) => getComputedStyle(element).overflow),
+    await button!.evaluate((element) => getComputedStyle(element).overflow),
   ).toBe("hidden");
 });
