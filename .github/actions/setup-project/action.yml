@@ -1,0 +1,15 @@
+name: Set up project
+description: Install the supported Node.js version and locked npm dependencies
+
+runs:
+  using: composite
+  steps:
+    - name: set up node
+      uses: actions/setup-node@v5
+      with:
+        node-version: "22"
+        cache: npm
+
+    - name: install deps
+      shell: bash
+      run: npm ci

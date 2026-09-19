@@ -86,7 +86,7 @@ test -f public/sw.js
 test -f nginx/site.conf
 
 grep -q 'content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"' dist/index.html
-grep -q 'serviceWorker.register("/sw.js"' dist/index.html
+node scripts/assert-web-pwa.cjs
 
 grep -q "listen 8080 default_server;" nginx/site.conf
 

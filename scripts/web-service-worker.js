@@ -1,4 +1,4 @@
-const CACHE_NAME = "aboutme-shell-v1";
+const CACHE_NAME = "aboutme-shell-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -21,9 +21,12 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
+  const url = new URL(request.url);
   if (
     request.method !== "GET" ||
-    new URL(request.url).origin !== self.location.origin
+    url.origin !== self.location.origin ||
+    request.cache === "no-store" ||
+    url.pathname === "/app-data.json"
   ) {
     return;
   }

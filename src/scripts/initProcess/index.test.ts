@@ -122,6 +122,30 @@ describe("init process security", () => {
     expect(generated.manifest).toContain('"start_url": "/"');
   });
 
+  it("keeps security headers in locations with their own cache headers", () => {
+    const { nginxConfig } = buildGeneratedFiles({
+      siteUrl: "https://portfolio.example.com/",
+      profileName: "Jane Example",
+      appName: "AboutMe",
+    });
+
+    const locations = nginxConfig.match(/ {4}location [^\n]+ \{[^}]+\}/g) ?? [];
+    const cachedLocations = locations.filter((location) =>
+      location.includes("add_header Cache-Control"),
+    );
+
+    expect(cachedLocations).toHaveLength(4);
+    for (const location of cachedLocations) {
+      expect(location).toContain(
+        "add_header 'X-Content-Type-Options' 'nosniff' always;",
+      );
+      expect(location).toContain("add_header 'X-Frame-Options' 'DENY' always;");
+      expect(location).toContain("add_header 'Strict-Transport-Security'");
+      expect(location).toContain("add_header Content-Security-Policy");
+      expect(location).toContain("frame-ancestors 'self'");
+    }
+  });
+
   it("exempts the service worker script from the long-lived immutable cache rule", () => {
     // Regression test: sw.js is a .js file, so the generic asset rule
     // below would otherwise cache it as immutable for a year -- since
@@ -139,7 +163,7 @@ describe("init process security", () => {
     });
 
     expect(generated.nginxConfig).toMatch(
-      /location = \/sw\.js \{\s*add_header Cache-Control "no-cache";\s*\}/,
+      /location = \/sw\.js \{[^}]*add_header Cache-Control "no-cache";\s*\}/,
     );
 
     const swLocationIndex = generated.nginxConfig.indexOf("location = /sw.js");
@@ -313,7 +337,7 @@ describe("init.sh", () => {
     expect(fs.existsSync(path.join(fixtureRoot, "public", "sw.js"))).toBe(true);
     expect(
       fs.readFileSync(path.join(fixtureRoot, "public", "sw.js"), "utf8"),
-    ).toContain('const CACHE_NAME = "aboutme-shell-v1"');
+    ).toContain('const CACHE_NAME = "aboutme-shell-v2"');
     const serviceWorker = fs.readFileSync(
       path.join(fixtureRoot, "public", "sw.js"),
       "utf8",

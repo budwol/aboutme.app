@@ -1,8 +1,14 @@
 module.exports = {
   testEnvironment: "jsdom",
   transform: {
-    "^.+\\.tsx?$": ["ts-jest", { tsconfig: { module: "commonjs" } }],
+    "^.+\\.[jt]sx?$": [
+      "ts-jest",
+      { tsconfig: { module: "commonjs", allowJs: true } },
+    ],
   },
+  transformIgnorePatterns: [
+    "/node_modules/(?!(htmlparser2|domutils|domhandler|entities|domelementtype|dom-serializer|launder)/)",
+  ],
   setupFiles: ["<rootDir>/jest.setup.cjs"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",

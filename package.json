@@ -29,6 +29,8 @@
     "test:smoke": "./scripts/smoke-export.sh",
     "test:web-bundle": "node ./scripts/assert-web-bundle.cjs dist",
     "test:security": "npm run test:deps && npm run test:unit -- src/scripts/initProcess/index.test.ts src/utils/appConfig/index.test.ts src/utils/htmlSanitizer/index.test.ts src/scripts/envParser/index.test.ts && npm run test:dry-run",
+    "test:security:audit": "npm audit --audit-level=moderate",
+    "test:security:headers": "playwright test --config playwright.security.config.ts",
     "test:types": "tsc --skipLibCheck",
     "test:coverage": "jest --runInBand --watchAll=false --coverage src && node scripts/assert-coverage.cjs",
     "test:unit": "jest --runInBand --watchAll=false src",
@@ -50,7 +52,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-i18next": "^15.6.1",
-    "sanitize-html": "^2.17.2"
+    "sanitize-html": "^2.17.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
@@ -80,7 +82,7 @@
     "vite": "^8.3.0"
   },
   "engines": {
-    "node": ">=20.19.4 <21",
+    "node": ">=22.12.0 <23",
     "npm": ">=11.5.2 <12"
   },
   "private": true

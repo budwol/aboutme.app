@@ -4,6 +4,7 @@ process.env.EXPO_PUBLIC_SITE_URL =
 global.IS_REACT_ACT_ENVIRONMENT = true;
 
 global.__APP_VERSION__ = require("./package.json").version;
+global.__IS_PRODUCTION__ = false;
 
 // jsdom doesn't implement fetch. Tests always mock it themselves
 // (jest.spyOn(global, "fetch")), so a stub that's merely callable is

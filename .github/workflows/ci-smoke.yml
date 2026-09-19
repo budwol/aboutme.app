@@ -14,14 +14,11 @@ jobs:
       - name: check out repo
         uses: actions/checkout@v5
 
-      - name: set up node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 20.19.4
-          cache: npm
+      - name: set up project
+        uses: ./.github/actions/setup-project
 
-      - name: install deps
-        run: npm ci
+      - name: audit dependencies
+        run: npm run test:security:audit
 
       - name: smoke
         run: npm run test:smoke

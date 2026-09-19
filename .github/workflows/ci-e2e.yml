@@ -14,14 +14,8 @@ jobs:
       - name: check out repo
         uses: actions/checkout@v5
 
-      - name: set up node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 20.19.4
-          cache: npm
-
-      - name: install deps
-        run: npm ci
+      - name: set up project
+        uses: ./.github/actions/setup-project
 
       - name: install playwright chromium
         run: npx playwright install --with-deps chromium
@@ -76,3 +70,11 @@ jobs:
           echo "Playwright failed in the previous step."
           echo "Check the grouped error-context output above or download the playwright-artifacts artifact."
           exit 1
+
+      - name: check container security headers and CSP
+        run: |
+          npm run test:smoke
+          docker build --pull -t aboutme-security-headers-test .
+          docker run --rm -d --name aboutme-security-headers-test -p 127.0.0.1:5111:8080 aboutme-security-headers-test
+          trap 'docker stop aboutme-security-headers-test' EXIT
+          npm run test:security:headers

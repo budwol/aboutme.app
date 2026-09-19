@@ -13,20 +13,20 @@ function assertWebPwa(distDir, publicDir) {
   ) {
     throw new Error("web PWA must keep the noindex robots policy");
   }
-  if (!html.includes('serviceWorker.register("/sw.js"')) {
+  const bundledScripts = fs
+    .readdirSync(path.join(distDir, "assets"))
+    .filter((file) => file.endsWith(".js"))
+    .map((file) => fs.readFileSync(path.join(distDir, "assets", file), "utf8"))
+    .join("\n");
+  if (!/serviceWorker\.register\((["'`])\/sw\.js\1/.test(bundledScripts)) {
     throw new Error("web PWA must register /sw.js");
   }
-  // The registration is gated behind %WNA_ENABLE_SERVICE_WORKER% (see
-  // vite.config.ts) so `vite dev` never registers it -- its cache-first
-  // fetch handler would otherwise permanently cache local dev's unhashed
-  // module URLs, masking every later code change until the browser's
-  // site data is cleared by hand. A production build must resolve that
-  // placeholder to `true`, or a real deploy would silently ship with no
-  // service worker (and no offline support) at all.
-  if (!html.includes("if (true) {") || html.includes("if (false) {")) {
-    throw new Error(
-      "web PWA must enable the service worker in production builds",
-    );
+  if (
+    /<script\b(?![^>]*\bsrc=)(?![^>]*type="application\/json")[^>]*>\s*[^<\s]/i.test(
+      html,
+    )
+  ) {
+    throw new Error("web PWA must not ship inline executable scripts");
   }
   if (manifest.display !== "standalone" || manifest.scope !== "/") {
     throw new Error(

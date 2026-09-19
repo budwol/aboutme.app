@@ -171,12 +171,9 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
       ? `com.${parts[0]}.app`
       : `com.${parts[parts.length - 2]}.${parts[0]}`;
 
-  const nginxConfig = `server {
-    listen 8080 default_server;
-
-    charset utf-8;
-
-    add_header 'X-Content-Type-Options' 'nosniff' always;
+  // Nginx does not inherit server-level add_header directives into a location
+  // that defines even one add_header of its own (such as Cache-Control).
+  const securityHeaders = `    add_header 'X-Content-Type-Options' 'nosniff' always;
     add_header 'X-Frame-Options' 'DENY' always;
     add_header 'Cross-Origin-Opener-Policy' 'same-origin' always;
     add_header 'Cross-Origin-Embedder-Policy' 'same-origin' always;
@@ -185,7 +182,18 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     add_header 'Referrer-Policy' 'same-origin' always;
     add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;
     add_header 'X-Robots-Tag' 'noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate' always;
-    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self' ${allowDomain}; font-src 'self' data: ${allowDomain}; form-action 'self'; frame-ancestors 'self'; frame-src 'self' ${allowDomain}; img-src 'self' data: ${allowDomain}; manifest-src 'self'; object-src 'none'; script-src 'self' ${allowDomain}; script-src-attr 'none'; script-src-elem 'self' ${allowDomain}; style-src 'self' 'unsafe-inline' ${allowDomain}; worker-src 'self' blob:;" always;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self' ${allowDomain}; font-src 'self' data: ${allowDomain}; form-action 'self'; frame-ancestors 'self'; frame-src 'self' ${allowDomain}; img-src 'self' data: ${allowDomain}; manifest-src 'self'; object-src 'none'; script-src 'self' ${allowDomain}; script-src-attr 'none'; script-src-elem 'self' ${allowDomain}; style-src 'self' 'unsafe-inline' ${allowDomain}; worker-src 'self' blob:;" always;`;
+  const locationSecurityHeaders = securityHeaders.replace(
+    /^ {4}/gm,
+    "        ",
+  );
+
+  const nginxConfig = `server {
+    listen 8080 default_server;
+
+    charset utf-8;
+
+${securityHeaders}
 
     server_tokens off;
 
@@ -196,6 +204,7 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     index index.html;
 
     location = /index.html {
+${locationSecurityHeaders}
         add_header Cache-Control "no-cache";
     }
 
@@ -208,15 +217,18 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     # regex rule below regardless of file order (nginx always prefers an
     # exact match over a regex one).
     location = /sw.js {
+${locationSecurityHeaders}
         add_header Cache-Control "no-cache";
     }
 
     location ~* \\.(js|css|png|jpg|jpeg|webp|gif|ico|svg|ttf|woff|woff2|webmanifest)$ {
+${locationSecurityHeaders}
         expires 1y;
         add_header Cache-Control "public, max-age=31536000, immutable";
     }
 
     location ~* \\.map$ {
+${locationSecurityHeaders}
         default_type application/json;
         expires 1y;
         add_header Cache-Control "public, max-age=31536000, immutable";

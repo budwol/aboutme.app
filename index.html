@@ -30,30 +30,6 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/logo_180.png" />
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          if (%WNA_ENABLE_SERVICE_WORKER%) {
-            navigator.serviceWorker.register("/sw.js", { scope: "/" });
-          } else {
-            // Local dev never registers one (see vite.config.ts), but an
-            // earlier visit to this same origin under a build that did
-            // (an older dev server, before this guard existed) can leave
-            // one permanently active -- its cache-first fetch handler
-            // would keep serving that moment's unhashed module files
-            // forever otherwise, no matter what changes on disk.
-            navigator.serviceWorker
-              .getRegistrations()
-              .then(function (registrations) {
-                registrations.forEach(function (registration) {
-                  registration.unregister();
-                });
-              });
-          }
-        });
-      }
-    </script>
-
     <style>
       @font-face {
         font-family: "Manrope";

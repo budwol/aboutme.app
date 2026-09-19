@@ -1,0 +1,14 @@
+name: scheduled security checks
+
+on:
+  schedule:
+    - cron: "13 5 * * 1"
+  workflow_dispatch:
+
+jobs:
+  audit_and_smoke:
+    uses: ./.github/workflows/ci-smoke.yml
+
+  browser_and_container:
+    needs: audit_and_smoke
+    uses: ./.github/workflows/ci-e2e.yml

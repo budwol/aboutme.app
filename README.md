@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml/badge.svg)](https://github.com/budwol/aboutme.app/actions/workflows/ci.yml)
 [![license: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![node](https://img.shields.io/badge/node-20.19.4-339933?logo=node.js&logoColor=white)](./package.json)
+[![node](https://img.shields.io/badge/node-22-339933?logo=node.js&logoColor=white)](./package.json)
 [![vite](https://img.shields.io/badge/vite-8-646CFF?logo=vite&logoColor=white)](./package.json)
 
 AboutMe is my little portfolio app built with plain React and Vite.
@@ -50,7 +50,7 @@ This thing runs on plain React and Vite. No wizard cave, no enchanted build fore
    npm install
    ```
 
-   Current baseline is Node `20.19.4` and npm `11.5.2`.
+   Current baseline is Node `22.12.0` or newer in the Node 22 series and npm `11.5.2`.
 
 2. Run the initializer.
 
@@ -242,10 +242,12 @@ Docker is there for people who actually want that delivery path, not as a rite o
 The runtime path is meant to stay plain and inspectable, not clever.
 
 - The container serves the exported app with nginx on internal port `8080`.
+- Docker Compose publishes port `5110` on `127.0.0.1` by default. Set `ABOUTME_BIND_ADDRESS` explicitly when the reverse proxy must reach the port through another interface.
 - The image healthcheck hits `http://127.0.0.1:8080/` with `wget`, so the check and the runtime speak the same language.
 - Runtime assets are only the exported `dist` output plus generated nginx config. Source content like `.aboutme/`, `.env`, tests, and other workshop clutter stays out of the image.
 - HTML content goes through `sanitize-html` with a small allowlist. That path is meant for trusted portfolio content, but it is no longer hanging off a homegrown regex filter.
 - The generated nginx config sets the boring but useful headers: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options`, `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `Cross-Origin-Resource-Policy`, `Referrer-Policy`, `Permissions-Policy`, and `X-Robots-Tag`.
+- To check the headers and browser CSP behavior returned by nginx, run `npm run init`, `npx vite build`, `node scripts/inject-web-shell.cjs`, `docker build -t aboutme-security-headers-test .`, and `docker run -d --name aboutme-security-headers-test -p 127.0.0.1:5111:8080 aboutme-security-headers-test`. Then run `npm run test:security:headers` and remove the test container with `docker rm -f aboutme-security-headers-test`. Set `SECURITY_BASE_URL` to test another running instance. Set `SECURITY_DEPLOYED_URL=https://your-site.example` to include the optional HTTPS deployment check.
 - Static assets get long-lived cache headers, while `index.html` stays on `no-cache`, so the app shell can refresh without painting over the whole landscape.
 - Production web builds do not publish JavaScript source maps. For bundle analysis, create a temporary export with `npx vite build --sourcemap`, inspect it, and remove it afterward. See [ADR 0021](adr/0021-production-source-maps-are-not-published.md).
 - The production SEO restriction is intentional: `noindex, nofollow` remains enabled and must not be removed to improve Lighthouse.
@@ -304,7 +306,7 @@ This little canvas is hardened in the plain, useful places, but a few corners ar
 - `deploy-container.sh` reads and validates the registry settings from `.env`; `--dry-run` stops there after printing the image ref, while a real run exports the web build before building and pushing an image. That is the right move for this setup, but the non-dry path is still a real shipping button, not a harmless little practice stroke.
 - The default local checks stay mostly offline and repeatable. `npm run test:security` covers the repo-specific work here: env parsing, URL and HTML hardening, init generation, dependency tree shape, and dry-run behavior. It is a good steady brush. It is not pretending to be a live advisory feed from the sky.
 - There is a small `SECURITY.md` now, so there is at least a clear place to send reports. There is still no grand enterprise advisory machine behind it, and that is fine for this kind of project.
-- If you want a live dependency advisory check, run `npm audit` when network access is available. That bit stays manual on purpose, because clean local repeatability won the toss against pretending a network check happened when it did not.
+- CI runs `npm run test:security:audit` against the live npm advisory database. Run the same command locally when network access is available; offline checks cannot establish whether new advisories have appeared.
 
 Short version: the app path is meant to stay calm and safe, the deploy scripts are meant to be clear and a little sharp, and the repo does not wear fake enterprise shoulder pads just to look important. Just a few happy little guard rails and enough honesty to leave the rough edges where they really are.
 

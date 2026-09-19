@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import WnaRootLayout from "@components/WnaRootLayout";
 import WnaErrorBoundary from "@components/WnaErrorBoundary";
+import "./serviceWorkerRegistration";
 
 const container = document.getElementById("root");
 

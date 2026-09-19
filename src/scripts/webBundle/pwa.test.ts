@@ -17,16 +17,24 @@ const { assertWebPwa } = require("../../../scripts/assert-web-pwa.cjs") as {
 function writeFixture(
   root: string,
   {
-    html = '<meta name="robots" content="noindex, nofollow"><script>if (true) { serviceWorker.register("/sw.js") }</script>',
+    html = '<meta name="robots" content="noindex, nofollow"><script type="module" src="/assets/index.js"></script>',
+    bundle = 'navigator.serviceWorker.register("/sw.js", { scope: "/" })',
     manifest = { display: "standalone", scope: "/", icons: [{}] },
     includeSw = true,
-  }: { html?: string; manifest?: object; includeSw?: boolean } = {},
+  }: {
+    html?: string;
+    bundle?: string;
+    manifest?: object;
+    includeSw?: boolean;
+  } = {},
 ) {
   const dist = path.join(root, "dist");
   const publicDir = path.join(root, "public");
   fs.mkdirSync(dist);
+  fs.mkdirSync(path.join(dist, "assets"));
   fs.mkdirSync(publicDir);
   fs.writeFileSync(path.join(dist, "index.html"), html);
+  fs.writeFileSync(path.join(dist, "assets", "index.js"), bundle);
   fs.writeFileSync(
     path.join(publicDir, "site.webmanifest"),
     JSON.stringify(manifest),
@@ -49,19 +57,26 @@ describe("assert-web-pwa", () => {
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  it("rejects a build where the service worker registration was left disabled", () => {
-    // Regression test: the registration is gated behind
-    // %WNA_ENABLE_SERVICE_WORKER% (see vite.config.ts) so `vite dev`
-    // never registers it -- a build that resolved that placeholder to
-    // anything other than "true" would silently ship with no service
-    // worker in production.
+  it("rejects a build without service worker registration", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-pwa-"));
     const { dist, publicDir } = writeFixture(root, {
-      html: '<meta name="robots" content="noindex, nofollow"><script>if (false) { serviceWorker.register("/sw.js") } else { unregisterExisting() }</script>',
+      bundle: "navigator.serviceWorker.getRegistrations()",
     });
 
     expect(() => assertWebPwa(dist, publicDir)).toThrow(
-      "web PWA must enable the service worker in production builds",
+      "web PWA must register /sw.js",
+    );
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  it("rejects inline executable scripts", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-pwa-"));
+    const { dist, publicDir } = writeFixture(root, {
+      html: '<meta name="robots" content="noindex, nofollow"><script>alert(1)</script>',
+    });
+
+    expect(() => assertWebPwa(dist, publicDir)).toThrow(
+      "web PWA must not ship inline executable scripts",
     );
     fs.rmSync(root, { recursive: true, force: true });
   });
