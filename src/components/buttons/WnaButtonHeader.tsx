@@ -77,6 +77,7 @@ const WnaButtonHeader: FC<WnaButtonHeaderProps> = ({
           cursor: "pointer",
           height: size,
           outlineColor,
+          overflow: "hidden",
           padding: 0,
           width: size,
         } as CSSProperties,

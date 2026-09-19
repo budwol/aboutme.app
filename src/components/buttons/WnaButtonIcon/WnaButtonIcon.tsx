@@ -78,6 +78,7 @@ const WnaButtonIconComponent: FC<WnaButtonIconProps> = ({
           boxSizing: "border-box",
           borderStyle: "solid",
           cursor: "pointer",
+          overflow: "hidden",
           padding: 0,
         } as React.CSSProperties,
       },
