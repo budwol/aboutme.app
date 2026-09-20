@@ -97,7 +97,6 @@ describe("init process security", () => {
       appName: "AboutMe",
     });
 
-    expect(generated.nginxConfig).toContain("https://portfolio.example.com");
     expect(generated.nginxConfig).toContain("listen 8080 default_server;");
     expect(generated.nginxConfig).toContain("error_log /dev/stderr warn;");
     expect(generated.nginxConfig).toContain(
@@ -114,7 +113,14 @@ describe("init process security", () => {
     expect(generated.nginxConfig).toContain("manifest-src 'self';");
     expect(generated.nginxConfig).toContain("script-src-attr 'none';");
     expect(generated.nginxConfig).toContain("worker-src 'self' blob:;");
+    expect(generated.nginxConfig).toContain("upgrade-insecure-requests;");
     expect(generated.nginxConfig).not.toContain("https://cdnjs.cloudflare.com");
+    // The CSP relies on 'self' alone -- no site-specific or wildcard
+    // subdomain host should ever be echoed into it (a wildcard subdomain
+    // allowance is a real attack surface if any subdomain is ever
+    // compromised or hosts user content).
+    expect(generated.nginxConfig).not.toContain("portfolio.example.com");
+    expect(generated.nginxConfig).not.toContain("https://*.");
     expect(generated.nginxConfig).not.toContain(
       "script-src 'self' 'unsafe-inline'",
     );
@@ -134,7 +140,7 @@ describe("init process security", () => {
       location.includes("add_header Cache-Control"),
     );
 
-    expect(cachedLocations).toHaveLength(4);
+    expect(cachedLocations).toHaveLength(6);
     for (const location of cachedLocations) {
       expect(location).toContain(
         "add_header 'X-Content-Type-Options' 'nosniff' always;",

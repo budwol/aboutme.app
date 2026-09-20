@@ -161,11 +161,6 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     .split(":")[0];
   const hostNoWww = host.replace(/^www\./, "");
   const parts = hostNoWww.split(".");
-  const baseDomain =
-    parts.length >= 2
-      ? `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
-      : hostNoWww;
-  const allowDomain = `https://${hostNoWww} https://*.${baseDomain}`;
   const manifestId =
     parts.length === 2
       ? `com.${parts[0]}.app`
@@ -182,7 +177,7 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     add_header 'Referrer-Policy' 'same-origin' always;
     add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;
     add_header 'X-Robots-Tag' 'noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate' always;
-    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self' ${allowDomain}; font-src 'self' data: ${allowDomain}; form-action 'self'; frame-ancestors 'self'; frame-src 'self' ${allowDomain}; img-src 'self' data: ${allowDomain}; manifest-src 'self'; object-src 'none'; script-src 'self' ${allowDomain}; script-src-attr 'none'; script-src-elem 'self' ${allowDomain}; style-src 'self' 'unsafe-inline' ${allowDomain}; worker-src 'self' blob:;" always;`;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src 'self'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; script-src-attr 'none'; script-src-elem 'self'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; worker-src 'self' blob:;" always;`;
   const locationSecurityHeaders = securityHeaders.replace(
     /^ {4}/gm,
     "        ",
@@ -221,7 +216,24 @@ ${locationSecurityHeaders}
         add_header Cache-Control "no-cache";
     }
 
-    location ~* \\.(js|css|png|jpg|jpeg|webp|gif|ico|svg|ttf|woff|woff2|webmanifest)$ {
+    # app-data.json is not cache-busted (fetched by its bare path, unlike
+    # the versioned images/PDFs covered below) and src/app-data/index.ts
+    # already fetches it with cache: "no-store" -- this mirrors that intent
+    # at the HTTP layer so no intermediary ever caches a stale copy.
+    location = /app-data.json {
+${locationSecurityHeaders}
+        add_header Cache-Control "no-store";
+    }
+
+    # robots.txt, sitemap.xml and llms.txt aren't cache-busted either and
+    # are fetched by crawlers/tools at fixed paths, so they must always be
+    # revalidated instead of relying on nginx's caching default.
+    location ~* \\.(txt|xml)$ {
+${locationSecurityHeaders}
+        add_header Cache-Control "no-cache";
+    }
+
+    location ~* \\.(js|css|png|jpg|jpeg|webp|gif|ico|svg|ttf|woff|woff2|webmanifest|pdf)$ {
 ${locationSecurityHeaders}
         expires 1y;
         add_header Cache-Control "public, max-age=31536000, immutable";
