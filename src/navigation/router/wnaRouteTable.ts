@@ -76,6 +76,10 @@ const routeComponents: Record<WnaRouteKey, ComponentType> = {
     () => import("@components/screens/WnaContactRoute"),
     "WnaContactRoute",
   ),
+  downloads: lazyRoute(
+    () => import("@components/screens/WnaDownloadsRoute"),
+    "WnaDownloadsRoute",
+  ),
 };
 
 const WnaProjectDetailsRoute = lazyRoute(

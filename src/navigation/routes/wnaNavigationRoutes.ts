@@ -11,7 +11,8 @@ export type WnaRouteKey =
   | "licenses"
   | "projects"
   | "experience"
-  | "contact";
+  | "contact"
+  | "downloads";
 
 type RouteDefinition = Record<WnaRouteLang, string>;
 
@@ -25,6 +26,13 @@ export const routeDefinitions: Record<WnaRouteKey, RouteDefinition> = {
   projects: { de: "/projekte", en: "/projects" },
   experience: { de: "/taetigkeiten", en: "/experience" },
   contact: { de: "/kontakt", en: "/contact" },
+  // Deliberately not referenced by WnaNavigationList/WnaMenuRoute or any
+  // other in-app link -- reachable only by someone who already has this
+  // URL (shared out of band, e.g. by email to a recruiter), matching the
+  // "not reachable from the UI" requirement for the underlying file
+  // download (see getApplicationPackageUrl / nginx/site.conf's /files/
+  // location).
+  downloads: { de: "/bewerbungsunterlagen", en: "/application-documents" },
 };
 
 export function getNavigationLang(lang = getLangCode()): WnaRouteLang {
