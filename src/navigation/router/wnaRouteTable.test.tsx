@@ -43,6 +43,10 @@ jest.mock("@components/screens/WnaContactRoute", () => ({
   __esModule: true,
   default: mockScreen("WnaContactRoute"),
 }));
+jest.mock("@components/screens/WnaDownloadsRoute", () => ({
+  __esModule: true,
+  default: mockScreen("WnaDownloadsRoute"),
+}));
 jest.mock("@components/screens/WnaProjectDetailsRoute", () => ({
   __esModule: true,
   default: mockScreen("WnaProjectDetailsRoute"),
@@ -65,6 +69,7 @@ describe("matchRoute", () => {
     projects: "WnaProjectsRoute",
     experience: "WnaExperienceRoute",
     contact: "WnaContactRoute",
+    downloads: "WnaDownloadsRoute",
   } as const;
 
   it.each(
@@ -148,6 +153,7 @@ describe("matchRoute", () => {
     ["/projekte", "WnaProjectsRoute"],
     ["/taetigkeiten", "WnaExperienceRoute"],
     ["/kontakt", "WnaContactRoute"],
+    ["/bewerbungsunterlagen", "WnaDownloadsRoute"],
     ["/projekte/pizza-app-2", "WnaProjectDetailsRoute"],
   ])(
     "actually resolves the lazy import for %s to its real screen module",

@@ -16,6 +16,7 @@ export type WnaNavigationItemProps = {
   iconName: keyof typeof iconMap;
   onPress: (text: string) => void;
   iconRightName?: keyof typeof iconMap | null;
+  iconColor?: string;
   t: TFunction<string[], undefined>;
   style?: CSSProperties;
   type?: "first" | "last" | "middle" | "standalone" | undefined;
@@ -28,6 +29,7 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
   iconName,
   onPress,
   iconRightName,
+  iconColor,
   type,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -65,7 +67,7 @@ const WnaNavigationItemComponent: FC<WnaNavigationItemProps> = ({
     [appColors.black],
   );
 
-  const leftIconColor = appColors.accent5;
+  const leftIconColor = iconColor ?? appColors.accent5;
   const rightIconColor = appColors.coolgray4;
   const interactionColor = appColors.isDark
     ? "rgba(255,255,255,0.06)"
