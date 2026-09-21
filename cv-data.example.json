@@ -1,0 +1,42 @@
+{
+  "personalDetails": {
+    "birthDate": "1990-01-01",
+    "birthPlace": "Musterstadt",
+    "familyStatusDe": "Ledig",
+    "familyStatusEn": "Single"
+  },
+  "education": [
+    {
+      "periodDe": "2010 - 2013",
+      "periodEn": "2010 - 2013",
+      "institution": "Universität Musterstadt",
+      "degreeDe": "Bachelor of Science, Informatik",
+      "degreeEn": "Bachelor of Science, Computer Science"
+    },
+    {
+      "periodDe": "2002 - 2010",
+      "periodEn": "2002 - 2010",
+      "institution": "Gymnasium Musterstadt",
+      "degreeDe": "Abitur (Allgemeine Hochschulreife)",
+      "degreeEn": "Abitur (General University Entrance Qualification)"
+    }
+  ],
+  "languages": [
+    {
+      "nameDe": "Deutsch",
+      "nameEn": "German",
+      "levelDe": "Muttersprache",
+      "levelEn": "Native speaker"
+    },
+    {
+      "nameDe": "Englisch",
+      "nameEn": "English",
+      "levelDe": "Fließend",
+      "levelEn": "Fluent"
+    }
+  ],
+  "drivingLicenseDe": "Führerschein Klasse B",
+  "drivingLicenseEn": "Driving license, class B",
+  "interestsDe": ["Programmieren", "Musizieren"],
+  "interestsEn": ["Programming", "Music"]
+}

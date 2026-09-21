@@ -478,9 +478,12 @@ function buildAtsSoftSkillList(softSkills, lang) {
     .filter((entry) => entry.name !== "");
 }
 
-function buildAbsoluteUrl(siteUrl, pathSegment) {
+// langCode is required (not folded into pathSegment by the caller) since a
+// plain Portfolio file name alone no longer says which language it is --
+// see buildPortfolioFileName below.
+function buildAbsoluteUrl(siteUrl, langCode, pathSegment) {
   const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
-  return `${base}/${pathSegment}`;
+  return `${base}/${langCode.toUpperCase()}/${pathSegment}`;
 }
 
 const GERMAN_DIACRITICS = {
@@ -511,12 +514,19 @@ function slugifyName(name) {
     .replace(/[^A-Za-z0-9_-]/g, "");
 }
 
-// "Vorname_Nachname_-_Portfolio_DE.pdf" / "..._DE_ATS.pdf" — a filename a
+// "Vorname_Nachname_-_Portfolio.pdf" / "..._ATS.pdf" — a filename a
 // recipient recognizes and can save without renaming, rather than the
-// generic "Portfolio-DE.pdf" every candidate's export used to share.
+// generic "Portfolio.pdf" every candidate's export used to share. Unlike
+// buildCvFileName in generate-cv-pdf.cjs, "Portfolio" is the same word in
+// German and English, so it carries no _DE/_EN suffix at all -- the DE and
+// EN files are told apart by which public/DE//public/EN/ folder they land
+// in (see generateResumePdf below), not by anything in the name itself.
+// langCode is still accepted, purely so every call site here and in
+// generate-application-package.cjs reads the same way buildCvFileName's
+// calls do; it has no effect on the returned string.
 function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
   const atsSuffix = ats ? "_ATS" : "";
-  return `${slugifyName(name)}_-_Portfolio_${langCode.toUpperCase()}${atsSuffix}.pdf`;
+  return `${slugifyName(name)}_-_Portfolio${atsSuffix}.pdf`;
 }
 
 // Renders a "heading + one bar per skill" block (used for both Tech-Stack
@@ -1346,7 +1356,7 @@ function writeResumePdf(filePath, data, lang, avatarPath) {
     const atsFileName = buildPortfolioFileName(data.profile?.name, lang, {
       ats: true,
     });
-    const atsUrl = buildAbsoluteUrl(data.siteUrl, atsFileName);
+    const atsUrl = buildAbsoluteUrl(data.siteUrl, lang, atsFileName);
     const atsLinkLabel =
       lang === "de" ? "Text-Version (ATS)" : "Text-only version (ATS)";
 
@@ -1403,18 +1413,31 @@ async function generateResumePdf(rootDir, logger = console.log) {
   }
 
   const data = JSON.parse(fs.readFileSync(sourceFile, "utf8"));
-  const targetDir = path.join(rootDir, "public");
-  fs.mkdirSync(targetDir, { recursive: true });
+  // DE and EN each get their own subfolder under public/ root: since
+  // "Portfolio"/"Portfolio_ATS" is the same file name in both languages
+  // (see buildPortfolioFileName), the folder is what actually disambiguates
+  // them, the same way public/files/DE//EN/ already does for the CV in
+  // generate-cv-pdf.cjs.
+  const deTargetDir = path.join(rootDir, "public", "DE");
+  const enTargetDir = path.join(rootDir, "public", "EN");
+  fs.mkdirSync(deTargetDir, { recursive: true });
+  fs.mkdirSync(enTargetDir, { recursive: true });
 
   const name = data.profile?.name;
-  const deTargetFile = path.join(targetDir, buildPortfolioFileName(name, "de"));
-  const enTargetFile = path.join(targetDir, buildPortfolioFileName(name, "en"));
+  const deTargetFile = path.join(
+    deTargetDir,
+    buildPortfolioFileName(name, "de"),
+  );
+  const enTargetFile = path.join(
+    enTargetDir,
+    buildPortfolioFileName(name, "en"),
+  );
   const deAtsTargetFile = path.join(
-    targetDir,
+    deTargetDir,
     buildPortfolioFileName(name, "de", { ats: true }),
   );
   const enAtsTargetFile = path.join(
-    targetDir,
+    enTargetDir,
     buildPortfolioFileName(name, "en", { ats: true }),
   );
   const avatar = prepareEmbeddableAvatar(rootDir, data, logger);
@@ -1435,7 +1458,7 @@ async function generateResumePdf(rootDir, logger = console.log) {
     enAtsTargetFile,
   ]) {
     logger(
-      `generated .aboutme/app-data.json -> public/${path.basename(targetFile)}`,
+      `generated .aboutme/app-data.json -> public/${path.relative(path.join(rootDir, "public"), targetFile)}`,
     );
   }
 

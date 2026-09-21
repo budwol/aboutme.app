@@ -84,10 +84,15 @@ test -f public/app-data.json
 test -f public/site.webmanifest
 test -f public/sw.js
 test -f nginx/site.conf
+test -f nginx/.htpasswd
+test -f .aboutme/secrets/documents-password.txt
 
 grep -q 'content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate"' dist/index.html
 node scripts/assert-web-pwa.cjs
 
 grep -q "listen 8080 default_server;" nginx/site.conf
+grep -q "location \^~ /files/ {" nginx/site.conf
+grep -q "auth_basic_user_file /etc/nginx/.htpasswd;" nginx/site.conf
+grep -q "^documents:{SHA}" nginx/.htpasswd
 
 echo "export smoke check done"
