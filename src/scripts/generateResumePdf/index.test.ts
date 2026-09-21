@@ -121,16 +121,26 @@ describe("generate-resume-pdf", () => {
     const result = await generateResumePdf(fixtureRoot, logger);
 
     expect(result.deTargetFile).toBe(
-      path.join(fixtureRoot, "public", "Jane_Example_-_Portfolio_DE.pdf"),
+      path.join(fixtureRoot, "public", "DE", "Jane_Example_-_Portfolio.pdf"),
     );
     expect(result.enTargetFile).toBe(
-      path.join(fixtureRoot, "public", "Jane_Example_-_Portfolio_EN.pdf"),
+      path.join(fixtureRoot, "public", "EN", "Jane_Example_-_Portfolio.pdf"),
     );
     expect(result.deAtsTargetFile).toBe(
-      path.join(fixtureRoot, "public", "Jane_Example_-_Portfolio_DE_ATS.pdf"),
+      path.join(
+        fixtureRoot,
+        "public",
+        "DE",
+        "Jane_Example_-_Portfolio_ATS.pdf",
+      ),
     );
     expect(result.enAtsTargetFile).toBe(
-      path.join(fixtureRoot, "public", "Jane_Example_-_Portfolio_EN_ATS.pdf"),
+      path.join(
+        fixtureRoot,
+        "public",
+        "EN",
+        "Jane_Example_-_Portfolio_ATS.pdf",
+      ),
     );
 
     const dePdf = fs.readFileSync(result.deTargetFile);
@@ -147,16 +157,16 @@ describe("generate-resume-pdf", () => {
     expect(deAtsPdf.length).toBeGreaterThan(500);
     expect(enAtsPdf.length).toBeGreaterThan(500);
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining("Jane_Example_-_Portfolio_DE.pdf"),
+      expect.stringContaining("DE/Jane_Example_-_Portfolio.pdf"),
     );
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining("Jane_Example_-_Portfolio_EN.pdf"),
+      expect.stringContaining("EN/Jane_Example_-_Portfolio.pdf"),
     );
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining("Jane_Example_-_Portfolio_DE_ATS.pdf"),
+      expect.stringContaining("DE/Jane_Example_-_Portfolio_ATS.pdf"),
     );
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining("Jane_Example_-_Portfolio_EN_ATS.pdf"),
+      expect.stringContaining("EN/Jane_Example_-_Portfolio_ATS.pdf"),
     );
   });
 

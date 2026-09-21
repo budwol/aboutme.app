@@ -124,7 +124,7 @@ describe("WnaContactSection", () => {
     );
     expect(canOpenURL).toHaveBeenNthCalledWith(
       6,
-      "/John_Doe_-_Portfolio_DE.pdf",
+      "/DE/John_Doe_-_Portfolio.pdf",
     );
 
     expect(openURL).toHaveBeenNthCalledWith(1, appData.contact.github);
@@ -135,7 +135,7 @@ describe("WnaContactSection", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
-    expect(openURL).toHaveBeenNthCalledWith(6, "/John_Doe_-_Portfolio_DE.pdf");
+    expect(openURL).toHaveBeenNthCalledWith(6, "/DE/John_Doe_-_Portfolio.pdf");
   });
 
   it("logs an error and skips opening when the URL is not supported", async () => {
@@ -244,7 +244,7 @@ describe("WnaContactSection", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_EN.pdf");
+    expect(canOpenURL).toHaveBeenCalledWith("/EN/John_Doe_-_Portfolio.pdf");
   });
 
   it("falls back to the language when resolvedLanguage is unset", async () => {
@@ -273,7 +273,7 @@ describe("WnaContactSection", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/John_Doe_-_Portfolio_DE.pdf");
+    expect(canOpenURL).toHaveBeenCalledWith("/DE/John_Doe_-_Portfolio.pdf");
   });
 
   it("skips the narrow max-width constraint on wide viewports", async () => {

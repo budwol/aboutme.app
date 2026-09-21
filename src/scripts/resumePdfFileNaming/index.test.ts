@@ -87,7 +87,7 @@ describe("resume PDF filename consistency", () => {
 
       for (const lang of ["de", "en"] as const) {
         expect(getResumePdfUrl(lang, name)).toBe(
-          `/${buildPortfolioFileName(name, lang)}`,
+          `/${lang.toUpperCase()}/${buildPortfolioFileName(name, lang)}`,
         );
       }
     },

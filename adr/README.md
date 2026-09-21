@@ -29,3 +29,4 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0021](0021-production-source-maps-are-not-published.md)        | Production web builds do not publish source maps                                         |
 | [0022](0022-csp-relies-on-self-only.md)                         | CSP relies on 'self' only, with no host or wildcard subdomain allowance                  |
 | [0023](0023-explicit-cache-control-on-uncached-root-files.md)   | Root files not covered by the hashed-asset rule get an explicit Cache-Control            |
+| [0024](0024-cv-pdf-and-password-protected-documents-page.md)    | A classic CV PDF and an HTTP-Basic-Auth-protected documents page are generated           |

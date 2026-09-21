@@ -1,7 +1,17 @@
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const { execFileSync } = require("child_process");
+
+// Fixed, non-secret: with HTTP Basic Auth all the secrecy lives in the
+// password, not the username.
+const DOCUMENTS_AUTH_USERNAME = "documents";
+const UPPERCASE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const LOWERCASE_CHARS = "abcdefghijklmnopqrstuvwxyz";
+const DIGIT_CHARS = "0123456789";
+const ALNUM_CHARS = `${UPPERCASE_CHARS}${LOWERCASE_CHARS}${DIGIT_CHARS}`;
+const DOCUMENTS_PASSWORD_PATTERN = /^![A-Za-z0-9]{31}$/;
 
 const DEFAULT_ASSETS = [
   {
@@ -116,6 +126,72 @@ function findBackgroundSource(sourceImagesDir) {
   return null;
 }
 
+function randomAlnumChar() {
+  return ALNUM_CHARS[crypto.randomInt(ALNUM_CHARS.length)];
+}
+
+// 32 characters total: a leading "!" plus 31 alphanumeric characters,
+// guaranteed to include at least one uppercase letter, one lowercase
+// letter, and one digit -- by construction, not left to chance. This is a
+// real, client-facing credential (HTTP Basic Auth on public/files/, see
+// buildHtpasswdLine below), not just an obscure token, so it's generated
+// with crypto.randomInt rather than Math.random.
+function generateDocumentsPassword() {
+  const body = [
+    UPPERCASE_CHARS[crypto.randomInt(UPPERCASE_CHARS.length)],
+    LOWERCASE_CHARS[crypto.randomInt(LOWERCASE_CHARS.length)],
+    DIGIT_CHARS[crypto.randomInt(DIGIT_CHARS.length)],
+  ];
+  while (body.length < 31) {
+    body.push(randomAlnumChar());
+  }
+  // Fisher-Yates shuffle so the guaranteed upper/lower/digit characters
+  // don't always land in the same three positions.
+  for (let i = body.length - 1; i > 0; i -= 1) {
+    const j = crypto.randomInt(i + 1);
+    [body[i], body[j]] = [body[j], body[i]];
+  }
+  return `!${body.join("")}`;
+}
+
+// Persisted so a password already shared with a recipient keeps working
+// across rebuilds -- regenerating it on every `npm run init` would
+// silently invalidate it. Deleting this file is how a password gets
+// deliberately rotated/revoked. Writes the file itself whenever it had to
+// generate a new password (missing OR malformed), so a malformed file
+// never leaves the freshly generated replacement unpersisted -- otherwise
+// it would regenerate (and immediately forget) a new password on every
+// single run instead of converging on one.
+function readOrCreateDocumentsPassword(passwordFile, logger) {
+  if (fs.existsSync(passwordFile)) {
+    const existing = fs.readFileSync(passwordFile, "utf8").trim();
+    if (DOCUMENTS_PASSWORD_PATTERN.test(existing)) {
+      return existing;
+    }
+    logger(
+      `ignoring malformed ${path.basename(passwordFile)}, generating a new documents password`,
+    );
+  }
+
+  const password = generateDocumentsPassword();
+  writeTextFile(passwordFile, `${password}\n`);
+  logger("generated .aboutme/secrets/documents-password.txt");
+  return password;
+}
+
+// nginx's auth_basic_user_file supports the {SHA} scheme (RFC 2307,
+// base64(SHA-1(password))) without needing the `htpasswd` CLI tool or a
+// third-party dependency. It's weaker than bcrypt/APR1-MD5 against offline
+// cracking, but the password itself is 32 truly random characters, so raw
+// SHA-1's speed isn't the practical bottleneck here.
+function buildHtpasswdLine(username, password) {
+  const digest = crypto
+    .createHash("sha1")
+    .update(password, "utf8")
+    .digest("base64");
+  return `${username}:{SHA}${digest}\n`;
+}
+
 function normalizeSiteUrl(siteUrl) {
   const normalized = `${siteUrl ?? ""}`.trim();
 
@@ -223,6 +299,37 @@ ${locationSecurityHeaders}
     location = /app-data.json {
 ${locationSecurityHeaders}
         add_header Cache-Control "no-store";
+    }
+
+    # Document downloads (CV PDFs + the per-language ApplicationDocuments
+    # ZIPs, see scripts/generate-cv-pdf.cjs / generate-application-package.cjs
+    # and src/components/screens/WnaDownloadsRoute.tsx). This directory is
+    # never linked from the app's navigation or listed in
+    # robots.txt/sitemap.xml, but the real access control is auth_basic
+    # below, not that obscurity -- nginx refuses every request here without
+    # the correct credentials, regardless of whether the exact file name
+    # was guessed. The password lives only in .aboutme/secrets/ (never
+    # committed) and .htpasswd holds just its SHA-1 digest, not the
+    # password itself.
+    #
+    # The "^~" prefix modifier is not optional: nginx always prefers a
+    # matching regex location (like the .pdf/.js/... asset-caching rule
+    # below) over a plain prefix location, no matter how specific the
+    # prefix is. Without "^~", a request for a .pdf file under /files/
+    # matched that unrelated regex location instead of this one and was
+    # served with zero authentication -- a real, verified bypass (curl
+    # against a built container returned the PDF's bytes with no
+    # credentials at all) caught only by testing the real nginx container,
+    # not by unit tests against the template string. "^~" tells nginx to
+    # stop checking regex locations entirely once this prefix is the
+    # longest match, regardless of the request's file extension.
+    location ^~ /files/ {
+${locationSecurityHeaders}
+        add_header Cache-Control "no-store";
+        autoindex off;
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        try_files $uri =404;
     }
 
     # robots.txt, sitemap.xml and llms.txt aren't cache-busted either and
@@ -425,6 +532,12 @@ function runInitProcess(rootDir, options = {}) {
   const publicAppDataFile = path.join(publicDir, "app-data.json");
   const publicImagesDir = path.join(publicDir, "images");
   const nginxConfFile = path.join(rootDir, "nginx", "site.conf");
+  const htpasswdFile = path.join(rootDir, "nginx", ".htpasswd");
+  const documentsPasswordFile = path.join(
+    sourceDir,
+    "secrets",
+    "documents-password.txt",
+  );
   const appDataExampleFile = path.join(rootDir, "app-data.example.json");
   const envExampleFile = path.join(rootDir, ".env.example");
   const envFile = path.join(rootDir, ".env");
@@ -667,6 +780,15 @@ function runInitProcess(rootDir, options = {}) {
     path.join(publicDir, "sw.js"),
   );
 
+  const documentsPassword = readOrCreateDocumentsPassword(
+    documentsPasswordFile,
+    logger,
+  );
+  writeTextFile(
+    htpasswdFile,
+    buildHtpasswdLine(DOCUMENTS_AUTH_USERNAME, documentsPassword),
+  );
+
   logger("");
   logger(`generated public assets from ${sourceDir}`);
   logger("init finished");
@@ -678,11 +800,15 @@ function runInitProcess(rootDir, options = {}) {
 module.exports = {
   buildAvatarVariantFileName,
   buildGeneratedFiles,
+  buildHtpasswdLine,
   defaultCreateResponsiveAvatar,
+  DOCUMENTS_AUTH_USERNAME,
   findBackgroundSource,
+  generateDocumentsPassword,
   getRequiredImageFiles,
   normalizeSiteUrl,
   parseCliArgs,
+  readOrCreateDocumentsPassword,
   runInitProcess,
 };
 

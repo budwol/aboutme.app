@@ -13,19 +13,19 @@ describe("getResumePdfUrl", () => {
     process.env.EXPO_PUBLIC_DEPLOY_VERSION = originalDeployVersion;
   });
 
-  it("resolves the German resume file", () => {
+  it("resolves the German resume file under the DE folder", () => {
     delete process.env.EXPO_PUBLIC_DEPLOY_VERSION;
 
     expect(getResumePdfUrl("de", "Jane Example")).toBe(
-      "/Jane_Example_-_Portfolio_DE.pdf",
+      "/DE/Jane_Example_-_Portfolio.pdf",
     );
   });
 
-  it("resolves the English resume file", () => {
+  it("resolves the English resume file under the EN folder", () => {
     delete process.env.EXPO_PUBLIC_DEPLOY_VERSION;
 
     expect(getResumePdfUrl("en", "Jane Example")).toBe(
-      "/Jane_Example_-_Portfolio_EN.pdf",
+      "/EN/Jane_Example_-_Portfolio.pdf",
     );
   });
 
@@ -33,7 +33,7 @@ describe("getResumePdfUrl", () => {
     process.env.EXPO_PUBLIC_DEPLOY_VERSION = "deploy123";
 
     expect(getResumePdfUrl("de", "Jane Example")).toBe(
-      "/Jane_Example_-_Portfolio_DE.pdf?v=deploy123",
+      "/DE/Jane_Example_-_Portfolio.pdf?v=deploy123",
     );
   });
 
@@ -41,7 +41,7 @@ describe("getResumePdfUrl", () => {
     delete process.env.EXPO_PUBLIC_DEPLOY_VERSION;
 
     expect(getResumePdfUrl("de", "Björn Müller-Straße")).toBe(
-      "/Bjoern_Mueller-Strasse_-_Portfolio_DE.pdf",
+      "/DE/Bjoern_Mueller-Strasse_-_Portfolio.pdf",
     );
   });
 
@@ -49,7 +49,7 @@ describe("getResumePdfUrl", () => {
     delete process.env.EXPO_PUBLIC_DEPLOY_VERSION;
 
     expect(getResumePdfUrl("de", "Anne O'Connor (Dr.)")).toBe(
-      "/Anne_OConnor_Dr_-_Portfolio_DE.pdf",
+      "/DE/Anne_OConnor_Dr_-_Portfolio.pdf",
     );
   });
 });

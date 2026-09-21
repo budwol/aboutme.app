@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "@jest/globals";
+import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -16,10 +16,17 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
     manifest: string;
   };
   buildAvatarVariantFileName: (fileName: string, size: number) => string;
+  buildHtpasswdLine: (username: string, password: string) => string;
+  DOCUMENTS_AUTH_USERNAME: string;
   findBackgroundSource: (directory: string) => string | null;
+  generateDocumentsPassword: () => string;
   getRequiredImageFiles: (data: unknown) => string[];
   normalizeSiteUrl: (siteUrl?: string) => string;
   parseCliArgs: (args: string[]) => { dryRun: boolean };
+  readOrCreateDocumentsPassword: (
+    passwordFile: string,
+    logger: (...parts: string[]) => void,
+  ) => string;
   runInitProcess: (
     rootDir: string,
     options?: {
@@ -38,10 +45,14 @@ const initProcessModule = require("../../../scripts/init-process.cjs") as {
 const {
   buildAvatarVariantFileName,
   buildGeneratedFiles,
+  buildHtpasswdLine,
+  DOCUMENTS_AUTH_USERNAME,
   findBackgroundSource,
+  generateDocumentsPassword,
   getRequiredImageFiles,
   normalizeSiteUrl,
   parseCliArgs,
+  readOrCreateDocumentsPassword,
   runInitProcess,
 } = initProcessModule;
 
@@ -140,7 +151,7 @@ describe("init process security", () => {
       location.includes("add_header Cache-Control"),
     );
 
-    expect(cachedLocations).toHaveLength(6);
+    expect(cachedLocations).toHaveLength(7);
     for (const location of cachedLocations) {
       expect(location).toContain(
         "add_header 'X-Content-Type-Options' 'nosniff' always;",
@@ -186,6 +197,29 @@ describe("init process security", () => {
     ).toBe(true);
   });
 
+  it("forces auth_basic on /files/ to win over the generic asset-caching regex", () => {
+    // Regression test for a real, verified bypass: nginx always prefers a
+    // matching regex location (like the .pdf/.js/... asset-caching rule
+    // below) over a plain prefix location, no matter how specific the
+    // prefix is. Without the "^~" modifier, a request for a .pdf file
+    // under /files/ matched that unrelated regex location instead of the
+    // auth_basic-protected one and was served with zero authentication --
+    // caught only by curling a real built container, not by a config
+    // string match. "^~" makes nginx stop checking regex locations
+    // entirely once /files/ is the longest matching prefix, regardless of
+    // the request's file extension.
+    const generated = buildGeneratedFiles({
+      siteUrl: "https://portfolio.example.com/",
+      profileName: "Jane Example",
+      appName: "AboutMe",
+    });
+
+    expect(generated.nginxConfig).toContain("location ^~ /files/ {");
+    expect(generated.nginxConfig).toMatch(
+      /location \^~ \/files\/ \{[^}]*auth_basic_user_file \/etc\/nginx\/\.htpasswd;[^}]*\}/,
+    );
+  });
+
   it("selects the first available background source", () => {
     const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-bg-"));
     const imagesDir = path.join(fixtureRoot, "images");
@@ -200,6 +234,97 @@ describe("init process security", () => {
       path.join(imagesDir, "bg.webp"),
     );
     fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  });
+});
+
+describe("documents password / .htpasswd", () => {
+  const createdFixtures: string[] = [];
+
+  afterEach(() => {
+    for (const fixture of createdFixtures.splice(0)) {
+      fs.rmSync(fixture, { recursive: true, force: true });
+    }
+  });
+
+  function createPasswordFile(): string {
+    const fixtureRoot = fs.mkdtempSync(
+      path.join(os.tmpdir(), "aboutme-documents-password-"),
+    );
+    createdFixtures.push(fixtureRoot);
+    return path.join(fixtureRoot, "secrets", "documents-password.txt");
+  }
+
+  it("uses a fixed, non-secret username", () => {
+    expect(DOCUMENTS_AUTH_USERNAME).toBe("documents");
+  });
+
+  it("generates a 32-character password starting with '!' that mixes case and digits", () => {
+    for (let i = 0; i < 20; i += 1) {
+      const password = generateDocumentsPassword();
+      expect(password).toHaveLength(32);
+      expect(password.startsWith("!")).toBe(true);
+      expect(/[A-Z]/.test(password)).toBe(true);
+      expect(/[a-z]/.test(password)).toBe(true);
+      expect(/[0-9]/.test(password)).toBe(true);
+      expect(/^![A-Za-z0-9]{31}$/.test(password)).toBe(true);
+    }
+  });
+
+  it("creates and persists a password when none exists yet", () => {
+    const passwordFile = createPasswordFile();
+    const logger = jest.fn<(...parts: string[]) => void>();
+
+    const password = readOrCreateDocumentsPassword(passwordFile, logger);
+
+    expect(/^![A-Za-z0-9]{31}$/.test(password)).toBe(true);
+    expect(fs.readFileSync(passwordFile, "utf8")).toBe(`${password}\n`);
+    expect(logger).toHaveBeenCalledWith(
+      "generated .aboutme/secrets/documents-password.txt",
+    );
+  });
+
+  it("reuses an existing valid password without rewriting or logging", () => {
+    const passwordFile = createPasswordFile();
+    const logger = jest.fn<(...parts: string[]) => void>();
+    const first = readOrCreateDocumentsPassword(passwordFile, logger);
+
+    logger.mockClear();
+    const second = readOrCreateDocumentsPassword(passwordFile, logger);
+
+    expect(second).toBe(first);
+    expect(logger).not.toHaveBeenCalled();
+  });
+
+  it("regenerates and persists a new password when the file is malformed", () => {
+    const passwordFile = createPasswordFile();
+    fs.mkdirSync(path.dirname(passwordFile), { recursive: true });
+    fs.writeFileSync(passwordFile, "not-a-valid-password\n", "utf8");
+    const logger = jest.fn<(...parts: string[]) => void>();
+
+    const password = readOrCreateDocumentsPassword(passwordFile, logger);
+
+    expect(/^![A-Za-z0-9]{31}$/.test(password)).toBe(true);
+    expect(fs.readFileSync(passwordFile, "utf8")).toBe(`${password}\n`);
+    expect(logger).toHaveBeenCalledWith(
+      expect.stringContaining("ignoring malformed"),
+    );
+    expect(logger).toHaveBeenCalledWith(
+      "generated .aboutme/secrets/documents-password.txt",
+    );
+  });
+
+  it("builds an nginx {SHA} auth_basic line matching an independent SHA-1 computation", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const crypto = require("crypto") as typeof import("crypto");
+    const password = "!Test1234567890Test1234567890a";
+    const expectedDigest = crypto
+      .createHash("sha1")
+      .update(password, "utf8")
+      .digest("base64");
+
+    expect(buildHtpasswdLine("documents", password)).toBe(
+      `documents:{SHA}${expectedDigest}\n`,
+    );
   });
 });
 
@@ -395,6 +520,17 @@ describe("init.sh", () => {
     expect(fs.existsSync(path.join(fixtureRoot, "nginx", "site.conf"))).toBe(
       true,
     );
+    expect(fs.existsSync(path.join(fixtureRoot, "nginx", ".htpasswd"))).toBe(
+      true,
+    );
+    expect(
+      fs.existsSync(
+        path.join(fixtureRoot, ".aboutme", "secrets", "documents-password.txt"),
+      ),
+    ).toBe(true);
+    expect(
+      fs.readFileSync(path.join(fixtureRoot, "nginx", ".htpasswd"), "utf8"),
+    ).toMatch(/^documents:\{SHA\}[A-Za-z0-9+/]+=*\n$/);
     expect(
       fs.existsSync(
         path.join(fixtureRoot, "public", "images", "default_avatar.webp"),
@@ -477,6 +613,13 @@ describe("init.sh", () => {
     const manifestPath = path.join(fixtureRoot, "public", "site.webmanifest");
     const publicAppDataPath = path.join(fixtureRoot, "public", "app-data.json");
     const nginxPath = path.join(fixtureRoot, "nginx", "site.conf");
+    const htpasswdPath = path.join(fixtureRoot, "nginx", ".htpasswd");
+    const documentsPasswordPath = path.join(
+      fixtureRoot,
+      ".aboutme",
+      "secrets",
+      "documents-password.txt",
+    );
     const publicImagePath = path.join(
       fixtureRoot,
       "public",
@@ -487,6 +630,11 @@ describe("init.sh", () => {
     const beforeManifest = fs.readFileSync(manifestPath, "utf8");
     const beforePublicAppData = fs.readFileSync(publicAppDataPath, "utf8");
     const beforeNginx = fs.readFileSync(nginxPath, "utf8");
+    const beforeHtpasswd = fs.readFileSync(htpasswdPath, "utf8");
+    const beforeDocumentsPassword = fs.readFileSync(
+      documentsPasswordPath,
+      "utf8",
+    );
     const beforeImage = fs.readFileSync(publicImagePath, "utf8");
     const beforeEnv = fs.readFileSync(envPath, "utf8");
 
@@ -499,6 +647,10 @@ describe("init.sh", () => {
       beforePublicAppData,
     );
     expect(fs.readFileSync(nginxPath, "utf8")).toBe(beforeNginx);
+    expect(fs.readFileSync(htpasswdPath, "utf8")).toBe(beforeHtpasswd);
+    expect(fs.readFileSync(documentsPasswordPath, "utf8")).toBe(
+      beforeDocumentsPassword,
+    );
     expect(fs.readFileSync(publicImagePath, "utf8")).toBe(beforeImage);
     expect(fs.readFileSync(envPath, "utf8")).toBe(beforeEnv);
   });
@@ -533,5 +685,13 @@ describe("init.sh", () => {
     expect(fs.existsSync(path.join(fixtureRoot, "nginx", "site.conf"))).toBe(
       false,
     );
+    expect(fs.existsSync(path.join(fixtureRoot, "nginx", ".htpasswd"))).toBe(
+      false,
+    );
+    expect(
+      fs.existsSync(
+        path.join(fixtureRoot, ".aboutme", "secrets", "documents-password.txt"),
+      ),
+    ).toBe(false);
   });
 });

@@ -22,6 +22,7 @@ EXPOSE 8080
 
 COPY --chown=nginx:nginx ./dist /usr/share/nginx/html
 COPY nginx/site.conf /etc/nginx/http.d/default.conf
+COPY --chown=nginx:nginx nginx/.htpasswd /etc/nginx/.htpasswd
 
 HEALTHCHECK --interval=10s --timeout=3s --retries=10 \
   CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1

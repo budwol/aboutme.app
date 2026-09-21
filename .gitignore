@@ -64,16 +64,16 @@ public/favicon.svg
 public/bg.jpg
 public/bg.webp
 public/app-data.json
-public/*_-_Portfolio_DE.pdf
-public/*_-_Portfolio_EN.pdf
-public/*_-_Portfolio_DE_ATS.pdf
-public/*_-_Portfolio_EN_ATS.pdf
+public/DE/
+public/EN/
+public/files/
 public/site.webmanifest
 public/sw.js
 public/robots.txt
 public/sitemap.xml
 public/llms.txt
 nginx/site.conf
+nginx/.htpasswd
 
 # local review artifacts
 /*-issue-*.png
