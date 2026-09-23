@@ -33,6 +33,7 @@ const ICONS = {
 
 const LABELS = {
   de: {
+    profile: "Profil",
     contact: "Kontakt",
     personal: "Persönliche Daten",
     birthDate: "Geburtsdatum",
@@ -47,9 +48,13 @@ const LABELS = {
     interests: "Interessen",
     pageWord: "Seite",
     pageOfWord: "von",
-    atsLink: "Text-Version (ATS)",
+    relatedCvDesigned: "Lebenslauf",
+    relatedCvAts: "Lebenslauf (ATS)",
+    relatedPortfolioDesigned: "Portfolio",
+    relatedPortfolioAts: "Portfolio (ATS)",
   },
   en: {
+    profile: "Profile",
     contact: "Contact",
     personal: "Personal Details",
     birthDate: "Date of Birth",
@@ -64,7 +69,10 @@ const LABELS = {
     interests: "Interests",
     pageWord: "Page",
     pageOfWord: "of",
-    atsLink: "Text-only version (ATS)",
+    relatedCvDesigned: "CV",
+    relatedCvAts: "CV (ATS)",
+    relatedPortfolioDesigned: "Portfolio",
+    relatedPortfolioAts: "Portfolio (ATS)",
   },
 };
 
@@ -153,6 +161,76 @@ function buildCvFileName(name, langCode, { ats = false } = {}) {
 function buildAbsoluteUrl(siteUrl, langCode, pathSegment) {
   const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
   return `${base}/files/${langCode.toUpperCase()}/${pathSegment}`;
+}
+
+// Mirrors buildPortfolioFileName in generate-resume-pdf.cjs -- reimplemented
+// locally (see pickString/slugifyName above for why) purely so this script's
+// own footer can link out to the Portfolio PDFs (buildRelatedDocumentLinks
+// below), the same way generate-resume-pdf.cjs mirrors buildCvFileName for
+// the reverse link.
+function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
+  const atsSuffix = ats ? "_ATS" : "";
+  return `${slugifyName(name)}_-_Portfolio${atsSuffix}.pdf`;
+}
+
+// Mirrors buildAbsoluteUrl in generate-resume-pdf.cjs -- the Portfolio PDFs
+// live in public/<DE|EN>/, not public/files/<DE|EN>/ like this script's own
+// output, so this deliberately does NOT reuse buildAbsoluteUrl above.
+function buildPortfolioAbsoluteUrl(siteUrl, langCode, pathSegment) {
+  const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
+  return `${base}/${langCode.toUpperCase()}/${pathSegment}`;
+}
+
+// Every document (this CV, its ats companion, the designed Portfolio, and
+// Portfolio-ATS) links to the other three from its own footer -- a reader
+// who only ever received one of the four (forwarded on its own, or found
+// via a job board attachment) can still reach the rest. `currentAts` is
+// this document's own variant, so its own designed/ats counterpart is
+// never listed as a link to itself.
+function buildRelatedDocumentLinks(data, name, lang, labels, currentAts) {
+  const cvUrl = (ats) =>
+    buildAbsoluteUrl(data.siteUrl, lang, buildCvFileName(name, lang, { ats }));
+  const portfolioUrl = (ats) =>
+    buildPortfolioAbsoluteUrl(
+      data.siteUrl,
+      lang,
+      buildPortfolioFileName(name, lang, { ats }),
+    );
+
+  return [
+    currentAts
+      ? { label: labels.relatedCvDesigned, url: cvUrl(false) }
+      : { label: labels.relatedCvAts, url: cvUrl(true) },
+    { label: labels.relatedPortfolioDesigned, url: portfolioUrl(false) },
+    { label: labels.relatedPortfolioAts, url: portfolioUrl(true) },
+  ];
+}
+
+// Draws `links` as one wrapped run of text (pdfkit's `continued` option
+// keeps every segment on the same logical paragraph, wrapping within
+// `width` exactly like a single .text() call would) so each label can carry
+// its own `link`/`underline` while the whole set still flows and wraps
+// naturally -- needed since the designed Portfolio PDF links to this from
+// its narrow sidebar column, too narrow to fit three labels on one line.
+function drawRelatedDocumentLinks(doc, links, x, y, width, color) {
+  doc.fillColor(color).font("Helvetica").fontSize(7.5);
+  links.forEach((linkEntry, index) => {
+    const isFirst = index === 0;
+    const isLast = index === links.length - 1;
+    const options = {
+      continued: !isLast,
+      link: linkEntry.url,
+      underline: true,
+    };
+    if (isFirst) {
+      doc.text(linkEntry.label, x, y, { ...options, width });
+    } else {
+      doc.text(linkEntry.label, options);
+    }
+    if (!isLast) {
+      doc.text("  ·  ", { continued: true, underline: false });
+    }
+  });
 }
 
 // Mirrors groupDigits/formatPhoneNumber in generate-resume-pdf.cjs --
@@ -704,6 +782,25 @@ function writeCvPdf(
         .stroke();
     }
 
+    // The same profile.descriptionDe/En text the designed Portfolio PDF
+    // already renders as its own "Profil" section (buildMainColumn in
+    // generate-resume-pdf.cjs) -- previously only there, never on the
+    // plain CV, which meant a reader of the CV alone (the point of its own
+    // "Lebenslauf_ATS.pdf" download) got no short orientation before
+    // diving into personal details and the full chronological history.
+    // pickString returns the raw string with its embedded newlines intact,
+    // which pdfkit's own .text() already renders as separate lines, same
+    // as the Portfolio PDF relies on.
+    const profileDescription = pickString(profile, "description", lang);
+    if (profileDescription) {
+      drawSectionHeading(doc, labels.profile, accentColor, { ats });
+      doc
+        .font("Helvetica")
+        .fontSize(10)
+        .fillColor(TEXT_COLOR)
+        .text(profileDescription);
+    }
+
     const personalLines = buildPersonalLines(
       data.personalDetails,
       lang,
@@ -763,14 +860,15 @@ function writeCvPdf(
         .text(interests.join(", "));
     }
 
-    // The designed variant's footer also links to its plain-text ats
-    // companion, the same "Text-Version (ATS)" footer link
-    // generate-resume-pdf.cjs's designed Portfolio PDF already carries --
-    // the ats variant never links to itself.
-    const atsUrl = buildAbsoluteUrl(
-      data.siteUrl,
+    // Every variant's footer links to the other three documents (this
+    // CV's own ats companion, the designed Portfolio, and Portfolio-ATS) --
+    // see buildRelatedDocumentLinks.
+    const relatedLinks = buildRelatedDocumentLinks(
+      data,
+      name,
       lang,
-      buildCvFileName(name, lang, { ats: true }),
+      labels,
+      ats,
     );
 
     const pageRange = doc.bufferedPageRange();
@@ -801,18 +899,14 @@ function writeCvPdf(
             lineBreak: false,
           },
         );
-      if (!ats) {
-        doc
-          .font("Helvetica")
-          .fontSize(7.5)
-          .fillColor(accentColor)
-          .text(labels.atsLink, margins.left, doc.page.height - 20, {
-            width: doc.page.width - margins.left - margins.right,
-            lineBreak: false,
-            link: atsUrl,
-            underline: true,
-          });
-      }
+      drawRelatedDocumentLinks(
+        doc,
+        relatedLinks,
+        margins.left,
+        doc.page.height - 20,
+        doc.page.width - margins.left - margins.right,
+        ats ? MUTED_COLOR : accentColor,
+      );
       doc.fillOpacity(1);
       doc.page.margins.bottom = originalBottomMargin;
     }

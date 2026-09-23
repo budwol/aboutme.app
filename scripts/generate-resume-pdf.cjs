@@ -39,6 +39,10 @@ const LABELS = {
     contact: "Kontakt",
     pageWord: "Seite",
     pageOfWord: "von",
+    relatedCvDesigned: "Lebenslauf",
+    relatedCvAts: "Lebenslauf (ATS)",
+    relatedPortfolioDesigned: "Portfolio",
+    relatedPortfolioAts: "Portfolio (ATS)",
   },
   en: {
     profile: "Profile",
@@ -50,6 +54,10 @@ const LABELS = {
     contact: "Contact",
     pageWord: "Page",
     pageOfWord: "of",
+    relatedCvDesigned: "CV",
+    relatedCvAts: "CV (ATS)",
+    relatedPortfolioDesigned: "Portfolio",
+    relatedPortfolioAts: "Portfolio (ATS)",
   },
 };
 
@@ -527,6 +535,82 @@ function slugifyName(name) {
 function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
   const atsSuffix = ats ? "_ATS" : "";
   return `${slugifyName(name)}_-_Portfolio${atsSuffix}.pdf`;
+}
+
+// Mirrors buildCvFileName in generate-cv-pdf.cjs -- reimplemented locally
+// (see slugifyName above for why) purely so this script's own footer can
+// link out to the CV PDFs (buildRelatedDocumentLinks below), the same way
+// generate-cv-pdf.cjs mirrors buildPortfolioFileName for the reverse link.
+const CV_FILE_WORDS = { de: "Lebenslauf", en: "CV" };
+
+function buildCvFileName(name, langCode, { ats = false } = {}) {
+  const word = CV_FILE_WORDS[langCode] ?? CV_FILE_WORDS.en;
+  const atsSuffix = ats ? "_ATS" : "";
+  return `${slugifyName(name)}_-_${word}${atsSuffix}.pdf`;
+}
+
+// Mirrors buildAbsoluteUrl in generate-cv-pdf.cjs -- the CV PDFs live in
+// public/files/<DE|EN>/, not public/<DE|EN>/ like this script's own output,
+// so this deliberately does NOT reuse buildAbsoluteUrl above.
+function buildCvAbsoluteUrl(siteUrl, langCode, pathSegment) {
+  const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
+  return `${base}/files/${langCode.toUpperCase()}/${pathSegment}`;
+}
+
+// Every document (this Portfolio, its ats companion, the CV, and CV-ATS)
+// links to the other three from its own footer -- a reader who only ever
+// received one of the four (forwarded on its own, or found via a job board
+// attachment) can still reach the rest. `currentAts` is this document's own
+// variant, so its own designed/ats counterpart is never listed as a link to
+// itself.
+function buildRelatedDocumentLinks(data, name, lang, labels, currentAts) {
+  const portfolioUrl = (ats) =>
+    buildAbsoluteUrl(
+      data.siteUrl,
+      lang,
+      buildPortfolioFileName(name, lang, { ats }),
+    );
+  const cvUrl = (ats) =>
+    buildCvAbsoluteUrl(
+      data.siteUrl,
+      lang,
+      buildCvFileName(name, lang, { ats }),
+    );
+
+  return [
+    currentAts
+      ? { label: labels.relatedPortfolioDesigned, url: portfolioUrl(false) }
+      : { label: labels.relatedPortfolioAts, url: portfolioUrl(true) },
+    { label: labels.relatedCvDesigned, url: cvUrl(false) },
+    { label: labels.relatedCvAts, url: cvUrl(true) },
+  ];
+}
+
+// Draws `links` as one wrapped run of text (pdfkit's `continued` option
+// keeps every segment on the same logical paragraph, wrapping within
+// `width` exactly like a single .text() call would) so each label can carry
+// its own `link`/`underline` while the whole set still flows and wraps
+// naturally -- needed since the designed variant links to this from its own
+// narrow sidebar column, too narrow to fit three labels on one line.
+function drawRelatedDocumentLinks(doc, links, x, y, width, color) {
+  doc.fillColor(color).font("Helvetica").fontSize(7.5);
+  links.forEach((linkEntry, index) => {
+    const isFirst = index === 0;
+    const isLast = index === links.length - 1;
+    const options = {
+      continued: !isLast,
+      link: linkEntry.url,
+      underline: true,
+    };
+    if (isFirst) {
+      doc.text(linkEntry.label, x, y, { ...options, width });
+    } else {
+      doc.text(linkEntry.label, options);
+    }
+    if (!isLast) {
+      doc.text("  ·  ", { continued: true, underline: false });
+    }
+  });
 }
 
 // Renders a "heading + one bar per skill" block (used for both Tech-Stack
@@ -1022,6 +1106,40 @@ function buildMainColumn(doc, data, lang, labels, accentColor, colors) {
         doc.y = bottomY;
       }
     });
+
+    // This list is capped to the homepage's own preview length (see
+    // limitExperienceToHomepage) -- without any marker, a candidate whose
+    // full career started well before these four roles reads as if it
+    // simply didn't, since the Lebenslauf/CV (which lists every role,
+    // uncapped) isn't always opened alongside this one. One more timeline
+    // dot with the same "…" placeholder the per-entry tech-stack pill row
+    // already uses when it overflows (limitEntryTechstack) makes the
+    // truncation itself visible instead of silent.
+    if (
+      Array.isArray(data.experience) &&
+      data.experience.length > experience.length
+    ) {
+      doc.moveDown(1.1);
+      const bottomLimit = doc.page.height - doc.page.margins.bottom;
+      if (doc.y + 20 > bottomLimit) {
+        doc.addPage();
+      }
+
+      const dotX = timelineX + TIMELINE_DOT_RADIUS;
+      const dotY = doc.y + 5;
+      if (previousDotPage === doc.page) {
+        doc
+          .moveTo(dotX, previousDotY + TIMELINE_DOT_RADIUS)
+          .lineTo(dotX, dotY - TIMELINE_DOT_RADIUS)
+          .strokeColor(colors.timelineLine)
+          .lineWidth(2)
+          .stroke();
+      }
+      doc.circle(dotX, dotY, TIMELINE_DOT_RADIUS).fill(colors.timelineLine);
+
+      doc.x = timelineX + TIMELINE_INDENT;
+      doc.font("Helvetica-Bold").fontSize(11).fillColor(MUTED_COLOR).text("…");
+    }
   }
 
   // Soft Skills used to live in the sidebar of a third page, only reachable
@@ -1264,7 +1382,32 @@ function writeAtsResumePdf(filePath, data, lang) {
             .text(`${labels.techStack}: ${entryTechstack.join(", ")}`);
         }
       });
+
+      // Same reasoning as the designed variant's timeline marker: makes the
+      // homepage-length cap visible instead of silent.
+      if (
+        Array.isArray(data.experience) &&
+        data.experience.length > experience.length
+      ) {
+        doc.moveDown(0.9);
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(11)
+          .fillColor(MUTED_COLOR)
+          .text("…");
+      }
     }
+
+    // Links to the designed Portfolio and both CV variants -- previously
+    // this variant had no footer link at all, unlike the designed one
+    // (which already linked to its own ats companion).
+    const relatedLinks = buildRelatedDocumentLinks(
+      data,
+      name,
+      lang,
+      labels,
+      true,
+    );
 
     const pageRange = doc.bufferedPageRange();
     for (
@@ -1288,6 +1431,14 @@ function writeAtsResumePdf(filePath, data, lang) {
             lineBreak: false,
           },
         );
+      drawRelatedDocumentLinks(
+        doc,
+        relatedLinks,
+        margins.left,
+        doc.page.height - 16,
+        doc.page.width - margins.left - margins.right,
+        MUTED_COLOR,
+      );
       doc.page.margins.bottom = originalBottomMargin;
     }
 
@@ -1353,12 +1504,17 @@ function writeResumePdf(filePath, data, lang, avatarPath) {
 
     buildMainColumn(doc, data, lang, labels, accentColor, colors);
 
-    const atsFileName = buildPortfolioFileName(data.profile?.name, lang, {
-      ats: true,
-    });
-    const atsUrl = buildAbsoluteUrl(data.siteUrl, lang, atsFileName);
-    const atsLinkLabel =
-      lang === "de" ? "Text-Version (ATS)" : "Text-only version (ATS)";
+    // Links to Portfolio-ATS and both CV variants -- three short labels
+    // wrapped across a few lines rather than the single "Text-Version
+    // (ATS)" line this used to be, since the sidebar column is too narrow
+    // (SIDEBAR_CONTENT_WIDTH) to fit all three on one line.
+    const relatedLinks = buildRelatedDocumentLinks(
+      data,
+      data.profile?.name,
+      lang,
+      labels,
+      false,
+    );
 
     const pageRange = doc.bufferedPageRange();
     for (
@@ -1382,20 +1538,18 @@ function writeResumePdf(filePath, data, lang, avatarPath) {
         .font("Helvetica")
         .fontSize(8)
         .fillColor(colors.sidebarMuted)
-        .text(footerText, SIDEBAR_PADDING, doc.page.height - 34, {
+        .text(footerText, SIDEBAR_PADDING, doc.page.height - 48, {
           width: SIDEBAR_CONTENT_WIDTH,
           lineBreak: false,
         });
-      doc
-        .font("Helvetica")
-        .fontSize(7.5)
-        .fillColor(colors.sidebarMuted)
-        .text(atsLinkLabel, SIDEBAR_PADDING, doc.page.height - 20, {
-          width: SIDEBAR_CONTENT_WIDTH,
-          lineBreak: false,
-          link: atsUrl,
-          underline: true,
-        });
+      drawRelatedDocumentLinks(
+        doc,
+        relatedLinks,
+        SIDEBAR_PADDING,
+        doc.page.height - 34,
+        SIDEBAR_CONTENT_WIDTH,
+        colors.sidebarMuted,
+      );
       doc.page.margins.bottom = originalBottomMargin;
     }
 

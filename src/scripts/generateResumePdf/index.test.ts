@@ -261,4 +261,83 @@ describe("generate-resume-pdf", () => {
     expect(fs.existsSync(result.deTargetFile)).toBe(true);
     expect(fs.existsSync(result.enTargetFile)).toBe(true);
   });
+
+  it("adds a trailing '…' timeline marker once experience overflows the homepage cap", async () => {
+    const fixtureRoot = createFixtureRoot();
+    const baseData = {
+      profile: {
+        name: "Jane Example",
+        title: "Engineer",
+        description: "Just a single line.",
+      },
+      contact: { email: "jane@example.com" },
+    };
+    const buildEntry = (index: number) => ({
+      period: `${2010 + index} - ${2011 + index}`,
+      role: `Engineer ${index}`,
+      company: `Company ${index}`,
+      description: "Did engineering things.",
+      techstack: [],
+    });
+
+    // Exactly at the homepage cap (4): no room for a 5th entry, so no
+    // marker is drawn.
+    writeAppData(fixtureRoot, {
+      ...baseData,
+      experience: Array.from({ length: 4 }, (_, index) => buildEntry(index)),
+    });
+    const capped = await generateResumePdf(fixtureRoot, silentLogger);
+    const cappedSize = fs.statSync(capped.deTargetFile).size;
+    const cappedAtsSize = fs.statSync(capped.deAtsTargetFile).size;
+
+    // One more than the cap: still only 4 entries render, but the trailing
+    // marker (a timeline dot + "…" in the designed variant, a lone "…"
+    // line in the ats variant) adds a little more content either way.
+    writeAppData(fixtureRoot, {
+      ...baseData,
+      experience: Array.from({ length: 5 }, (_, index) => buildEntry(index)),
+    });
+    const overflowing = await generateResumePdf(fixtureRoot, silentLogger);
+    const overflowingSize = fs.statSync(overflowing.deTargetFile).size;
+    const overflowingAtsSize = fs.statSync(overflowing.deAtsTargetFile).size;
+
+    expect(overflowingSize).not.toBe(cappedSize);
+    expect(overflowingAtsSize).not.toBe(cappedAtsSize);
+  });
+
+  it("links every variant's footer to the other three documents, but never to itself", async () => {
+    const fixtureRoot = createFixtureRoot();
+    writeAppData(fixtureRoot, {
+      profile: { name: "Jane Example" },
+      contact: { email: "jane@example.com" },
+      experience: [],
+      siteUrl: "https://example.com",
+    });
+
+    const result = await generateResumePdf(fixtureRoot, silentLogger);
+
+    const designedPdf = fs.readFileSync(result.deTargetFile).toString("latin1");
+    const atsPdf = fs.readFileSync(result.deAtsTargetFile).toString("latin1");
+
+    const portfolioUrl = "https://example.com/DE/Jane_Example_-_Portfolio.pdf";
+    const portfolioAtsUrl =
+      "https://example.com/DE/Jane_Example_-_Portfolio_ATS.pdf";
+    const cvUrl = "https://example.com/files/DE/Jane_Example_-_Lebenslauf.pdf";
+    const cvAtsUrl =
+      "https://example.com/files/DE/Jane_Example_-_Lebenslauf_ATS.pdf";
+
+    // Designed Portfolio: links to its own ats companion and both CV
+    // variants, never to itself.
+    expect(designedPdf).toContain(portfolioAtsUrl);
+    expect(designedPdf).toContain(cvUrl);
+    expect(designedPdf).toContain(cvAtsUrl);
+    expect(designedPdf).not.toContain(portfolioUrl);
+
+    // Portfolio-ATS: links back to the designed Portfolio and both CV
+    // variants, never to itself.
+    expect(atsPdf).toContain(portfolioUrl);
+    expect(atsPdf).toContain(cvUrl);
+    expect(atsPdf).toContain(cvAtsUrl);
+    expect(atsPdf).not.toContain(portfolioAtsUrl);
+  });
 });
