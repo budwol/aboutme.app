@@ -294,7 +294,7 @@ describe("generate-cv-pdf", () => {
     assertPdf(result.deTargetFile);
   });
 
-  it("links the designed CV's footer to its own ats companion, but never the ats variant to itself", async () => {
+  it("links every variant's footer to the other three documents, but never to itself", async () => {
     const fixtureRoot = createFixtureRoot();
     writeAppData(fixtureRoot, {
       profile: { name: "Jane Example" },
@@ -306,14 +306,30 @@ describe("generate-cv-pdf", () => {
 
     const designedPdf = fs.readFileSync(result.deTargetFile).toString("latin1");
     const atsPdf = fs.readFileSync(result.deAtsTargetFile).toString("latin1");
-    const atsUrl =
-      "https://example.com/files/DE/Jane_Example_-_Lebenslauf_ATS.pdf";
 
-    expect(designedPdf).toContain(atsUrl);
-    expect(atsPdf).not.toContain(atsUrl);
+    const cvUrl = "https://example.com/files/DE/Jane_Example_-_Lebenslauf.pdf";
+    const cvAtsUrl =
+      "https://example.com/files/DE/Jane_Example_-_Lebenslauf_ATS.pdf";
+    const portfolioUrl = "https://example.com/DE/Jane_Example_-_Portfolio.pdf";
+    const portfolioAtsUrl =
+      "https://example.com/DE/Jane_Example_-_Portfolio_ATS.pdf";
+
+    // Designed CV: links to its own ats companion and both Portfolio
+    // variants, never to itself.
+    expect(designedPdf).toContain(cvAtsUrl);
+    expect(designedPdf).toContain(portfolioUrl);
+    expect(designedPdf).toContain(portfolioAtsUrl);
+    expect(designedPdf).not.toContain(cvUrl);
+
+    // CV-ATS: links back to the designed CV and both Portfolio variants,
+    // never to itself.
+    expect(atsPdf).toContain(cvUrl);
+    expect(atsPdf).toContain(portfolioUrl);
+    expect(atsPdf).toContain(portfolioAtsUrl);
+    expect(atsPdf).not.toContain(cvAtsUrl);
   });
 
-  it("renders the ats variant with every optional section, and without the accent-colored rule/underline", async () => {
+  it("renders the ats variant with every optional section, and without the accent-colored section-heading rule", async () => {
     const fixtureRoot = createFixtureRoot();
     copyExampleAppData(fixtureRoot);
 
@@ -322,9 +338,9 @@ describe("generate-cv-pdf", () => {
     assertPdf(result.deAtsTargetFile);
     assertPdf(result.enAtsTargetFile);
     // The designed variant's accent color is only ever set via fillColor
-    // with a stroke -- the ats variant skips both entirely, so unlike the
-    // designed CV, the accent hex string never appears in the ats PDF at
-    // all (pdfkit round-trips it as literal PDF color operands).
+    // with a stroke for the section-heading underline -- the ats variant
+    // skips that entirely (its footer's related-document links still get
+    // an underline, but in a plain muted color, never the accent).
     const atsPdf = fs.readFileSync(result.deAtsTargetFile).toString("latin1");
     const designedPdf = fs.readFileSync(result.deTargetFile).toString("latin1");
     expect(designedPdf.length).not.toBe(atsPdf.length);
@@ -376,6 +392,29 @@ describe("generate-cv-pdf", () => {
 
     const result = await generateCvPdf(fixtureRoot, silentLogger);
     assertPdf(result.deTargetFile);
+  });
+
+  it("renders a Profil section from the same profile.description the Portfolio PDF uses", async () => {
+    const fixtureRoot = createFixtureRoot();
+    writeAppData(fixtureRoot, {
+      profile: {
+        name: "Jane Example",
+        descriptionDe: "Zeile eins.\nZeile zwei.",
+      },
+    });
+
+    const withProfile = await generateCvPdf(fixtureRoot, silentLogger);
+    assertPdf(withProfile.deTargetFile);
+    const withProfileSize = fs.statSync(withProfile.deTargetFile).size;
+
+    writeAppData(fixtureRoot, { profile: { name: "Jane Example" } });
+    const withoutProfile = await generateCvPdf(fixtureRoot, silentLogger);
+    const withoutProfileSize = fs.statSync(withoutProfile.deTargetFile).size;
+
+    // Not a content assertion (the PDF's text is FlateDecode-compressed,
+    // see the certifications test above) -- just confirms the section
+    // actually adds real content rather than silently being skipped.
+    expect(withProfileSize).toBeGreaterThan(withoutProfileSize);
   });
 
   it("renders education entries with only an institution or only a degree", async () => {
