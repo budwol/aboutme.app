@@ -148,32 +148,43 @@ WnaNavigationItem.displayName = "WnaNavigationItem";
 export default WnaNavigationItem;
 
 const styles: Record<string, CSSProperties> = {
+  // Everything centers on the row's cross axis, so the 24px icons and the
+  // single text line share one vertical center regardless of the text's
+  // line-height.
   row: {
     display: "flex",
     flex: 1,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 12,
-    alignContent: "center",
     position: "relative",
   },
+  // A flex box (not a plain block) so the inline <svg> doesn't sit on a text
+  // baseline and pick up extra descender space below it.
   iconWrapper: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     width: 24,
+    height: 24,
+    flexShrink: 0,
   },
   content: {
+    display: "flex",
+    alignItems: "center",
     flex: 1,
+    minWidth: 0,
   },
   text: {
-    // `width: "100%"` has no effect here — this style applies to a plain
-    // inline `<span>`, and `width` does not apply to non-replaced inline
-    // elements per the CSS spec. Only `paddingRight` actually renders.
+    // Leaves room for the absolutely positioned trailing icon.
     paddingRight: 24,
-    alignSelf: "center",
   },
   trailingIcon: {
     position: "absolute",
+    top: "50%",
     right: 0,
     marginRight: 8,
-    alignSelf: "center",
+    display: "flex",
+    transform: "translateY(-50%)",
   },
 };
