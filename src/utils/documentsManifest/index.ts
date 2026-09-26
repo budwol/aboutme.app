@@ -44,9 +44,9 @@ export type DocumentEntry = {
 //
 // The two Portfolio (designed) and Portfolio-ATS entries are a deliberate
 // exception: those files live in public/<DE|EN>/, not /files/<DE|EN>/ --
-// they're the exact same, already-public download the contact footer /
-// drawer menu link to (src/utils/resumePdfUrl), just also listed here for
-// convenience. Listing them on this page does not add any protection;
+// they're the exact same, already-public file the contact section / drawer
+// menu point to (via its detail page, see src/utils/resumePdfUrl), just also
+// listed here for convenience. Listing them on this page does not add any protection;
 // whoever unlocks this page simply gets a shortcut to a file anyone could
 // already fetch directly. getVersionedLocalAssetUrl applies the same
 // cache-busting query param getResumePdfUrl uses, since (unlike /files/,
@@ -54,9 +54,8 @@ export type DocumentEntry = {
 // year by file extension.
 //
 // Grouped by language, German first, so the first entry is always a real
-// /files/ URL protected by auth_basic (see handleUnlock in
-// WnaDownloadsRoute, which verifies the entered password against
-// documents[0]).
+// /files/ URL protected by auth_basic (WnaDownloadsRoute verifies the
+// entered password against documents[0]).
 export function getDocumentsManifest(name: string): DocumentEntry[] {
   const slug = slugifyName(name);
 

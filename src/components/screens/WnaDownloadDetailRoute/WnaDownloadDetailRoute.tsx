@@ -31,9 +31,9 @@ export type WnaDownloadDetailRouteProps = {
 
 // A protected document lives under /files/ (see src/utils/documentsManifest,
 // nginx/site.conf's auth_basic block) -- the Portfolio pair does not: it's
-// already reachable by anyone with the URL (the contact footer/drawer menu
-// already link straight to it), so this page skips the password gate
-// entirely for those two kinds.
+// public (the contact section's and drawer menu's portfolio buttons open
+// this page for it), so this page skips the password gate entirely for
+// those two kinds.
 function isProtectedDocumentUrl(url: string): boolean {
   return url.startsWith("/files/");
 }

@@ -33,7 +33,10 @@ import { formatFileSize } from "@utils/formatFileSize";
 import Colors from "@constants/theme/colors";
 import AppStyle from "@/theme/appStyle";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { getNavigationLang } from "@/navigation/routes/wnaNavigationRoutes";
+import {
+  getDownloadDetailNavigationPath,
+  getNavigationLang,
+} from "@/navigation/routes/wnaNavigationRoutes";
 import { router } from "@/navigation/router/wnaRouter";
 import { TFunction } from "i18next";
 import React, {
@@ -162,13 +165,19 @@ type DisplayDocumentRow = {
   iconName: "file-pdf-box" | "folder-zip";
   iconColor: string;
   url: string;
+  // Set for the four CV/Portfolio PDFs, which each have their own detail
+  // page (WnaDownloadDetailRoute) -- the row opens that page instead of
+  // downloading the file directly. The ZIPs and reference scans have no
+  // detail page and still download in place.
+  detailPath?: string;
 };
 
 // A single document row, shared by every section on this page -- the whole
 // row is one semi-transparent WnaNavigationItem-style button (like the
 // menu's navigation buttons) rather than a label next to its own solid
 // download button, with the file-type icon on the left and a download icon
-// on the right standing in for the usual chevron.
+// on the right standing in for the usual chevron -- unless the row opens a
+// detail page, which keeps the chevron.
 function renderDocumentRow(
   row: DisplayDocumentRow,
   rowIndex: number,
@@ -195,9 +204,13 @@ function renderDocumentRow(
       text={row.label}
       iconName={row.iconName}
       iconColor={row.iconColor}
-      iconRightName="download"
+      iconRightName={row.detailPath ? undefined : "download"}
       type={type}
-      onPress={() => handleDownload(row.url)}
+      onPress={() =>
+        row.detailPath
+          ? router.navigate(row.detailPath)
+          : handleDownload(row.url)
+      }
       t={t}
     />
   );
@@ -291,6 +304,7 @@ function buildLanguageSectionRows(
       iconName: DOCUMENT_ICON_NAMES[entry.kind],
       iconColor: documentIconColors[entry.kind],
       url: entry.url,
+      detailPath: getDownloadDetailNavigationPath(entry.kind),
     }));
 }
 

@@ -1,5 +1,4 @@
 import React, { CSSProperties, useCallback, useMemo } from "react";
-import { Linking } from "@utils/webLinking";
 import { router, useWnaPathname } from "@/navigation/router/wnaRouter";
 import { useTranslation } from "react-i18next";
 
@@ -21,6 +20,7 @@ import { useWnaNavigationTransition } from "@/navigation/hooks/useWnaNavigationT
 import {
   getNavigationLang,
   getNavigationPath,
+  getPortfolioDetailNavigationPath,
 } from "@/navigation/routes/wnaNavigationRoutes";
 import {
   appLayoutConstants,
@@ -29,7 +29,6 @@ import {
 import { navigationLayoutConstants } from "@constants/navigationLayoutConstants";
 import { getLangCode } from "@/i18n/i18n";
 import { i18nKeys } from "@/i18n/i18nKeys";
-import { getResumePdfUrl } from "@utils/resumePdfUrl";
 import WnaImage from "@components/images/WnaImage";
 import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
 
@@ -247,7 +246,7 @@ export default function WnaDrawerMenu() {
         textColor={appColors.black}
         borderWidth={1}
         onPress={() =>
-          Linking.openURL(getResumePdfUrl(langCode, appData.profile.name))
+          handleNavigate(getPortfolioDetailNavigationPath(langCode))
         }
         style={{
           ...styles.themeButton,
