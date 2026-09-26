@@ -11,4 +11,8 @@ export const appMotionConstants = {
   navigationTransitionDurationIn: 420,
   navigationTransitionDurationOut: 560,
   deferredHomeSectionsDelay: 120,
+  // WnaToastHost: slide/fade in, stay for toastDisplayDuration, fade out.
+  toastEnterDuration: 220,
+  toastExitDuration: 180,
+  toastDisplayDuration: 2400,
 } as const;

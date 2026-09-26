@@ -1,9 +1,23 @@
 import Colors from "@constants/theme/colors";
 import { convertHexToRgba } from "@utils/colorConverter";
+import { appMotionConstants } from "@constants/motionConstants";
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { subscribeWnaToast, WnaToast } from "@components/feedback/wnaToast";
 
-const toastDuration = 2400;
+const { toastDisplayDuration, toastEnterDuration, toastExitDuration } =
+  appMotionConstants;
+
+// "entering" is a single frame at the hidden style, so the browser has a
+// start value to transition from before switching to "shown".
+type ToastPhase = "entering" | "shown" | "leaving";
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 export function renderWnaToastCard(
   appColors: Colors,
@@ -131,37 +145,79 @@ type WnaToastHostProps = {
 
 export default function WnaToastHost({ appColors }: WnaToastHostProps) {
   const [toast, setToast] = useState<WnaToast | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [phase, setPhase] = useState<ToastPhase>("entering");
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const removeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hostRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const unsubscribe = subscribeWnaToast((nextToast) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+    const clearTimers = () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
       }
+      if (removeTimeoutRef.current) {
+        clearTimeout(removeTimeoutRef.current);
+        removeTimeoutRef.current = null;
+      }
+    };
+
+    const unsubscribe = subscribeWnaToast((nextToast) => {
+      clearTimers();
 
       setToast(nextToast);
-      timeoutRef.current = setTimeout(() => {
-        setToast(null);
-        timeoutRef.current = null;
-      }, toastDuration);
+      // A toast arriving while one is already fully shown (e.g. toggling
+      // the theme twice quickly) just swaps its content in place; one
+      // arriving while hidden or mid-fade-out animates in again.
+      setPhase((current) => (current === "shown" ? "shown" : "entering"));
+      hideTimeoutRef.current = setTimeout(() => {
+        hideTimeoutRef.current = null;
+        setPhase("leaving");
+        removeTimeoutRef.current = setTimeout(() => {
+          removeTimeoutRef.current = null;
+          setToast(null);
+        }, toastExitDuration);
+      }, toastDisplayDuration);
     });
 
     return () => {
       unsubscribe();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      clearTimers();
     };
   }, []);
+
+  useEffect(() => {
+    if (toast && phase === "entering") {
+      // Forces a style flush at the hidden start values; without it the
+      // browser may batch both states into one frame and skip the
+      // transition entirely.
+      hostRef.current?.getBoundingClientRect();
+      setPhase("shown");
+    }
+  }, [toast, phase]);
 
   if (!toast) {
     return null;
   }
 
+  const isShown = phase === "shown";
+  const hiddenTransform = prefersReducedMotion()
+    ? "none"
+    : "translateY(-16px) scale(0.98)";
+
   return React.createElement(
     "div",
     {
-      style: { ...styles.host, pointerEvents: "none" } as CSSProperties,
+      ref: hostRef,
+      style: {
+        ...styles.host,
+        pointerEvents: "none",
+        opacity: isShown ? 1 : 0,
+        transform: isShown ? "none" : hiddenTransform,
+        transition: isShown
+          ? `opacity ${toastEnterDuration}ms ease-out, transform ${toastEnterDuration}ms ease-out`
+          : `opacity ${toastExitDuration}ms ease-in, transform ${toastExitDuration}ms ease-in`,
+      } as CSSProperties,
     },
     renderWnaToastCard(
       toast.props?.appColors ?? appColors,
