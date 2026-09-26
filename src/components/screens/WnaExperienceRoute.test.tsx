@@ -7,10 +7,12 @@ const mockAppColors = { black: "#111111" };
 const mockAppStyle = { textNeutralSmall: {} };
 const mockAppData = { experience: [] };
 const mockRouter = { push: jest.fn() };
+let mockIsLandscape = false;
 
 jest.mock("@/state/WnaAppContext", () => ({
   useWnaTheme: () => ({ appColors: mockAppColors, appStyle: mockAppStyle }),
   useWnaAppData: () => ({ appData: mockAppData }),
+  useWnaLayout: () => ({ isLandscape: mockIsLandscape }),
 }));
 
 jest.mock("react-i18next", () => ({
@@ -120,4 +122,24 @@ describe("WnaExperienceRoute", () => {
     expect(menuButton.type).toBeDefined();
     expect(card.props.appData).toBe(mockAppData);
   });
+
+  it.each([
+    [false, false],
+    [true, true],
+  ])(
+    "with isLandscape %s, shows the section title: %s",
+    (isLandscape, expected) => {
+      mockIsLandscape = isLandscape;
+      let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+      act(() => {
+        tree = TestRenderer.create(<WnaExperienceRoute />);
+      });
+
+      // Portrait: the header right above already reads the same title.
+      expect(
+        tree!.root.findByType("WnaExperienceSection").props.showTitle,
+      ).toBe(expected);
+    },
+  );
 });

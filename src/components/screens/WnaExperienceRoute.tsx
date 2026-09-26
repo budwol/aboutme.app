@@ -1,4 +1,8 @@
-import { useWnaAppData, useWnaTheme } from "@/state/WnaAppContext";
+import {
+  useWnaAppData,
+  useWnaLayout,
+  useWnaTheme,
+} from "@/state/WnaAppContext";
 import WnaSurfaceCard from "@/components/cards/WnaSurfaceCard";
 import WnaMenuToggleButton from "@/navigation/components/WnaMenuToggleButton";
 import WnaHeaderRouteButton from "@/navigation/components/WnaHeaderRouteButton";
@@ -13,6 +17,7 @@ import { i18nKeys } from "@/i18n/i18nKeys";
 export default function WnaExperienceRoute(): ReactNode {
   const { appColors, appStyle } = useWnaTheme();
   const { appData } = useWnaAppData();
+  const { isLandscape } = useWnaLayout();
   const { t } = useTranslation(["common"]);
 
   return (
@@ -39,6 +44,11 @@ export default function WnaExperienceRoute(): ReactNode {
           appData={appData}
           appStyle={appStyle}
           t={t}
+          // In portrait the header sits right above this card and already
+          // reads "Berufliche Tätigkeiten" -- repeating it as the section
+          // title just stacks the same words. The home page (no such
+          // header) and landscape (header off to the side) keep it.
+          showTitle={isLandscape}
         />
       </WnaSurfaceCard>
     </WnaScrollViewScreen>

@@ -10,6 +10,9 @@ export interface WnaSectionTitleProps {
   appStyle: AppStyle;
   title: string;
   subtitle?: string;
+  // false leaves only the subtitle -- for a screen whose own header already
+  // shows the same title directly above it.
+  showTitle?: boolean;
   titleTextColor?: string;
   showAccentBar?: boolean;
   accentBarWidth?: number;
@@ -22,6 +25,7 @@ const WnaSectionTitle = ({
   appStyle,
   title,
   subtitle,
+  showTitle = true,
   titleTextColor,
   showAccentBar = false,
   accentBarWidth = 112,
@@ -43,7 +47,9 @@ const WnaSectionTitle = ({
 
     return (
       <>
-        <WnaSeparatorHorizontal transparent space={showAccentBar ? 10 : 8} />
+        {showTitle ? (
+          <WnaSeparatorHorizontal transparent space={showAccentBar ? 10 : 8} />
+        ) : null}
         {showAccentBar ? (
           <WnaAccentBar
             appColors={appColors}
@@ -70,13 +76,16 @@ const WnaSectionTitle = ({
     appColors,
     appStyle,
     showAccentBar,
+    showTitle,
     subtitle,
   ]);
 
   return React.createElement(
     "div",
     { style: styles.container },
-    React.createElement("span", { style: titleStyle }, title),
+    showTitle
+      ? React.createElement("span", { style: titleStyle }, title)
+      : null,
     subtitleComponent,
   );
 };
