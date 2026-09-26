@@ -305,7 +305,7 @@ describe("generate-resume-pdf", () => {
     expect(overflowingAtsSize).not.toBe(cappedAtsSize);
   });
 
-  it("links every variant's footer to the other three documents, but never to itself", async () => {
+  it("links every variant's footer to the other three documents' stable detail-page URLs, but never to itself", async () => {
     const fixtureRoot = createFixtureRoot();
     writeAppData(fixtureRoot, {
       profile: { name: "Jane Example" },
@@ -319,12 +319,19 @@ describe("generate-resume-pdf", () => {
     const designedPdf = fs.readFileSync(result.deTargetFile).toString("latin1");
     const atsPdf = fs.readFileSync(result.deAtsTargetFile).toString("latin1");
 
-    const portfolioUrl = "https://example.com/DE/Jane_Example_-_Portfolio.pdf";
+    // Every link points at the stable /bewerbungsunterlagen/<word> detail
+    // page (WnaDownloadDetailRoute) rather than a raw file URL -- so the PDF
+    // never has to know the DE/EN subfolder or /files/-vs-public-root split
+    // a raw path would otherwise bake in. The trailing ")" (a PDF URI
+    // annotation's own closing delimiter) matters: "Portfolio" is otherwise
+    // a substring of "Portfolio_ATS", which would make a bare
+    // `.not.toContain(portfolioUrl)` pass trivially against a PDF that only
+    // actually links to portfolioAtsUrl.
+    const portfolioUrl = "https://example.com/bewerbungsunterlagen/Portfolio)";
     const portfolioAtsUrl =
-      "https://example.com/DE/Jane_Example_-_Portfolio_ATS.pdf";
-    const cvUrl = "https://example.com/files/DE/Jane_Example_-_Lebenslauf.pdf";
-    const cvAtsUrl =
-      "https://example.com/files/DE/Jane_Example_-_Lebenslauf_ATS.pdf";
+      "https://example.com/bewerbungsunterlagen/Portfolio_ATS)";
+    const cvUrl = "https://example.com/bewerbungsunterlagen/Lebenslauf)";
+    const cvAtsUrl = "https://example.com/bewerbungsunterlagen/Lebenslauf_ATS)";
 
     // Designed Portfolio: links to its own ats companion and both CV
     // variants, never to itself.

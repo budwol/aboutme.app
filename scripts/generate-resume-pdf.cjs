@@ -486,14 +486,6 @@ function buildAtsSoftSkillList(softSkills, lang) {
     .filter((entry) => entry.name !== "");
 }
 
-// langCode is required (not folded into pathSegment by the caller) since a
-// plain Portfolio file name alone no longer says which language it is --
-// see buildPortfolioFileName below.
-function buildAbsoluteUrl(siteUrl, langCode, pathSegment) {
-  const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
-  return `${base}/${langCode.toUpperCase()}/${pathSegment}`;
-}
-
 const GERMAN_DIACRITICS = {
   ä: "ae",
   ö: "oe",
@@ -506,7 +498,7 @@ const GERMAN_DIACRITICS = {
 
 // A profile name can contain characters that are neither filesystem- nor
 // URL-safe (umlauts, accents, punctuation) — this filename ends up both as
-// an actual file on disk and as a URL path segment (buildAbsoluteUrl,
+// an actual file on disk and as a URL path segment (buildDownloadsDetailUrl,
 // getResumePdfUrl on the website side), so it needs to survive both
 // untouched rather than relying on percent-encoding to paper over it.
 // German umlauts/ß are spelled out since this is a German name; anything
@@ -537,24 +529,28 @@ function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
   return `${slugifyName(name)}_-_Portfolio${atsSuffix}.pdf`;
 }
 
-// Mirrors buildCvFileName in generate-cv-pdf.cjs -- reimplemented locally
+// Mirrors CV_FILE_WORDS in generate-cv-pdf.cjs -- reimplemented locally
 // (see slugifyName above for why) purely so this script's own footer can
-// link out to the CV PDFs (buildRelatedDocumentLinks below), the same way
-// generate-cv-pdf.cjs mirrors buildPortfolioFileName for the reverse link.
+// name the CV word in its cross-link (buildRelatedDocumentLinks below).
 const CV_FILE_WORDS = { de: "Lebenslauf", en: "CV" };
 
-function buildCvFileName(name, langCode, { ats = false } = {}) {
-  const word = CV_FILE_WORDS[langCode] ?? CV_FILE_WORDS.en;
-  const atsSuffix = ats ? "_ATS" : "";
-  return `${slugifyName(name)}_-_${word}${atsSuffix}.pdf`;
-}
-
-// Mirrors buildAbsoluteUrl in generate-cv-pdf.cjs -- the CV PDFs live in
-// public/files/<DE|EN>/, not public/<DE|EN>/ like this script's own output,
-// so this deliberately does NOT reuse buildAbsoluteUrl above.
-function buildCvAbsoluteUrl(siteUrl, langCode, pathSegment) {
+// A stable, storage-agnostic link to one of the four PDF documents' own
+// detail page (WnaDownloadDetailRoute, reachable at
+// /bewerbungsunterlagen/<word> or /application-documents/<word>) rather
+// than that document's raw file URL -- a PDF's footer linking straight at
+// e.g. "/DE/Name_-_Portfolio.pdf" would bake the DE/EN subfolder and
+// /files/-vs-public-root split directly into an already-generated PDF; this
+// resolves to wherever the file actually lives at click time instead.
+// Mirrors routeDefinitions.downloads + downloadsIntentWords in
+// src/navigation/routes/wnaNavigationRoutes.ts -- duplicated here per this
+// file's own established "independent scripts" convention (see slugifyName
+// above); keep the path segment and words in sync by hand if either side
+// changes.
+function buildDownloadsDetailUrl(siteUrl, langCode, word) {
   const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
-  return `${base}/files/${langCode.toUpperCase()}/${pathSegment}`;
+  const pathSegment =
+    langCode === "de" ? "bewerbungsunterlagen" : "application-documents";
+  return `${base}/${pathSegment}/${word}`;
 }
 
 // Every document (this Portfolio, its ats companion, the CV, and CV-ATS)
@@ -565,17 +561,14 @@ function buildCvAbsoluteUrl(siteUrl, langCode, pathSegment) {
 // itself.
 function buildRelatedDocumentLinks(data, name, lang, labels, currentAts) {
   const portfolioUrl = (ats) =>
-    buildAbsoluteUrl(
+    buildDownloadsDetailUrl(
       data.siteUrl,
       lang,
-      buildPortfolioFileName(name, lang, { ats }),
+      ats ? "Portfolio_ATS" : "Portfolio",
     );
+  const cvWord = CV_FILE_WORDS[lang] ?? CV_FILE_WORDS.en;
   const cvUrl = (ats) =>
-    buildCvAbsoluteUrl(
-      data.siteUrl,
-      lang,
-      buildCvFileName(name, lang, { ats }),
-    );
+    buildDownloadsDetailUrl(data.siteUrl, lang, ats ? `${cvWord}_ATS` : cvWord);
 
   return [
     currentAts
