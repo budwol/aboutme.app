@@ -1,5 +1,6 @@
 import { ComponentType, lazy } from "react";
 import {
+  downloadsIntentWords,
   routeDefinitions,
   WnaRouteKey,
 } from "@/navigation/routes/wnaNavigationRoutes";
@@ -87,6 +88,11 @@ const WnaProjectDetailsRoute = lazyRoute(
   "WnaProjectDetailsRoute",
 );
 
+const WnaDownloadDetailRoute = lazyRoute(
+  () => import("@components/screens/WnaDownloadDetailRoute"),
+  "WnaDownloadDetailRoute",
+);
+
 const staticRouteMap = new Map<string, ComponentType>();
 for (const key of Object.keys(routeDefinitions) as WnaRouteKey[]) {
   const Component = routeComponents[key];
@@ -98,6 +104,15 @@ for (const key of Object.keys(routeDefinitions) as WnaRouteKey[]) {
 const projectPathPrefixes = (["de", "en"] as const).map(
   (lang) => `/${getProjectPathSegment(lang)}/`,
 );
+
+// One prefix per language, each carrying that language's own intent-word ->
+// DocumentKind map (see downloadsIntentWords) -- "Portfolio" alone can't
+// tell DE and EN apart (it's the same word in both), so the prefix itself
+// is what does, exactly like projectPathPrefixes above.
+const downloadsIntentPrefixes = (["de", "en"] as const).map((lang) => ({
+  prefix: `${routeDefinitions.downloads[lang]}/`,
+  words: downloadsIntentWords[lang],
+}));
 
 export function matchRoute(pathname: string): WnaRouteMatch | undefined {
   const staticComponent = staticRouteMap.get(pathname);
@@ -111,6 +126,17 @@ export function matchRoute(pathname: string): WnaRouteMatch | undefined {
       if (slug) {
         return { Component: WnaProjectDetailsRoute, params: { slug } };
       }
+    }
+  }
+
+  for (const { prefix, words } of downloadsIntentPrefixes) {
+    if (pathname.startsWith(prefix)) {
+      const kind = words[pathname.slice(prefix.length)];
+      // An unrecognized word (e.g. a typo in a shared/forwarded link) falls
+      // back to the full downloads list instead of a dead route.
+      return kind
+        ? { Component: WnaDownloadDetailRoute, params: { kind } }
+        : { Component: routeComponents.downloads, params: {} };
     }
   }
 
