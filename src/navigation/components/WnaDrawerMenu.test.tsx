@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import React from "react";
-import { Linking } from "@utils/webLinking";
 import TestRenderer, { act } from "react-test-renderer";
 import WnaDrawerMenu from "@/navigation/components/WnaDrawerMenu";
 import {
@@ -484,9 +483,7 @@ describe("WnaDrawerMenu", () => {
     });
   });
 
-  it("renders a standalone portfolio download button in the drawer footer, separate from the nav list", async () => {
-    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(undefined);
-
+  it("renders a standalone portfolio button in the drawer footer that opens the portfolio's detail page", async () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 
     await act(async () => {
@@ -511,9 +508,8 @@ describe("WnaDrawerMenu", () => {
       await downloadButton!.props.onPress();
     });
 
-    expect(openURL).toHaveBeenCalledWith("/DE/John_Doe_-_Portfolio.pdf");
-
-    openURL.mockRestore();
+    expect(mockPush).toHaveBeenCalledWith("/bewerbungsunterlagen/Portfolio");
+    expect(mockCloseDrawer).toHaveBeenCalled();
   });
 
   it("does not navigate when pressing the already-active drawer item", async () => {

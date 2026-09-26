@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import WnaContactSection from "@components/sections/WnaContactSection";
 import { Linking } from "@utils/webLinking";
+import { router } from "@/navigation/router/wnaRouter";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
 import { useTranslation } from "react-i18next";
@@ -47,11 +48,13 @@ type ViewNode = {
 describe("WnaContactSection", () => {
   const canOpenURL = jest.spyOn(Linking, "canOpenURL");
   const openURL = jest.spyOn(Linking, "openURL");
+  const navigate = jest.spyOn(router, "navigate");
 
   beforeEach(() => {
     jest.clearAllMocks();
     canOpenURL.mockResolvedValue(true);
     openURL.mockResolvedValue(undefined);
+    navigate.mockImplementation(() => undefined);
   });
 
   it("opens the social, phone and email URLs via Linking", async () => {
@@ -122,10 +125,6 @@ describe("WnaContactSection", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
-    expect(canOpenURL).toHaveBeenNthCalledWith(
-      6,
-      "/DE/John_Doe_-_Portfolio.pdf",
-    );
 
     expect(openURL).toHaveBeenNthCalledWith(1, appData.contact.github);
     expect(openURL).toHaveBeenNthCalledWith(2, appData.contact.linkedin);
@@ -135,7 +134,9 @@ describe("WnaContactSection", () => {
       5,
       `mailto:${appData.contact.email}`,
     );
-    expect(openURL).toHaveBeenNthCalledWith(6, "/DE/John_Doe_-_Portfolio.pdf");
+    expect(openURL).toHaveBeenCalledTimes(5);
+    // The portfolio opens its own in-app detail page, not the raw PDF.
+    expect(navigate).toHaveBeenCalledWith("/bewerbungsunterlagen/Portfolio");
   });
 
   it("logs an error and skips opening when the URL is not supported", async () => {
@@ -244,7 +245,7 @@ describe("WnaContactSection", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/EN/John_Doe_-_Portfolio.pdf");
+    expect(navigate).toHaveBeenCalledWith("/application-documents/Portfolio");
   });
 
   it("falls back to the language when resolvedLanguage is unset", async () => {
@@ -273,7 +274,7 @@ describe("WnaContactSection", () => {
       await resumeButton.props.onPress();
     });
 
-    expect(canOpenURL).toHaveBeenCalledWith("/DE/John_Doe_-_Portfolio.pdf");
+    expect(navigate).toHaveBeenCalledWith("/bewerbungsunterlagen/Portfolio");
   });
 
   it("skips the narrow max-width constraint on wide viewports", async () => {
