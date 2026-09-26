@@ -51,6 +51,10 @@ jest.mock("@components/screens/WnaProjectDetailsRoute", () => ({
   __esModule: true,
   default: mockScreen("WnaProjectDetailsRoute"),
 }));
+jest.mock("@components/screens/WnaDownloadDetailRoute", () => ({
+  __esModule: true,
+  default: mockScreen("WnaDownloadDetailRoute"),
+}));
 
 describe("matchRoute", () => {
   // Every route but "root" is lazy-loaded (see wnaRouteTable.ts), so it
@@ -129,6 +133,47 @@ describe("matchRoute", () => {
     expect(matchRoute("/projekte/")).toBeUndefined();
   });
 
+  it.each([
+    ["/bewerbungsunterlagen/Lebenslauf", "cvDe"],
+    ["/bewerbungsunterlagen/Lebenslauf_ATS", "cvAtsDe"],
+    ["/bewerbungsunterlagen/Portfolio", "portfolioDe"],
+    ["/bewerbungsunterlagen/Portfolio_ATS", "portfolioAtsDe"],
+    ["/application-documents/CV", "cvEn"],
+    ["/application-documents/CV_ATS", "cvAtsEn"],
+    ["/application-documents/Portfolio", "portfolioEn"],
+    ["/application-documents/Portfolio_ATS", "portfolioAtsEn"],
+  ])(
+    "resolves the downloads intent word at %s to WnaDownloadDetailRoute with kind %s",
+    (path, kind) => {
+      const match = matchRoute(path);
+
+      expect(
+        (match?.Component as { displayName?: string } | undefined)?.displayName,
+      ).toBe("WnaDownloadDetailRoute");
+      expect(match?.params).toEqual({ kind });
+    },
+  );
+
+  it("falls back to the full downloads list for an unrecognized intent word", () => {
+    // e.g. a typo in a shared/forwarded link -- this should not be a dead
+    // route.
+    const match = matchRoute("/bewerbungsunterlagen/Portfilio");
+
+    expect(
+      (match?.Component as { displayName?: string } | undefined)?.displayName,
+    ).toBe("WnaDownloadsRoute");
+    expect(match?.params).toEqual({});
+  });
+
+  it("falls back to the full downloads list for an empty intent segment", () => {
+    const match = matchRoute("/bewerbungsunterlagen/");
+
+    expect(
+      (match?.Component as { displayName?: string } | undefined)?.displayName,
+    ).toBe("WnaDownloadsRoute");
+    expect(match?.params).toEqual({});
+  });
+
   it("still resolves the bare projects list path to WnaProjectsRoute", () => {
     // "/projekte" (no trailing slash) is the static projects-list route
     // itself, not a project-detail prefix match.
@@ -155,6 +200,7 @@ describe("matchRoute", () => {
     ["/kontakt", "WnaContactRoute"],
     ["/bewerbungsunterlagen", "WnaDownloadsRoute"],
     ["/projekte/pizza-app-2", "WnaProjectDetailsRoute"],
+    ["/bewerbungsunterlagen/Lebenslauf", "WnaDownloadDetailRoute"],
   ])(
     "actually resolves the lazy import for %s to its real screen module",
     async (path, expectedName) => {
