@@ -23,6 +23,7 @@ export default function WnaExperienceSection({
   appStyle,
   t,
   maxItems,
+  showTitle = true,
   showDetails = true,
   expandAllDetailsByDefault = false,
   footerActionLabel,
@@ -99,6 +100,7 @@ export default function WnaExperienceSection({
       appStyle={appStyle}
       title={t(i18nKeys.screenTitleExperience)}
       subtitle={(appData.experienceSubtitle ?? "").toUpperCase()}
+      showTitle={showTitle}
     />,
     React.createElement(
       "div",
