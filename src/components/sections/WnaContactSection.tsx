@@ -4,8 +4,9 @@ import { WnaSectionProps } from "@components/sections/wnaSectionProps";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import { useTranslation } from "react-i18next";
 import WnaButtonIcon from "@components/buttons/WnaButtonIcon";
-import { getResumePdfUrl } from "@utils/resumePdfUrl";
 import { useWnaLayout } from "@/state/WnaAppContext";
+import { getPortfolioDetailNavigationPath } from "@/navigation/routes/wnaNavigationRoutes";
+import { router } from "@/navigation/router/wnaRouter";
 import { Linking } from "@utils/webLinking";
 
 const buttonSize = 52;
@@ -163,10 +164,7 @@ export default function WnaContactSection({
           appStyle={appStyle}
           iconName={"file-pdf-box"}
           onPress={() =>
-            handleOpenUrl(
-              getResumePdfUrl(resumeLang, appData.profile.name),
-              "resume",
-            )
+            router.navigate(getPortfolioDetailNavigationPath(resumeLang))
           }
           checkInternetConnection={false}
           toolTipPosition="top"

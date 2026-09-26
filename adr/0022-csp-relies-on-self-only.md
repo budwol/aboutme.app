@@ -14,3 +14,4 @@ The generated CSP uses `'self'` alone with no site-specific or wildcard-subdomai
 
 - `nginx/site.conf` is generated (gitignored) -- this decision lives in `scripts/init-process.cjs`; regenerate via `npm run init` after changing it, don't hand-edit the generated file.
 - `style-src 'unsafe-inline'` remains: the app renders ~28 dynamic inline `style={{...}}` values in React, and CSP hashes/nonces only cover `<style>` elements and scripts, not per-element style attributes. Removing it would need moving those to CSS custom properties/classes, which is a larger refactor than this fix.
+- 2026-09-26: `frame-src` now also allows `blob:` so the document detail page can preview a PDF it fetched with an `Authorization` header — see ADR 0025.

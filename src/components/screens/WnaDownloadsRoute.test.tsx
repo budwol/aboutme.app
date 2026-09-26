@@ -11,6 +11,7 @@ import WnaDownloadsRoute from "@components/screens/WnaDownloadsRoute";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { testAppData } from "@/app-data/testAppData";
+import { router } from "@/navigation/router/wnaRouter";
 
 const SESSION_STORAGE_KEY = "wna-documents-auth";
 const LAST_ACTIVE_STORAGE_KEY = "wna-documents-auth-last-active";
@@ -51,7 +52,12 @@ jest.mock("wna-logger", () => ({
 jest.mock("@/navigation/routes/wnaNavigationRoutes", () => {
   const { jest: jestModule } = require("@jest/globals");
 
-  return { getNavigationLang: jestModule.fn(() => "en") };
+  return {
+    ...(jestModule.requireActual(
+      "@/navigation/routes/wnaNavigationRoutes",
+    ) as typeof import("@/navigation/routes/wnaNavigationRoutes")),
+    getNavigationLang: jestModule.fn(() => "en"),
+  };
 });
 
 jest.mock("@components/cards/WnaSurfaceCard", () => {
@@ -167,12 +173,18 @@ describe("WnaDownloadsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         coolgray2: "#ccc",
+        coolgray5: "#999",
         background: "#fff",
         text: "#000",
         red4: "#f75056",
         yellow4: "#fff000",
+        accent4: "#61afa7",
       },
-      appStyle: { textNeutralMedium: {}, textNeutralSubtitle: {} },
+      appStyle: {
+        textNeutralMedium: {},
+        textNeutralSubtitle: {},
+        textNeutralTitleLarge: {},
+      },
     });
     appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
   });
@@ -276,13 +288,19 @@ describe("WnaDownloadsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         coolgray2: "#ccc",
+        coolgray5: "#999",
         background: "#000",
         text: "#fff",
         red4: "#f75056",
         yellow4: "#fff000",
+        accent4: "#61afa7",
         isDark: true,
       },
-      appStyle: { textNeutralMedium: {}, textNeutralSubtitle: {} },
+      appStyle: {
+        textNeutralMedium: {},
+        textNeutralSubtitle: {},
+        textNeutralTitleLarge: {},
+      },
     });
 
     const tree = renderRoute();
@@ -373,7 +391,7 @@ describe("WnaDownloadsRoute", () => {
     // Once unlocked there is no password field at all, so every
     // WnaNavigationItem here is a document row -- one folder-zip + four
     // file-pdf-box (CV, CV-ATS, Portfolio, Portfolio-ATS) per language,
-    // German section first, each downloading rather than navigating.
+    // German section first.
     type NavItemProps = {
       props: { iconName: string; iconColor: string; iconRightName: string };
     };
@@ -401,11 +419,22 @@ describe("WnaDownloadsRoute", () => {
       "#f75056",
       "#f75056",
     ]);
-    expect(
-      items.every(
-        (item: NavItemProps) => item.props.iconRightName === "download",
-      ),
-    ).toBe(true);
+    // Only the ZIPs download in place; every PDF row opens its own detail
+    // page and keeps the default chevron.
+    expect(items.map((item: NavItemProps) => item.props.iconRightName)).toEqual(
+      [
+        "download",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "download",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ],
+    );
   });
 
   it("appends the formatted file size to a fixed document's label once document-sizes.json loads", async () => {
@@ -629,6 +658,37 @@ describe("WnaDownloadsRoute", () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
 
     clickSpy.mockRestore();
+  });
+
+  it("opens a CV/Portfolio row's own detail page instead of downloading the file", () => {
+    setStoredSession(`Basic ${btoa("documents:!correct")}`);
+    const navigateSpy = jest
+      .spyOn(router, "navigate")
+      .mockImplementation(() => undefined);
+
+    const tree = renderRoute();
+    expandAllSections(tree);
+    const cvRow = tree.root
+      .findAllByType("WnaNavigationItem")
+      .find(
+        (item: { props: { text: string } }) =>
+          item.props.text === "documentCvEn",
+      );
+
+    // undefined -> WnaNavigationItem's default chevron, not "download".
+    expect(cvRow?.props.iconRightName).toBeUndefined();
+
+    act(() => {
+      (cvRow?.props.onPress as () => void)();
+    });
+
+    expect(navigateSpy).toHaveBeenCalledWith("/application-documents/CV");
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      expect.stringContaining("CV.pdf"),
+      expect.anything(),
+    );
+
+    navigateSpy.mockRestore();
   });
 
   it("relocks and reports an incorrect password when a download comes back 401", async () => {

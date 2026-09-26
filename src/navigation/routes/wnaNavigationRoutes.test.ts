@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import type { DocumentKind } from "@utils/documentsManifest";
 
 type RoutesModule = typeof import("@/navigation/routes/wnaNavigationRoutes");
 
@@ -51,6 +52,47 @@ describe("wnaNavigationRoutes", () => {
 
     expect(getProjectNavigationPath("my-project", "en")).toBe(
       "/projects/my-project",
+    );
+  });
+
+  it.each([
+    ["cvDe", "/bewerbungsunterlagen/Lebenslauf"],
+    ["cvAtsDe", "/bewerbungsunterlagen/Lebenslauf_ATS"],
+    ["portfolioDe", "/bewerbungsunterlagen/Portfolio"],
+    ["portfolioAtsDe", "/bewerbungsunterlagen/Portfolio_ATS"],
+    ["cvEn", "/application-documents/CV"],
+    ["cvAtsEn", "/application-documents/CV_ATS"],
+    ["portfolioEn", "/application-documents/Portfolio"],
+    ["portfolioAtsEn", "/application-documents/Portfolio_ATS"],
+  ] satisfies [DocumentKind, string][])(
+    "builds the detail page path for %s in the document's own language",
+    (kind, expected) => {
+      // UI language deliberately differs from the German documents.
+      const { getDownloadDetailNavigationPath } = loadRoutesWithLang("en");
+
+      expect(getDownloadDetailNavigationPath(kind)).toBe(expected);
+    },
+  );
+
+  it("has no detail page path for the ZIP packages", () => {
+    const { getDownloadDetailNavigationPath } = loadRoutesWithLang("de");
+
+    expect(
+      getDownloadDetailNavigationPath("applicationPackageDe"),
+    ).toBeUndefined();
+    expect(
+      getDownloadDetailNavigationPath("applicationPackageEn"),
+    ).toBeUndefined();
+  });
+
+  it("builds the portfolio detail page path per language", () => {
+    const { getPortfolioDetailNavigationPath } = loadRoutesWithLang("de");
+
+    expect(getPortfolioDetailNavigationPath("de")).toBe(
+      "/bewerbungsunterlagen/Portfolio",
+    );
+    expect(getPortfolioDetailNavigationPath("en")).toBe(
+      "/application-documents/Portfolio",
     );
   });
 });

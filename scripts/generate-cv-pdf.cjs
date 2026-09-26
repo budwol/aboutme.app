@@ -152,33 +152,23 @@ function buildCvFileName(name, langCode, { ats = false } = {}) {
   return `${slugifyName(name)}_-_${word}${atsSuffix}.pdf`;
 }
 
-// Mirrors buildAbsoluteUrl in generate-resume-pdf.cjs -- builds the public
-// URL of the ats companion PDF so the designed CV's footer can link to it
-// (see the footer-drawing loop in writeCvPdf below). Needs langCode
-// explicitly, unlike a plain file name: "Lebenslauf_ATS.pdf" alone doesn't
-// say which folder (DE or EN) it lives in the way "Lebenslauf" itself
-// already said which language it was under the old _DE/_EN suffix scheme.
-function buildAbsoluteUrl(siteUrl, langCode, pathSegment) {
+// A stable, storage-agnostic link to one of the four PDF documents' own
+// detail page (WnaDownloadDetailRoute, reachable at
+// /bewerbungsunterlagen/<word> or /application-documents/<word>) rather
+// than that document's raw file URL -- a PDF's footer linking straight at
+// e.g. "/files/DE/Name_-_Lebenslauf.pdf" would bake the DE/EN subfolder and
+// /files/-vs-public-root split directly into an already-generated PDF; this
+// resolves to wherever the file actually lives at click time instead.
+// Mirrors routeDefinitions.downloads + downloadsIntentWords in
+// src/navigation/routes/wnaNavigationRoutes.ts -- duplicated here per this
+// file's own established "independent scripts" convention (see
+// pickString/slugifyName above); keep the path segment and words in sync by
+// hand if either side changes.
+function buildDownloadsDetailUrl(siteUrl, langCode, word) {
   const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
-  return `${base}/files/${langCode.toUpperCase()}/${pathSegment}`;
-}
-
-// Mirrors buildPortfolioFileName in generate-resume-pdf.cjs -- reimplemented
-// locally (see pickString/slugifyName above for why) purely so this script's
-// own footer can link out to the Portfolio PDFs (buildRelatedDocumentLinks
-// below), the same way generate-resume-pdf.cjs mirrors buildCvFileName for
-// the reverse link.
-function buildPortfolioFileName(name, langCode, { ats = false } = {}) {
-  const atsSuffix = ats ? "_ATS" : "";
-  return `${slugifyName(name)}_-_Portfolio${atsSuffix}.pdf`;
-}
-
-// Mirrors buildAbsoluteUrl in generate-resume-pdf.cjs -- the Portfolio PDFs
-// live in public/<DE|EN>/, not public/files/<DE|EN>/ like this script's own
-// output, so this deliberately does NOT reuse buildAbsoluteUrl above.
-function buildPortfolioAbsoluteUrl(siteUrl, langCode, pathSegment) {
-  const base = typeof siteUrl === "string" ? siteUrl.replace(/\/+$/, "") : "";
-  return `${base}/${langCode.toUpperCase()}/${pathSegment}`;
+  const pathSegment =
+    langCode === "de" ? "bewerbungsunterlagen" : "application-documents";
+  return `${base}/${pathSegment}/${word}`;
 }
 
 // Every document (this CV, its ats companion, the designed Portfolio, and
@@ -188,13 +178,14 @@ function buildPortfolioAbsoluteUrl(siteUrl, langCode, pathSegment) {
 // this document's own variant, so its own designed/ats counterpart is
 // never listed as a link to itself.
 function buildRelatedDocumentLinks(data, name, lang, labels, currentAts) {
+  const cvWord = CV_FILE_WORDS[lang] ?? CV_FILE_WORDS.en;
   const cvUrl = (ats) =>
-    buildAbsoluteUrl(data.siteUrl, lang, buildCvFileName(name, lang, { ats }));
+    buildDownloadsDetailUrl(data.siteUrl, lang, ats ? `${cvWord}_ATS` : cvWord);
   const portfolioUrl = (ats) =>
-    buildPortfolioAbsoluteUrl(
+    buildDownloadsDetailUrl(
       data.siteUrl,
       lang,
-      buildPortfolioFileName(name, lang, { ats }),
+      ats ? "Portfolio_ATS" : "Portfolio",
     );
 
   return [
