@@ -124,6 +124,9 @@ describe("init process security", () => {
     expect(generated.nginxConfig).toContain("manifest-src 'self';");
     expect(generated.nginxConfig).toContain("script-src-attr 'none';");
     expect(generated.nginxConfig).toContain("worker-src 'self' blob:;");
+    // blob: lets WnaDownloadDetailRoute preview a protected PDF it fetched
+    // with an Authorization header -- see ADR 0025.
+    expect(generated.nginxConfig).toContain("frame-src 'self' blob:;");
     expect(generated.nginxConfig).toContain("upgrade-insecure-requests;");
     expect(generated.nginxConfig).not.toContain("https://cdnjs.cloudflare.com");
     // The CSP relies on 'self' alone -- no site-specific or wildcard

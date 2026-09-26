@@ -253,7 +253,7 @@ function buildGeneratedFiles({ siteUrl, profileName, appName }) {
     add_header 'Referrer-Policy' 'same-origin' always;
     add_header 'Permissions-Policy' 'geolocation=(self),accelerometer=(),camera=(),fullscreen=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),sync-xhr=(),usb=()' always;
     add_header 'X-Robots-Tag' 'noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate' always;
-    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src 'self'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; script-src-attr 'none'; script-src-elem 'self'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; worker-src 'self' blob:;" always;`;
+    add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'self'; frame-src 'self' blob:; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; script-src-attr 'none'; script-src-elem 'self'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests; worker-src 'self' blob:;" always;`;
   const locationSecurityHeaders = securityHeaders.replace(
     /^ {4}/gm,
     "        ",
