@@ -43,6 +43,7 @@
     "documentsCategoryCertificates": "Certificates",
     "documentsCategoryDiplomas": "Diplomas",
     "downloadsBody": "Password-protected area with resume and application documents.",
+    "downloadsUnlockTitle": "Protected area",
     "errorIncorrectPassword": "Incorrect password",
     "errorNoInternet": "You are currently offline",
     "errorUnknown": "An error has occurred",
