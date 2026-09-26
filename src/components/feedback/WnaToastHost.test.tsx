@@ -125,8 +125,16 @@ describe("WnaToastHost", () => {
 
     expect(tree!.root.findAllByType("span")).toHaveLength(2);
 
+    // Display time is over: fading out, but still mounted until the exit
+    // transition has finished.
     act(() => {
       jest.advanceTimersByTime(2400);
+    });
+
+    expect(tree!.root.findAllByType("span")).toHaveLength(2);
+
+    act(() => {
+      jest.advanceTimersByTime(180);
     });
 
     expect(tree!.root.findAllByType("span")).toHaveLength(0);
@@ -186,6 +194,150 @@ describe("WnaToastHost", () => {
     });
     act(() => {
       tree!.unmount();
+    });
+  });
+
+  describe("animation", () => {
+    type HostNode = { props: { style: Record<string, unknown> } };
+
+    function renderHost() {
+      const getBoundingClientRect = jest.fn();
+      let tree: ReturnType<typeof TestRenderer.create> | undefined;
+      act(() => {
+        tree = TestRenderer.create(<WnaToastHost appColors={appColors} />, {
+          createNodeMock: () => ({ getBoundingClientRect }),
+        });
+      });
+      const hostStyle = () =>
+        (tree!.root.findAllByType("div")[0] as unknown as HostNode).props.style;
+      return { tree: tree!, hostStyle, getBoundingClientRect };
+    }
+
+    it("slides and fades in, then fades out before unmounting", () => {
+      jest.useFakeTimers();
+      const { tree, hostStyle, getBoundingClientRect } = renderHost();
+
+      act(() => {
+        showWnaToast({ type: "info", text2: "Hello" });
+      });
+
+      // The hidden start frame was flushed, then switched to shown.
+      expect(getBoundingClientRect).toHaveBeenCalled();
+      expect(hostStyle()).toMatchObject({
+        opacity: 1,
+        transform: "none",
+        transition: "opacity 220ms ease-out, transform 220ms ease-out",
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(2400);
+      });
+
+      expect(hostStyle()).toMatchObject({
+        opacity: 0,
+        transform: "translateY(-16px) scale(0.98)",
+        transition: "opacity 180ms ease-in, transform 180ms ease-in",
+      });
+
+      act(() => {
+        tree.unmount();
+      });
+      jest.useRealTimers();
+    });
+
+    it("animates back in when a new toast arrives mid-fade-out", () => {
+      jest.useFakeTimers();
+      const { tree, hostStyle } = renderHost();
+
+      act(() => {
+        showWnaToast({ type: "info", text2: "First" });
+      });
+      act(() => {
+        jest.advanceTimersByTime(2400 + 90);
+      });
+      expect(hostStyle().opacity).toBe(0);
+
+      act(() => {
+        showWnaToast({ type: "info", text2: "Second" });
+      });
+      // The pending unmount from the first toast was cancelled.
+      act(() => {
+        jest.advanceTimersByTime(180);
+      });
+
+      expect(hostStyle().opacity).toBe(1);
+      expect(
+        tree.root
+          .findAllByType("span")
+          .map((node: RenderedTextNode) => node.props.children),
+      ).toEqual(["Second"]);
+
+      act(() => {
+        tree.unmount();
+      });
+      jest.useRealTimers();
+    });
+
+    it("swaps the content in place when a new toast arrives while one is shown", () => {
+      jest.useFakeTimers();
+      const { tree, hostStyle, getBoundingClientRect } = renderHost();
+
+      act(() => {
+        showWnaToast({ type: "info", text2: "First" });
+      });
+      getBoundingClientRect.mockClear();
+      act(() => {
+        jest.advanceTimersByTime(1000);
+        showWnaToast({ type: "info", text2: "Second" });
+      });
+
+      // No re-entry frame: it stays shown and just shows the new text.
+      expect(getBoundingClientRect).not.toHaveBeenCalled();
+      expect(hostStyle().opacity).toBe(1);
+      expect(
+        tree.root
+          .findAllByType("span")
+          .map((node: RenderedTextNode) => node.props.children),
+      ).toEqual(["Second"]);
+
+      // The display timer restarted with the second toast.
+      act(() => {
+        jest.advanceTimersByTime(2399);
+      });
+      expect(hostStyle().opacity).toBe(1);
+
+      act(() => {
+        tree.unmount();
+      });
+      jest.useRealTimers();
+    });
+
+    it("only fades, without sliding, when reduced motion is preferred", () => {
+      jest.useFakeTimers();
+      const matchMedia = jest.fn(() => ({ matches: true }));
+      Object.defineProperty(window, "matchMedia", {
+        configurable: true,
+        value: matchMedia,
+      });
+      const { tree, hostStyle } = renderHost();
+
+      act(() => {
+        showWnaToast({ type: "info", text2: "Hello" });
+      });
+      act(() => {
+        jest.advanceTimersByTime(2400);
+      });
+
+      expect(matchMedia).toHaveBeenCalledWith(
+        "(prefers-reduced-motion: reduce)",
+      );
+      expect(hostStyle()).toMatchObject({ opacity: 0, transform: "none" });
+
+      act(() => {
+        tree.unmount();
+      });
+      delete (window as { matchMedia?: unknown }).matchMedia;
+      jest.useRealTimers();
     });
   });
 });
