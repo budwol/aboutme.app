@@ -53,6 +53,30 @@ describe("WnaSectionTitle", () => {
     expect(tree!.root.findAllByType("WnaAccentBar")).toHaveLength(0);
   });
 
+  it("renders only the subtitle, without its leading separator, when showTitle is false", () => {
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaSectionTitle
+          appColors={appColors}
+          appStyle={appStyle}
+          title="Hidden title"
+          subtitle="SUBTITLE"
+          showTitle={false}
+        />,
+      );
+    });
+
+    expect(
+      tree!.root
+        .findAllByType("span")
+        .map((node: { props: { children?: unknown } }) => node.props.children),
+    ).toEqual(["SUBTITLE"]);
+    // Only the trailing separator below the subtitle remains.
+    expect(tree!.root.findAllByType("WnaSeparatorHorizontal")).toHaveLength(1);
+  });
+
   it("renders the subtitle without the accent bar by default", () => {
     let tree: ReturnType<typeof TestRenderer.create> | undefined;
 

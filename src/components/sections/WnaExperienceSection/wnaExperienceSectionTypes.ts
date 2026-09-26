@@ -3,6 +3,7 @@ import { AppData } from "@/app-data";
 
 export type WnaExperienceSectionProps = WnaSectionProps & {
   maxItems?: number;
+  showTitle?: boolean;
   showDetails?: boolean;
   expandAllDetailsByDefault?: boolean;
   footerActionLabel?: string;
