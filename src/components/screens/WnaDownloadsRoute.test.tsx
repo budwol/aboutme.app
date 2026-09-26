@@ -167,12 +167,18 @@ describe("WnaDownloadsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         coolgray2: "#ccc",
+        coolgray5: "#999",
         background: "#fff",
         text: "#000",
         red4: "#f75056",
         yellow4: "#fff000",
+        accent4: "#61afa7",
       },
-      appStyle: { textNeutralMedium: {}, textNeutralSubtitle: {} },
+      appStyle: {
+        textNeutralMedium: {},
+        textNeutralSubtitle: {},
+        textNeutralTitleLarge: {},
+      },
     });
     appContext.useWnaAppData.mockReturnValue({ appData: testAppData });
   });
@@ -276,13 +282,19 @@ describe("WnaDownloadsRoute", () => {
     appContext.useWnaTheme.mockReturnValue({
       appColors: {
         coolgray2: "#ccc",
+        coolgray5: "#999",
         background: "#000",
         text: "#fff",
         red4: "#f75056",
         yellow4: "#fff000",
+        accent4: "#61afa7",
         isDark: true,
       },
-      appStyle: { textNeutralMedium: {}, textNeutralSubtitle: {} },
+      appStyle: {
+        textNeutralMedium: {},
+        textNeutralSubtitle: {},
+        textNeutralTitleLarge: {},
+      },
     });
 
     const tree = renderRoute();

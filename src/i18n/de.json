@@ -43,6 +43,7 @@
     "documentsCategoryCertificates": "Zertifikate",
     "documentsCategoryDiplomas": "Zeugnisse",
     "downloadsBody": "Passwortgeschützter Bereich mit Lebenslauf und Bewerbungsunterlagen.",
+    "downloadsUnlockTitle": "Geschützter Bereich",
     "errorIncorrectPassword": "Falsches Passwort",
     "errorNoInternet": "Du bist gerade offline",
     "errorUnknown": "Das hätte nicht passieren sollen",

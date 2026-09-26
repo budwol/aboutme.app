@@ -43,6 +43,7 @@ const i18nKeys = {
   documentsCategoryCertificates: "documentsCategoryCertificates",
   documentsCategoryDiplomas: "documentsCategoryDiplomas",
   downloadsBody: "downloadsBody",
+  downloadsUnlockTitle: "downloadsUnlockTitle",
   errorIncorrectPassword: "errorIncorrectPassword",
   errorNoInternet: "errorNoInternet",
   errorUnknown: "errorUnknown",
