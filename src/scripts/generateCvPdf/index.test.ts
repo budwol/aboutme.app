@@ -294,7 +294,7 @@ describe("generate-cv-pdf", () => {
     assertPdf(result.deTargetFile);
   });
 
-  it("links every variant's footer to the other three documents, but never to itself", async () => {
+  it("links every variant's footer to the other three documents' stable detail-page URLs, but never to itself", async () => {
     const fixtureRoot = createFixtureRoot();
     writeAppData(fixtureRoot, {
       profile: { name: "Jane Example" },
@@ -307,12 +307,19 @@ describe("generate-cv-pdf", () => {
     const designedPdf = fs.readFileSync(result.deTargetFile).toString("latin1");
     const atsPdf = fs.readFileSync(result.deAtsTargetFile).toString("latin1");
 
-    const cvUrl = "https://example.com/files/DE/Jane_Example_-_Lebenslauf.pdf";
-    const cvAtsUrl =
-      "https://example.com/files/DE/Jane_Example_-_Lebenslauf_ATS.pdf";
-    const portfolioUrl = "https://example.com/DE/Jane_Example_-_Portfolio.pdf";
+    // Every link points at the stable /bewerbungsunterlagen/<word> detail
+    // page (WnaDownloadDetailRoute) rather than a raw file URL -- so the PDF
+    // never has to know the DE/EN subfolder or /files/-vs-public-root split
+    // a raw path would otherwise bake in. The trailing ")" (a PDF URI
+    // annotation's own closing delimiter, confirmed against a generated
+    // file's raw bytes) matters here: "Lebenslauf" is otherwise a substring
+    // of "Lebenslauf_ATS", which would make a bare `.not.toContain(cvUrl)`
+    // pass trivially against a PDF that only actually links to cvAtsUrl.
+    const cvUrl = "https://example.com/bewerbungsunterlagen/Lebenslauf)";
+    const cvAtsUrl = "https://example.com/bewerbungsunterlagen/Lebenslauf_ATS)";
+    const portfolioUrl = "https://example.com/bewerbungsunterlagen/Portfolio)";
     const portfolioAtsUrl =
-      "https://example.com/DE/Jane_Example_-_Portfolio_ATS.pdf";
+      "https://example.com/bewerbungsunterlagen/Portfolio_ATS)";
 
     // Designed CV: links to its own ats companion and both Portfolio
     // variants, never to itself.
