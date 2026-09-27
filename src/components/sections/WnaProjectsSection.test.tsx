@@ -96,6 +96,7 @@ describe("WnaProjectsSection", () => {
         {
           ...testAppData.projects[0],
           title: "Project 2",
+          imagePosition: "center 10%",
           imageM: "project-2-medium.png",
           imageS: "project-2.png",
         },
@@ -146,6 +147,7 @@ describe("WnaProjectsSection", () => {
       `images/${appData.projects[1].imageS}`,
     );
     expect(cards[1].props.text1).toBe("Project 2");
+    expect(cards[1].props.imageContentPosition).toBe("center 10%");
   });
 
   it("calls the provided project press handler with the matching index", () => {

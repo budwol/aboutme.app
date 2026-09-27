@@ -9,7 +9,7 @@ import { convertHexToRgba } from "@utils/colorConverter";
 
 interface WnaHeroImageProps extends Pick<
   WnaImageProps,
-  "priority" | "responsivePolicy" | "style"
+  "contentPosition" | "priority" | "responsivePolicy" | "style"
 > {
   appColors: Colors;
   imageUrl: string;

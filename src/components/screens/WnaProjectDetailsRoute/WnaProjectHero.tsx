@@ -159,6 +159,7 @@ export default function WnaProjectHero({
       appColors={appColors}
       imageUrl={`images/${getProjectImageForWidth(project, currentWindowWidth)}`}
       imageTitle={project.title}
+      contentPosition={project.imagePosition}
     />,
   );
 }

@@ -36,6 +36,17 @@ function asRepoVisibility(
   return value === "private" || value === "public" ? value : fallback;
 }
 
+// Keywords and lengths only, up to the four values object-position takes.
+// Anything else (a typo, a stray url() or expression) is dropped so the
+// image falls back to its centred default instead of an invalid style.
+const imagePositionPattern =
+  /^(?:(?:left|right|top|bottom|center|-?\d+(?:\.\d+)?(?:%|px)?)(?:\s+|$)){1,4}$/i;
+
+function asImagePosition(value: unknown): string | undefined {
+  const position = firstNonEmptyString(value)?.trim();
+  return position && imagePositionPattern.test(position) ? position : undefined;
+}
+
 function normalizeProjectEntry(
   entry: ProjectEntryInput,
   lang: SupportedLang,
@@ -96,6 +107,7 @@ function normalizeProjectEntry(
     imageL: asString(entry.imageL, defaultProjectEntry.imageL),
     imageM: asString(entry.imageM, defaultProjectEntry.imageM),
     imageS: asString(entry.imageS, defaultProjectEntry.imageS),
+    imagePosition: asImagePosition(entry.imagePosition),
   };
 }
 

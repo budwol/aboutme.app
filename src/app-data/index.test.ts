@@ -280,6 +280,29 @@ describe("normalizeAppData", () => {
     expect(data).toEqual(normalizeAppData(defaultAppData, "en"));
   });
 
+  it("keeps valid project image positions and drops invalid ones", () => {
+    const data = normalizeAppData(
+      {
+        projects: [
+          { titleEn: "Keyword and percentage", imagePosition: " center 10% " },
+          { titleEn: "Four values", imagePosition: "right 8px bottom -2.5%" },
+          { titleEn: "Expression", imagePosition: "url(evil.png)" },
+          { titleEn: "Too many values", imagePosition: "1% 2% 3% 4% 5%" },
+          { titleEn: "Missing" },
+        ],
+      },
+      "en",
+    );
+
+    expect(data.projects.map((project) => project.imagePosition)).toEqual([
+      "center 10%",
+      "right 8px bottom -2.5%",
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
   it("filters out project highlights missing an icon or text", () => {
     const data = normalizeAppData(
       {

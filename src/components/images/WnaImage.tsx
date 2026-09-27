@@ -26,6 +26,7 @@ export type WnaImageProps = {
   showActivityIndicator?: boolean;
   grayScale?: boolean;
   contentFit?: "contain" | "cover";
+  contentPosition?: string;
   overwriteAnimationSpeed?: number;
   priority?: "low" | "normal" | "high";
   responsivePolicy?: "static" | "live";
@@ -108,6 +109,7 @@ function shouldRenderImage(prevProps: WnaImageProps, nextProps: WnaImageProps) {
     nextProps.thumbnailUrl !== prevProps.thumbnailUrl ||
     nextProps.grayScale !== prevProps.grayScale ||
     nextProps.contentFit !== prevProps.contentFit ||
+    nextProps.contentPosition !== prevProps.contentPosition ||
     nextProps.showActivityIndicator !== prevProps.showActivityIndicator ||
     nextProps.overwriteAnimationSpeed !== prevProps.overwriteAnimationSpeed ||
     nextProps.priority !== prevProps.priority ||
@@ -191,6 +193,7 @@ function WnaImage(props: WnaImageProps) {
         altText={altText}
         grayScale={props.grayScale}
         contentFit={contentFit}
+        contentPosition={props.contentPosition}
         overwriteAnimationSpeed={props.overwriteAnimationSpeed}
         priority={props.priority}
         responsivePolicy={props.responsivePolicy}

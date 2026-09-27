@@ -32,6 +32,9 @@ export type WnaImageElementProps = {
   style?: WnaImageStyle;
   grayScale?: boolean;
   contentFit?: "contain" | "cover";
+  // CSS object-position; which part of the image stays visible when
+  // contentFit="cover" crops it. Defaults to the browser's "50% 50%".
+  contentPosition?: string;
   overwriteAnimationSpeed?: number;
   priority?: "low" | "normal" | "high";
   responsivePolicy?: "static" | "live";

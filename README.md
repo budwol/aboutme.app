@@ -179,6 +179,14 @@ convert source.png -resize 300x150!  images/myproject_300_150.webp
 
 Drop the results into `.aboutme/images/` and point the three fields in `app-data.json` at them. If you do not have an image yet, `default_project.webp` works fine as a placeholder for all three.
 
+The project detail header and the wide cards on the home page are closer to 4:1, so they show only the middle half of the image. If your subject sits higher or lower, like a portrait near the top, gently nudge the visible part with the optional `imagePosition` field. It takes a CSS `object-position` value:
+
+```json
+"imagePosition": "center 10%"
+```
+
+`0%` shows the top edge, `100%` the bottom, and without the field the image stays centred. Only keywords (`top`, `center`, `left`, …) and numbers with `%` or `px` are accepted; anything else is ignored.
+
 ## Deployment
 
 If you are just using this as a portfolio template, you can ignore Docker for a while. The normal path is:

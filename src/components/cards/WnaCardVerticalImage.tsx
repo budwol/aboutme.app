@@ -12,6 +12,7 @@ export type WnaCardVerticalImageProps = WnaBaseCardProps &
     contentMinHeight?: number;
     height?: number;
     imageUrl?: string;
+    imageContentPosition?: string;
     text1?: string;
     text2?: string;
     width?: number;
@@ -23,6 +24,7 @@ const WnaCardVerticalImageComponent: FC<WnaCardVerticalImageProps> = ({
   contentMinHeight,
   height,
   imageUrl,
+  imageContentPosition,
   text1,
   text2,
   width,
@@ -46,6 +48,7 @@ const WnaCardVerticalImageComponent: FC<WnaCardVerticalImageProps> = ({
       appColors={appColors}
       imageUrl={imageUrl ?? ""}
       contentFit={"cover"}
+      contentPosition={imageContentPosition}
       style={{ width: cardWidth, height: cardHeight }}
     />,
     React.createElement(
@@ -80,7 +83,8 @@ const WnaCardVerticalImage = memo(
     prevProps.text2 === nextProps.text2 &&
     prevProps.height === nextProps.height &&
     prevProps.width === nextProps.width &&
-    prevProps.imageUrl === nextProps.imageUrl,
+    prevProps.imageUrl === nextProps.imageUrl &&
+    prevProps.imageContentPosition === nextProps.imageContentPosition,
 );
 
 WnaCardVerticalImage.displayName = "WnaCardVerticalImage";

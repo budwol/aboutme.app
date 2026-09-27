@@ -392,6 +392,7 @@ describe("WnaProjectDetailsRoute", () => {
           ...testAppData.projects[0],
           repoVisibility: "public",
           context: "Part of a cohesive fullstack system",
+          imagePosition: "center 10%",
           webUrl: "https://app.example.com",
           playStoreUrl: "https://play.example.com",
         },
@@ -426,6 +427,7 @@ describe("WnaProjectDetailsRoute", () => {
     expect(heroImage.props.imageUrl).toBe(
       `images/${appData.projects[0].imageL}`,
     );
+    expect(heroImage.props.contentPosition).toBe("center 10%");
     expect(title.props.title).toBe(appData.projects[0].title);
     expect(title.props.subtitle).toBe(appData.projects[0].context);
     expect(textValues).toContain(appData.projects[0].subtitle);

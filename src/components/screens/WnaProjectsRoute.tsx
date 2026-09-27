@@ -503,6 +503,7 @@ export default function WnaProjectsRoute(): ReactNode {
               appColors={appColors}
               imageUrl={`images/${getProjectImageForWidth(item, projectImageWidth)}`}
               imageTitle={item.title}
+              contentPosition={item.imagePosition}
               showGradient={true}
               borderRadius={0}
               style={[

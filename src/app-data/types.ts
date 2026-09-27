@@ -34,6 +34,9 @@ export type ProjectEntry = {
   imageL: string;
   imageM: string;
   imageS: string;
+  // CSS object-position for the project image wherever it is cropped
+  // (detail hero, wide cards), e.g. "center 10%". See ADR 0029.
+  imagePosition?: string;
 };
 
 export type AppData = {

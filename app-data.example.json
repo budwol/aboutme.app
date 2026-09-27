@@ -126,7 +126,8 @@
       "techstack": ["Python", "React", "PostgreSQL"],
       "imageL": "default_project.webp",
       "imageM": "default_project.webp",
-      "imageS": "default_project.webp"
+      "imageS": "default_project.webp",
+      "imagePosition": "center 30%"
     }
   ],
   "experienceSubtitleDe": "Beruflicher Werdegang",

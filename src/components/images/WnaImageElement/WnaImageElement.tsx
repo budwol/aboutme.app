@@ -53,6 +53,7 @@ function WnaImageElement(props: WnaImageElementProps) {
   const imageStyle = {
     ...style,
     objectFit: props.contentFit ?? "cover",
+    objectPosition: props.contentPosition,
     filter: props.grayScale ? "grayscale(100%)" : undefined,
     opacity: isLoaded ? 1 : 0,
     transition: `opacity ${props.overwriteAnimationSpeed ?? appMotionConstants.defaultAnimationDuration}ms ease`,

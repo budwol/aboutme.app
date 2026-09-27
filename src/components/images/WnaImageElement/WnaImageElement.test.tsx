@@ -24,6 +24,7 @@ describe("WnaImageElement", () => {
           altText="B"
           grayScale
           contentFit="contain"
+          contentPosition="center 10%"
         />,
       );
     });
@@ -33,6 +34,7 @@ describe("WnaImageElement", () => {
     expect(image.props.src).toBe("/image-b.webp");
     expect(image.props.alt).toBe("B");
     expect(image.props.style.objectFit).toBe("contain");
+    expect(image.props.style.objectPosition).toBe("center 10%");
   });
 
   it("flattens nested and conditional styles for the DOM image", () => {

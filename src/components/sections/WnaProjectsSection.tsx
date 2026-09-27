@@ -214,6 +214,7 @@ export default function WnaProjectsSection({
               appColors={appColors}
               appStyle={appStyle}
               imageUrl={`images/${getProjectImageForWidth(project, width)}`}
+              imageContentPosition={project.imagePosition}
               text1={project.title}
               text2={project.subtitle}
             />
