@@ -1,6 +1,12 @@
 import { test } from "@playwright/test";
 import { LegalPage } from "../../../helpers/page-objects/legal.page";
 import { MenuPage } from "../../../helpers/page-objects/menu.page";
+import { featureFlags } from "../../../../src/constants/featureFlags";
+
+test.skip(
+  !featureFlags.thirdPartyLicenses,
+  "The licenses page is hidden behind featureFlags.thirdPartyLicenses",
+);
 
 test("user opens the licenses page from the menu", async ({ page }) => {
   const menuPage = new MenuPage(page);

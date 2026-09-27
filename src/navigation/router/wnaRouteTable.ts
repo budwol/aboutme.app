@@ -6,6 +6,7 @@ import {
 } from "@/navigation/routes/wnaNavigationRoutes";
 import { getProjectPathSegment } from "@utils/projectRoutes";
 import WnaHomeRoute from "@components/screens/WnaHomeRoute";
+import { featureFlags } from "@constants/featureFlags";
 
 export type WnaRouteMatch = {
   // A route table intentionally mixes components with different prop
@@ -95,6 +96,12 @@ const WnaDownloadDetailRoute = lazyRoute(
 
 const staticRouteMap = new Map<string, ComponentType>();
 for (const key of Object.keys(routeDefinitions) as WnaRouteKey[]) {
+  // A hidden feature's page stays in the codebase but isn't reachable, not
+  // even by direct URL -- an old link falls through to WnaRoutes' redirect
+  // to the home page. See src/constants/featureFlags.ts.
+  if (key === "licenses" && !featureFlags.thirdPartyLicenses) {
+    continue;
+  }
   const Component = routeComponents[key];
   for (const path of Object.values(routeDefinitions[key])) {
     staticRouteMap.set(path, Component);

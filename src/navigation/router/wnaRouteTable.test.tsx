@@ -11,6 +11,23 @@ function mockScreen(name: string) {
   };
 }
 
+// Every route's resolution (including the licenses page's lazy import) is
+// still tested with its feature turned on; the hidden state has its own
+// test below.
+// `var`, not `let`/`const`: wnaRouteTable reads the flag while being
+// imported, i.e. before this file's own top-level code has run, and a
+// hoisted `var` is merely `undefined` at that point instead of throwing.
+// eslint-disable-next-line no-var
+var mockThirdPartyLicenses: boolean | undefined;
+
+jest.mock("@constants/featureFlags", () => ({
+  featureFlags: {
+    get thirdPartyLicenses() {
+      return mockThirdPartyLicenses ?? true;
+    },
+  },
+}));
+
 jest.mock("@components/screens/WnaMenuRoute", () => ({
   __esModule: true,
   default: mockScreen("WnaMenuRoute"),
@@ -187,6 +204,29 @@ describe("matchRoute", () => {
 
   it("returns undefined for an unknown path", () => {
     expect(matchRoute("/this-page-does-not-exist")).toBeUndefined();
+  });
+
+  it("doesn't register the licenses page while its feature flag is off", () => {
+    // The route map is built once at module load, so this needs its own
+    // module instance with the flag off.
+    let isolatedMatchRoute!: typeof matchRoute;
+    mockThirdPartyLicenses = false;
+    try {
+      jest.isolateModules(() => {
+        isolatedMatchRoute = (
+          jest.requireActual("@/navigation/router/wnaRouteTable") as {
+            matchRoute: typeof matchRoute;
+          }
+        ).matchRoute;
+      });
+    } finally {
+      mockThirdPartyLicenses = undefined;
+    }
+
+    // Unmatched -> WnaRoutes redirects an old link to the home page.
+    expect(isolatedMatchRoute("/menu/lizenzen")).toBeUndefined();
+    expect(isolatedMatchRoute("/menu/third-party-licenses")).toBeUndefined();
+    expect(isolatedMatchRoute("/menu/nutzungsbedingungen")).toBeDefined();
   });
 
   it.each([

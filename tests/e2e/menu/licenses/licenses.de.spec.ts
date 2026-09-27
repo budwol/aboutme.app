@@ -1,5 +1,11 @@
 import { test } from "@playwright/test";
 import { LegalPage } from "../../../helpers/page-objects/legal.page";
+import { featureFlags } from "../../../../src/constants/featureFlags";
+
+test.skip(
+  !featureFlags.thirdPartyLicenses,
+  "The licenses page is hidden behind featureFlags.thirdPartyLicenses",
+);
 
 test.use({ locale: "de-DE" });
 

@@ -6,6 +6,15 @@ import TestRenderer, { act } from "react-test-renderer";
 const mockNavigate = jest.fn();
 const mockSetTheme = jest.fn();
 const mockSetAppColors = jest.fn();
+const mockFeatureFlags = { thirdPartyLicenses: true };
+
+jest.mock("@constants/featureFlags", () => ({
+  // `get` so each test's value is read at render time, not captured at
+  // module-eval time before the `const` above has run.
+  get featureFlags() {
+    return mockFeatureFlags;
+  },
+}));
 
 jest.mock("@/state/WnaAppContext", () => ({
   useWnaAppLifecycle: jest.fn(() => ({ isAppInitialized: true })),
@@ -124,6 +133,28 @@ jest.mock("@components/screens/WnaScrollViewScreen", () => {
 });
 
 describe("WnaMenuRoute", () => {
+  it("hides the licenses entry while the feature flag is off", async () => {
+    mockNavigate.mockClear();
+    mockFeatureFlags.thirdPartyLicenses = false;
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(<WnaMenuRoute />);
+    });
+
+    const items = tree!.root.findAllByType("WnaNavigationItem");
+
+    expect(
+      items.map((item: { props: { text: string } }) => item.props.text),
+    ).not.toContain("screenTitleLicenses");
+    // Terms becomes the card's last row, so its bottom corners round off.
+    expect(items[items.length - 1].props.text).toBe("screenTitleTerms");
+    expect(items[items.length - 1].props.type).toBe("last");
+
+    mockFeatureFlags.thirdPartyLicenses = true;
+  });
+
   it("uses localized drawer paths for legal navigation entries", async () => {
     mockNavigate.mockClear();
 

@@ -90,13 +90,14 @@ describe("WnaMenuRoute integration", () => {
     const tree = await renderWithAppContext(<WnaMenuRoute />);
     const items = tree.root.findAllByType("WnaNavigationItem");
 
-    expect(items).toHaveLength(5);
+    // Theme + three legal entries -- the licenses entry is hidden behind
+    // featureFlags.thirdPartyLicenses (src/constants/featureFlags.ts).
+    expect(items).toHaveLength(4);
 
     await act(async () => {
       items[1].props.onPress();
       items[2].props.onPress();
       items[3].props.onPress();
-      items[4].props.onPress();
     });
 
     expect(mockNavigate).toHaveBeenNthCalledWith(1, "/menu/impressum");
@@ -105,7 +106,7 @@ describe("WnaMenuRoute integration", () => {
       3,
       "/menu/nutzungsbedingungen",
     );
-    expect(mockNavigate).toHaveBeenNthCalledWith(4, "/menu/lizenzen");
+    expect(mockNavigate).toHaveBeenCalledTimes(3);
   });
 
   it("forwards the theme action through the theme toggle helper", async () => {

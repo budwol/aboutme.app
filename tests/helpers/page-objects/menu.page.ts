@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { exampleAppData } from "../../fixtures/example-app-data";
+import { featureFlags } from "../../../src/constants/featureFlags";
 import { BasePage } from "./base.page";
 
 export class MenuPage extends BasePage {
@@ -19,7 +20,11 @@ export class MenuPage extends BasePage {
     await expect(this.body()).toContainText(exampleAppData.menu.disclaimer);
     await expect(this.body()).toContainText(exampleAppData.menu.privacy);
     await expect(this.body()).toContainText(exampleAppData.menu.terms);
-    await expect(this.body()).toContainText(exampleAppData.menu.licenses);
+    if (featureFlags.thirdPartyLicenses) {
+      await expect(this.body()).toContainText(exampleAppData.menu.licenses);
+    } else {
+      await expect(this.body()).not.toContainText(exampleAppData.menu.licenses);
+    }
   }
 
   async assertAccessibility() {

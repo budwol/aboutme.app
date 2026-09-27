@@ -16,6 +16,7 @@ import { router } from "@/navigation/router/wnaRouter";
 import React, { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useBrowserColorScheme } from "@utils/useBrowserColorScheme";
+import { featureFlags } from "@constants/featureFlags";
 import WnaScrollViewScreen from "@components/screens/WnaScrollViewScreen";
 
 export default function WnaMenuRoute(): ReactNode {
@@ -113,23 +114,25 @@ export default function WnaMenuRoute(): ReactNode {
           appColors={appColors}
           text={t(i18nKeys.screenTitleTerms)}
           iconName={"file-sign"}
-          type={"middle"}
+          type={featureFlags.thirdPartyLicenses ? "middle" : "last"}
           onPress={() =>
             navigationRouter.navigate(getNavigationPath("terms", lang))
           }
           t={t}
         />
-        <WnaNavigationItem
-          appStyle={appStyle}
-          appColors={appColors}
-          text={t(i18nKeys.screenTitleLicenses)}
-          iconName={"certificate-outline"}
-          type={"last"}
-          onPress={() =>
-            navigationRouter.navigate(getNavigationPath("licenses", lang))
-          }
-          t={t}
-        />
+        {featureFlags.thirdPartyLicenses ? (
+          <WnaNavigationItem
+            appStyle={appStyle}
+            appColors={appColors}
+            text={t(i18nKeys.screenTitleLicenses)}
+            iconName={"certificate-outline"}
+            type={"last"}
+            onPress={() =>
+              navigationRouter.navigate(getNavigationPath("licenses", lang))
+            }
+            t={t}
+          />
+        ) : null}
       </WnaSurfaceCard>
     </WnaScrollViewScreen>
   );
