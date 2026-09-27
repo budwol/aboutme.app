@@ -77,6 +77,8 @@ describe("normalizeAppData", () => {
             titleEn: "Custom Project",
             contextDe: "Deutscher Projektkontext",
             contextEn: "English project context",
+            detailsContextDe: "Deutscher Detailkontext",
+            detailsContextEn: "English details context",
             descriptionDe: "Deutsche Beschreibung",
             descriptionEn: "English description",
             repoUrl: "https://github.com/example/custom-project",
@@ -118,6 +120,7 @@ describe("normalizeAppData", () => {
     expect(data.projects[0]).toMatchObject({
       title: "Custom Project",
       context: "English project context",
+      detailsContext: "English details context",
       description: "English description",
       repoUrl: "https://github.com/example/custom-project",
       repoVisibility: "private",

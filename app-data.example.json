@@ -117,6 +117,8 @@
       "subtitleEn": "Store for Code Snippets",
       "contextDe": "Konzeptstudie für Verkauf, Bewertung und Verwaltung digitaler Produkte.",
       "contextEn": "Concept study for selling, reviewing, and managing digital products.",
+      "detailsContextDe": "Diese Konzeptstudie steht für sich und gehört nicht zum übrigen Portfolio.",
+      "detailsContextEn": "This concept study stands on its own and is not part of the rest of the portfolio.",
       "descriptionDe": "Konzept für eine Plattform zum Kaufen, Verkaufen und Bewerten von Code-Snippets.",
       "descriptionEn": "Concept for a platform to buy, sell, and review code snippets.",
       "repoUrl": "https://github.com/JohnDoe/code-snippet-store",

@@ -66,6 +66,15 @@ function normalizeProjectEntry(
         entry.contextEn,
       ),
     ),
+    detailsContext: firstNonEmptyString(
+      getLocalizedString(
+        lang,
+        "",
+        entry.detailsContext,
+        entry.detailsContextDe,
+        entry.detailsContextEn,
+      ),
+    ),
     description: firstNonEmptyString(
       getLocalizedString(
         lang,

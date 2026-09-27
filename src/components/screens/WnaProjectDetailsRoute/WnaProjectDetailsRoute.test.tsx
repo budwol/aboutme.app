@@ -958,6 +958,44 @@ describe("WnaProjectDetailsRoute", () => {
     expect(textValues).toContain("Solo side project");
   });
 
+  it("prefers the project's own details context over the shared one", async () => {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaAppData: jest.Mock;
+    };
+    const appData = {
+      ...testAppData,
+      projects: [
+        {
+          ...testAppData.projects[0],
+          detailsContext: "Standalone project outside the shared system",
+        },
+      ],
+    };
+
+    appContext.useWnaAppData.mockReturnValue({ appData });
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        <WnaProjectDetailsRoute
+          slug={createProjectSlug(appData.projects[0].title, 0)}
+        />,
+      );
+    });
+
+    const textValues = tree!.root
+      .findAllByType("span")
+      .map(
+        (node: { props: { children?: React.ReactNode } }) =>
+          node.props.children,
+      );
+
+    expect(textValues).toContain(
+      "Standalone project outside the shared system",
+    );
+    expect(textValues).not.toContain(appData.projectDetailsContext);
+  });
+
   it("omits the optional sections when techstack, context, and description are absent", async () => {
     const appContext = jest.requireMock("@/state/WnaAppContext") as {
       useWnaAppData: jest.Mock;

@@ -56,6 +56,8 @@ export default function WnaProjectDetailsRoute({
 
   const { project } = projectMatch;
   const lang = getNavigationLang(getLangCode());
+  const detailsContext =
+    project.detailsContext ?? appData.projectDetailsContext;
   const privateRepoMailToUrl = `mailto:${appData.contact.email}?subject=${encodeURIComponent(
     `Repository review: ${project.title}`,
   )}&body=${encodeURIComponent(
@@ -150,11 +152,11 @@ export default function WnaProjectDetailsRoute({
             React.createElement(
               "div",
               { style: styles.contentSection as CSSProperties },
-              appData.projectDetailsContext ? (
+              detailsContext ? (
                 <WnaProjectDetailsContext
                   appColors={appColors}
                   appStyle={appStyle}
-                  context={appData.projectDetailsContext}
+                  context={detailsContext}
                 />
               ) : null,
               project.description ? (

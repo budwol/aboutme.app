@@ -23,6 +23,7 @@ export type ProjectEntry = {
   title: string;
   subtitle?: string;
   context?: string;
+  detailsContext?: string;
   description?: string;
   repoUrl?: string;
   repoVisibility?: RepoVisibility;
@@ -83,6 +84,8 @@ export type ProjectEntryInput = Partial<ProjectEntry> & {
   subtitleEn?: string;
   contextDe?: string;
   contextEn?: string;
+  detailsContextDe?: string;
+  detailsContextEn?: string;
   descriptionDe?: string;
   descriptionEn?: string;
 };
