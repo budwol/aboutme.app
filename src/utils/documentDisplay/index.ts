@@ -18,6 +18,13 @@ export const DOCUMENT_LABEL_KEYS: Record<DocumentKind, string> = {
   portfolioAtsEn: i18nKeys.documentPortfolioAtsEn,
 };
 
+// Every DocumentKind ends in De/En -- the language the document itself is
+// written in. Its label is translated into that language rather than the
+// site's current one, so the English card reads "CV" even on the German site.
+export function getDocumentLang(kind: DocumentKind): "de" | "en" {
+  return kind.endsWith("De") ? "de" : "en";
+}
+
 // The manifest only ever contains these two file types (PDF documents, one
 // ZIP per language), so the icon is keyed off document kind rather than
 // parsing the URL.

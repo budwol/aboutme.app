@@ -7,7 +7,7 @@ import WnaButtonIconText from "@components/buttons/WnaButtonIconText";
 import WnaDocumentsUnlockGate from "@components/documents/WnaDocumentsUnlockGate";
 import { useDocumentsAuth } from "@/hooks/useDocumentsAuth";
 import { DocumentKind, getDocumentsManifest } from "@utils/documentsManifest";
-import { DOCUMENT_LABEL_KEYS } from "@utils/documentDisplay";
+import { DOCUMENT_LABEL_KEYS, getDocumentLang } from "@utils/documentDisplay";
 import { appLayoutConstants } from "@constants/layoutConstants";
 import { i18nKeys } from "@/i18n/i18nKeys";
 import {
@@ -99,8 +99,8 @@ export default function WnaDownloadDetailRoute({
   const entry = getDocumentsManifest(appData.profile.name).find(
     (document) => document.kind === kind,
   )!;
-  const lang: WnaRouteLang = kind.endsWith("De") ? "de" : "en";
-  const label = t(DOCUMENT_LABEL_KEYS[kind]);
+  const lang: WnaRouteLang = getDocumentLang(kind);
+  const label = t(DOCUMENT_LABEL_KEYS[kind], { lng: lang });
   const fileName = getFileNameFromUrl(entry.url);
   const isProtected = isProtectedDocumentUrl(entry.url);
 

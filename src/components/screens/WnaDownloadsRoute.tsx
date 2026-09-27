@@ -17,6 +17,7 @@ import {
   DOCUMENT_ICON_NAMES,
   DOCUMENT_LABEL_KEYS,
   getDocumentIconColors,
+  getDocumentLang,
 } from "@utils/documentDisplay";
 import {
   groupReferenceDocumentsByCategory,
@@ -298,7 +299,9 @@ function buildLanguageSectionRows(
     .map((entry) => ({
       rowKey: entry.kind,
       label: appendSizeLabel(
-        t(DOCUMENT_LABEL_KEYS[entry.kind]),
+        t(DOCUMENT_LABEL_KEYS[entry.kind], {
+          lng: getDocumentLang(entry.kind),
+        }),
         lookupDocumentSize(documentSizes, entry.url),
       ),
       iconName: DOCUMENT_ICON_NAMES[entry.kind],
