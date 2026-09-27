@@ -26,7 +26,14 @@ module.exports = {
     "<rootDir>/tests/e2e/",
     "/playwright-report/",
     "/test-results/",
+    // Git worktrees (e.g. Claude Code's) live under .claude/ inside the
+    // checkout. Their copies of the tests would otherwise run here too, and
+    // resolve their @-aliases against this checkout's src/ instead of their
+    // own. <rootDir>-anchored, so a run from inside a worktree still finds
+    // that worktree's own tests.
+    "<rootDir>/.claude/",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.claude/"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/**/*.test.{ts,tsx}",
