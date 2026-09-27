@@ -55,6 +55,36 @@ jest.mock("@components/icon/WnaIcon/WnaIcon", () => {
   };
 });
 
+type ResizeObserverCallbackLike = (
+  entries: { target: { offsetWidth: number } }[],
+) => void;
+
+let resizeObserverCallback: ResizeObserverCallbackLike | undefined;
+const disconnectResizeObserver = jest.fn();
+
+class MockResizeObserver {
+  constructor(callback: ResizeObserverCallbackLike) {
+    resizeObserverCallback = callback;
+  }
+  observe() {}
+  disconnect() {
+    disconnectResizeObserver();
+  }
+}
+
+function emitGridWidth(width: number) {
+  act(() => {
+    resizeObserverCallback?.([{ target: { offsetWidth: width } }]);
+  });
+}
+
+function createProjects(count: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    ...testAppData.projects[0],
+    title: `Project ${index + 1}`,
+  }));
+}
+
 describe("WnaProjectsSection", () => {
   it("renders one project card per project entry", () => {
     const appData = {
@@ -270,6 +300,55 @@ describe("WnaProjectsSection", () => {
     expect(cards[0].props.imageUrl).toBe(
       `images/${testAppData.projects[0].imageS}`,
     );
+  });
+
+  it("widens the last card when the measured grid leaves one column free", () => {
+    const appContext = jest.requireMock("@/state/WnaAppContext") as {
+      useWnaLayout: jest.Mock;
+    };
+    appContext.useWnaLayout.mockReturnValue({ isLandscape: true });
+    const globalWithObserver = global as { ResizeObserver?: unknown };
+    const originalResizeObserver = globalWithObserver.ResizeObserver;
+    globalWithObserver.ResizeObserver = MockResizeObserver;
+
+    let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+    act(() => {
+      tree = TestRenderer.create(
+        <WnaProjectsSection
+          appColors={
+            {
+              warmgray6: "#999999",
+              coolgray2: "#cccccc",
+              accent5: "#0aa",
+            } as never
+          }
+          appData={{ ...testAppData, projects: createProjects(7) }}
+          appStyle={{} as never}
+          t={((value: string) => value) as never}
+        />,
+        { createNodeMock: () => ({ offsetWidth: 1060 }) },
+      );
+    });
+
+    const widths = () =>
+      tree!.root
+        .findAllByType("WnaCardVerticalImage")
+        .map((card: { props: { width: number } }) => card.props.width);
+
+    expect(widths()).toEqual([528, 256, 256, 256, 256, 256, 256]);
+
+    emitGridWidth(1060);
+    expect(widths()).toEqual([528, 256, 256, 256, 256, 256, 528]);
+
+    // The same column count again must not re-render into another layout.
+    emitGridWidth(1000);
+    expect(widths()).toEqual([528, 256, 256, 256, 256, 256, 528]);
+
+    act(() => tree!.unmount());
+    expect(disconnectResizeObserver).toHaveBeenCalled();
+
+    globalWithObserver.ResizeObserver = originalResizeObserver;
   });
 
   it("falls back to an empty subtitle when projectsSubtitle is missing", () => {

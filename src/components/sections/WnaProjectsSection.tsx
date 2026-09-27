@@ -8,10 +8,14 @@ import { appLayoutConstants } from "@constants/layoutConstants";
 import { sectionConstants } from "@constants/sectionConstants";
 import { convertHexToRgba } from "@utils/colorConverter";
 import { addToLineHeight } from "@utils/addToLineHeight";
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import WnaCardVerticalImage from "@components/cards/WnaCardVerticalImage";
 import { WnaSectionProps } from "@components/sections/wnaSectionProps";
 import { i18nKeys } from "@/i18n/i18nKeys";
+import {
+  getProjectCardSpans,
+  getProjectColumnCount,
+} from "@components/sections/wnaProjectsSectionLayout";
 
 const styles = {
   footerActionWrap: {
@@ -62,6 +66,33 @@ export default function WnaProjectsSection({
   const featuredCardWidth =
     cardWidth * 2 + sectionConstants.projectsCardGridGap;
   const useFeaturedFirstCard = isLandscape;
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [columnCount, setColumnCount] = useState<number | undefined>();
+
+  useEffect(() => {
+    const node = gridRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver((entries) => {
+      const nextColumnCount = getProjectColumnCount(
+        (entries[0].target as HTMLElement).offsetWidth,
+        cardWidth,
+        sectionConstants.projectsCardGridGap,
+      );
+      setColumnCount((current) =>
+        nextColumnCount !== current ? nextColumnCount : current,
+      );
+    });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [cardWidth]);
+
+  const cardSpans = getProjectCardSpans(
+    appData.projects.length,
+    columnCount,
+    useFeaturedFirstCard,
+  );
   return React.createElement(
     "div",
     {
@@ -149,6 +180,7 @@ export default function WnaProjectsSection({
     React.createElement(
       "div",
       {
+        ref: gridRef,
         style: {
           display: "flex",
           flexDirection: "row",
@@ -157,12 +189,14 @@ export default function WnaProjectsSection({
           gap: sectionConstants.projectsCardGridGap,
         } as CSSProperties,
       },
-      appData.projects.map((project, index) =>
-        React.createElement(
+      appData.projects.map((project, index) => {
+        const isFeatured = cardSpans[index] === 2;
+        const width = isFeatured ? featuredCardWidth : cardWidth;
+        return React.createElement(
           "div",
           {
             key: `${project.title}-${index}`,
-            style: (index === 0 && useFeaturedFirstCard
+            style: (isFeatured
               ? styles.projectItemFeatured
               : undefined) as CSSProperties,
           },
@@ -176,25 +210,16 @@ export default function WnaProjectsSection({
             <WnaCardVerticalImage
               contentMinHeight={cardContentMinHeight}
               height={cardHeight}
-              width={
-                index === 0 && useFeaturedFirstCard
-                  ? featuredCardWidth
-                  : cardWidth
-              }
+              width={width}
               appColors={appColors}
               appStyle={appStyle}
-              imageUrl={`images/${getProjectImageForWidth(
-                project,
-                index === 0 && useFeaturedFirstCard
-                  ? featuredCardWidth
-                  : cardWidth,
-              )}`}
+              imageUrl={`images/${getProjectImageForWidth(project, width)}`}
               text1={project.title}
               text2={project.subtitle}
             />
           </WnaPressable>,
-        ),
-      ),
+        );
+      }),
     ),
     onShowMorePress
       ? React.createElement(

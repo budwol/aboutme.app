@@ -33,3 +33,4 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0025](0025-document-links-open-a-detail-page.md)                | Document links open a per-document detail page instead of the raw file                   |
 | [0026](0026-hidden-features-use-feature-flags.md)                | Hidden features stay in the code behind a feature flag                                   |
 | [0027](0027-projects-can-override-the-shared-details-context.md) | Projects can override the shared details context                                         |
+| [0028](0028-home-project-grid-closes-its-last-row.md)            | The home page's project grid closes its last row                                         |
