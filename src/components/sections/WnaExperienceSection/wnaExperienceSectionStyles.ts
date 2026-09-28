@@ -87,6 +87,11 @@ export const styles = {
     paddingTop: 2,
   },
   dot: {
+    // timelineLine is absolutely positioned, and positioned elements paint
+    // after in-flow ones regardless of DOM order; without its own position
+    // and z-index the dot would sit underneath the translucent line.
+    position: "relative",
+    zIndex: 1,
     width: 12,
     height: 12,
     boxSizing: "border-box",
