@@ -379,8 +379,11 @@ describe("WnaHeader", () => {
       (node: { props: { id?: string } }) =>
         node.props.id === "wna-header-blur-container",
     );
+    const blur = tree!.root.findByType("WnaBlurView" as never);
 
-    expect(blurContainer.props.style.opacity).toBe(0.2);
+    // Fading the container would make it a backdrop root and kill the blur.
+    expect(blurContainer.props.style.opacity).toBeUndefined();
+    expect(blur.props.blurIntensity).toBeCloseTo(6);
   });
 
   it("forces the header shadow and blur fully hidden when showShadow is false", () => {
@@ -392,12 +395,9 @@ describe("WnaHeader", () => {
       );
     });
 
-    const blurContainer = tree!.root.find(
-      (node: { props: { id?: string } }) =>
-        node.props.id === "wna-header-blur-container",
-    );
+    const blur = tree!.root.findByType("WnaBlurView" as never);
 
-    expect(blurContainer.props.style.opacity).toBe(0);
+    expect(blur.props.blurIntensity).toBe(0);
   });
 
   it("caps the shadow and blur opacity once scroll passes the threshold", () => {
@@ -414,7 +414,10 @@ describe("WnaHeader", () => {
         node.props.id === "wna-header-blur-overlay",
     );
 
-    expect(blurOverlay.props.style.opacity).toBe(0.4);
+    const blur = tree!.root.findByType("WnaBlurView" as never);
+
+    expect(blurOverlay.props.style.opacity).toBeCloseTo(0.4 * 0.96);
+    expect(blur.props.blurIntensity).toBeCloseTo(30 * 0.96);
   });
 
   it("hides the back placeholder spacer to match portrait spacing on the root page", () => {

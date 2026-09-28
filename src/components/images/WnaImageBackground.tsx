@@ -57,6 +57,10 @@ const WnaImageBackground = React.memo(
         loading="eager"
         style={styles.webImage}
       />,
+      // The blur stays an empty layer next to the content, not around it:
+      // an element with backdrop-filter is a backdrop root, so any
+      // backdrop-filter inside it (the header's scroll blur) could only
+      // see what lies within this layer and would blur nothing.
       <WnaBlurView
         forceExperimentalBlur
         isBackground
@@ -64,9 +68,12 @@ const WnaImageBackground = React.memo(
         blurTint="dark"
         blurIntensity={40}
         backgroundOpacity={isDarkMode ? 0.72 : 0.55}
-      >
-        {children}
-      </WnaBlurView>,
+      />,
+      React.createElement(
+        "div",
+        { style: styles.contentLayer as CSSProperties },
+        children,
+      ),
     );
   },
 );
@@ -89,6 +96,18 @@ const styles = {
     right: 0,
     bottom: 0,
     overflow: "hidden",
+  },
+  // Same box as the blur layer, and the flex column WnaBlurView used to
+  // give the screens it wrapped.
+  contentLayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
   },
   webImage: {
     position: "absolute",

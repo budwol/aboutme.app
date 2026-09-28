@@ -35,3 +35,4 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0027](0027-projects-can-override-the-shared-details-context.md) | Projects can override the shared details context                                         |
 | [0028](0028-home-project-grid-closes-its-last-row.md)            | The home page's project grid closes its last row                                         |
 | [0029](0029-projects-can-set-an-image-position.md)               | Projects can set the visible part of their image                                         |
+| [0030](0030-backdrop-blurs-stay-outside-other-backdrop-roots.md) | Backdrop blurs stay outside other backdrop roots                                         |

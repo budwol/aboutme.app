@@ -12,6 +12,9 @@ import { WnaBlurView } from "@components/effects/WnaBlurView";
 import WnaMultilineHeader from "@components/chrome/WnaMultilineHeader";
 import { i18nKeys } from "@/i18n/i18nKeys";
 
+// WnaBlurView's 0-100 scale; 30 is a 6 px CSS blur once fully scrolled.
+const HEADER_BLUR_INTENSITY = 30;
+
 export type WnaHeaderProps = {
   headerTitle?: string;
   icon?: string;
@@ -69,12 +72,13 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
     const calculatedBlur = Math.min(1, Math.max(0, baseOpacity * 2.4));
     const blurOpacity =
       showShadow === true && calculatedBlur < 0.2 ? 0.2 : calculatedBlur;
-    const blurContainerStyle = {
-      opacity: blurOpacity,
-    };
-
+    // The blur fades in through its radius, not through the container's
+    // opacity: an ancestor with opacity < 1 is a backdrop root, which
+    // leaves backdrop-filter nothing to blur. The overlay keeps the
+    // darkening it had while it was nested in the faded container.
+    const blurIntensity = HEADER_BLUR_INTENSITY * blurOpacity;
     const blurOverlayStyle = {
-      opacity: baseOpacity,
+      opacity: baseOpacity * blurOpacity,
     };
 
     const handleBack = useCallback(() => {
@@ -163,12 +167,11 @@ export const WnaHeader: FC<WnaHeaderProps> = memo(
             style: {
               ...headerStyle,
               zIndex: 1,
-              ...blurContainerStyle,
             } as CSSProperties,
           },
           <WnaBlurView
             forceExperimentalBlur
-            blurIntensity={30}
+            blurIntensity={blurIntensity}
             blurTint="systemThickMaterial"
             style={headerStyle}
           />,
