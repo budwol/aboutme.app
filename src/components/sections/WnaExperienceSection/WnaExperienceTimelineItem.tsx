@@ -112,7 +112,12 @@ export default function WnaExperienceTimelineItem({
           {
             style: {
               ...styles.expandButton,
-              backgroundColor: accentSurfaceColor,
+              // The label keeps the accent hue; its contrast comes from the
+              // button surface instead: near-white with a hint of accent in
+              // light mode, darkened in dark mode (both above WCAG AA).
+              backgroundColor: appColors.isDark
+                ? convertHexToRgba(appColors.staticBlack, 0.35)
+                : convertHexToRgba(appColors.accent1, 0.85),
               borderColor: accentBorderColor,
             } as CSSProperties,
           },
@@ -122,7 +127,9 @@ export default function WnaExperienceTimelineItem({
               style: {
                 ...appStyle.textMicro,
                 ...styles.expandButtonText,
-                color: appColors.accent5,
+                // accent5 itself can't reach 4.5:1 on any light surface, so
+                // light mode uses the darkest shade that still reads as teal.
+                color: appColors.isDark ? appColors.accent5 : appColors.accent7,
               } as CSSProperties,
             },
             t(
@@ -130,7 +137,13 @@ export default function WnaExperienceTimelineItem({
                 ? i18nKeys.actionHideDetails
                 : i18nKeys.actionShowDetails,
             ),
-            isExpanded ? " ↑" : " ↓",
+            " ",
+            // A direction icon, not text: hidden from screen readers.
+            React.createElement(
+              "span",
+              { "aria-hidden": "true" },
+              isExpanded ? "↑" : "↓",
+            ),
           ),
         ),
       )

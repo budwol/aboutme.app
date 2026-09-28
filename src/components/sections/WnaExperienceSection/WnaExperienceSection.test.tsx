@@ -146,7 +146,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -187,7 +189,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -224,7 +228,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -252,6 +258,61 @@ describe("WnaExperienceSection", () => {
     expect(toggle).toBeDefined();
   });
 
+  it.each([
+    { isDark: false, expected: "#366" },
+    { isDark: true, expected: "#0aa" },
+  ])(
+    "colours the details toggle for contrast (isDark: $isDark)",
+    ({ isDark, expected }) => {
+      const appData = {
+        ...testAppData,
+        experience: [
+          { ...testAppData.experience[0], details: ["Built the thing"] },
+        ],
+      };
+
+      let tree: ReturnType<typeof TestRenderer.create> | undefined;
+
+      act(() => {
+        tree = TestRenderer.create(
+          <WnaExperienceSection
+            appColors={
+              {
+                isDark,
+                accent3: "#9ee",
+                accent1: "#dff",
+                accent5: "#0aa",
+                staticBlack: "#000",
+                accent7: "#366",
+                accent8: "#033",
+                coolgray1: "#fafafa",
+                coolgray2: "#ddd",
+                coolgray6: "#666",
+              } as never
+            }
+            appData={appData}
+            appStyle={
+              {
+                textNeutralSmall: {},
+                textMicro: {},
+                textNeutralMicro: {},
+              } as never
+            }
+            t={((value: string) => value) as never}
+          />,
+        );
+      });
+
+      const toggle = tree!.root
+        .findAllByType("span")
+        .find((node: RenderedTextNode) =>
+          flattenText(node.props.children).includes("actionShowDetails"),
+        );
+
+      expect(toggle!.props.style.color).toBe(expected);
+    },
+  );
+
   it("renders the company as a subtle link and opens the employer URL", async () => {
     const appData = {
       ...testAppData,
@@ -271,7 +332,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -359,7 +422,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -409,7 +474,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -457,7 +524,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -506,7 +575,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -572,7 +643,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -607,7 +680,8 @@ describe("WnaExperienceSection", () => {
 
     expect(textValues).toContain("Built the thing");
     expect(textValues).toContain("titleProjectTechstack");
-    expect(textValues).toContain("actionHideDetails ↑");
+    expect(textValues).toContain("actionHideDetails ");
+    expect(textValues).toContain("↑");
   });
 
   it("collapses the details again when the experience card is pressed twice", () => {
@@ -629,7 +703,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -673,7 +749,9 @@ describe("WnaExperienceSection", () => {
       ? detailsClip.props.style
       : [detailsClip.props.style];
 
-    expect(textValues).toContain("actionShowDetails ↓");
+    expect(textValues).toContain("actionShowDetails ");
+
+    expect(textValues).toContain("↓");
     expect(
       detailsClipStyle.some(
         (entry: { height?: number } | undefined) => entry?.height === 0,
@@ -694,7 +772,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -745,7 +825,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -819,7 +901,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -870,7 +954,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -906,7 +992,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -945,7 +1033,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -978,7 +1068,8 @@ describe("WnaExperienceSection", () => {
       .map((node: RenderedTextNode) => flattenText(node.props.children));
 
     expect(textValues).toContain(description);
-    expect(textValues).toContain("actionHideDetails ↑");
+    expect(textValues).toContain("actionHideDetails ");
+    expect(textValues).toContain("↑");
   });
 
   it("can render the detail view with all experience details open by default", () => {
@@ -1000,7 +1091,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -1032,7 +1125,8 @@ describe("WnaExperienceSection", () => {
     expect(textValues).toContain("Built the thing");
     expect(textValues).toContain("Improved the tests");
     expect(textValues).toContain("titleProjectTechstack");
-    expect(textValues).toContain("actionHideDetails ↑");
+    expect(textValues).toContain("actionHideDetails ");
+    expect(textValues).toContain("↑");
     expect(badges.map((badge: BadgeNode) => badge.props.text)).toEqual([
       "C#",
       ".NET",
@@ -1074,7 +1168,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -1138,7 +1234,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
@@ -1226,7 +1324,9 @@ describe("WnaExperienceSection", () => {
         <WnaExperienceSection
           appColors={
             {
+              accent1: "#dff",
               accent5: "#0aa",
+              staticBlack: "#000",
               coolgray1: "#fafafa",
               coolgray2: "#ddd",
               coolgray6: "#666",
