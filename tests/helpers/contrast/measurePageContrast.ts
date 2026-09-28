@@ -26,6 +26,7 @@ type TextBox = {
   height: number;
   fontSize: number;
   fontWeight: number;
+  isGraphic: boolean;
 };
 
 const HIDE_TEXT_STYLE_ID = "contrast-test-hide-text";
@@ -131,6 +132,7 @@ async function collectTextBoxes(page: Page): Promise<TextBox[]> {
           height: rect.height,
           fontSize: parseFloat(style.fontSize),
           fontWeight: Number(style.fontWeight) || 400,
+          isGraphic: element.closest('[aria-hidden="true"]') !== null,
         });
       }
     }
@@ -236,7 +238,11 @@ async function measureViewport(page: Page): Promise<ContrastFinding[]> {
       text: box.text,
       element: box.element,
       ratio: Math.round(measurement.ratio * 100) / 100,
-      required: requiredContrastRatio(box.fontSize, box.fontWeight),
+      required: requiredContrastRatio(
+        box.fontSize,
+        box.fontWeight,
+        box.isGraphic,
+      ),
       textColor: toHex(measurement.text),
       backgroundColor: toHex(measurement.background),
       fontSize: box.fontSize,

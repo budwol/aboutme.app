@@ -29,6 +29,7 @@ describe("contrast math", () => {
     expect(requiredContrastRatio(24, 400)).toBe(3);
     expect(requiredContrastRatio(19, 700)).toBe(3);
     expect(requiredContrastRatio(19, 600)).toBe(4.5);
+    expect(requiredContrastRatio(12, 400, true)).toBe(3);
   });
 
   it("formats colours as hex", () => {

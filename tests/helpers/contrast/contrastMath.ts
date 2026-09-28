@@ -14,8 +14,9 @@ export type TextContrastMeasurement = {
 const GLYPH_DIFF_THRESHOLD = 24;
 // Only the most strongly changed pixels are glyph cores; the rest are
 // antialiased edges that blend text and background and would understate
-// the contrast a reader actually sees.
-const GLYPH_CORE_SHARE = 0.25;
+// the contrast. At 10% the measured colour of 12px text matches its CSS
+// colour; a larger share read thin small text as up to ~15% too faint.
+const GLYPH_CORE_SHARE = 0.1;
 
 function channelToLinear(channel: number): number {
   const value = channel / 255;
@@ -37,14 +38,16 @@ export function contrastRatio(a: Rgb, b: Rgb): number {
 }
 
 // WCAG AA: 4.5:1 for body text, 3:1 for large text (at least 24px, or
-// at least 18.66px (14pt) when bold).
+// at least 18.66px (14pt) when bold). Glyphs used as icons (hidden from
+// assistive technology) are graphics and need 3:1 (WCAG 1.4.11).
 export function requiredContrastRatio(
   fontSizePx: number,
   fontWeight: number,
+  isGraphic = false,
 ): number {
   const isLarge =
     fontSizePx >= 24 || (fontSizePx >= 18.66 && fontWeight >= 700);
-  return isLarge ? 3 : 4.5;
+  return isGraphic || isLarge ? 3 : 4.5;
 }
 
 function meanColor(pixels: ArrayLike<number>, offsets: number[]): Rgb {
