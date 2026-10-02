@@ -23,6 +23,16 @@ npm run web
 
 That gets you from clone to a running template without wandering through the whole forest first.
 
+## How I Work with AI
+
+This app, like the private Wandertagebuch projects it presents, is built with AI coding agents, mainly Claude Code. The split is deliberate:
+
+- **Mine:** architecture, decisions and review. Every decision is written down as an [ADR](adr/README.md), and every commit is mine to answer for.
+- **The agent's:** implementation, tests, refactoring and review passes, guided by the review roles in [`skills/`](skills/README.md).
+- **Nobody's exception:** every change passes the same gates: 100% line and branch coverage, zero lint warnings, enforced layer boundaries, type checks, and the full CI chain with integration, E2E and security tests.
+
+That is why the commits carry no AI trailers: the involvement is stated here once, and the gates are what back it up. Details in [ADR 0031](adr/0031-ai-assisted-development-under-the-same-guardrails.md).
+
 ## Tech Stack
 
 This thing runs on plain React and Vite. No wizard cave, no enchanted build forest, just a web app with a few happy little layers and enough room to put a mountain where you want one.
