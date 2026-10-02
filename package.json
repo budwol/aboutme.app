@@ -14,7 +14,7 @@
     "generate:cv-pdf": "node ./scripts/generate-cv-pdf.cjs",
     "generate:application-package": "node ./scripts/generate-application-package.cjs",
     "init": "./init.sh",
-    "lint": "eslint ./src ./tests ./scripts --no-cache",
+    "lint": "eslint ./src ./tests ./scripts --no-cache --max-warnings=0",
     "lint-fix": "eslint ./src ./tests ./scripts --fix --no-cache",
     "prepare": "husky",
     "start": "npm run web",
