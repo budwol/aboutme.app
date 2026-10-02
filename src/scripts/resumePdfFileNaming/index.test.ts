@@ -16,7 +16,6 @@ const nodeUtil = require("util") as typeof import("util");
 
 const {
   buildAtsSkillList,
-  buildAtsSoftSkillList,
   buildGoogleMapsUrl,
   buildLocalizedNameList,
   buildPortfolioFileName,
@@ -34,7 +33,6 @@ const {
     options?: { ats?: boolean },
   ) => string;
   buildAtsSkillList: (group: unknown, levels?: unknown) => unknown[];
-  buildAtsSoftSkillList: (skills: unknown, lang: string) => unknown[];
   buildGoogleMapsUrl: (parts: string[]) => string | undefined;
   buildLocalizedNameList: (items: unknown, lang: string) => string[];
   buildSkillEntries: (
@@ -154,12 +152,6 @@ describe("resume PDF data helpers", () => {
       { name: "TypeScript", level: "mid" },
       { name: "Go", level: "mid" },
     ]);
-    expect(
-      buildAtsSoftSkillList(
-        { primary: [{ nameEn: "Clear", level: "expert" }] },
-        "en",
-      ),
-    ).toEqual([{ name: "Clear", level: "expert" }]);
     expect(buildLocalizedNameList([{ nameDe: "Klar" }], "en")).toEqual([
       "Klar",
     ]);

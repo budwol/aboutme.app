@@ -16,7 +16,7 @@ The designed resume (ADR 0010) is a two-column layout: a colored sidebar carries
 
 - Single column, full document width, top-to-bottom reading order — no sidebar, no absolute positioning.
 - No photo.
-- Proficiency shown as text (`"C# [Senior]"`) instead of a bar — `buildAtsSkillList`/`buildAtsSoftSkillList` produce `{ name, level }` pairs from the same `skillLevels` lookup and `softSkills` data ADR 0010 introduced, just rendered as a comma-separated line under each section instead of `drawSkillBarSection`'s bars. Tech-Stack and Tools show every item (primary and secondary together) rather than the designed version's curated, space-limited subset, since there's no sidebar height to protect here.
+- Proficiency shown as text (`"C# [Senior]"`) instead of a bar — `buildAtsSkillList` produces `{ name, level }` pairs from the same `skillLevels` lookup ADR 0010 introduced, just rendered as a comma-separated line under each section instead of `drawSkillBarSection`'s bars. Tech-Stack and Tools show every item (primary and secondary together) rather than the designed version's curated, space-limited subset, since there's no sidebar height to protect here. Soft skills carry no level and are a plain name list, like certificates.
 - Plain `Helvetica`, plain black text, standard section headings ("Kontakt", "Profil", "Tech-Stack", "Tools", "Soft Skills", "Berufserfahrung") reused from the same `LABELS` object as the designed PDF.
 - Bullets are a literal `"- "` prefix with no hanging-indent treatment — visual alignment doesn't matter for a document whose only job is to be text-extracted cleanly.
 

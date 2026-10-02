@@ -43,13 +43,11 @@
     "primary": [
       {
         "nameDe": "Kommunikationsstark",
-        "nameEn": "Strong Communicator",
-        "level": "mid"
+        "nameEn": "Strong Communicator"
       },
       {
         "nameDe": "Selbstorganisiert",
-        "nameEn": "Self-Organized",
-        "level": "senior"
+        "nameEn": "Self-Organized"
       }
     ]
   },

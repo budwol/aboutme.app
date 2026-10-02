@@ -472,20 +472,6 @@ function buildAtsSkillList(skillGroup, skillLevels) {
   }));
 }
 
-function buildAtsSoftSkillList(softSkills, lang) {
-  const primary = Array.isArray(softSkills?.primary) ? softSkills.primary : [];
-  return primary
-    .map((item) => ({
-      name:
-        (lang === "de" ? item?.nameDe : item?.nameEn) ??
-        item?.nameDe ??
-        item?.nameEn ??
-        "",
-      level: item?.level ?? DEFAULT_SKILL_LEVEL,
-    }))
-    .filter((entry) => entry.name !== "");
-}
-
 const GERMAN_DIACRITICS = {
   ä: "ae",
   ö: "oe",
@@ -1317,10 +1303,10 @@ function writeAtsResumePdf(filePath, data, lang) {
       labels.tools,
       buildAtsSkillList(data.tools ?? {}, data.skillLevels),
     );
-    drawAtsSkillLine(
+    drawAtsPlainList(
       doc,
       labels.softSkills,
-      buildAtsSoftSkillList(data.softSkills, lang),
+      buildLocalizedNameList(data.softSkills?.primary, lang),
     );
     drawAtsPlainList(
       doc,
@@ -1614,7 +1600,6 @@ async function generateResumePdf(rootDir, logger = console.log) {
 
 module.exports = {
   buildAtsSkillList,
-  buildAtsSoftSkillList,
   buildGoogleMapsUrl,
   buildLocalizedNameList,
   buildPortfolioFileName,

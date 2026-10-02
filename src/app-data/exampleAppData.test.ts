@@ -99,7 +99,6 @@ describe("app-data.example.json", () => {
     for (const skill of exampleAppData.softSkills.primary) {
       expect(skill.nameDe).toEqual(expect.any(String));
       expect(skill.nameEn).toEqual(expect.any(String));
-      expect(skill.level).toMatch(/^(junior|mid|senior|expert)$/);
     }
 
     for (const certificate of exampleAppData.certificates) {
