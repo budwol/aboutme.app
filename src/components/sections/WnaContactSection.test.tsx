@@ -57,7 +57,7 @@ describe("WnaContactSection", () => {
     navigate.mockImplementation(() => undefined);
   });
 
-  it("opens the social, phone and email URLs via Linking", async () => {
+  it("opens the social and email URLs via Linking", async () => {
     const appData = {
       ...testAppData,
       contact: {
@@ -65,7 +65,6 @@ describe("WnaContactSection", () => {
         github: "https://github.com/example",
         linkedin: "https://linkedin.com/in/example",
         xing: "https://xing.com/profile/example",
-        phone: "+4912345",
         email: "hello@example.com",
       },
     };
@@ -85,7 +84,7 @@ describe("WnaContactSection", () => {
 
     const buttons = testRenderer!.root.findAllByType("WnaButtonIcon");
 
-    expect(buttons).toHaveLength(6);
+    expect(buttons).toHaveLength(5);
     const actionContainer = testRenderer!.root
       .findAllByType("div")
       .find(
@@ -119,22 +118,17 @@ describe("WnaContactSection", () => {
     expect(canOpenURL).toHaveBeenNthCalledWith(3, appData.contact.xing);
     expect(canOpenURL).toHaveBeenNthCalledWith(
       4,
-      `tel:${appData.contact.phone}`,
-    );
-    expect(canOpenURL).toHaveBeenNthCalledWith(
-      5,
       `mailto:${appData.contact.email}`,
     );
 
     expect(openURL).toHaveBeenNthCalledWith(1, appData.contact.github);
     expect(openURL).toHaveBeenNthCalledWith(2, appData.contact.linkedin);
     expect(openURL).toHaveBeenNthCalledWith(3, appData.contact.xing);
-    expect(openURL).toHaveBeenNthCalledWith(4, `tel:${appData.contact.phone}`);
     expect(openURL).toHaveBeenNthCalledWith(
-      5,
+      4,
       `mailto:${appData.contact.email}`,
     );
-    expect(openURL).toHaveBeenCalledTimes(5);
+    expect(openURL).toHaveBeenCalledTimes(4);
     // The portfolio opens its own in-app detail page, not the raw PDF.
     expect(navigate).toHaveBeenCalledWith("/bewerbungsunterlagen/Portfolio");
   });
@@ -191,12 +185,11 @@ describe("WnaContactSection", () => {
     expect(openURL).toHaveBeenCalledWith(testAppData.contact.github);
   });
 
-  it("omits the phone and email buttons when contact info is missing", async () => {
+  it("omits the email button when the address is missing", async () => {
     const appData = {
       ...testAppData,
       contact: {
         ...testAppData.contact,
-        phone: undefined,
         email: undefined,
       },
     } as never;

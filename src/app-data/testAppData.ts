@@ -157,11 +157,8 @@ const exampleAppDataInput = {
     },
   ],
   contact: {
-    phone: "+491631737743",
     email: "tough.camel.mcew@hidingmail.com",
     addressCountry: "Deutschland",
-    addressStreet: "Straße 1",
-    addressZipCode: "01234",
     addressCity: "Berlin",
     github: "https://github.com/JohnDoe",
     xing: "https://xing.com/JohnDoe",

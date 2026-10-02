@@ -105,7 +105,6 @@ describe("WnaContactSection action integration", () => {
         github: "https://github.com/example",
         linkedin: "https://linkedin.com/in/example",
         xing: "https://xing.com/profile/example",
-        phone: "+4912345",
         email: "hello@example.com",
       },
     };
@@ -117,7 +116,7 @@ describe("WnaContactSection action integration", () => {
     const tree = await renderWithAppContext(<ContactCardHost />, { appData });
     const buttons = getActionButtons(tree);
 
-    expect(buttons).toHaveLength(6);
+    expect(buttons).toHaveLength(5);
 
     await act(async () => {
       await buttons[0].props.onPress();

@@ -35,7 +35,7 @@ export class ContactPage extends BasePage {
 
   async assertGermanContent() {
     await expect(this.body()).toContainText(exampleAppDataDe.contact.name);
-    await expect(this.body()).toContainText(exampleAppDataDe.contact.street);
+    await expect(this.body()).not.toContainText(exampleAppDataDe.legal.street);
     await expect(this.body()).toContainText(exampleAppDataDe.contact.city);
     await expect(this.body()).toContainText(exampleAppDataDe.contact.country);
 
@@ -46,7 +46,7 @@ export class ContactPage extends BasePage {
 
   async assertContent() {
     await expect(this.body()).toContainText(exampleAppData.contact.name);
-    await expect(this.body()).toContainText(exampleAppData.contact.street);
+    await expect(this.body()).not.toContainText(exampleAppData.legal.street);
     await expect(this.body()).toContainText(exampleAppData.contact.city);
     await expect(this.body()).toContainText(exampleAppData.contact.country);
 
@@ -84,16 +84,8 @@ export class ContactPage extends BasePage {
     await this.assertLastOpenedUrlMatches(/xing\.com/);
   }
 
-  async openCallAction() {
-    await this.actionButton(exampleAppData.contact.actions[3]).click();
-  }
-
-  async assertIsOnPhoneLink() {
-    await this.assertLastOpenedUrlMatches(/^tel:/);
-  }
-
   async openEmailAction() {
-    await this.actionButton(exampleAppData.contact.actions[4]).click();
+    await this.actionButton(exampleAppData.contact.actions[3]).click();
   }
 
   async assertIsOnEmailLink() {

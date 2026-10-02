@@ -12,6 +12,7 @@ const { syncWebAppData } =
     ) => {
       sourceFile: string;
       targetFile: string;
+      legalFile: string;
       sourceImagesDir: string;
       targetImagesDir: string;
       deployVersion: string;
@@ -30,7 +31,7 @@ describe("sync-web-app-data", () => {
     }
   });
 
-  it("copies .aboutme/app-data.json into public/app-data.json", () => {
+  it("writes the public app-data.json and legal.json from .aboutme/app-data.json", () => {
     const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aboutme-web-"));
     createdFixtures.push(fixtureRoot);
 
@@ -38,7 +39,19 @@ describe("sync-web-app-data", () => {
     fs.mkdirSync(sourceDir, { recursive: true });
     fs.writeFileSync(
       path.join(sourceDir, "app-data.json"),
-      JSON.stringify({ profile: { name: "Jane Example" } }, null, 2),
+      JSON.stringify(
+        {
+          profile: { name: "Jane Example" },
+          contact: {
+            phone: "+49 123",
+            addressStreet: "Straße 1",
+            addressZipCode: "01234",
+            addressCity: "Berlin",
+          },
+        },
+        null,
+        2,
+      ),
       "utf8",
     );
 
@@ -49,18 +62,27 @@ describe("sync-web-app-data", () => {
       path.join(fixtureRoot, "public", "app-data.json"),
     );
     expect(
-      fs.readFileSync(
-        path.join(fixtureRoot, "public", "app-data.json"),
-        "utf8",
+      JSON.parse(
+        fs.readFileSync(
+          path.join(fixtureRoot, "public", "app-data.json"),
+          "utf8",
+        ),
       ),
-    ).toBe(
-      fs.readFileSync(
-        path.join(fixtureRoot, ".aboutme", "app-data.json"),
-        "utf8",
-      ),
+    ).toEqual({
+      profile: { name: "Jane Example" },
+      contact: { addressCity: "Berlin" },
+    });
+    expect(result.legalFile).toBe(
+      path.join(fixtureRoot, "public", "legal.json"),
+    );
+    expect(JSON.parse(fs.readFileSync(result.legalFile, "utf8"))).toMatchObject(
+      { name: "Jane Example", addressStreet: "Straße 1" },
     );
     expect(logger).toHaveBeenCalledWith(
       "synced .aboutme/app-data.json -> public/app-data.json",
+    );
+    expect(logger).toHaveBeenCalledWith(
+      "synced .aboutme/app-data.json -> public/legal.json",
     );
     expect(logger).toHaveBeenCalledWith(
       "synced .aboutme/images -> public/images",

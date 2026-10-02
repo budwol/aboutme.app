@@ -22,6 +22,19 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+const mockLegalData = {
+  name: "Jane Example",
+  addressStreet: "Straße 1",
+  addressZipCode: "01234",
+  addressCity: "Berlin",
+  addressCountry: "Deutschland",
+  email: "jane@example.com",
+};
+
+jest.mock("@utils/legalData", () => ({
+  useLegalData: () => mockLegalData,
+}));
+
 jest.mock("@components/screens/legalContent", () => ({
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   buildDisclaimerHtml: require("@jest/globals").jest.fn(
@@ -48,7 +61,10 @@ describe("WnaDisclaimerRoute integration", () => {
     const tree = await renderWithAppContext(<WnaDisclaimerRoute />);
     const legalDocumentScreen = tree.root.findByType("WnaLegalDocumentScreen");
 
-    expect(buildDisclaimerHtml).toHaveBeenCalledWith(testAppData);
+    expect(buildDisclaimerHtml).toHaveBeenCalledWith(
+      testAppData,
+      mockLegalData,
+    );
     expect(legalDocumentScreen.props.headerTitle).toBe("screenTitleDisclaimer");
     expect(legalDocumentScreen.props.htmlContent).toBe("<p>Disclaimer</p>");
   });

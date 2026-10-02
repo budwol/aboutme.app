@@ -136,17 +136,20 @@ function buildExampleAppData(lang: "de" | "en") {
       title: common.screenTitleContact,
       subtitle: common.contactSubtitle.toUpperCase(),
       name: appDataExample.profile.name,
-      street: appDataExample.contact.addressStreet,
-      city: `${appDataExample.contact.addressZipCode} ${appDataExample.contact.addressCity}`,
+      city: appDataExample.contact.addressCity,
       country: appDataExample.contact.addressCountry,
       email: appDataExample.contact.email,
       actions: [
         common.actionGithub,
         common.actionLinkedin,
         common.actionXing,
-        common.actionPhoneCall,
         common.actionEmail,
       ],
+    },
+    // Only the imprint and privacy pages show these (legal.json, ADR 0032).
+    legal: {
+      street: appDataExample.contact.addressStreet,
+      city: `${appDataExample.contact.addressZipCode} ${appDataExample.contact.addressCity}`,
     },
     menu: {
       title: common.screenTitleMenuWithoutDots,

@@ -5,6 +5,7 @@ const os = require("os");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const PDFDocument = require("pdfkit");
+const { buildPublicAppData } = require("./public-app-data.cjs");
 const {
   mdiMapMarker,
   mdiPhone,
@@ -1545,7 +1546,12 @@ async function generateResumePdf(rootDir, logger = console.log) {
     );
   }
 
-  const data = JSON.parse(fs.readFileSync(sourceFile, "utf8"));
+  // The Portfolio PDFs are public downloads, so they get the same contact
+  // fields as the public app-data.json: no phone, no street, no ZIP code
+  // (ADR 0032). The protected CV keeps the full contact block.
+  const data = buildPublicAppData(
+    JSON.parse(fs.readFileSync(sourceFile, "utf8")),
+  );
   // DE and EN each get their own subfolder under public/ root: since
   // "Portfolio"/"Portfolio_ATS" is the same file name in both languages
   // (see buildPortfolioFileName), the folder is what actually disambiguates

@@ -7,6 +7,8 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 EXAMPLE_FILE="$ROOT_DIR/app-data.example.json"
 TARGET_FILE="$ROOT_DIR/public/app-data.json"
 BACKUP_FILE="/tmp/about-me-app-data.e2e.backup.json"
+LEGAL_FILE="$ROOT_DIR/public/legal.json"
+LEGAL_BACKUP_FILE="/tmp/about-me-legal.e2e.backup.json"
 
 load_env_file() {
   local file="$1"
@@ -25,6 +27,13 @@ restore() {
   else
     rm -f "$TARGET_FILE"
   fi
+
+  if [ -f "$LEGAL_BACKUP_FILE" ]; then
+    cp "$LEGAL_BACKUP_FILE" "$LEGAL_FILE"
+    rm -f "$LEGAL_BACKUP_FILE"
+  else
+    rm -f "$LEGAL_FILE"
+  fi
 }
 
 trap restore EXIT INT TERM
@@ -33,7 +42,12 @@ if [ -f "$TARGET_FILE" ]; then
   cp "$TARGET_FILE" "$BACKUP_FILE"
 fi
 
-cp "$EXAMPLE_FILE" "$TARGET_FILE"
+if [ -f "$LEGAL_FILE" ]; then
+  cp "$LEGAL_FILE" "$LEGAL_BACKUP_FILE"
+fi
+
+# Same public/private split as a real build (scripts/public-app-data.cjs).
+node "$ROOT_DIR/scripts/public-app-data.cjs" "$EXAMPLE_FILE" "$ROOT_DIR/public"
 
 # Clear out any stale production build so nothing shadows the dev server.
 rm -rf "$ROOT_DIR/dist"

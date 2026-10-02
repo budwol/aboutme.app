@@ -81,6 +81,12 @@ grep -rq "$APP_VERSION" dist/assets/*.js
 
 test -f dist/index.html
 test -f public/app-data.json
+test -f public/legal.json
+# The public data must not carry the private contact fields (ADR 0032).
+if grep -qE '"(phone|addressStreet|addressZipCode)": *' public/app-data.json; then
+  echo "public/app-data.json contains private contact fields" >&2
+  exit 1
+fi
 test -f public/site.webmanifest
 test -f public/sw.js
 test -f nginx/site.conf

@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const { execFileSync } = require("child_process");
+const { writePublicAppData } = require("./public-app-data.cjs");
 
 // Fixed, non-secret: with HTTP Basic Auth all the secrecy lives in the
 // password, not the username.
@@ -301,6 +302,13 @@ ${locationSecurityHeaders}
         add_header Cache-Control "no-store";
     }
 
+    # legal.json carries the street address for the imprint and privacy
+    # pages only (scripts/public-app-data.cjs) and is fetched the same way.
+    location = /legal.json {
+${locationSecurityHeaders}
+        add_header Cache-Control "no-store";
+    }
+
     # Document downloads (CV PDFs + the per-language ApplicationDocuments
     # ZIPs, see scripts/generate-cv-pdf.cjs / generate-application-package.cjs
     # and src/components/screens/WnaDownloadsRoute.tsx). This directory is
@@ -529,7 +537,6 @@ function runInitProcess(rootDir, options = {}) {
   const sourceAppDataFile = path.join(sourceDir, "app-data.json");
   const targetAppDataFile = path.join(rootDir, "app-data.json");
   const publicDir = path.join(rootDir, "public");
-  const publicAppDataFile = path.join(publicDir, "app-data.json");
   const publicImagesDir = path.join(publicDir, "images");
   const nginxConfFile = path.join(rootDir, "nginx", "site.conf");
   const htpasswdFile = path.join(rootDir, "nginx", ".htpasswd");
@@ -643,13 +650,16 @@ function runInitProcess(rootDir, options = {}) {
 
   if (!dryRun) {
     copyFile(sourceAppDataFile, targetAppDataFile);
-    copyFile(sourceAppDataFile, publicAppDataFile);
+    writePublicAppData(sourceAppDataFile, publicDir);
   }
   logger(
     `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> app-data.json`,
   );
   logger(
     `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> public/app-data.json`,
+  );
+  logger(
+    `${dryRun ? "would sync" : "synced"} .aboutme/app-data.json -> public/legal.json`,
   );
 
   const appData = readJson(

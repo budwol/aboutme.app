@@ -37,3 +37,4 @@ Format: concise ADR (Context / Decision / Consequences). Keep each record focuse
 | [0029](0029-projects-can-set-an-image-position.md)                | Projects can set the visible part of their image                                         |
 | [0030](0030-backdrop-blurs-stay-outside-other-backdrop-roots.md)  | Backdrop blurs stay outside other backdrop roots                                         |
 | [0031](0031-ai-assisted-development-under-the-same-guardrails.md) | AI-assisted development runs under the same guardrails                                   |
+| [0032](0032-private-contact-fields-stay-out-of-public-data.md)    | Private contact fields stay out of the public data                                       |

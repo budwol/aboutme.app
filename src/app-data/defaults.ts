@@ -48,11 +48,8 @@ export const defaultAppData: AppData = {
     },
   ],
   contact: {
-    phone: "0118999",
     email: "your@email.com",
     addressCountry: "Deutschland",
-    addressStreet: "Straße 1",
-    addressZipCode: "01234",
     addressCity: "Berlin",
     github: "https://github.com/budwol",
     xing: "https://xing.com",

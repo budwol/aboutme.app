@@ -22,6 +22,19 @@ jest.mock("react-i18next", () => ({
   }),
 }));
 
+const mockLegalData = {
+  name: "Jane Example",
+  addressStreet: "Straße 1",
+  addressZipCode: "01234",
+  addressCity: "Berlin",
+  addressCountry: "Deutschland",
+  email: "jane@example.com",
+};
+
+jest.mock("@utils/legalData", () => ({
+  useLegalData: () => mockLegalData,
+}));
+
 jest.mock("@components/screens/legalContent", () => ({
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   buildPrivacyHtml: require("@jest/globals").jest.fn(() => "<p>Privacy</p>"),
@@ -46,7 +59,7 @@ describe("WnaPrivacyRoute integration", () => {
     const tree = await renderWithAppContext(<WnaPrivacyRoute />);
     const legalDocumentScreen = tree.root.findByType("WnaLegalDocumentScreen");
 
-    expect(buildPrivacyHtml).toHaveBeenCalledWith(testAppData);
+    expect(buildPrivacyHtml).toHaveBeenCalledWith(testAppData, mockLegalData);
     expect(legalDocumentScreen.props.headerTitle).toBe("screenTitlePrivacy");
     expect(legalDocumentScreen.props.htmlContent).toBe("<p>Privacy</p>");
   });

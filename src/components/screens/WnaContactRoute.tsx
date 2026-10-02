@@ -87,13 +87,6 @@ export default function WnaContactRoute(): ReactNode {
               React.createElement(
                 "span",
                 { style: appStyle.textNeutralMedium as CSSProperties },
-                appData.contact.addressStreet,
-              ),
-              React.createElement(
-                "span",
-                { style: appStyle.textNeutralMedium as CSSProperties },
-                appData.contact.addressZipCode,
-                " ",
                 appData.contact.addressCity,
               ),
               React.createElement(

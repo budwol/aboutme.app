@@ -7,7 +7,6 @@ const i18nKeys = {
   actionInfo: "actionInfo",
   actionHideDetails: "actionHideDetails",
   actionLinkedin: "actionLinkedin",
-  actionPhoneCall: "actionPhoneCall",
   actionShowDetails: "actionShowDetails",
   actionShowMore: "actionShowMore",
   actionShowPassword: "actionShowPassword",

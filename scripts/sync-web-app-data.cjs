@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { writePublicAppData } = require("./public-app-data.cjs");
 
 function createDeployVersion() {
   return Date.now().toString(36);
@@ -64,17 +65,18 @@ function syncWebAppData(rootDir, logger = console.log) {
     );
   }
 
-  fs.mkdirSync(targetDir, { recursive: true });
-  fs.copyFileSync(sourceFile, targetFile);
+  const { legalFile } = writePublicAppData(sourceFile, targetDir);
   syncDirectory(sourceImagesDir, targetImagesDir);
   upsertEnvVarFile(envLocalFile, "EXPO_PUBLIC_DEPLOY_VERSION", deployVersion);
   logger("synced .aboutme/app-data.json -> public/app-data.json");
+  logger("synced .aboutme/app-data.json -> public/legal.json");
   logger("synced .aboutme/images -> public/images");
   logger("updated .env.local -> EXPO_PUBLIC_DEPLOY_VERSION");
 
   return {
     sourceFile,
     targetFile,
+    legalFile,
     sourceImagesDir,
     targetImagesDir,
     deployVersion,

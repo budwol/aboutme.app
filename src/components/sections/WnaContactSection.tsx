@@ -70,7 +70,6 @@ export default function WnaContactSection({
     }
   }, []);
 
-  const phone = appData?.contact?.phone;
   const email = appData?.contact?.email;
 
   return React.createElement(
@@ -126,21 +125,6 @@ export default function WnaContactSection({
           t={t}
         />,
       ),
-      phone &&
-        React.createElement(
-          "div",
-          { key: "phone", style: styles.actionItem },
-          <WnaButtonIcon
-            appColors={appColors}
-            appStyle={appStyle}
-            iconName={"phone"}
-            onPress={() => handleOpenUrl(`tel:${phone}`, "tel")}
-            checkInternetConnection={false}
-            toolTipPosition="top"
-            toolTip={t(i18nKeys.actionPhoneCall)}
-            t={t}
-          />,
-        ),
       email &&
         React.createElement(
           "div",

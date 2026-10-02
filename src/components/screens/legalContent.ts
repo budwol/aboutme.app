@@ -1,6 +1,7 @@
 import { AppData } from "@/app-data";
 import { getLangCode } from "@/i18n/i18n";
 import { escapeHtml } from "@utils/htmlSanitizer";
+import { LegalData } from "@utils/legalData";
 
 type SupportedLang = "de" | "en";
 
@@ -8,8 +9,38 @@ function getSupportedLang(lang = getLangCode()): SupportedLang {
   return lang === "de" ? "de" : "en";
 }
 
+// The street address comes from legal.json, not app-data.json (ADR 0032):
+// undefined while it loads, null if it could not be loaded.
+function buildPostalAddressHtml(
+  appData: AppData,
+  legalData: LegalData | null | undefined,
+  lang: SupportedLang,
+) {
+  const name = escapeHtml(appData.profile.name);
+
+  if (legalData === undefined) {
+    return `${name}<br/>${lang === "de" ? "Anschrift wird geladen …" : "Loading address …"}`;
+  }
+
+  if (legalData === null) {
+    return `${name}<br/>${
+      lang === "de"
+        ? "Die Anschrift konnte nicht geladen werden. Bitte per E-Mail anfragen."
+        : "The address could not be loaded. Please request it by e-mail."
+    }`;
+  }
+
+  return [
+    escapeHtml(legalData.name),
+    escapeHtml(legalData.addressStreet),
+    `${escapeHtml(legalData.addressZipCode)} ${escapeHtml(legalData.addressCity)}`,
+    escapeHtml(legalData.addressCountry),
+  ].join("<br/>");
+}
+
 export function buildDisclaimerHtml(
   appData: AppData,
+  legalData: LegalData | null | undefined,
   lang = getSupportedLang(),
 ) {
   if (lang === "en") {
@@ -19,15 +50,11 @@ export function buildDisclaimerHtml(
       <h3>Provider information pursuant to Section 5 DDG</h3>
       <p>
         <strong>Responsible for content:</strong><br/>
-        ${escapeHtml(appData.profile.name)}<br/>
-        ${escapeHtml(appData.contact.addressStreet)}<br/>
-        ${escapeHtml(appData.contact.addressZipCode)} ${escapeHtml(appData.contact.addressCity)}<br/>
-        ${escapeHtml(appData.contact.addressCountry)}
+        ${buildPostalAddressHtml(appData, legalData, "en")}
       </p>
 
       <h3>Contact</h3>
       <p>
-        Phone: ${escapeHtml(appData.contact.phone)}<br/>
         E-Mail: ${escapeHtml(appData.contact.email)}
       </p>
 
@@ -74,15 +101,11 @@ export function buildDisclaimerHtml(
     <h3>Angaben gemäß § 5 DDG</h3>
     <p>
       <strong>Verantwortlich für den Inhalt:</strong><br/>
-      ${escapeHtml(appData.profile.name)}<br/>
-      ${escapeHtml(appData.contact.addressStreet)}<br/>
-      ${escapeHtml(appData.contact.addressZipCode)} ${escapeHtml(appData.contact.addressCity)}<br/>
-      ${escapeHtml(appData.contact.addressCountry)}
+      ${buildPostalAddressHtml(appData, legalData, "de")}
     </p>
 
     <h3>Kontakt</h3>
     <p>
-      Telefon: ${escapeHtml(appData.contact.phone)}<br/>
       E-Mail: ${escapeHtml(appData.contact.email)}
     </p>
 
@@ -127,7 +150,11 @@ export function buildDisclaimerHtml(
   `;
 }
 
-export function buildPrivacyHtml(appData: AppData, lang = getSupportedLang()) {
+export function buildPrivacyHtml(
+  appData: AppData,
+  legalData: LegalData | null | undefined,
+  lang = getSupportedLang(),
+) {
   if (lang === "en") {
     return `
       <h2>Privacy Policy</h2>
@@ -139,11 +166,7 @@ export function buildPrivacyHtml(appData: AppData, lang = getSupportedLang()) {
 
       <h3>1. Controller</h3>
       <p>
-        ${escapeHtml(appData.profile.name)}<br/>
-        ${escapeHtml(appData.contact.addressStreet)}<br/>
-        ${escapeHtml(appData.contact.addressZipCode)} ${escapeHtml(appData.contact.addressCity)}<br/>
-        ${escapeHtml(appData.contact.addressCountry)}<br/>
-        Phone: ${escapeHtml(appData.contact.phone)}<br/>
+        ${buildPostalAddressHtml(appData, legalData, "en")}<br/>
         E-Mail: ${escapeHtml(appData.contact.email)}
       </p>
 
@@ -244,11 +267,7 @@ export function buildPrivacyHtml(appData: AppData, lang = getSupportedLang()) {
 
     <h3>1. Verantwortlicher</h3>
     <p>
-      ${escapeHtml(appData.profile.name)}<br/>
-      ${escapeHtml(appData.contact.addressStreet)}<br/>
-      ${escapeHtml(appData.contact.addressZipCode)} ${escapeHtml(appData.contact.addressCity)}<br/>
-      ${escapeHtml(appData.contact.addressCountry)}<br/>
-      Telefon: ${escapeHtml(appData.contact.phone)}<br/>
+      ${buildPostalAddressHtml(appData, legalData, "de")}<br/>
       E-Mail: ${escapeHtml(appData.contact.email)}
     </p>
 

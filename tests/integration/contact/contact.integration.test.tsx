@@ -92,14 +92,9 @@ describe("WnaContactRoute integration", () => {
 
     expect(scrollViewScreen.props.showContactFooter).toBe(false);
     expect(texts).toContain(testAppData.profile.name);
-    expect(texts).toContain(testAppData.contact.addressStreet);
-    expect(texts).toContainEqual(
-      expect.arrayContaining([
-        testAppData.contact.addressZipCode,
-        " ",
-        testAppData.contact.addressCity,
-      ]),
-    );
+    expect(texts).toContain(testAppData.contact.addressCity);
+    expect(texts).toContain(testAppData.contact.addressCountry);
+    expect(texts).not.toContain("Straße 1");
     expect(contactCard.props.appData.contact.email).toBe(
       testAppData.contact.email,
     );

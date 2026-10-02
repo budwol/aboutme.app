@@ -265,19 +265,10 @@ export function normalizeAppData(
       data.experience?.map((entry) => normalizeExperienceEntry(entry, lang)) ??
       defaultAppData.experience,
     contact: {
-      phone: asString(data.contact?.phone, defaultAppData.contact.phone),
       email: asString(data.contact?.email, defaultAppData.contact.email),
       addressCountry: asString(
         data.contact?.addressCountry,
         defaultAppData.contact.addressCountry,
-      ),
-      addressStreet: asString(
-        data.contact?.addressStreet,
-        defaultAppData.contact.addressStreet,
-      ),
-      addressZipCode: asString(
-        data.contact?.addressZipCode,
-        defaultAppData.contact.addressZipCode,
       ),
       addressCity: asString(
         data.contact?.addressCity,

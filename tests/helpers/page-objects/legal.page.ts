@@ -57,17 +57,22 @@ export class LegalPage extends BasePage {
       "Provider information pursuant to Section 5 DDG",
     );
     await expect(this.body()).toContainText(exampleAppData.contact.email);
+    await expect(this.body()).toContainText(exampleAppData.legal.street);
+    await expect(this.body()).toContainText(exampleAppData.legal.city);
   }
 
   async assertGermanDisclaimerContent() {
     await expect(this.body()).toContainText("Impressum");
     await expect(this.body()).toContainText("Angaben gemäß § 5 DDG");
     await expect(this.body()).toContainText(exampleAppDataDe.contact.email);
+    await expect(this.body()).toContainText(exampleAppDataDe.legal.street);
+    await expect(this.body()).toContainText(exampleAppDataDe.legal.city);
   }
 
   async assertPrivacyContent() {
     await expect(this.body()).toContainText("Privacy Policy");
     await expect(this.body()).toContainText("Controller");
+    await expect(this.body()).toContainText(exampleAppData.legal.street);
     await expect(this.body()).toContainText("Right to data portability");
   }
 

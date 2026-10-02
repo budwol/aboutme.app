@@ -2,6 +2,12 @@ import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import fs from "fs";
 import os from "os";
 import path from "path";
+/* eslint-disable @typescript-eslint/no-require-imports */
+const { buildPublicAppData } =
+  require("../../../scripts/public-app-data.cjs") as {
+    buildPublicAppData: (appData: unknown) => unknown;
+  };
+/* eslint-enable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const initProcessModule = require("../../../scripts/init-process.cjs") as {
   buildGeneratedFiles: (input: {
@@ -154,7 +160,7 @@ describe("init process security", () => {
       location.includes("add_header Cache-Control"),
     );
 
-    expect(cachedLocations).toHaveLength(7);
+    expect(cachedLocations).toHaveLength(8);
     for (const location of cachedLocations) {
       expect(location).toContain(
         "add_header 'X-Content-Type-Options' 'nosniff' always;",
@@ -356,6 +362,7 @@ function createFixtureRepo(): string {
   copyRepoScript(repoRoot, "scripts/svgToPng.sh", fixtureRoot);
   copyRepoScript(repoRoot, "scripts/resizeImage.sh", fixtureRoot);
   copyRepoScript(repoRoot, "scripts/init-process.cjs", fixtureRoot);
+  copyRepoScript(repoRoot, "scripts/public-app-data.cjs", fixtureRoot);
   copyRepoScript(repoRoot, "assets/defaults/logo.svg", fixtureRoot);
   copyRepoScript(repoRoot, "assets/defaults/bg.webp", fixtureRoot);
   copyRepoScript(
@@ -498,15 +505,24 @@ describe("init.sh", () => {
       ),
     );
     expect(
-      fs.readFileSync(
-        path.join(fixtureRoot, "public", "app-data.json"),
-        "utf8",
+      JSON.parse(
+        fs.readFileSync(
+          path.join(fixtureRoot, "public", "app-data.json"),
+          "utf8",
+        ),
       ),
-    ).toBe(
-      fs.readFileSync(
-        path.join(fixtureRoot, ".aboutme", "app-data.json"),
-        "utf8",
+    ).toEqual(
+      buildPublicAppData(
+        JSON.parse(
+          fs.readFileSync(
+            path.join(fixtureRoot, ".aboutme", "app-data.json"),
+            "utf8",
+          ),
+        ),
       ),
+    );
+    expect(fs.existsSync(path.join(fixtureRoot, "public", "legal.json"))).toBe(
+      true,
     );
     expect(
       fs.existsSync(path.join(fixtureRoot, "public", "site.webmanifest")),

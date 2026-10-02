@@ -60,12 +60,12 @@ export type AppData = {
   projectDetailsContext?: string;
   experience: ExperienceEntry[];
   experienceSubtitle?: string;
+  // Street, ZIP code and phone never reach the public app-data.json
+  // (scripts/public-app-data.cjs, ADR 0032); the imprint and privacy pages
+  // load the street address from legal.json instead (src/utils/legalData).
   contact: {
-    phone: string;
     email: string;
     addressCountry: string;
-    addressStreet: string;
-    addressZipCode: string;
     addressCity: string;
     github: string;
     xing: string;
